@@ -1,0 +1,279 @@
+{
+  "name": "ELITE AI - Post Call Processing",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "elevenlabs-post-call",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "elevenlabs-post-call"
+    },
+    {
+      "parameters": {
+        "respondWith": "noData",
+        "options": {}
+      },
+      "id": "respond-ok",
+      "name": "Respond 200 OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [220, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse data from ElevenLabs post-call webhook\n// ElevenLabs webhook format matches GET /conversations/{id} response\nconst raw = $input.all()[0].json;\n\n// Log all top-level keys for debugging\nconst topKeys = Object.keys(raw);\n\n// ElevenLabs sends data at top level OR nested under body/data\nconst body = raw.body || raw.data || raw;\n\n// conversation_id can be at top level or nested\nconst conversationId = body.conversation_id || raw.conversation_id || '';\n\n// transcript is an array of {role, message, time_in_call_secs}\nconst transcript = body.transcript || raw.transcript || [];\n\n// metadata contains call_duration_secs, start_time_unix_secs etc\nconst metadata = body.metadata || raw.metadata || {};\n\n// analysis contains call_successful, transcript_summary etc\nconst analysis = body.analysis || raw.analysis || {};\n\n// Format transcript as readable text for ChatGPT\nlet transcriptText = '';\ntranscript.forEach((entry, index) => {\n  const role = entry.role === 'agent' ? 'KLIENT (AI)' : 'MAKLÉŘ (Uživatel)';\n  const msg = entry.message || entry.text || '';\n  transcriptText += `${role}: ${msg}\\n\\n`;\n});\n\nreturn [{\n  json: {\n    conversationId,\n    transcript,\n    transcriptText,\n    transcriptLength: transcript.length,\n    metadata,\n    analysis,\n    durationSeconds: metadata.call_duration_secs || 0,\n    _debug_topKeys: topKeys,\n    _debug_hasBody: !!raw.body,\n    _debug_hasData: !!raw.data\n  }\n}];"
+      },
+      "id": "parse-webhook",
+      "name": "Parse Webhook Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 0]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "calls",
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": {
+                "key": "conversation_id",
+                "condition": "eq",
+                "value": "={{ $json.conversationId }}"
+              }
+            }
+          ]
+        },
+        "returnAll": false,
+        "limit": 1
+      },
+      "id": "find-call",
+      "name": "Find Call in Supabase",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [660, 0],
+      "credentials": {
+        "supabaseApi": {
+          "id": "SUPABASE_CREDENTIAL_ID",
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "Jsi expert na hodnocení obchodních hovorů v oblasti realitního trhu v České republice. Tvým úkolem je analyzovat tréninkový hovor mezi realitním makléřem a AI klientem. Odpovídej VŽDY v češtině. Odpovídej POUZE ve formátu JSON bez markdown bloků.",
+              "role": "system"
+            },
+            {
+              "content": "=Analyzuj následující tréninkový hovor realitního makléře.\n\nPŘEPIS HOVORU:\n{{ $node[\"Parse Webhook Data\"].json.transcriptText }}\n\nVrať POUZE validní JSON (bez ```json bloků) v tomto formátu:\n{\n  \"overall_score\": <číslo 0-100>,\n  \"strengths\": [\"silná stránka 1\", \"silná stránka 2\"],\n  \"improvements\": [\"oblast ke zlepšení 1\", \"oblast ke zlepšení 2\"],\n  \"filler_words\": [{\"word\": \"ehm\", \"count\": 2}],\n  \"recommendations\": [\"doporučení 1\", \"doporučení 2\"],\n  \"transcript_highlights\": [\n    {\"index\": 0, \"highlight\": null},\n    {\"index\": 1, \"highlight\": \"good\"},\n    {\"index\": 2, \"highlight\": \"mistake\"}\n  ]\n}\n\nHodnotící kritéria:\n1. Profesionální představení (0-15 bodů)\n2. Zjišťování potřeb klienta (0-20 bodů)\n3. Prezentace hodnoty služeb (0-20 bodů)\n4. Práce s námitkami (0-15 bodů)\n5. Uzavření / domluvení dalšího kroku (0-20 bodů)\n6. Komunikační dovednosti (0-10 bodů) - plynulost, výplňová slova, tón",
+              "role": "user"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.3,
+          "maxTokens": 2000
+        }
+      },
+      "id": "chatgpt-analysis",
+      "name": "ChatGPT Analysis",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [880, 0],
+      "credentials": {
+        "openAiApi": {
+          "id": "OPENAI_CREDENTIAL_ID",
+          "name": "OpenAI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse JSON from ChatGPT response\nconst item = $input.all()[0].json;\n\n// ChatGPT response can be in different fields depending on n8n version\nconst chatResponse = item.message?.content || item.text || item.content || JSON.stringify(item);\n\nlet analysis;\ntry {\n  // Remove potential markdown code blocks\n  let cleaned = chatResponse.replace(/```json\\n?/g, '').replace(/```\\n?/g, '').trim();\n  const jsonMatch = cleaned.match(/\\{[\\s\\S]*\\}/);\n  analysis = JSON.parse(jsonMatch ? jsonMatch[0] : cleaned);\n} catch (e) {\n  analysis = {\n    overall_score: 50,\n    strengths: [\"Analýza nebyla k dispozici\"],\n    improvements: [\"Zkuste hovor znovu\"],\n    filler_words: [],\n    recommendations: [\"Kontaktujte podporu, pokud problém přetrvává\"],\n    transcript_highlights: []\n  };\n}\n\n// Also pass through the call ID from earlier\nconst callId = $node[\"Find Call in Supabase\"].json.id || '';\n\nreturn [{ json: { analysis, callId } }];"
+      },
+      "id": "parse-chatgpt",
+      "name": "Parse ChatGPT Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1100, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare transcript rows for Supabase insert\nconst transcript = $node[\"Parse Webhook Data\"].json.transcript || [];\nconst highlights = $json.analysis.transcript_highlights || [];\nconst callId = $json.callId;\n\nif (!callId) {\n  return [{ json: { error: 'No call ID found' } }];\n}\n\nconst rows = transcript.map((entry, index) => {\n  const mins = Math.floor(index * 8 / 60);\n  const secs = (index * 8) % 60;\n  const timestamp = `${mins}:${secs.toString().padStart(2, '0')}`;\n  \n  const highlightEntry = highlights.find(h => h.index === index);\n  const highlightValue = highlightEntry ? highlightEntry.highlight : null;\n  \n  return {\n    json: {\n      call_id: callId,\n      speaker: entry.role === 'agent' ? 'ai' : 'user',\n      text: entry.message || '',\n      timestamp_label: timestamp,\n      highlight: highlightValue,\n      sort_order: index\n    }\n  };\n});\n\n// Return at least one item even if transcript is empty\nreturn rows.length > 0 ? rows : [{ json: { call_id: callId, speaker: 'ai', text: 'Prázdný přepis', timestamp_label: '0:00', highlight: null, sort_order: 0 } }];"
+      },
+      "id": "prepare-transcript",
+      "name": "Prepare Transcript Rows",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1320, -150]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "tableId": "transcripts",
+        "fieldsUi": {
+          "fieldValues": [
+            { "fieldName": "call_id", "fieldValue": "={{ $json.call_id }}" },
+            { "fieldName": "speaker", "fieldValue": "={{ $json.speaker }}" },
+            { "fieldName": "text", "fieldValue": "={{ $json.text }}" },
+            { "fieldName": "timestamp_label", "fieldValue": "={{ $json.timestamp_label }}" },
+            { "fieldName": "highlight", "fieldValue": "={{ $json.highlight }}" },
+            { "fieldName": "sort_order", "fieldValue": "={{ $json.sort_order }}" }
+          ]
+        }
+      },
+      "id": "store-transcript",
+      "name": "Store Transcript",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1540, -150],
+      "credentials": {
+        "supabaseApi": {
+          "id": "SUPABASE_CREDENTIAL_ID",
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "tableId": "feedback",
+        "fieldsUi": {
+          "fieldValues": [
+            { "fieldName": "call_id", "fieldValue": "={{ $json.callId }}" },
+            { "fieldName": "overall_score", "fieldValue": "={{ $json.analysis.overall_score }}" },
+            { "fieldName": "strengths", "fieldValue": "={{ JSON.stringify($json.analysis.strengths) }}" },
+            { "fieldName": "improvements", "fieldValue": "={{ JSON.stringify($json.analysis.improvements) }}" },
+            { "fieldName": "filler_words", "fieldValue": "={{ JSON.stringify($json.analysis.filler_words) }}" },
+            { "fieldName": "recommendations", "fieldValue": "={{ JSON.stringify($json.analysis.recommendations) }}" }
+          ]
+        }
+      },
+      "id": "store-feedback",
+      "name": "Store Feedback",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1320, 150],
+      "credentials": {
+        "supabaseApi": {
+          "id": "SUPABASE_CREDENTIAL_ID",
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "calls",
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": {
+                "key": "id",
+                "condition": "eq",
+                "value": "={{ $node[\"Parse ChatGPT Response\"].json.callId }}"
+              }
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            { "fieldName": "status", "fieldValue": "completed" },
+            { "fieldName": "success_rate", "fieldValue": "={{ $node[\"Parse ChatGPT Response\"].json.analysis.overall_score }}" },
+            { "fieldName": "updated_at", "fieldValue": "={{ new Date().toISOString() }}" }
+          ]
+        }
+      },
+      "id": "update-call-status",
+      "name": "Update Call Status",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1540, 150],
+      "credentials": {
+        "supabaseApi": {
+          "id": "SUPABASE_CREDENTIAL_ID",
+          "name": "Supabase"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          { "node": "Respond 200 OK", "type": "main", "index": 0 },
+          { "node": "Parse Webhook Data", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Respond 200 OK": {
+      "main": [[]]
+    },
+    "Parse Webhook Data": {
+      "main": [
+        [
+          { "node": "Find Call in Supabase", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Find Call in Supabase": {
+      "main": [
+        [
+          { "node": "ChatGPT Analysis", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "ChatGPT Analysis": {
+      "main": [
+        [
+          { "node": "Parse ChatGPT Response", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Parse ChatGPT Response": {
+      "main": [
+        [
+          { "node": "Prepare Transcript Rows", "type": "main", "index": 0 },
+          { "node": "Store Feedback", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Prepare Transcript Rows": {
+      "main": [
+        [
+          { "node": "Store Transcript", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Store Feedback": {
+      "main": [
+        [
+          { "node": "Update Call Status", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    { "name": "ELITE AI" }
+  ]
+}

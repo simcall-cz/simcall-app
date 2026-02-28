@@ -1,0 +1,95 @@
+import { NextRequest, NextResponse } from "next/server";
+import { createServerClient } from "@/lib/supabase";
+
+// GET /api/calls/[id] - Get a single call with transcript and feedback
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const supabase = createServerClient();
+
+    const { data: call, error: callError } = await supabase
+      .from("calls")
+      .select(
+        `
+        *,
+        agents:agent_id (*),
+        scenarios:scenario_id (*),
+        feedback (*),
+        transcripts (*)
+      `
+      )
+      .eq("id", id)
+      .order("sort_order", {
+        referencedTable: "transcripts",
+        ascending: true,
+      })
+      .single();
+
+    if (callError) {
+      return NextResponse.json(
+        { error: "Call not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ call });
+  } catch (err) {
+    console.error("GET /api/calls/[id] error:", err);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+// PATCH /api/calls/[id] - Update call status, duration, conversation_id etc
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const supabase = createServerClient();
+    const body = await request.json();
+
+    const allowedFields = [
+      "status",
+      "duration_seconds",
+      "conversation_id",
+      "success_rate",
+      "audio_url",
+    ];
+
+    const updateData: Record<string, unknown> = {
+      updated_at: new Date().toISOString(),
+    };
+
+    for (const field of allowedFields) {
+      if (body[field] !== undefined) {
+        updateData[field] = body[field];
+      }
+    }
+
+    const { data: call, error } = await supabase
+      .from("calls")
+      .update(updateData)
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ call });
+  } catch (err) {
+    console.error("PATCH /api/calls/[id] error:", err);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}

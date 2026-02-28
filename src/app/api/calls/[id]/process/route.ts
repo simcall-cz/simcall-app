@@ -1,0 +1,330 @@
+import { NextRequest, NextResponse } from "next/server";
+import { createServerClient } from "@/lib/supabase";
+
+/**
+ * POST /api/calls/[id]/process
+ *
+ * Server-side post-call processing:
+ * 1. Fetch conversation transcript from ElevenLabs API
+ * 2. Send transcript to OpenAI (GPT-4o) for analysis
+ * 3. Store transcript rows in Supabase
+ * 4. Store feedback/scoring in Supabase
+ * 5. Update call status to "completed"
+ *
+ * This replaces the fragile n8n webhook-based processing.
+ */
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+  const supabase = createServerClient();
+
+  // 1. Get the call record
+  const { data: call, error: callError } = await supabase
+    .from("calls")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (callError || !call) {
+    return NextResponse.json({ error: "Call not found" }, { status: 404 });
+  }
+
+  if (!call.conversation_id) {
+    return NextResponse.json(
+      { error: "No conversation_id on this call" },
+      { status: 400 }
+    );
+  }
+
+  try {
+    // 2. Fetch conversation from ElevenLabs API (with retries)
+    // After a call ends there can be a short delay before data is available
+    let conversationData: ElevenLabsConversation | null = null;
+
+    for (let attempt = 0; attempt < 6; attempt++) {
+      if (attempt > 0) {
+        // Wait progressively longer: 2s, 4s, 6s, 8s, 10s
+        await new Promise((r) => setTimeout(r, (attempt + 1) * 2000));
+      }
+
+      const elResponse = await fetch(
+        `https://api.elevenlabs.io/v1/convai/conversations/${call.conversation_id}`,
+        {
+          headers: {
+            "xi-api-key": process.env.ELEVENLABS_API_KEY!,
+          },
+        }
+      );
+
+      if (elResponse.ok) {
+        const data = await elResponse.json();
+        if (data.transcript && data.transcript.length > 0) {
+          conversationData = data;
+          break;
+        }
+        // Transcript might not be ready yet, retry
+        if (attempt < 5) continue;
+        // Last attempt - accept even empty transcript
+        conversationData = data;
+      } else {
+        console.error(
+          `ElevenLabs API attempt ${attempt + 1} failed:`,
+          elResponse.status
+        );
+      }
+    }
+
+    if (!conversationData) {
+      await supabase
+        .from("calls")
+        .update({ status: "failed", updated_at: new Date().toISOString() })
+        .eq("id", id);
+      return NextResponse.json(
+        { error: "Could not fetch conversation from ElevenLabs" },
+        { status: 502 }
+      );
+    }
+
+    const transcript: ElevenLabsTranscriptEntry[] =
+      conversationData.transcript || [];
+    const elMetadata = conversationData.metadata || {};
+
+    // 3. Format transcript as readable text for ChatGPT
+    let transcriptText = "";
+    transcript.forEach((entry) => {
+      const role =
+        entry.role === "agent" ? "KLIENT (AI)" : "MAKLER (Uzivatel)";
+      transcriptText += `${role}: ${entry.message}\n\n`;
+    });
+
+    // 4. Call OpenAI for analysis
+    let analysis: CallAnalysis | null = null;
+
+    if (process.env.OPENAI_API_KEY && transcriptText.trim().length > 20) {
+      try {
+        const openaiResponse = await fetch(
+          "https://api.openai.com/v1/chat/completions",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model: "gpt-4o",
+              temperature: 0.3,
+              max_tokens: 2000,
+              messages: [
+                {
+                  role: "system",
+                  content:
+                    'Jsi expert na hodnoceni obchodnich hovoru v oblasti realitniho trhu v Ceske republice. Analyzuj treninkovy hovor mezi realitnim maklerem a AI klientem. Odpovidej VZDY v cestine. Odpovidej POUZE ve formatu JSON bez markdown bloku.',
+                },
+                {
+                  role: "user",
+                  content: `Analyzuj nasledujici treninkovy hovor realitniho maklere.\n\nPREPIS HOVORU:\n${transcriptText}\n\nVrat POUZE validni JSON (bez \`\`\`json bloku) v tomto formatu:\n{\n  "overall_score": <cislo 0-100>,\n  "strengths": ["silna stranka 1", "silna stranka 2"],\n  "improvements": ["oblast ke zlepseni 1", "oblast ke zlepseni 2"],\n  "filler_words": [{"word": "ehm", "count": 2}],\n  "recommendations": ["doporuceni 1", "doporuceni 2"],\n  "transcript_highlights": [\n    {"index": 0, "highlight": null},\n    {"index": 1, "highlight": "good"},\n    {"index": 2, "highlight": "mistake"}\n  ]\n}\n\nHodnotici kriteria:\n1. Profesionalni predstaveni (0-15 bodu)\n2. Zjistovani potreb klienta (0-20 bodu)\n3. Prezentace hodnoty sluzeb (0-20 bodu)\n4. Prace s namitkami (0-15 bodu)\n5. Uzavreni / domluveni dalsiho kroku (0-20 bodu)\n6. Komunikacni dovednosti (0-10 bodu) - plynulost, vyplnova slova, ton`,
+                },
+              ],
+            }),
+          }
+        );
+
+        if (openaiResponse.ok) {
+          const data = await openaiResponse.json();
+          const content = data.choices?.[0]?.message?.content || "";
+          try {
+            const cleaned = content
+              .replace(/```json\n?/g, "")
+              .replace(/```\n?/g, "")
+              .trim();
+            const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+            analysis = JSON.parse(jsonMatch ? jsonMatch[0] : cleaned);
+          } catch (parseErr) {
+            console.error("Failed to parse ChatGPT JSON:", parseErr);
+          }
+        } else {
+          console.error("OpenAI API error:", openaiResponse.status);
+        }
+      } catch (aiErr) {
+        console.error("OpenAI call failed:", aiErr);
+      }
+    }
+
+    // 5. Fallback analysis if ChatGPT failed or no API key
+    if (!analysis) {
+      analysis = {
+        overall_score: 50,
+        strengths: ["Hovor byl dokoncen"],
+        improvements: [
+          "Pro detailni analyzu pridejte OPENAI_API_KEY do .env.local",
+        ],
+        filler_words: [],
+        recommendations: [
+          "Zkuste hovor znovu pro detailnejsi zpetnou vazbu",
+        ],
+        transcript_highlights: [],
+      };
+    }
+
+    // 6. Clean up old data (in case of re-processing)
+    await supabase.from("transcripts").delete().eq("call_id", id);
+    await supabase.from("feedback").delete().eq("call_id", id);
+
+    // 7. Store transcript rows in Supabase
+    const transcriptRows = transcript.map(
+      (entry: ElevenLabsTranscriptEntry, index: number) => {
+        const time = entry.time_in_call_secs || index * 8;
+        const mins = Math.floor(time / 60);
+        const secs = Math.floor(time % 60);
+
+        const highlightEntry = analysis!.transcript_highlights?.find(
+          (h: TranscriptHighlight) => h.index === index
+        );
+
+        return {
+          call_id: id,
+          speaker: entry.role === "agent" ? "ai" : "user",
+          text: entry.message || "",
+          timestamp_label: `${mins}:${secs.toString().padStart(2, "0")}`,
+          highlight: highlightEntry?.highlight || null,
+          sort_order: index,
+        };
+      }
+    );
+
+    if (transcriptRows.length > 0) {
+      const { error: transcriptError } = await supabase
+        .from("transcripts")
+        .insert(transcriptRows);
+      if (transcriptError) {
+        console.error("Failed to store transcript:", transcriptError);
+      }
+    }
+
+    // 8. Store feedback in Supabase
+    const { error: feedbackError } = await supabase.from("feedback").insert({
+      call_id: id,
+      overall_score: analysis.overall_score,
+      strengths: analysis.strengths,
+      improvements: analysis.improvements,
+      filler_words: analysis.filler_words,
+      recommendations: analysis.recommendations,
+    });
+    if (feedbackError) {
+      console.error("Failed to store feedback:", feedbackError);
+    }
+
+    // 9. Download and store audio recording from ElevenLabs
+    let audioUrl: string | null = null;
+
+    if (conversationData.has_audio) {
+      try {
+        const audioResponse = await fetch(
+          `https://api.elevenlabs.io/v1/convai/conversations/${call.conversation_id}/audio`,
+          {
+            headers: {
+              "xi-api-key": process.env.ELEVENLABS_API_KEY!,
+            },
+          }
+        );
+
+        if (audioResponse.ok) {
+          const audioBuffer = await audioResponse.arrayBuffer();
+          const fileName = `${id}.mp3`;
+
+          const { error: uploadError } = await supabase.storage
+            .from("call-recordings")
+            .upload(fileName, audioBuffer, {
+              contentType: "audio/mpeg",
+              upsert: true,
+            });
+
+          if (!uploadError) {
+            const { data: urlData } = supabase.storage
+              .from("call-recordings")
+              .getPublicUrl(fileName);
+            audioUrl = urlData.publicUrl;
+          } else {
+            console.error("Failed to upload audio:", uploadError);
+          }
+        }
+      } catch (audioErr) {
+        console.error("Failed to download audio:", audioErr);
+      }
+    }
+
+    // 10. Update call status to completed
+    const durationSeconds =
+      elMetadata.call_duration_secs || call.duration_seconds || 0;
+
+    const { error: updateError } = await supabase
+      .from("calls")
+      .update({
+        status: "completed",
+        success_rate: analysis.overall_score,
+        duration_seconds: Math.round(durationSeconds),
+        audio_url: audioUrl,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", id);
+
+    if (updateError) {
+      console.error("Failed to update call status:", updateError);
+    }
+
+    return NextResponse.json({
+      success: true,
+      overall_score: analysis.overall_score,
+      transcript_count: transcript.length,
+      duration_seconds: Math.round(durationSeconds),
+      audio_url: audioUrl,
+    });
+  } catch (err) {
+    console.error("Process call error:", err);
+    await supabase
+      .from("calls")
+      .update({ status: "failed", updated_at: new Date().toISOString() })
+      .eq("id", id);
+    return NextResponse.json(
+      { error: "Processing failed" },
+      { status: 500 }
+    );
+  }
+}
+
+// Type definitions for ElevenLabs API response
+interface ElevenLabsTranscriptEntry {
+  role: "agent" | "user";
+  message: string;
+  time_in_call_secs?: number;
+}
+
+interface ElevenLabsConversation {
+  conversation_id: string;
+  status: string;
+  transcript: ElevenLabsTranscriptEntry[];
+  has_audio?: boolean;
+  has_user_audio?: boolean;
+  has_response_audio?: boolean;
+  metadata?: {
+    call_duration_secs?: number;
+    start_time_unix_secs?: number;
+  };
+  analysis?: Record<string, unknown>;
+}
+
+interface TranscriptHighlight {
+  index: number;
+  highlight: "good" | "mistake" | null;
+}
+
+interface CallAnalysis {
+  overall_score: number;
+  strengths: string[];
+  improvements: string[];
+  filler_words: { word: string; count: number }[];
+  recommendations: string[];
+  transcript_highlights?: TranscriptHighlight[];
+}

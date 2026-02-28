@@ -1,0 +1,250 @@
+=========================================
+ELITE AI - n8n Workflow Setup Guide
+=========================================
+
+PŘEHLED:
+Po každém hovoru ElevenLabs odešle webhook s přepisem.
+n8n workflow zpracuje data, pošle přepis do ChatGPT pro analýzu,
+uloží nahrávku do Supabase Storage a výsledky do databáze.
+
+=========================================
+WORKFLOW: ElevenLabs Post-Call Processing
+=========================================
+
+TRIGGER: Webhook (POST)
+URL: https://VAS-N8N-URL/webhook/elevenlabs-post-call
+
+=========================================
+NODE 1: Webhook Trigger
+=========================================
+Type: Webhook
+Method: POST
+Path: elevenlabs-post-call
+Response Mode: Immediately (200 OK)
+
+Přijme JSON od ElevenLabs s:
+- conversation_id
+- transcript (pole zpráv)
+- metadata (agent_id, duration, atd.)
+- analysis (pokud je povolena)
+
+=========================================
+NODE 2: Parse Webhook Data
+=========================================
+Type: Code (JavaScript)
+
+const body = $input.all()[0].json;
+
+const conversationId = body.conversation_id;
+const transcript = body.transcript || [];
+const metadata = body.metadata || {};
+const analysis = body.analysis || {};
+
+// Formátování přepisu do čitelné podoby pro ChatGPT
+let transcriptText = '';
+transcript.forEach((entry, index) => {
+  const role = entry.role === 'agent' ? 'KLIENT (AI)' : 'MAKLÉŘ (Uživatel)';
+  transcriptText += `${role}: ${entry.message}\n\n`;
+});
+
+return [{
+  json: {
+    conversationId,
+    transcript,
+    transcriptText,
+    metadata,
+    analysis,
+    durationSeconds: metadata.call_duration_secs || 0
+  }
+}];
+
+=========================================
+NODE 3: Find Call in Supabase
+=========================================
+Type: Supabase
+Operation: Get Many Rows
+Table: calls
+Filter: conversation_id = {{ $json.conversationId }}
+Limit: 1
+
+=========================================
+NODE 4: ChatGPT Analysis
+=========================================
+Type: OpenAI Chat
+Model: gpt-4o
+Temperature: 0.3
+
+System Prompt:
+---
+Jsi expert na hodnocení obchodních hovorů v oblasti realitního trhu v České republice.
+Tvým úkolem je analyzovat tréninkový hovor mezi realitním makléřem a AI klientem.
+Odpovídej VŽDY v češtině. Odpovídej POUZE ve formátu JSON.
+---
+
+User Message:
+---
+Analyzuj následující tréninkový hovor realitního makléře.
+Hovor proběhl se scénářem: {{ $node["Find Call in Supabase"].json.scenarios?.title || "Neznámý scénář" }}
+AI klient: {{ $node["Find Call in Supabase"].json.agents?.name || "Neznámý" }} ({{ $node["Find Call in Supabase"].json.agents?.personality || "" }})
+
+PŘEPIS HOVORU:
+{{ $json.transcriptText }}
+
+Vrať POUZE validní JSON v tomto formátu:
+{
+  "overall_score": <číslo 0-100>,
+  "strengths": ["silná stránka 1", "silná stránka 2", ...],
+  "improvements": ["oblast ke zlepšení 1", "oblast ke zlepšení 2", ...],
+  "filler_words": [{"word": "ehm", "count": 2}, {"word": "jako", "count": 1}],
+  "recommendations": ["doporučení 1", "doporučení 2", ...],
+  "transcript_highlights": [
+    {"index": 0, "highlight": null},
+    {"index": 1, "highlight": "good"},
+    {"index": 2, "highlight": null},
+    {"index": 3, "highlight": "mistake"}
+  ]
+}
+
+Hodnotící kritéria:
+1. Profesionální představení (0-15 bodů)
+2. Zjišťování potřeb klienta (0-20 bodů)
+3. Prezentace hodnoty služeb (0-20 bodů)
+4. Práce s námitkami (0-15 bodů)
+5. Uzavření / domluvení dalšího kroku (0-20 bodů)
+6. Komunikační dovednosti (0-10 bodů) - plynulost, výplňová slova, tón
+---
+
+=========================================
+NODE 5: Parse ChatGPT Response
+=========================================
+Type: Code (JavaScript)
+
+const chatResponse = $input.all()[0].json.message.content;
+
+// Parse JSON from ChatGPT response
+let analysis;
+try {
+  // Handle potential markdown code blocks
+  const jsonMatch = chatResponse.match(/\{[\s\S]*\}/);
+  analysis = JSON.parse(jsonMatch ? jsonMatch[0] : chatResponse);
+} catch (e) {
+  analysis = {
+    overall_score: 50,
+    strengths: ["Analýza nebyla k dispozici"],
+    improvements: ["Zkuste hovor znovu"],
+    filler_words: [],
+    recommendations: ["Kontaktujte podporu, pokud problém přetrvává"],
+    transcript_highlights: []
+  };
+}
+
+return [{ json: { analysis } }];
+
+=========================================
+NODE 6: Download Audio from ElevenLabs
+=========================================
+Type: HTTP Request
+Method: GET
+URL: https://api.elevenlabs.io/v1/convai/conversations/{{ $node["Parse Webhook Data"].json.conversationId }}/audio
+Headers:
+  xi-api-key: {{ $credentials.elevenLabsApiKey }}
+Response Format: File (Binary)
+
+(Poznámka: Tento krok může selhat, pokud nahrávka není k dispozici.
+Přidejte Error Handling → Continue on Error)
+
+=========================================
+NODE 7: Upload Audio to Supabase Storage
+=========================================
+Type: Supabase
+Operation: Upload File
+Bucket: call-recordings
+File Path: {{ $node["Find Call in Supabase"].json.id }}/recording.mp3
+Binary Data: z předchozího uzlu
+
+(Pokud NODE 6 selhal, přeskočte tento uzel)
+
+=========================================
+NODE 8: Store Transcript in Supabase
+=========================================
+Type: Supabase
+Operation: Insert Rows
+Table: transcripts
+
+Data (pro každou zprávu v přepisu):
+Loop přes transcript pole a vloží řádky:
+- call_id: {{ $node["Find Call in Supabase"].json.id }}
+- speaker: "ai" nebo "user" (mapovat z role)
+- text: message text
+- timestamp_label: vypočítat z indexu
+- highlight: z ChatGPT analysis.transcript_highlights
+- sort_order: index
+
+(Použijte Code node pro přípravu dat, pak Supabase Insert)
+
+=========================================
+NODE 9: Store Feedback in Supabase
+=========================================
+Type: Supabase
+Operation: Insert Row
+Table: feedback
+
+Data:
+- call_id: {{ $node["Find Call in Supabase"].json.id }}
+- overall_score: {{ $node["Parse ChatGPT Response"].json.analysis.overall_score }}
+- strengths: {{ $node["Parse ChatGPT Response"].json.analysis.strengths }}
+- improvements: {{ $node["Parse ChatGPT Response"].json.analysis.improvements }}
+- filler_words: {{ $node["Parse ChatGPT Response"].json.analysis.filler_words }}
+- recommendations: {{ $node["Parse ChatGPT Response"].json.analysis.recommendations }}
+
+=========================================
+NODE 10: Update Call Status in Supabase
+=========================================
+Type: Supabase
+Operation: Update Row
+Table: calls
+Filter: id = {{ $node["Find Call in Supabase"].json.id }}
+
+Data:
+- status: "completed"
+- success_rate: {{ $node["Parse ChatGPT Response"].json.analysis.overall_score }}
+- audio_url: URL ze Supabase Storage (pokud upload úspěšný)
+- updated_at: NOW()
+
+=========================================
+NASTAVENÍ CREDENTIALS V n8n:
+=========================================
+
+1. ElevenLabs API Key:
+   - Credentials → Add → Header Auth
+   - Name: xi-api-key
+   - Value: váš ElevenLabs API key
+
+2. OpenAI (ChatGPT):
+   - Credentials → Add → OpenAI
+   - API Key: váš OpenAI API key
+
+3. Supabase:
+   - Credentials → Add → Supabase
+   - Host: váš Supabase URL (https://xxx.supabase.co)
+   - Service Role Key: váš service_role key
+
+=========================================
+ERROR HANDLING:
+=========================================
+
+- Přidejte Error Trigger workflow pro logování chyb
+- Každý uzel by měl mít Error Handling → Continue on Error
+- Pokud ChatGPT selže, uložte přepis s default hodnocením
+- Pokud audio download selže, pokračujte bez nahrávky
+
+=========================================
+TESTOVÁNÍ:
+=========================================
+
+1. Aktivujte webhook v n8n (Production mode)
+2. Zkopírujte webhook URL
+3. Nastavte ho v ElevenLabs Dashboard → Agent → Webhooks
+4. Proveďte testovací hovor
+5. Zkontrolujte n8n Executions pro výsledek
+6. Ověřte data v Supabase tabulkách
