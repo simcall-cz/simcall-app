@@ -66,6 +66,7 @@ export default function RegistracePage() {
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
+    phone: "",
     password: "",
     confirmPassword: "",
   });
@@ -111,6 +112,7 @@ export default function RegistracePage() {
         options: {
           data: {
             full_name: formData.fullName,
+            phone: formData.phone,
             role: selectedPlan,
           },
         },
@@ -127,12 +129,17 @@ export default function RegistracePage() {
 
       if (data.user) {
         // 2. Create profile in profiles table
-        await supabase.from("profiles").insert({
+        // Insert profile (phone column needs to be added in Supabase Dashboard)
+        const profileData: Record<string, string | null> = {
           id: data.user.id,
           email: formData.email,
           full_name: formData.fullName,
           role: selectedPlan,
-        });
+        };
+        if (formData.phone.trim()) {
+          profileData.phone = formData.phone.trim();
+        }
+        await supabase.from("profiles").insert(profileData);
 
         // 3. Redirect to dashboard
         router.push("/dashboard");
@@ -342,6 +349,29 @@ export default function RegistracePage() {
               placeholder="jan@example.com"
               className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
             />
+          </div>
+
+          {/* Phone */}
+          <div>
+            <label
+              htmlFor="phone"
+              className="mb-1.5 block text-sm font-medium text-neutral-700"
+            >
+              Telefonní číslo
+            </label>
+            <div className="relative">
+              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                autoComplete="tel"
+                value={formData.phone}
+                onChange={handleChange}
+                placeholder="+420 123 456 789"
+                className="w-full rounded-lg border border-neutral-300 pl-10 pr-4 py-2.5 text-sm text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+              />
+            </div>
           </div>
 
           {/* Password */}
