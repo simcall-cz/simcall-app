@@ -78,9 +78,7 @@ export default function FunkcePage() {
                 <GradientText>posunou dál</GradientText>
               </h1>
               <p className="mt-6 text-lg text-neutral-500 leading-relaxed max-w-2xl mx-auto">
-                Kompletní AI tréninková platforma navržená speciálně pro
-                realitní makléře. Od realistických hovorů přes detailní analýzu
-                až po gamifikaci, která vás bude motivovat každý den.
+                Kompletní AI tréninková platforma pro realitní makléře.
               </p>
             </div>
           </ScrollReveal>
@@ -127,7 +125,7 @@ export default function FunkcePage() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-neutral-500 leading-relaxed">
+                    <p className="text-sm text-neutral-500 leading-relaxed line-clamp-2">
                       {agent.description}
                     </p>
                     <div className="mt-4 flex flex-wrap gap-1.5">
@@ -560,14 +558,22 @@ export default function FunkcePage() {
                 Připraveni na lepší hovory?
               </h2>
               <p className="mt-4 text-lg text-neutral-400 leading-relaxed">
-                Vyzkoušejte ELITE AI zdarma na 14 dní a objevte všechny funkce,
-                které vám pomohou stát se lepším makléřem.
+                Vyzkoušejte ELITE AI zdarma. Bez závazků, bez kreditní karty.
               </p>
-              <div className="mt-8">
+              <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/demo">
                   <Button size="lg" className="group">
-                    Vyzkoušet zdarma
+                    Vyzkoušet demo
                     <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
+                <Link href="/cenik">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="border-neutral-700 text-neutral-300 hover:bg-neutral-800 hover:text-white hover:border-neutral-600"
+                  >
+                    Zobrazit ceník
                   </Button>
                 </Link>
               </div>

@@ -38,9 +38,9 @@ export function Footer() {
   return (
     <footer className="bg-neutral-900 text-white">
       <Container>
-        <div className="py-16">
+        <div className="py-10 sm:py-16">
           {/* Top Section */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-8 lg:gap-12">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-6 sm:gap-8 lg:gap-12">
             {/* Logo Column */}
             <div className="col-span-2 md:col-span-1">
               <Link href="/" className="flex items-center gap-0.5">

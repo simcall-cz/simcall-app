@@ -82,21 +82,20 @@ export default function NahravkyPage() {
 
                   {/* Info */}
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold text-neutral-800">{recording.memberName}</span>
-                      <span className="text-neutral-300">•</span>
-                      <span className="text-sm text-neutral-500">{recording.scenario}</span>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-semibold text-sm sm:text-base text-neutral-800 truncate">{recording.memberName}</span>
+                      <span className="text-neutral-300 hidden sm:inline">•</span>
+                      <span className="text-xs sm:text-sm text-neutral-500 truncate">{recording.scenario}</span>
                     </div>
-                    <div className="mt-1 flex items-center gap-3 text-xs text-neutral-400">
+                    <div className="mt-1 flex items-center gap-2 sm:gap-3 text-xs text-neutral-400 flex-wrap">
                       <span>
                         {new Date(recording.date).toLocaleDateString("cs-CZ", {
                           day: "numeric",
                           month: "short",
-                          year: "numeric",
                         })}
                       </span>
                       <span>{recording.duration}</span>
-                      <span>AI: {recording.agentName}</span>
+                      <span className="hidden sm:inline">AI: {recording.agentName}</span>
                     </div>
                   </div>
 
@@ -135,10 +134,10 @@ export default function NahravkyPage() {
                         {recording.transcript.slice(0, 4).map((entry, i) => (
                           <div
                             key={i}
-                            className={`rounded-lg p-3 text-sm ${
+                            className={`rounded-lg p-2.5 sm:p-3 text-sm ${
                               entry.speaker === "user"
-                                ? "ml-8 bg-primary-50 text-neutral-700"
-                                : "mr-8 bg-neutral-50 text-neutral-600"
+                                ? "ml-4 sm:ml-8 bg-primary-50 text-neutral-700"
+                                : "mr-4 sm:mr-8 bg-neutral-50 text-neutral-600"
                             } ${
                               entry.highlight === "good"
                                 ? "border-l-2 border-green-400"

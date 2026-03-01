@@ -67,45 +67,45 @@ export default function ProfilPage() {
 
       {/* Profile Card */}
       <Card>
-        <CardContent className="p-8">
-          <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
+        <CardContent className="p-5 sm:p-8">
+          <div className="flex flex-col items-center gap-4 sm:gap-6 sm:flex-row sm:items-start">
             {/* Avatar */}
-            <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-primary-500 text-3xl font-bold text-white">
+            <div className="flex h-20 w-20 sm:h-24 sm:w-24 shrink-0 items-center justify-center rounded-full bg-primary-500 text-2xl sm:text-3xl font-bold text-white">
               {agentProfile.avatarInitials}
             </div>
 
             {/* Info */}
-            <div className="flex-1 text-center sm:text-left">
-              <h2 className="text-2xl font-bold text-neutral-800">{agentProfile.name}</h2>
-              <p className="text-neutral-500">{agentProfile.email}</p>
-              <div className="mt-2 flex flex-wrap justify-center gap-2 sm:justify-start">
+            <div className="flex-1 text-center sm:text-left w-full">
+              <h2 className="text-xl sm:text-2xl font-bold text-neutral-800">{agentProfile.name}</h2>
+              <p className="text-sm sm:text-base text-neutral-500">{agentProfile.email}</p>
+              <div className="mt-2 flex flex-wrap justify-center gap-1.5 sm:gap-2 sm:justify-start">
                 <Badge>{agentProfile.role}</Badge>
                 <Badge variant="secondary">{agentProfile.company}</Badge>
-                <Badge variant="outline">{`Člen od ${memberSinceDate}`}</Badge>
+                <Badge variant="outline" className="text-xs">{`Člen od ${memberSinceDate}`}</Badge>
               </div>
 
               {/* Stats */}
-              <div className="mt-6 grid grid-cols-3 gap-4 rounded-xl bg-neutral-50 p-4">
+              <div className="mt-4 sm:mt-6 grid grid-cols-3 gap-2 sm:gap-4 rounded-xl bg-neutral-50 p-3 sm:p-4">
                 <div className="text-center">
-                  <div className="flex items-center justify-center gap-1 text-sm text-neutral-500">
-                    <Phone className="h-3.5 w-3.5" />
-                    Hovory
+                  <div className="flex items-center justify-center gap-1 text-xs sm:text-sm text-neutral-500">
+                    <Phone className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0" />
+                    <span>Hovory</span>
                   </div>
-                  <p className="text-2xl font-bold text-neutral-800">{agentProfile.totalCalls}</p>
+                  <p className="text-lg sm:text-2xl font-bold text-neutral-800">{agentProfile.totalCalls}</p>
                 </div>
                 <div className="text-center">
-                  <div className="flex items-center justify-center gap-1 text-sm text-neutral-500">
-                    <TrendingUp className="h-3.5 w-3.5" />
-                    Úspěšnost
+                  <div className="flex items-center justify-center gap-1 text-xs sm:text-sm text-neutral-500">
+                    <TrendingUp className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0" />
+                    <span>Úspěšnost</span>
                   </div>
-                  <p className="text-2xl font-bold text-primary-500">{agentProfile.avgSuccessRate}%</p>
+                  <p className="text-lg sm:text-2xl font-bold text-primary-500">{agentProfile.avgSuccessRate}%</p>
                 </div>
                 <div className="text-center">
-                  <div className="flex items-center justify-center gap-1 text-sm text-neutral-500">
-                    <Calendar className="h-3.5 w-3.5" />
-                    Tento týden
+                  <div className="flex items-center justify-center gap-1 text-xs sm:text-sm text-neutral-500">
+                    <Calendar className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0" />
+                    <span>Týden</span>
                   </div>
-                  <p className="text-2xl font-bold text-neutral-800">{agentProfile.callsThisWeek}</p>
+                  <p className="text-lg sm:text-2xl font-bold text-neutral-800">{agentProfile.callsThisWeek}</p>
                 </div>
               </div>
             </div>
@@ -166,10 +166,10 @@ export default function ProfilPage() {
                 { label: "Týdenní report", desc: "Souhrn výkonu každý pátek", checked: true },
                 { label: "Tipy ke zlepšení", desc: "AI doporučení na základě vašich hovorů", checked: false },
               ].map((pref) => (
-                <div key={pref.label} className="flex items-center justify-between rounded-lg border border-neutral-100 p-4">
-                  <div>
-                    <p className="font-medium text-neutral-800">{pref.label}</p>
-                    <p className="text-sm text-neutral-500">{pref.desc}</p>
+                <div key={pref.label} className="flex items-center justify-between gap-4 rounded-lg border border-neutral-100 p-3 sm:p-4">
+                  <div className="min-w-0">
+                    <p className="font-medium text-sm sm:text-base text-neutral-800">{pref.label}</p>
+                    <p className="text-xs sm:text-sm text-neutral-500 truncate">{pref.desc}</p>
                   </div>
                   <div
                     className={`h-6 w-11 rounded-full transition-colors ${

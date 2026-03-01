@@ -64,7 +64,7 @@ export function ActiveCall({
   }, [isSpeaking, phase]);
 
   return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center px-4">
+    <div className="flex min-h-[50vh] sm:min-h-[60vh] flex-col items-center justify-center px-3 sm:px-4">
       <AnimatePresence mode="wait">
         {/* Connecting State */}
         {phase === "connecting" && (
@@ -73,16 +73,16 @@ export function ActiveCall({
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            className="flex flex-col items-center gap-6 text-center"
+            className="flex flex-col items-center gap-4 sm:gap-6 text-center"
           >
             <div className="relative">
-              <div className="flex h-28 w-28 items-center justify-center rounded-full bg-neutral-100">
-                <span className="text-3xl font-bold text-neutral-600">
+              <div className="flex h-24 w-24 sm:h-28 sm:w-28 items-center justify-center rounded-full bg-neutral-100">
+                <span className="text-2xl sm:text-3xl font-bold text-neutral-600">
                   {agentInitials}
                 </span>
               </div>
-              <div className="absolute -right-1 -bottom-1 flex h-10 w-10 items-center justify-center rounded-full bg-amber-100">
-                <Loader2 className="h-5 w-5 animate-spin text-amber-600" />
+              <div className="absolute -right-1 -bottom-1 flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-amber-100">
+                <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin text-amber-600" />
               </div>
             </div>
             <div>
@@ -103,20 +103,20 @@ export function ActiveCall({
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            className="flex flex-col items-center gap-8 text-center"
+            className="flex flex-col items-center gap-5 sm:gap-8 text-center"
           >
             {/* Avatar with speaking indicator */}
             <div className="relative">
               <motion.div
                 animate={{ scale: pulseScale }}
                 transition={{ duration: 0.3 }}
-                className={`flex h-32 w-32 items-center justify-center rounded-full ${
+                className={`flex h-24 w-24 sm:h-32 sm:w-32 items-center justify-center rounded-full ${
                   isSpeaking
                     ? "bg-primary-100 ring-4 ring-primary-300"
                     : "bg-neutral-100"
                 }`}
               >
-                <span className="text-4xl font-bold text-neutral-700">
+                <span className="text-3xl sm:text-4xl font-bold text-neutral-700">
                   {agentInitials}
                 </span>
               </motion.div>
@@ -142,7 +142,7 @@ export function ActiveCall({
             </div>
 
             {/* Duration */}
-            <div className="font-mono text-4xl font-light tabular-nums text-neutral-900">
+            <div className="font-mono text-3xl sm:text-4xl font-light tabular-nums text-neutral-900">
               {formatDuration(duration)}
             </div>
 
@@ -158,7 +158,7 @@ export function ActiveCall({
             </div>
 
             {/* Call Controls */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-5 sm:gap-4">
               <button
                 onClick={onToggleMute}
                 className={`flex h-14 w-14 items-center justify-center rounded-full transition-colors ${
@@ -176,7 +176,7 @@ export function ActiveCall({
 
               <button
                 onClick={onEndCall}
-                className="flex h-16 w-16 items-center justify-center rounded-full bg-red-500 text-white shadow-lg transition-colors hover:bg-red-600"
+                className="flex h-16 w-16 items-center justify-center rounded-full bg-red-500 text-white shadow-lg transition-colors hover:bg-red-600 active:scale-95"
               >
                 <PhoneOff className="h-7 w-7" />
               </button>
@@ -214,11 +214,11 @@ export function ActiveCall({
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            className="flex flex-col items-center gap-6 text-center"
+            className="flex flex-col items-center gap-4 sm:gap-6 text-center"
           >
             <div className="relative">
-              <div className="flex h-28 w-28 items-center justify-center rounded-full bg-blue-50">
-                <Loader2 className="h-10 w-10 animate-spin text-blue-500" />
+              <div className="flex h-24 w-24 sm:h-28 sm:w-28 items-center justify-center rounded-full bg-blue-50">
+                <Loader2 className="h-8 w-8 sm:h-10 sm:w-10 animate-spin text-blue-500" />
               </div>
             </div>
             <div>
@@ -254,10 +254,10 @@ export function ActiveCall({
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            className="flex flex-col items-center gap-6 text-center"
+            className="flex flex-col items-center gap-4 sm:gap-6 text-center"
           >
-            <div className="flex h-28 w-28 items-center justify-center rounded-full bg-green-50">
-              <CheckCircle2 className="h-14 w-14 text-green-500" />
+            <div className="flex h-24 w-24 sm:h-28 sm:w-28 items-center justify-center rounded-full bg-green-50">
+              <CheckCircle2 className="h-12 w-12 sm:h-14 sm:w-14 text-green-500" />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-neutral-900">
@@ -283,10 +283,10 @@ export function ActiveCall({
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            className="flex flex-col items-center gap-6 text-center"
+            className="flex flex-col items-center gap-4 sm:gap-6 text-center"
           >
-            <div className="flex h-28 w-28 items-center justify-center rounded-full bg-red-50">
-              <AlertCircle className="h-14 w-14 text-red-500" />
+            <div className="flex h-24 w-24 sm:h-28 sm:w-28 items-center justify-center rounded-full bg-red-50">
+              <AlertCircle className="h-12 w-12 sm:h-14 sm:w-14 text-red-500" />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-neutral-900">

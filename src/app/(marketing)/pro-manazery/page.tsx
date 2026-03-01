@@ -43,22 +43,22 @@ const painPoints = [
   {
     title: "Nekonzistentní výkon týmu",
     description:
-      "Někteří makléři jsou hvězdy, jiní zaostávají. Nemáte nástroj, jak systematicky zvyšovat úroveň celého týmu.",
+      "Nemáte nástroj, jak systematicky zvyšovat úroveň celého týmu.",
   },
   {
-    title: "Nemožnost sledovat kvalitu hovorů",
+    title: "Nemožnost sledovat kvalitu",
     description:
-      "Nevíte, jak vaši makléři skutečně telefonují. Nemůžete odposlouchávat každý hovor a dávat zpětnou vazbu.",
+      "Nevíte, jak vaši makléři skutečně telefonují.",
   },
   {
     title: "Chybějící data pro hodnocení",
     description:
-      "Hodnotíte makléře podle výsledků, ale nemáte data o procesu. Nevíte, proč někdo nevykazuje lepší čísla.",
+      "Nemáte data o procesu, jen o výsledcích.",
   },
   {
-    title: "Drahé a neefektivní školení",
+    title: "Drahé školení",
     description:
-      "Tradiční školení jsou drahá, jednorázová a těžko měřitelná. Efekt vyprchá za pár týdnů a investice se nevrátí.",
+      "Jednorázová školení jsou drahá a efekt rychle vyprchá.",
   },
 ];
 
@@ -67,37 +67,37 @@ const managerFeatures = [
     icon: BarChart3,
     title: "Dashboard výkonnosti týmu",
     description:
-      "Přehledný dashboard s klíčovými metrikami celého týmu. Sledujte průměrné skóre, aktivitu a trendy na jednom místě.",
+      "Klíčové metriky celého týmu na jednom přehledném místě.",
   },
   {
     icon: Users,
     title: "Sledování jednotlivých makléřů",
     description:
-      "Detailní profil každého makléře s historií hovorů, silnými stránkami a oblastmi ke zlepšení.",
+      "Detailní profil každého makléře s historií hovorů a oblastmi ke zlepšení.",
   },
   {
     icon: Headphones,
     title: "Knihovna nahrávek",
     description:
-      "Přístup ke všem tréninkovým hovorům vašeho týmu. Poslechněte si nejlepší i nejhorší hovory a sdílejte příklady.",
+      "Přístup ke všem tréninkovým hovorům týmu s možností sdílení příkladů.",
   },
   {
     icon: ClipboardList,
     title: "Přiřazení tréninkového programu",
     description:
-      "Vytvářejte a přiřazujte tréninkové plány jednotlivým makléřům. Nastavte cíle a sledujte jejich plnění.",
+      "Tréninkové plány s cíli a sledováním plnění pro každého makléře.",
   },
   {
     icon: LineChart,
     title: "Srovnávací analytika",
     description:
-      "Porovnávejte výkonnost makléřů, identifikujte nejlepší praktiky a replikujte úspěch napříč týmem.",
+      "Porovnání výkonnosti makléřů a replikace nejlepších praktik.",
   },
   {
     icon: FileDown,
     title: "Export reportů",
     description:
-      "Generujte týdenní a měsíční reporty o výkonnosti týmu. Exportujte data pro firemní porady a hodnocení.",
+      "Týdenní a měsíční reporty pro firemní porady a hodnocení.",
   },
 ];
 
@@ -122,9 +122,7 @@ export default function ProManageryPage() {
                 <GradientText>novou úroveň</GradientText>
               </h1>
               <p className="mt-6 text-lg text-neutral-500 leading-relaxed max-w-2xl mx-auto">
-                Kompletní přehled o výkonnosti vašeho týmu. Sledujte pokrok,
-                identifikujte slabiny a trénujte makléře efektivněji než
-                kdykoliv předtím.
+                Kompletní přehled o výkonnosti vašeho týmu na jednom místě.
               </p>
               <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/demo">
@@ -193,7 +191,9 @@ export default function ProManageryPage() {
           </ScrollReveal>
 
           <ScrollReveal delay={0.1}>
-            <Card className="mt-12 max-w-5xl mx-auto overflow-hidden border-neutral-200">
+            <div className="mt-12 max-w-5xl mx-auto relative">
+              <Badge variant="secondary" className="absolute -top-3 left-6 z-10">Ukázkový přehled</Badge>
+            <Card className="overflow-hidden border-neutral-200">
               <CardContent className="p-6 sm:p-8">
                 {/* Team Summary Bar */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-neutral-100">
@@ -280,6 +280,7 @@ export default function ProManageryPage() {
                 </div>
               </CardContent>
             </Card>
+            </div>
           </ScrollReveal>
         </Container>
       </section>
@@ -472,11 +473,16 @@ export default function ProManageryPage() {
                 Domluvte si nezávaznou demo prezentaci a zjistěte, jak ELITE AI
                 pomůže právě vašemu týmu.
               </p>
-              <div className="mt-8">
+              <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/demo">
                   <Button size="lg" className="group">
                     Domluvit demo
                     <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
+                <Link href="/cenik">
+                  <Button variant="outline" size="lg" className="text-white border-white/20 hover:bg-white/10">
+                    Zobrazit ceník
                   </Button>
                 </Link>
               </div>

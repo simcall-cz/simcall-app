@@ -233,7 +233,7 @@ export default function StatistikyPage() {
                 <BarChart
                   data={performanceByCategory}
                   layout="vertical"
-                  margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
+                  margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
                 >
                   <CartesianGrid
                     strokeDasharray="3 3"
@@ -251,10 +251,10 @@ export default function StatistikyPage() {
                   <YAxis
                     type="category"
                     dataKey="category"
-                    tick={{ fontSize: 11, fill: "#6b7280" }}
+                    tick={{ fontSize: 10, fill: "#6b7280" }}
                     tickLine={false}
                     axisLine={{ stroke: "#e5e7eb" }}
-                    width={120}
+                    width={90}
                   />
                   <Tooltip
                     contentStyle={{
@@ -357,25 +357,25 @@ export default function StatistikyPage() {
           <CardTitle>Osobní rekordy</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
             {personalRecords.map((record) => (
               <div
                 key={record.label}
-                className="flex items-center gap-4 p-4 rounded-xl border border-neutral-100 bg-white"
+                className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl border border-neutral-100 bg-white"
               >
                 <div
-                  className={`flex items-center justify-center w-12 h-12 rounded-xl ${record.bg}`}
+                  className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl shrink-0 ${record.bg}`}
                 >
-                  <record.icon className={`w-6 h-6 ${record.color}`} />
+                  <record.icon className={`w-5 h-5 sm:w-6 sm:h-6 ${record.color}`} />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <p className="text-xs text-neutral-400 font-medium">
                     {record.label}
                   </p>
-                  <p className="text-base font-semibold text-neutral-900">
+                  <p className="text-sm sm:text-base font-semibold text-neutral-900 truncate">
                     {record.value}
                   </p>
-                  <p className="text-xs text-neutral-500">{record.detail}</p>
+                  <p className="text-xs text-neutral-500 truncate">{record.detail}</p>
                 </div>
               </div>
             ))}

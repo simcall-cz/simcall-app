@@ -196,42 +196,42 @@ export default function RegistracePage() {
               <button
                 key={plan.id}
                 onClick={() => setSelectedPlan(plan.id)}
-                className={`w-full text-left rounded-xl border-2 p-5 transition-all ${
+                className={`w-full text-left rounded-xl border-2 p-4 sm:p-5 transition-all ${
                   isSelected
                     ? "border-primary-500 bg-primary-50/50 shadow-sm"
                     : "border-neutral-200 bg-white hover:border-neutral-300"
                 }`}
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-start gap-2.5 sm:gap-3 min-w-0">
                     <div
-                      className={`flex h-10 w-10 items-center justify-center rounded-lg ${
+                      className={`flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg shrink-0 ${
                         isSelected
                           ? "bg-primary-500 text-white"
                           : "bg-neutral-100 text-neutral-500"
                       }`}
                     >
-                      <Icon className="h-5 w-5" />
+                      <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
                     </div>
-                    <div>
-                      <div className="flex items-center gap-2">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <h3 className="font-semibold text-neutral-900">
                           {plan.name}
                         </h3>
                         {plan.popular && (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-700">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-primary-100 px-2 py-0.5 text-[11px] font-medium text-primary-700">
                             <Sparkles className="h-3 w-3" />
                             Populární
                           </span>
                         )}
                       </div>
-                      <p className="text-sm text-neutral-500">
+                      <p className="text-xs sm:text-sm text-neutral-500">
                         {plan.description}
                       </p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-lg font-bold text-neutral-900">
+                  <div className="text-right shrink-0">
+                    <p className="text-base sm:text-lg font-bold text-neutral-900">
                       {plan.price}
                     </p>
                     <p className="text-xs text-neutral-400">{plan.period}</p>

@@ -42,22 +42,22 @@ const painPoints = [
   {
     title: "Nervozita při studeném volání",
     description:
-      "Strach zvednout telefon a zavolat neznámému člověku. Pocit nejistoty, co říct, když vám klient položí nečekanou otázku.",
+      "Nejistota, co říct, když klient položí nečekanou otázku.",
   },
   {
-    title: "Ztráta klientů kvůli nedostatečné přípravě",
+    title: "Ztráta klientů",
     description:
-      "Propásnete příležitosti, protože nevíte, jak reagovat na námitky. Konkurence je rychlejší a přesvědčivější.",
+      "Propásnuté příležitosti kvůli špatné reakci na námitky.",
   },
   {
-    title: "Žádná zpětná vazba na hovory",
+    title: "Žádná zpětná vazba",
     description:
-      "Nevíte, co děláte špatně a co dobře. Nikdo vám neřekne, kde se můžete zlepšit a jak na tom pracovat.",
+      "Nevíte, co děláte špatně a kde se můžete zlepšit.",
   },
   {
-    title: "Repetitivní chyby bez uvědomění",
+    title: "Repetitivní chyby",
     description:
-      "Opakujete stále stejné chyby, aniž byste si je uvědomovali. Používáte výplňová slova, váháte v klíčových momentech.",
+      "Výplňová slova a váhání v klíčových momentech hovoru.",
   },
 ];
 
@@ -66,25 +66,25 @@ const solutions = [
     icon: Headphones,
     title: "Trénujte bez stresu s AI",
     description:
-      "Procvičujte si hovory s 10 různými AI agenty, kteří simulují reálné klienty. Žádný strach z odmítnutí, žádné ztracené příležitosti. Trénujte, opakujte a zlepšujte se.",
+      "10 AI agentů simuluje reálné klienty. Trénujte, opakujte a zlepšujte se.",
   },
   {
     icon: BookOpen,
     title: "Připravte se na jakýkoli scénář",
     description:
-      "10 realistických scénářů pokrývá všechny situace: od horkých leadů přes cold cally až po vyjednávání o provizi. Buďte připraveni na cokoli.",
+      "Od horkých leadů přes cold cally až po vyjednávání o provizi.",
   },
   {
     icon: BarChart3,
     title: "Získejte okamžitou zpětnou vazbu",
     description:
-      "Po každém hovoru získáte detailní rozbor: skóre, přepis, silné stránky, oblasti ke zlepšení a konkrétní doporučení. Víte přesně, na čem pracovat.",
+      "Skóre, přepis, silné stránky a konkrétní doporučení po každém hovoru.",
   },
   {
     icon: Target,
     title: "Odhalte své slabiny automaticky",
     description:
-      "AI identifikuje výplňová slova, momenty váhání, chybějící closing techniky a další vzorce, které si sami neuvědomíte. Data mluví jasně.",
+      "AI identifikuje výplňová slova, váhání a chybějící techniky.",
   },
 ];
 
@@ -103,20 +103,18 @@ export default function ProMaklerePage() {
                 ve svém týmu
               </h1>
               <p className="mt-6 text-lg text-neutral-500 leading-relaxed max-w-2xl mx-auto">
-                Zlepšete své dovednosti v cold callingu, zvyšte konverze a
-                získejte sebevědomí při každém telefonátu. ELITE AI je váš
-                osobní trenér, který je k dispozici 24/7.
+                Váš osobní AI trenér pro cold calling. K dispozici 24/7.
               </p>
               <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/demo">
                   <Button size="lg" className="group">
-                    Vyzkoušet zdarma
+                    Vyzkoušet demo
                     <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
-                <Link href="/funkce">
+                <Link href="/cenik">
                   <Button variant="outline" size="lg">
-                    Prozkoumat funkce
+                    Zobrazit ceník
                   </Button>
                 </Link>
               </div>
@@ -369,7 +367,10 @@ export default function ProMaklerePage() {
           </ScrollReveal>
 
           <ScrollReveal delay={0.1}>
-            <Card className="mt-12 max-w-5xl mx-auto overflow-hidden border-neutral-200">
+            <Card className="mt-12 max-w-5xl mx-auto overflow-hidden border-neutral-200 relative">
+              <div className="absolute top-4 right-4 z-10">
+                <Badge variant="secondary" className="text-xs">Ukázkový dashboard</Badge>
+              </div>
               <CardContent className="p-6 sm:p-8">
                 {/* Stats Row */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
@@ -495,14 +496,22 @@ export default function ProMaklerePage() {
                 Začněte trénovat ještě dnes
               </h2>
               <p className="mt-4 text-lg text-neutral-400 leading-relaxed">
-                14 dní zdarma, bez platební karty. Zjistěte, jak moc se můžete
-                zlepšit za pouhé dva týdny.
+                Vyzkoušejte demo zdarma. Bez závazků, bez kreditní karty.
               </p>
-              <div className="mt-8">
+              <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/demo">
                   <Button size="lg" className="group">
-                    Vyzkoušet zdarma
+                    Vyzkoušet demo
                     <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
+                <Link href="/cenik">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="border-neutral-700 text-neutral-300 hover:bg-neutral-800 hover:text-white hover:border-neutral-600"
+                  >
+                    Zobrazit ceník
                   </Button>
                 </Link>
               </div>

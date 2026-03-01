@@ -1,314 +1,200 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
 import {
   ArrowRight,
-  Phone,
-  Target,
-  BarChart3,
-  Star,
   Mic,
   FileText,
+  BarChart3,
   TrendingUp,
-  Trophy,
+  User,
   Users,
+  Check,
+  Phone,
+  Sparkles,
+  Zap,
 } from "lucide-react";
 
 import { Container } from "@/components/shared/container";
 import { SectionHeader } from "@/components/shared/section-header";
 import { ScrollReveal } from "@/components/shared/scroll-reveal";
 import { GradientText } from "@/components/shared/gradient-text";
-import { IconBox } from "@/components/shared/icon-box";
-import { AnimatedCounter } from "@/components/shared/animated-counter";
-import { buttonVariants } from "@/components/ui/button";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 
-import { features } from "@/data/features";
+import { CallInterfaceMockup } from "@/components/marketing/call-interface-mockup";
+import { AnalyticsMockup } from "@/components/marketing/analytics-mockup";
+import { PricingTeaser } from "@/components/marketing/pricing-teaser";
+
 import { aiAgents } from "@/data/ai-agents";
-import { testimonials } from "@/data/testimonials";
 
 /* ------------------------------------------------------------------ */
-/*  Icon map for dynamic rendering from feature data                  */
+/*  Difficulty config                                                   */
 /* ------------------------------------------------------------------ */
-const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  Mic,
-  FileText,
-  BarChart3,
-  TrendingUp,
-  Trophy,
-  Users,
-};
+const difficultyColors = {
+  easy: "bg-green-500",
+  medium: "bg-yellow-500",
+  hard: "bg-red-500",
+} as const;
+
+const difficultyLabels = {
+  easy: "Snadný",
+  medium: "Střední",
+  hard: "Těžký",
+} as const;
 
 /* ------------------------------------------------------------------ */
-/*  Difficulty helpers                                                */
-/* ------------------------------------------------------------------ */
-const difficultyLabel: Record<string, string> = {
-  easy: "Snadn\u00fd",
-  medium: "St\u0159edn\u00ed",
-  hard: "T\u011b\u017ek\u00fd",
-};
-
-const difficultyVariant: Record<
-  string,
-  "success" | "warning" | "default"
-> = {
-  easy: "success",
-  medium: "warning",
-  hard: "default",
-};
-
-/* ------------------------------------------------------------------ */
-/*  How-it-works steps                                                */
+/*  Steps data                                                          */
 /* ------------------------------------------------------------------ */
 const steps = [
   {
-    number: "01",
-    icon: Target,
-    title: "Vyberte sc\u00e9n\u00e1\u0159",
-    description:
-      "Zvolte si z nab\u00eddky realistick\u00fdch situac\u00ed \u2014 osloven\u00ed studen\u00e9ho kontaktu, reakce na hork\u00fd lead, vyjedn\u00e1v\u00e1n\u00ed provize a dal\u0161\u00ed.",
-  },
-  {
-    number: "02",
+    num: "01",
     icon: Phone,
-    title: "Zavolejte AI agentovi",
-    description:
-      "Zahajte hovor s AI agentem, kter\u00fd reaguje v re\u00e1ln\u00e9m \u010dase. Ka\u017ed\u00fd agent m\u00e1 vlastn\u00ed osobnost, emoce a n\u00e1mitky.",
+    title: "Vyberte scénář",
+    desc: "Zvolte si typ hovoru a AI agenta, se kterým chcete trénovat.",
   },
   {
-    number: "03",
+    num: "02",
+    icon: Mic,
+    title: "Zavolejte AI agentovi",
+    desc: "Hovor probíhá v reálném čase přímo ve vašem prohlížeči.",
+  },
+  {
+    num: "03",
     icon: BarChart3,
-    title: "Z\u00edskejte zp\u011btnou vazbu",
-    description:
-      "Po hovoru obdr\u017e\u00edte detailn\u00ed anal\u00fdzu: p\u0159epis hovoru, hodnocen\u00ed \u00fasp\u011b\u0161nosti, siln\u00e9 str\u00e1nky a doporu\u010den\u00ed ke zlep\u0161en\u00ed.",
+    title: "Získejte zpětnou vazbu",
+    desc: "Okamžitá analýza se skóre, přepisem a doporučeními.",
   },
 ];
 
 /* ------------------------------------------------------------------ */
-/*  Stats                                                             */
+/*  Feature bullets                                                     */
 /* ------------------------------------------------------------------ */
-const stats = [
-  { target: 500, suffix: "+", label: "makl\u00e9\u0159\u016f" },
-  { target: 10000, suffix: "+", label: "hovor\u016f" },
-  { target: 85, suffix: "%", label: "\u00fasp\u011b\u0161nost" },
-  { target: 10, suffix: "", label: "AI agent\u016f" },
+const featureBullets = [
+  { icon: Mic, text: "10 AI agentů s vlastní osobností" },
+  { icon: FileText, text: "Realistické scénáře z praxe" },
+  { icon: BarChart3, text: "Detailní analýza po každém hovoru" },
+  { icon: TrendingUp, text: "Sledování pokroku v čase" },
 ];
 
 /* ------------------------------------------------------------------ */
-/*  Logo cloud companies                                              */
+/*  Page                                                                */
 /* ------------------------------------------------------------------ */
-const companies = [
-  "RE/MAX",
-  "Century 21",
-  "M&M Reality",
-  "Bezrealitky",
-  "Next Reality",
-];
-
-/* ================================================================== */
-/*  HomePage                                                          */
-/* ================================================================== */
 export default function HomePage() {
+  const showcaseAgents = aiAgents.slice(0, 5);
+
   return (
     <>
-      {/* ============================================================ */}
-      {/*  HERO SECTION                                                */}
-      {/* ============================================================ */}
-      <section className="relative overflow-hidden pt-20 pb-24 sm:pt-28 sm:pb-32">
-        {/* Subtle background decoration */}
+      {/* ============================================ */}
+      {/* HERO - Split layout                          */}
+      {/* ============================================ */}
+      <section className="relative overflow-hidden pt-16 pb-12 sm:pt-24 sm:pb-20 lg:pt-28 lg:pb-24">
+        {/* Background decoration */}
         <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-primary-50/60 blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-primary-50/40 blur-3xl" />
+          <div className="absolute top-20 right-0 w-[500px] h-[500px] rounded-full bg-primary-50/60 blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-primary-50/30 blur-3xl" />
         </div>
 
         <Container>
-          <div className="text-center max-w-4xl mx-auto">
-            <ScrollReveal>
-              <span className="inline-flex items-center rounded-full bg-primary-50 px-4 py-1.5 text-xs font-medium text-primary-700 ring-1 ring-primary-100 mb-6">
-                {`Nov\u00fd zp\u016fsob tr\u00e9ninku pro makl\u00e9\u0159e`}
-              </span>
-            </ScrollReveal>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            {/* Left: Text */}
+            <div>
+              <ScrollReveal>
+                <Badge className="mb-5">AI trénink pro realitní makléře</Badge>
+              </ScrollReveal>
 
-            <ScrollReveal delay={0.1}>
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-neutral-800 leading-[1.1]">
-                {`Tr\u00e9nujte obchodn\u00ed`}{" "}
-                <br className="hidden sm:block" />
-                {"hovory "}
-                <GradientText>{`s\u00a0AI.`}</GradientText>
-              </h1>
-            </ScrollReveal>
+              <ScrollReveal delay={0.1}>
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-neutral-800 leading-[1.1]">
+                  Trénujte hovory{" "}
+                  <GradientText>s&nbsp;AI.</GradientText>
+                </h1>
+              </ScrollReveal>
 
-            <ScrollReveal delay={0.2}>
-              <p className="mt-6 text-lg text-neutral-500 max-w-2xl mx-auto leading-relaxed">
-                {`Realitn\u00ed makl\u00e9\u0159i zvy\u0161uj\u00ed svou \u00fasp\u011b\u0161nost a\u017e o\u00a040\u00a0% d\u00edky tr\u00e9ninku s\u00a0AI agenty. Realistick\u00e9 simulace hovor\u016f, okam\u017eit\u00e1 zp\u011btn\u00e1 vazba a\u00a0personalizovan\u00e9 lekce\u00a0\u2014 v\u0161e na jednom m\u00edst\u011b.`}
-              </p>
-            </ScrollReveal>
-
-            <ScrollReveal delay={0.3}>
-              <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link
-                  href="/demo"
-                  className={cn(
-                    buttonVariants({ size: "lg" }),
-                    "group gap-2"
-                  )}
-                >
-                  {`Vyzkou\u0161et demo`}
-                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                </Link>
-                <Link
-                  href="/funkce"
-                  className={buttonVariants({
-                    variant: "outline",
-                    size: "lg",
-                  })}
-                >
-                  {`Zjistit v\u00edce`}
-                </Link>
-              </div>
-            </ScrollReveal>
-
-            {/* Hero mockup - decorative phone-call UI */}
-            <ScrollReveal delay={0.45}>
-              <div className="mt-16 mx-auto max-w-sm">
-                <div className="relative rounded-3xl bg-gradient-to-b from-neutral-900 to-neutral-800 p-6 shadow-2xl ring-1 ring-white/10">
-                  {/* Status bar */}
-                  <div className="flex items-center justify-between text-[11px] text-neutral-400 mb-6">
-                    <span>9:41</span>
-                    <div className="flex items-center gap-1.5">
-                      <span className="block w-4 h-2.5 rounded-sm border border-neutral-500" />
-                    </div>
-                  </div>
-
-                  {/* Avatar */}
-                  <div className="flex flex-col items-center">
-                    <div className="w-20 h-20 rounded-full bg-primary-500/20 flex items-center justify-center mb-4">
-                      <span className="text-2xl font-bold text-primary-400">
-                        JN
-                      </span>
-                    </div>
-                    <p className="text-white font-semibold text-lg">
-                      {`Jana Nov\u00e1kov\u00e1`}
-                    </p>
-                    <p className="text-neutral-400 text-sm mt-1">
-                      {`Skeptick\u00fd klient`}
-                    </p>
-
-                    {/* Timer */}
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 1.2, duration: 0.6 }}
-                      className="mt-6 text-3xl font-mono text-primary-400 tabular-nums"
+              <ScrollReveal delay={0.2}>
+                <ul className="mt-6 space-y-2.5">
+                  {[
+                    "Realistické simulace hovorů s AI agenty",
+                    "Okamžitá zpětná vazba a analýza",
+                    "Přepis, skóre a doporučení ke zlepšení",
+                  ].map((item) => (
+                    <li
+                      key={item}
+                      className="flex items-center gap-2.5 text-neutral-500"
                     >
-                      02:34
-                    </motion.div>
+                      <Check className="w-4 h-4 text-primary-500 shrink-0" />
+                      <span className="text-base sm:text-lg">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </ScrollReveal>
 
-                    {/* Waveform bars */}
-                    <div className="mt-6 flex items-end gap-1 h-8">
-                      {[3, 5, 8, 4, 7, 6, 3, 5, 7, 4, 6, 8, 5, 3, 6].map(
-                        (h, i) => (
-                          <motion.div
-                            key={i}
-                            className="w-1 rounded-full bg-primary-500/60"
-                            animate={{
-                              height: [
-                                `${h * 3}px`,
-                                `${h * 5}px`,
-                                `${h * 3}px`,
-                              ],
-                            }}
-                            transition={{
-                              duration: 0.8 + Math.random() * 0.4,
-                              repeat: Infinity,
-                              delay: i * 0.05,
-                            }}
-                          />
-                        )
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Call controls */}
-                  <div className="flex items-center justify-center gap-8 mt-8">
-                    <div className="w-12 h-12 rounded-full bg-neutral-700 flex items-center justify-center">
-                      <Mic className="w-5 h-5 text-white" />
-                    </div>
-                    <div className="w-14 h-14 rounded-full bg-red-500 flex items-center justify-center shadow-lg shadow-red-500/30">
-                      <Phone className="w-6 h-6 text-white rotate-[135deg]" />
-                    </div>
-                  </div>
+              <ScrollReveal delay={0.3}>
+                <div className="mt-8 flex flex-col sm:flex-row gap-3">
+                  <Link href="/demo">
+                    <Button size="lg" className="group w-full sm:w-auto">
+                      Vyzkoušet demo
+                      <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                  </Link>
+                  <Link href="/cenik">
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="w-full sm:w-auto"
+                    >
+                      Zobrazit ceník
+                    </Button>
+                  </Link>
                 </div>
-              </div>
-            </ScrollReveal>
+              </ScrollReveal>
+            </div>
+
+            {/* Right: Call Interface Mockup */}
+            <div className="flex justify-center lg:justify-end">
+              <CallInterfaceMockup />
+            </div>
           </div>
         </Container>
       </section>
 
-      {/* ============================================================ */}
-      {/*  LOGO CLOUD / SOCIAL PROOF                                   */}
-      {/* ============================================================ */}
-      <section className="py-12 border-y border-neutral-100 bg-neutral-25">
-        <Container>
-          <ScrollReveal>
-            <p className="text-center text-sm text-neutral-400 mb-8">
-              {`D\u016fv\u011b\u0159uje n\u00e1m p\u0159es 500+ makl\u00e9\u0159\u016f z\u00a0cel\u00e9 \u010cesk\u00e9 republiky`}
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-4">
-              {companies.map((name) => (
-                <span
-                  key={name}
-                  className="text-lg font-semibold text-neutral-300 select-none"
-                >
-                  {name}
-                </span>
-              ))}
-            </div>
-          </ScrollReveal>
-        </Container>
-      </section>
-
-      {/* ============================================================ */}
-      {/*  HOW IT WORKS                                                */}
-      {/* ============================================================ */}
-      <section className="py-24 sm:py-32">
+      {/* ============================================ */}
+      {/* HOW IT WORKS - 3 steps                       */}
+      {/* ============================================ */}
+      <section className="py-16 sm:py-24">
         <Container>
           <ScrollReveal>
             <SectionHeader
               badge="Jak to funguje"
-              title={`T\u0159i jednoduch\u00e9 kroky k lep\u0161\u00edm hovor\u016fm`}
+              title="Tři kroky k lepším hovorům"
             />
           </ScrollReveal>
 
-          <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-            {/* Connecting line (visible md+) */}
-            <div className="hidden md:block absolute top-14 left-[16.67%] right-[16.67%] h-px bg-neutral-200" />
-
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-4xl mx-auto">
             {steps.map((step, index) => (
-              <ScrollReveal key={step.number} delay={index * 0.15}>
-                <div className="relative text-center">
-                  {/* Step number box */}
-                  <div className="relative mx-auto w-28 h-28 rounded-2xl bg-white border border-neutral-100 shadow-card flex flex-col items-center justify-center mb-6">
-                    <span className="text-xs font-bold text-primary-500 mb-1">
-                      {step.number}
-                    </span>
-                    <step.icon className="w-7 h-7 text-neutral-700" />
+              <ScrollReveal key={step.num} delay={index * 0.1}>
+                <div className="relative text-center p-6 rounded-2xl border border-neutral-100 bg-white hover:shadow-lg transition-shadow">
+                  {/* Step number */}
+                  <span className="text-5xl font-black text-neutral-100">
+                    {step.num}
+                  </span>
+                  <div className="mt-2 flex justify-center">
+                    <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center">
+                      <step.icon className="w-5 h-5 text-primary-500" />
+                    </div>
                   </div>
-                  <h3 className="text-xl font-semibold text-neutral-800 mb-3">
+                  <h3 className="mt-3 font-semibold text-neutral-800">
                     {step.title}
                   </h3>
-                  <p className="text-neutral-500 leading-relaxed max-w-xs mx-auto">
-                    {step.description}
+                  <p className="mt-2 text-sm text-neutral-500 leading-relaxed">
+                    {step.desc}
                   </p>
+
+                  {/* Connecting arrow (hidden on last + mobile) */}
+                  {index < 2 && (
+                    <div className="hidden md:block absolute top-1/2 -right-4 sm:-right-5 -translate-y-1/2 text-neutral-200">
+                      <ArrowRight className="w-5 h-5" />
+                    </div>
+                  )}
                 </div>
               </ScrollReveal>
             ))}
@@ -316,240 +202,347 @@ export default function HomePage() {
         </Container>
       </section>
 
-      {/* ============================================================ */}
-      {/*  FEATURES GRID                                               */}
-      {/* ============================================================ */}
-      <section className="py-24 sm:py-32 bg-neutral-25">
+      {/* ============================================ */}
+      {/* PRODUCT SHOWCASE - Call Interface + Features  */}
+      {/* ============================================ */}
+      <section className="py-16 sm:py-24 bg-neutral-50/80">
         <Container>
-          <ScrollReveal>
-            <SectionHeader
-              badge="Funkce"
-              title={`V\u0161e co pot\u0159ebujete k lep\u0161\u00edm hovor\u016fm`}
-            />
-          </ScrollReveal>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            {/* Left: Mockup */}
+            <div className="flex justify-center order-2 lg:order-1">
+              <CallInterfaceMockup className="max-w-xs sm:max-w-sm" />
+            </div>
 
-          <div className="mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature, index) => {
-              const Icon = iconMap[feature.icon];
-              return (
-                <ScrollReveal key={feature.title} delay={index * 0.1}>
-                  <Card className="h-full p-6 transition-shadow duration-300 hover:shadow-card-hover">
-                    <CardHeader className="p-0 pb-4">
-                      <IconBox>
-                        {Icon ? (
-                          <Icon className="w-5 h-5" />
-                        ) : (
-                          <Mic className="w-5 h-5" />
-                        )}
-                      </IconBox>
-                    </CardHeader>
-                    <CardContent className="p-0">
-                      <CardTitle className="mb-2">{feature.title}</CardTitle>
-                      <CardDescription className="leading-relaxed">
-                        {feature.description}
-                      </CardDescription>
-                    </CardContent>
-                  </Card>
-                </ScrollReveal>
-              );
-            })}
+            {/* Right: Text */}
+            <div className="order-1 lg:order-2">
+              <ScrollReveal>
+                <Badge className="mb-4">Produkt</Badge>
+                <h2 className="text-3xl sm:text-4xl font-bold text-neutral-800 tracking-tight">
+                  Realistické hovory{" "}
+                  <GradientText>s AI agenty</GradientText>
+                </h2>
+                <p className="mt-3 text-neutral-500 leading-relaxed">
+                  10 unikátních osobností. Každý reaguje jinak, má vlastní
+                  námitky a komunikační styl.
+                </p>
+              </ScrollReveal>
+
+              <ScrollReveal delay={0.1}>
+                <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {featureBullets.map((f) => (
+                    <div
+                      key={f.text}
+                      className="flex items-start gap-3 p-3 rounded-xl bg-white border border-neutral-100"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center shrink-0">
+                        <f.icon className="w-4 h-4 text-primary-500" />
+                      </div>
+                      <span className="text-sm text-neutral-700 leading-snug mt-1">
+                        {f.text}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </ScrollReveal>
+
+              <ScrollReveal delay={0.2}>
+                <div className="mt-8 flex flex-col sm:flex-row gap-3">
+                  <Link href="/funkce">
+                    <Button variant="outline" className="group w-full sm:w-auto">
+                      Prozkoumat funkce
+                      <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                    </Button>
+                  </Link>
+                  <Link href="/demo">
+                    <Button className="w-full sm:w-auto">
+                      Vyzkoušet demo
+                    </Button>
+                  </Link>
+                </div>
+              </ScrollReveal>
+            </div>
           </div>
         </Container>
       </section>
 
-      {/* ============================================================ */}
-      {/*  AI AGENT SHOWCASE                                           */}
-      {/* ============================================================ */}
-      <section className="py-24 sm:py-32">
+      {/* ============================================ */}
+      {/* ANALYTICS SHOWCASE - Feedback mockup          */}
+      {/* ============================================ */}
+      <section className="py-16 sm:py-24 bg-neutral-900 relative overflow-hidden">
+        {/* Glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary-500/5 rounded-full blur-3xl pointer-events-none" />
+
+        <Container>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            {/* Left: Text */}
+            <div>
+              <ScrollReveal>
+                <Badge className="mb-4">Zpětná vazba</Badge>
+                <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
+                  Okamžitá analýza{" "}
+                  <span className="text-primary-400">každého hovoru</span>
+                </h2>
+                <p className="mt-4 text-neutral-400 leading-relaxed">
+                  Přepis, skóre, silné stránky i konkrétní doporučení ke
+                  zlepšení. Vše automaticky po každém hovoru.
+                </p>
+              </ScrollReveal>
+
+              <ScrollReveal delay={0.1}>
+                <ul className="mt-6 space-y-3">
+                  {[
+                    "Celkové skóre a splněné cíle",
+                    "Kompletní přepis hovoru",
+                    "Identifikace výplňových slov",
+                    "Konkrétní tipy ke zlepšení",
+                  ].map((item) => (
+                    <li
+                      key={item}
+                      className="flex items-center gap-2.5 text-neutral-300"
+                    >
+                      <Sparkles className="w-4 h-4 text-primary-400 shrink-0" />
+                      <span className="text-sm">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </ScrollReveal>
+
+              <ScrollReveal delay={0.2}>
+                <div className="mt-8">
+                  <Link href="/funkce">
+                    <Button
+                      variant="outline"
+                      className="border-neutral-700 text-neutral-300 hover:bg-neutral-800 hover:text-white hover:border-neutral-600 group"
+                    >
+                      Zjistit více
+                      <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                    </Button>
+                  </Link>
+                </div>
+              </ScrollReveal>
+            </div>
+
+            {/* Right: Analytics Mockup */}
+            <div className="flex justify-center">
+              <AnalyticsMockup className="max-w-sm w-full" />
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      {/* ============================================ */}
+      {/* AUDIENCE SPLIT - Pro makléře / Pro manažery   */}
+      {/* ============================================ */}
+      <section className="py-16 sm:py-24">
+        <Container>
+          <ScrollReveal>
+            <SectionHeader
+              badge="Pro koho je ELITE AI"
+              title="Řešení pro makléře i manažery"
+            />
+          </ScrollReveal>
+
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            {/* Pro makléře */}
+            <ScrollReveal delay={0.05}>
+              <div className="h-full rounded-2xl border border-neutral-200 bg-white p-6 sm:p-8 hover:shadow-lg transition-shadow group relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-500 to-primary-400" />
+                <div className="w-12 h-12 rounded-xl bg-primary-50 flex items-center justify-center mb-5">
+                  <User className="w-6 h-6 text-primary-500" />
+                </div>
+                <h3 className="text-xl font-bold text-neutral-800">
+                  Pro makléře
+                </h3>
+                <ul className="mt-4 space-y-2.5">
+                  {[
+                    "Trénujte bez stresu, kdykoliv",
+                    "Získejte okamžitou zpětnou vazbu",
+                    "Zlepšujte se s každým hovorem",
+                  ].map((item) => (
+                    <li
+                      key={item}
+                      className="flex items-center gap-2 text-sm text-neutral-600"
+                    >
+                      <Check className="w-4 h-4 text-green-500 shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  href="/pro-maklere"
+                  className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-primary-500 hover:text-primary-600 transition-colors group"
+                >
+                  Více pro makléře
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+              </div>
+            </ScrollReveal>
+
+            {/* Pro manažery */}
+            <ScrollReveal delay={0.1}>
+              <div className="h-full rounded-2xl border border-neutral-200 bg-white p-6 sm:p-8 hover:shadow-lg transition-shadow group relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-blue-400" />
+                <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mb-5">
+                  <Users className="w-6 h-6 text-blue-500" />
+                </div>
+                <h3 className="text-xl font-bold text-neutral-800">
+                  Pro manažery
+                </h3>
+                <ul className="mt-4 space-y-2.5">
+                  {[
+                    "Přehled o výkonnosti celého týmu",
+                    "Data pro efektivní koučink",
+                    "Měřitelná návratnost investice",
+                  ].map((item) => (
+                    <li
+                      key={item}
+                      className="flex items-center gap-2 text-sm text-neutral-600"
+                    >
+                      <Check className="w-4 h-4 text-green-500 shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  href="/pro-manazery"
+                  className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-blue-500 hover:text-blue-600 transition-colors group"
+                >
+                  Více pro manažery
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+              </div>
+            </ScrollReveal>
+          </div>
+        </Container>
+      </section>
+
+      {/* ============================================ */}
+      {/* AI AGENTS - Compact avatar strip              */}
+      {/* ============================================ */}
+      <section className="py-16 sm:py-24 bg-neutral-50/80">
         <Container>
           <ScrollReveal>
             <SectionHeader
               badge="AI Agenti"
-              title={`Poznejte na\u0161e AI agenty`}
-              subtitle={`Ka\u017ed\u00fd agent m\u00e1 svou osobnost, emoce a komunika\u010dn\u00ed styl`}
+              title="10 unikátních osobností"
+              subtitle="Od skeptických klientů po investory. Připravte se na cokoli."
             />
           </ScrollReveal>
 
-          <div className="mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {aiAgents.slice(0, 4).map((agent, index) => (
-              <ScrollReveal key={agent.id} delay={index * 0.1}>
-                <Card className="h-full p-6 transition-shadow duration-300 hover:shadow-card-hover">
-                  <div className="flex items-center gap-4 mb-4">
-                    {/* Avatar */}
-                    <div className="w-12 h-12 rounded-full bg-primary-50 flex items-center justify-center shrink-0">
-                      <span className="text-sm font-bold text-primary-600">
-                        {agent.avatarInitials}
-                      </span>
-                    </div>
-                    <div className="min-w-0">
-                      <p className="font-semibold text-neutral-800 truncate">
-                        {agent.name}
-                      </p>
-                      <Badge variant="secondary" className="mt-1">
-                        {agent.personality}
-                      </Badge>
-                    </div>
-                  </div>
-
-                  {/* Difficulty */}
-                  <Badge
-                    variant={difficultyVariant[agent.difficulty]}
-                    className="mb-3"
+          <div className="mt-12 flex flex-wrap justify-center gap-6 sm:gap-8 max-w-3xl mx-auto">
+            {showcaseAgents.map((agent, index) => (
+              <ScrollReveal key={agent.id} delay={index * 0.05}>
+                <div className="flex flex-col items-center group">
+                  <div
+                    className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full ${difficultyColors[agent.difficulty]} text-white flex items-center justify-center text-lg sm:text-xl font-bold shadow-lg group-hover:scale-110 transition-transform`}
                   >
-                    {difficultyLabel[agent.difficulty]}
-                  </Badge>
-
-                  {/* Description (truncated) */}
-                  <p className="text-sm text-neutral-500 leading-relaxed line-clamp-3 mb-4">
-                    {agent.description}
-                  </p>
-
-                  {/* Traits */}
-                  <div className="flex flex-wrap gap-1.5">
-                    {agent.traits.slice(0, 3).map((trait) => (
-                      <Badge
-                        key={trait}
-                        variant="outline"
-                        className="text-[11px]"
-                      >
-                        {trait}
-                      </Badge>
-                    ))}
+                    {agent.avatarInitials}
                   </div>
-                </Card>
+                  <p className="mt-2.5 text-sm font-medium text-neutral-800 text-center">
+                    {agent.name}
+                  </p>
+                  <span
+                    className={`mt-1 text-[11px] px-2 py-0.5 rounded-full font-medium ${
+                      agent.difficulty === "easy"
+                        ? "bg-green-100 text-green-700"
+                        : agent.difficulty === "medium"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    {difficultyLabels[agent.difficulty]}
+                  </span>
+                </div>
               </ScrollReveal>
             ))}
+
+            {/* +5 more indicator */}
+            <ScrollReveal delay={0.3}>
+              <div className="flex flex-col items-center">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-neutral-200 text-neutral-500 flex items-center justify-center text-lg font-bold">
+                  +5
+                </div>
+                <p className="mt-2.5 text-sm font-medium text-neutral-500 text-center">
+                  dalších
+                </p>
+              </div>
+            </ScrollReveal>
           </div>
 
-          <ScrollReveal delay={0.3}>
-            <div className="mt-12 text-center">
-              <Link
-                href="/funkce"
-                className={cn(
-                  buttonVariants({ variant: "outline" }),
-                  "group gap-2"
-                )}
-              >
-                {`Zobrazit v\u0161echny agenty`}
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+          <ScrollReveal delay={0.35}>
+            <div className="mt-10 text-center">
+              <Link href="/funkce">
+                <Button variant="outline" className="group">
+                  Zobrazit všechny agenty
+                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                </Button>
               </Link>
             </div>
           </ScrollReveal>
         </Container>
       </section>
 
-      {/* ============================================================ */}
-      {/*  STATISTICS COUNTER                                          */}
-      {/* ============================================================ */}
-      <section className="py-20 sm:py-24 bg-neutral-900">
-        <Container>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
-            {stats.map((stat, index) => (
-              <ScrollReveal key={stat.label} delay={index * 0.1}>
-                <div className="text-center">
-                  <div className="text-4xl sm:text-5xl font-bold text-white">
-                    <AnimatedCounter
-                      target={stat.target}
-                      suffix={stat.suffix}
-                    />
-                  </div>
-                  <p className="mt-2 text-neutral-400 text-sm font-medium">
-                    {stat.label}
-                  </p>
-                </div>
-              </ScrollReveal>
-            ))}
-          </div>
-        </Container>
-      </section>
-
-      {/* ============================================================ */}
-      {/*  TESTIMONIALS                                                */}
-      {/* ============================================================ */}
-      <section className="py-24 sm:py-32">
+      {/* ============================================ */}
+      {/* PRICING TEASER                                */}
+      {/* ============================================ */}
+      <section className="py-16 sm:py-24">
         <Container>
           <ScrollReveal>
             <SectionHeader
-              badge="Reference"
-              title={`Co \u0159\u00edkaj\u00ed na\u0161i klienti`}
+              badge="Ceník"
+              title="Jednoduchý ceník, žádné skryté poplatky"
             />
           </ScrollReveal>
 
-          <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6">
-            {testimonials.slice(0, 3).map((testimonial, index) => (
-              <ScrollReveal key={testimonial.id} delay={index * 0.12}>
-                <Card className="h-full p-6 flex flex-col">
-                  {/* Stars */}
-                  <div className="flex items-center gap-0.5 mb-4">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star
-                        key={i}
-                        className={cn(
-                          "w-4 h-4",
-                          i < testimonial.rating
-                            ? "fill-yellow-400 text-yellow-400"
-                            : "text-neutral-200"
-                        )}
-                      />
-                    ))}
-                  </div>
-
-                  {/* Quote */}
-                  <p className="text-neutral-600 leading-relaxed flex-1 text-sm">
-                    &ldquo;{testimonial.quote}&rdquo;
-                  </p>
-
-                  {/* Author */}
-                  <div className="flex items-center gap-3 mt-6 pt-6 border-t border-neutral-100">
-                    <div className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center shrink-0">
-                      <span className="text-xs font-bold text-neutral-600">
-                        {testimonial.avatarInitials}
-                      </span>
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold text-neutral-800 truncate">
-                        {testimonial.name}
-                      </p>
-                      <p className="text-xs text-neutral-400 truncate">
-                        {testimonial.role}, {testimonial.company}
-                      </p>
-                    </div>
-                  </div>
-                </Card>
-              </ScrollReveal>
-            ))}
+          <div className="mt-12">
+            <PricingTeaser />
           </div>
+
+          <ScrollReveal delay={0.2}>
+            <div className="mt-8 text-center">
+              <Link
+                href="/cenik"
+                className="text-sm font-medium text-primary-500 hover:text-primary-600 transition-colors inline-flex items-center gap-1"
+              >
+                Porovnat všechny plány
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </ScrollReveal>
         </Container>
       </section>
 
-      {/* ============================================================ */}
-      {/*  CTA SECTION                                                 */}
-      {/* ============================================================ */}
-      <section className="py-24 sm:py-32 bg-neutral-50">
+      {/* ============================================ */}
+      {/* FINAL CTA                                     */}
+      {/* ============================================ */}
+      <section className="py-20 sm:py-28 bg-neutral-900 relative overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-primary-500/5 rounded-full blur-3xl pointer-events-none" />
         <Container>
           <ScrollReveal>
-            <div className="text-center max-w-2xl mx-auto">
-              <h2 className="text-3xl sm:text-4xl font-bold text-neutral-800 tracking-tight">
-                {`P\u0159ipraveni zlep\u0161it sv\u00e9 hovory?`}
+            <div className="text-center max-w-2xl mx-auto relative">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight">
+                Připraveni na lepší hovory?
               </h2>
-              <p className="mt-4 text-lg text-neutral-500 leading-relaxed">
-                {`Vy\u017e\u00e1dejte si demo je\u0161t\u011b dnes a\u00a0zjist\u011bte, jak v\u00e1m ELITE AI pom\u016f\u017ee zv\u00fd\u0161it \u00fasp\u011b\u0161nost va\u0161ich obchodn\u00edch hovor\u016f.`}
+              <p className="mt-3 sm:mt-4 text-base sm:text-lg text-neutral-400 leading-relaxed">
+                Vyzkoušejte demo zdarma. Bez závazků, bez kreditní karty.
               </p>
-              <div className="mt-8">
-                <Link
-                  href="/demo"
-                  className={cn(
-                    buttonVariants({ size: "lg" }),
-                    "group gap-2"
-                  )}
-                >
-                  {`Vyzkou\u0161et demo zdarma`}
-                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+                <Link href="/demo">
+                  <Button size="lg" className="group w-full sm:w-auto">
+                    Vyzkoušet demo zdarma
+                    <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
+                <Link href="/cenik">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="border-neutral-700 text-neutral-300 hover:bg-neutral-800 hover:text-white hover:border-neutral-600 w-full sm:w-auto"
+                  >
+                    Zobrazit ceník
+                  </Button>
                 </Link>
               </div>
-              <p className="mt-4 text-sm text-neutral-400">
-                {`Bez z\u00e1vazk\u016f. \u017d\u00e1dn\u00e1 kreditn\u00ed karta.`}
-              </p>
             </div>
           </ScrollReveal>
         </Container>

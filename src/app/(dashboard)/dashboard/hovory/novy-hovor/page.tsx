@@ -101,7 +101,7 @@ export default function NovyHovorPage() {
   // CALL VIEW
   if (step === "call" && agent) {
     return (
-      <div className="p-6">
+      <div className="p-2 sm:p-6">
         <ActiveCall
           phase={phase}
           duration={duration}
@@ -123,10 +123,10 @@ export default function NovyHovorPage() {
   // CONFIRM VIEW
   if (step === "confirm" && scenario && agent) {
     return (
-      <div className="mx-auto max-w-2xl p-6">
+      <div className="mx-auto max-w-2xl px-2 sm:p-6">
         <button
           onClick={() => setStep("select")}
-          className="mb-6 flex items-center gap-2 text-sm text-neutral-500 transition-colors hover:text-neutral-900"
+          className="mb-4 sm:mb-6 flex items-center gap-2 text-sm text-neutral-500 transition-colors hover:text-neutral-900"
         >
           <ArrowLeft className="h-4 w-4" />
           Zpět na výběr scénáře
@@ -227,16 +227,16 @@ export default function NovyHovorPage() {
 
   // SELECT SCENARIO VIEW (default)
   return (
-    <div className="p-6">
-      <div className="mb-8">
+    <div>
+      <div className="mb-6 sm:mb-8">
         <button
           onClick={() => router.push("/dashboard/hovory")}
-          className="mb-4 flex items-center gap-2 text-sm text-neutral-500 transition-colors hover:text-neutral-900"
+          className="mb-3 sm:mb-4 flex items-center gap-2 text-sm text-neutral-500 transition-colors hover:text-neutral-900"
         >
           <ArrowLeft className="h-4 w-4" />
           Zpět na hovory
         </button>
-        <h1 className="text-3xl font-bold text-neutral-900">Nový hovor</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900">Nový hovor</h1>
         <p className="mt-2 text-neutral-500">
           Vyberte scénář pro tréninkový hovor s AI agentem
         </p>

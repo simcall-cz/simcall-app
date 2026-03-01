@@ -82,28 +82,6 @@ export default function DemoPage() {
                 ))}
               </ul>
 
-              {/* Testimonial */}
-              <div className="mt-10 p-6 bg-neutral-50 rounded-xl border border-neutral-100">
-                <p className="text-neutral-600 italic leading-relaxed">
-                  &ldquo;ELITE AI mi pomohlo zvýšit úspěšnost cold callů o 40 %
-                  za první měsíc. Trénink s AI agentem je neuvěřitelně
-                  realistický.&rdquo;
-                </p>
-                <div className="mt-4 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-sm font-semibold text-primary-700">
-                    PK
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-neutral-800">
-                      Petr Kovář
-                    </p>
-                    <p className="text-sm text-neutral-500">
-                      Senior makléř, RE/MAX Praha
-                    </p>
-                  </div>
-                </div>
-              </div>
-
               {/* Trust Badges */}
               <div className="mt-8 flex flex-wrap gap-6">
                 {trustBadges.map((badge) => (

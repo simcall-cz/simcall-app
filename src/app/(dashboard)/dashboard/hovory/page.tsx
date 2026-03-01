@@ -157,51 +157,69 @@ function CallDetailModal({
   const call = fullCall || callPreview;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-start justify-center sm:overflow-y-auto">
       <div
         className="fixed inset-0 bg-black/40 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-3xl my-8 mx-4 border border-neutral-100">
+      <div className="relative bg-white rounded-t-2xl sm:rounded-xl shadow-2xl w-full max-w-3xl sm:my-8 sm:mx-4 max-h-[92vh] sm:max-h-[90vh] border border-neutral-100 flex flex-col overflow-hidden">
+        {/* Drag handle (mobile) */}
+        <div className="flex justify-center py-2 sm:hidden">
+          <div className="w-10 h-1 rounded-full bg-neutral-300" />
+        </div>
+
         {/* Header */}
-        <div className="flex items-start justify-between p-6 border-b border-neutral-100">
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-2">
-              <h2 className="text-xl font-bold text-neutral-900">
-                {call.agentName}
-              </h2>
-              <Badge variant="secondary">{call.agentPersonality}</Badge>
+        <div className="p-4 sm:p-6 border-b border-neutral-100">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 sm:gap-3 mb-1.5 sm:mb-2 flex-wrap">
+                <h2 className="text-lg sm:text-xl font-bold text-neutral-900 truncate">
+                  {call.agentName}
+                </h2>
+                <Badge variant="secondary" className="text-xs shrink-0">{call.agentPersonality}</Badge>
+              </div>
+              <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-neutral-500">
+                <span className="truncate">{call.scenario}</span>
+                <span className="flex items-center gap-1 shrink-0">
+                  <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                  {call.duration}
+                </span>
+                <span className="shrink-0">{formatCallDate(call.date)}</span>
+              </div>
             </div>
-            <div className="flex flex-wrap items-center gap-4 text-sm text-neutral-500">
-              <span>{call.scenario}</span>
-              <span className="flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5" />
-                {call.duration}
-              </span>
-              <span>{formatCallDate(call.date)}</span>
+            <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+              <div className="hidden sm:block">
+                <ScoreCircle score={call.feedback.overallScore} />
+              </div>
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-neutral-50 rounded-lg transition-colors text-neutral-400 hover:text-neutral-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <ScoreCircle score={call.feedback.overallScore} />
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-neutral-50 rounded-lg transition-colors text-neutral-400 hover:text-neutral-600"
-            >
-              <X className="w-5 h-5" />
-            </button>
+          {/* Mobile score - inline */}
+          <div className="flex items-center gap-3 mt-3 sm:hidden">
+            <div className="flex items-center gap-2">
+              <span className={`text-2xl font-bold ${getScoreColor(call.feedback.overallScore)}`}>
+                {call.feedback.overallScore}%
+              </span>
+              <span className="text-xs text-neutral-400">Celkové skóre</span>
+            </div>
           </div>
         </div>
 
         {/* Audio Player */}
         {call.audioUrl ? (
-          <div className="px-6 py-3 border-b border-neutral-100 bg-neutral-25">
+          <div className="px-4 sm:px-6 py-3 border-b border-neutral-100 bg-neutral-25">
             <audio controls className="w-full h-10" preload="metadata">
               <source src={call.audioUrl} type="audio/mpeg" />
               Váš prohlížeč nepodporuje přehrávání audia.
             </audio>
           </div>
         ) : (
-          <div className="px-6 py-3 border-b border-neutral-100 bg-neutral-25">
+          <div className="px-4 sm:px-6 py-3 border-b border-neutral-100 bg-neutral-25">
             <div className="flex items-center gap-2 text-sm text-neutral-400">
               <PhoneCall className="w-4 h-4" />
               <span>Nahrávka není k dispozici</span>
@@ -213,30 +231,31 @@ function CallDetailModal({
         <div className="flex border-b border-neutral-100">
           <button
             onClick={() => setActiveTab("transcript")}
-            className={`flex items-center gap-2 px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+            className={`flex-1 sm:flex-none flex items-center justify-center sm:justify-start gap-2 px-4 sm:px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
               activeTab === "transcript"
                 ? "border-primary-500 text-primary-600"
                 : "border-transparent text-neutral-500 hover:text-neutral-700"
             }`}
           >
             <MessageSquare className="w-4 h-4" />
-            Přepis hovoru
+            <span className="hidden xs:inline">Přepis</span>
+            <span className="xs:hidden">Přepis</span>
           </button>
           <button
             onClick={() => setActiveTab("feedback")}
-            className={`flex items-center gap-2 px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+            className={`flex-1 sm:flex-none flex items-center justify-center sm:justify-start gap-2 px-4 sm:px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
               activeTab === "feedback"
                 ? "border-primary-500 text-primary-600"
                 : "border-transparent text-neutral-500 hover:text-neutral-700"
             }`}
           >
             <BarChart3 className="w-4 h-4" />
-            Zpětná vazba
+            <span>Zpětná vazba</span>
           </button>
         </div>
 
         {/* Tab Content */}
-        <div className="p-6 max-h-[50vh] overflow-y-auto">
+        <div className="p-4 sm:p-6 flex-1 overflow-y-auto">
           {activeTab === "transcript" && (
             <div className="space-y-3">
               {isLoadingDetail ? (
@@ -258,7 +277,7 @@ function CallDetailModal({
                     className={`flex ${entry.speaker === "user" ? "justify-end" : "justify-start"}`}
                   >
                     <div
-                      className={`max-w-[80%] rounded-xl px-4 py-3 ${
+                      className={`max-w-[90%] sm:max-w-[80%] rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 ${
                         entry.speaker === "user"
                           ? "bg-blue-50 text-blue-900"
                           : "bg-neutral-100 text-neutral-800"
@@ -375,7 +394,7 @@ function CallDetailModal({
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end p-4 border-t border-neutral-100">
+        <div className="flex justify-end p-3 sm:p-4 border-t border-neutral-100 shrink-0">
           <Button variant="outline" size="sm" onClick={onClose}>
             Zavřít
           </Button>
