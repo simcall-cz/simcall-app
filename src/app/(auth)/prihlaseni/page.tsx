@@ -285,21 +285,6 @@ export default function PrihlaseniPage() {
         </button>
       </form>
 
-      {/* Divider */}
-      <div className="my-6 flex items-center gap-4">
-        <div className="flex-1 border-t border-neutral-200" />
-        <span className="text-xs text-neutral-400">nebo</span>
-        <div className="flex-1 border-t border-neutral-200" />
-      </div>
-
-      {/* Demo access */}
-      <button
-        onClick={() => router.push("/dashboard")}
-        className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
-      >
-        Pokračovat bez přihlášení (demo)
-      </button>
-
       {/* Register link */}
       <div className="mt-8 text-center">
         <p className="text-sm text-neutral-500">

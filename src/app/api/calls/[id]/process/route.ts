@@ -217,10 +217,16 @@ export async function POST(
     }
 
     // 9. Download and store audio recording from ElevenLabs
+    // Always attempt to download audio — the has_audio flag is unreliable
     let audioUrl: string | null = null;
 
-    if (conversationData.has_audio) {
-      try {
+    try {
+      // Audio may not be immediately available, retry a few times
+      for (let audioAttempt = 0; audioAttempt < 3; audioAttempt++) {
+        if (audioAttempt > 0) {
+          await new Promise((r) => setTimeout(r, 3000)); // wait 3s between retries
+        }
+
         const audioResponse = await fetch(
           `https://api.elevenlabs.io/v1/convai/conversations/${call.conversation_id}/audio`,
           {
@@ -232,27 +238,37 @@ export async function POST(
 
         if (audioResponse.ok) {
           const audioBuffer = await audioResponse.arrayBuffer();
-          const fileName = `${id}.mp3`;
 
-          const { error: uploadError } = await supabase.storage
-            .from("call-recordings")
-            .upload(fileName, audioBuffer, {
-              contentType: "audio/mpeg",
-              upsert: true,
-            });
+          // Verify we got actual audio data (not empty)
+          if (audioBuffer.byteLength > 1000) {
+            const fileName = `${id}.mp3`;
 
-          if (!uploadError) {
-            const { data: urlData } = supabase.storage
+            const { error: uploadError } = await supabase.storage
               .from("call-recordings")
-              .getPublicUrl(fileName);
-            audioUrl = urlData.publicUrl;
+              .upload(fileName, audioBuffer, {
+                contentType: "audio/mpeg",
+                upsert: true,
+              });
+
+            if (!uploadError) {
+              const { data: urlData } = supabase.storage
+                .from("call-recordings")
+                .getPublicUrl(fileName);
+              audioUrl = urlData.publicUrl;
+              console.log("Audio uploaded successfully:", audioUrl);
+            } else {
+              console.error("Failed to upload audio:", uploadError);
+            }
+            break; // Success, stop retrying
           } else {
-            console.error("Failed to upload audio:", uploadError);
+            console.log(`Audio attempt ${audioAttempt + 1}: too small (${audioBuffer.byteLength} bytes), retrying...`);
           }
+        } else {
+          console.log(`Audio attempt ${audioAttempt + 1}: HTTP ${audioResponse.status}, retrying...`);
         }
-      } catch (audioErr) {
-        console.error("Failed to download audio:", audioErr);
       }
+    } catch (audioErr) {
+      console.error("Failed to download audio:", audioErr);
     }
 
     // 10. Update call status to completed
