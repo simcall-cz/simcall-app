@@ -13,7 +13,9 @@ export default function DashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
 
-  const variant: "agent" | "manager" = pathname.startsWith("/manager")
+  const variant: "agent" | "manager" | "admin" = pathname.startsWith("/admin")
+    ? "admin"
+    : pathname.startsWith("/manager")
     ? "manager"
     : "agent";
 

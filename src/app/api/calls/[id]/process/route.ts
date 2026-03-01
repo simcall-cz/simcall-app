@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
 
+// Allow up to 60s on Vercel Hobby (default is 10s which causes audio upload to fail)
+export const maxDuration = 60;
+
 /**
  * POST /api/calls/[id]/process
  *

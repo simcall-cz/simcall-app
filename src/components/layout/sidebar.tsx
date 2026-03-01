@@ -10,11 +10,15 @@ import {
   Users,
   Headphones,
   X,
+  Building2,
+  DollarSign,
+  Server,
+  Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface SidebarProps {
-  variant: "agent" | "manager";
+  variant: "agent" | "manager" | "admin";
   isOpen: boolean;
   onClose: () => void;
 }
@@ -66,12 +70,45 @@ const managerNavItems: SidebarNavItem[] = [
   },
 ];
 
+const adminNavItems: SidebarNavItem[] = [
+  {
+    label: "Přehled",
+    href: "/admin",
+    icon: <LayoutDashboard className="w-5 h-5" />,
+  },
+  {
+    label: "Firmy",
+    href: "/admin/firmy",
+    icon: <Building2 className="w-5 h-5" />,
+  },
+  {
+    label: "Uživatelé",
+    href: "/admin/uzivatele",
+    icon: <Users className="w-5 h-5" />,
+  },
+  {
+    label: "Finance",
+    href: "/admin/financni-prehled",
+    icon: <DollarSign className="w-5 h-5" />,
+  },
+  {
+    label: "Systém",
+    href: "/admin/system",
+    icon: <Server className="w-5 h-5" />,
+  },
+];
+
 export function Sidebar({ variant, isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
-  const navItems = variant === "agent" ? agentNavItems : managerNavItems;
+  const navItems =
+    variant === "admin"
+      ? adminNavItems
+      : variant === "manager"
+      ? managerNavItems
+      : agentNavItems;
 
   const isActive = (href: string) => {
-    if (href === "/dashboard" || href === "/manager") {
+    if (href === "/dashboard" || href === "/manager" || href === "/admin") {
       return pathname === href;
     }
     return pathname.startsWith(href);
@@ -81,10 +118,18 @@ export function Sidebar({ variant, isOpen, onClose }: SidebarProps) {
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div className="flex items-center justify-between h-16 px-6 border-b border-neutral-100">
-        <Link href="/" className="flex items-center gap-0.5">
-          <span className="text-xl font-bold text-neutral-800">Sim</span>
-          <span className="text-xl font-bold text-primary-500">Call</span>
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-0.5">
+            <span className="text-xl font-bold text-neutral-800">Sim</span>
+            <span className="text-xl font-bold text-primary-500">Call</span>
+          </Link>
+          {variant === "admin" && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-primary-50 px-2 py-0.5 text-[10px] font-semibold text-primary-600 uppercase tracking-wider">
+              <Shield className="w-3 h-3" />
+              Admin
+            </span>
+          )}
+        </div>
         <button
           onClick={onClose}
           className="lg:hidden flex items-center justify-center w-8 h-8 rounded-lg hover:bg-neutral-50 transition-colors"
@@ -123,15 +168,23 @@ export function Sidebar({ variant, isOpen, onClose }: SidebarProps) {
       {/* User Info */}
       <div className="border-t border-neutral-100 p-4">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-neutral-100 flex items-center justify-center">
-            <span className="text-xs font-medium text-neutral-600">JN</span>
+          <div className={cn(
+            "w-9 h-9 rounded-full flex items-center justify-center",
+            variant === "admin" ? "bg-primary-100" : "bg-neutral-100"
+          )}>
+            <span className={cn(
+              "text-xs font-medium",
+              variant === "admin" ? "text-primary-600" : "text-neutral-600"
+            )}>
+              {variant === "admin" ? "SC" : "JN"}
+            </span>
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-neutral-800 truncate">
-              Jan Novák
+              {variant === "admin" ? "SimCall Admin" : "Jan Novák"}
             </p>
             <p className="text-xs text-neutral-400 truncate">
-              jan@realitka.cz
+              {variant === "admin" ? "admin@simcall.cz" : "jan@realitka.cz"}
             </p>
           </div>
         </div>
