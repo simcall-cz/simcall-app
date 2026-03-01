@@ -1,5 +1,5 @@
 {
-  "name": "ELITE AI - Post Call Processing",
+  "name": "SimCall - Post Call Processing",
   "nodes": [
     {
       "parameters": {
@@ -12,7 +12,10 @@
       "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [0, 0],
+      "position": [
+        0,
+        0
+      ],
       "webhookId": "elevenlabs-post-call"
     },
     {
@@ -24,7 +27,10 @@
       "name": "Respond 200 OK",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
-      "position": [220, 0]
+      "position": [
+        220,
+        0
+      ]
     },
     {
       "parameters": {
@@ -34,7 +40,10 @@
       "name": "Parse Webhook Data",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [440, 0]
+      "position": [
+        440,
+        0
+      ]
     },
     {
       "parameters": {
@@ -58,7 +67,10 @@
       "name": "Find Call in Supabase",
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
-      "position": [660, 0],
+      "position": [
+        660,
+        0
+      ],
       "credentials": {
         "supabaseApi": {
           "id": "SUPABASE_CREDENTIAL_ID",
@@ -96,7 +108,10 @@
       "name": "ChatGPT Analysis",
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 1.8,
-      "position": [880, 0],
+      "position": [
+        880,
+        0
+      ],
       "credentials": {
         "openAiApi": {
           "id": "OPENAI_CREDENTIAL_ID",
@@ -112,7 +127,10 @@
       "name": "Parse ChatGPT Response",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1100, 0]
+      "position": [
+        1100,
+        0
+      ]
     },
     {
       "parameters": {
@@ -122,7 +140,10 @@
       "name": "Prepare Transcript Rows",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1320, -150]
+      "position": [
+        1320,
+        -150
+      ]
     },
     {
       "parameters": {
@@ -130,12 +151,30 @@
         "tableId": "transcripts",
         "fieldsUi": {
           "fieldValues": [
-            { "fieldName": "call_id", "fieldValue": "={{ $json.call_id }}" },
-            { "fieldName": "speaker", "fieldValue": "={{ $json.speaker }}" },
-            { "fieldName": "text", "fieldValue": "={{ $json.text }}" },
-            { "fieldName": "timestamp_label", "fieldValue": "={{ $json.timestamp_label }}" },
-            { "fieldName": "highlight", "fieldValue": "={{ $json.highlight }}" },
-            { "fieldName": "sort_order", "fieldValue": "={{ $json.sort_order }}" }
+            {
+              "fieldName": "call_id",
+              "fieldValue": "={{ $json.call_id }}"
+            },
+            {
+              "fieldName": "speaker",
+              "fieldValue": "={{ $json.speaker }}"
+            },
+            {
+              "fieldName": "text",
+              "fieldValue": "={{ $json.text }}"
+            },
+            {
+              "fieldName": "timestamp_label",
+              "fieldValue": "={{ $json.timestamp_label }}"
+            },
+            {
+              "fieldName": "highlight",
+              "fieldValue": "={{ $json.highlight }}"
+            },
+            {
+              "fieldName": "sort_order",
+              "fieldValue": "={{ $json.sort_order }}"
+            }
           ]
         }
       },
@@ -143,7 +182,10 @@
       "name": "Store Transcript",
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
-      "position": [1540, -150],
+      "position": [
+        1540,
+        -150
+      ],
       "credentials": {
         "supabaseApi": {
           "id": "SUPABASE_CREDENTIAL_ID",
@@ -157,12 +199,30 @@
         "tableId": "feedback",
         "fieldsUi": {
           "fieldValues": [
-            { "fieldName": "call_id", "fieldValue": "={{ $json.callId }}" },
-            { "fieldName": "overall_score", "fieldValue": "={{ $json.analysis.overall_score }}" },
-            { "fieldName": "strengths", "fieldValue": "={{ JSON.stringify($json.analysis.strengths) }}" },
-            { "fieldName": "improvements", "fieldValue": "={{ JSON.stringify($json.analysis.improvements) }}" },
-            { "fieldName": "filler_words", "fieldValue": "={{ JSON.stringify($json.analysis.filler_words) }}" },
-            { "fieldName": "recommendations", "fieldValue": "={{ JSON.stringify($json.analysis.recommendations) }}" }
+            {
+              "fieldName": "call_id",
+              "fieldValue": "={{ $json.callId }}"
+            },
+            {
+              "fieldName": "overall_score",
+              "fieldValue": "={{ $json.analysis.overall_score }}"
+            },
+            {
+              "fieldName": "strengths",
+              "fieldValue": "={{ JSON.stringify($json.analysis.strengths) }}"
+            },
+            {
+              "fieldName": "improvements",
+              "fieldValue": "={{ JSON.stringify($json.analysis.improvements) }}"
+            },
+            {
+              "fieldName": "filler_words",
+              "fieldValue": "={{ JSON.stringify($json.analysis.filler_words) }}"
+            },
+            {
+              "fieldName": "recommendations",
+              "fieldValue": "={{ JSON.stringify($json.analysis.recommendations) }}"
+            }
           ]
         }
       },
@@ -170,7 +230,10 @@
       "name": "Store Feedback",
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
-      "position": [1320, 150],
+      "position": [
+        1320,
+        150
+      ],
       "credentials": {
         "supabaseApi": {
           "id": "SUPABASE_CREDENTIAL_ID",
@@ -195,9 +258,18 @@
         },
         "fieldsUi": {
           "fieldValues": [
-            { "fieldName": "status", "fieldValue": "completed" },
-            { "fieldName": "success_rate", "fieldValue": "={{ $node[\"Parse ChatGPT Response\"].json.analysis.overall_score }}" },
-            { "fieldName": "updated_at", "fieldValue": "={{ new Date().toISOString() }}" }
+            {
+              "fieldName": "status",
+              "fieldValue": "completed"
+            },
+            {
+              "fieldName": "success_rate",
+              "fieldValue": "={{ $node[\"Parse ChatGPT Response\"].json.analysis.overall_score }}"
+            },
+            {
+              "fieldName": "updated_at",
+              "fieldValue": "={{ new Date().toISOString() }}"
+            }
           ]
         }
       },
@@ -205,7 +277,10 @@
       "name": "Update Call Status",
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
-      "position": [1540, 150],
+      "position": [
+        1540,
+        150
+      ],
       "credentials": {
         "supabaseApi": {
           "id": "SUPABASE_CREDENTIAL_ID",
@@ -218,54 +293,92 @@
     "Webhook": {
       "main": [
         [
-          { "node": "Respond 200 OK", "type": "main", "index": 0 },
-          { "node": "Parse Webhook Data", "type": "main", "index": 0 }
+          {
+            "node": "Respond 200 OK",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Parse Webhook Data",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "Respond 200 OK": {
-      "main": [[]]
+      "main": [
+        []
+      ]
     },
     "Parse Webhook Data": {
       "main": [
         [
-          { "node": "Find Call in Supabase", "type": "main", "index": 0 }
+          {
+            "node": "Find Call in Supabase",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "Find Call in Supabase": {
       "main": [
         [
-          { "node": "ChatGPT Analysis", "type": "main", "index": 0 }
+          {
+            "node": "ChatGPT Analysis",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "ChatGPT Analysis": {
       "main": [
         [
-          { "node": "Parse ChatGPT Response", "type": "main", "index": 0 }
+          {
+            "node": "Parse ChatGPT Response",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "Parse ChatGPT Response": {
       "main": [
         [
-          { "node": "Prepare Transcript Rows", "type": "main", "index": 0 },
-          { "node": "Store Feedback", "type": "main", "index": 0 }
+          {
+            "node": "Prepare Transcript Rows",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Store Feedback",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "Prepare Transcript Rows": {
       "main": [
         [
-          { "node": "Store Transcript", "type": "main", "index": 0 }
+          {
+            "node": "Store Transcript",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "Store Feedback": {
       "main": [
         [
-          { "node": "Update Call Status", "type": "main", "index": 0 }
+          {
+            "node": "Update Call Status",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     }
@@ -274,6 +387,8 @@
     "executionOrder": "v1"
   },
   "tags": [
-    { "name": "ELITE AI" }
+    {
+      "name": "SimCall"
+    }
   ]
 }

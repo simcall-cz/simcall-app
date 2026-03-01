@@ -5,7 +5,6 @@ import Link from "next/link";
 import {
   LayoutDashboard,
   Phone,
-  GraduationCap,
   BarChart3,
   User,
   Users,
@@ -36,11 +35,6 @@ const agentNavItems: SidebarNavItem[] = [
     label: "Hovory",
     href: "/dashboard/hovory",
     icon: <Phone className="w-5 h-5" />,
-  },
-  {
-    label: "Lekce",
-    href: "/dashboard/lekce",
-    icon: <GraduationCap className="w-5 h-5" />,
   },
   {
     label: "Statistiky",

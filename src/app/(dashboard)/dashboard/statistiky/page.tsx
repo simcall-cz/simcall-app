@@ -1,15 +1,13 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { Trophy, Flame, TrendingUp } from "lucide-react";
+import { useMemo } from "react";
+import { Phone, TrendingUp, Clock, Award } from "lucide-react";
 import {
   ResponsiveContainer,
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
   AreaChart,
   Area,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -17,286 +15,188 @@ import {
   Cell,
 } from "recharts";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import {
-  dailyStats,
-  performanceByCategory,
-} from "@/data/dashboard/agent-stats";
-
-type Period = "week" | "month" | "all";
-
-const periodTabs: { key: Period; label: string }[] = [
-  { key: "week", label: "Tento týden" },
-  { key: "month", label: "Tento měsíc" },
-  { key: "all", label: "Celkově" },
-];
+import { useCallHistory } from "@/hooks/useCallHistory";
 
 function formatDateShort(dateStr: string) {
   const date = new Date(dateStr);
   return `${date.getDate()}.${date.getMonth() + 1}.`;
 }
 
-const fillerWordsTrend = [
-  { day: "Den 1", count: 15 },
-  { day: "Den 2", count: 14 },
-  { day: "Den 3", count: 12 },
-  { day: "Den 4", count: 11 },
-  { day: "Den 5", count: 10 },
-  { day: "Den 6", count: 9 },
-  { day: "Den 7", count: 8 },
-  { day: "Den 8", count: 7 },
-  { day: "Den 9", count: 6 },
-  { day: "Den 10", count: 5 },
-];
-
-const personalRecords = [
-  {
-    icon: Trophy,
-    label: "Nejlepší hovor",
-    value: "92%",
-    detail: "12. února 2026",
-    color: "text-amber-500",
-    bg: "bg-amber-50",
-  },
-  {
-    icon: Flame,
-    label: "Nejdelší série",
-    value: "5 hovorů v řadě",
-    detail: "Nad 75% úspěšnost",
-    color: "text-orange-500",
-    bg: "bg-orange-50",
-  },
-  {
-    icon: TrendingUp,
-    label: "Největší zlepšení",
-    value: "Cold calling",
-    detail: "+18% za poslední měsíc",
-    color: "text-green-500",
-    bg: "bg-green-50",
-  },
-];
-
 export default function StatistikyPage() {
-  const [period, setPeriod] = useState<Period>("all");
+  const { calls, isLoading } = useCallHistory({ limit: 200 });
 
-  const filteredStats = useMemo(() => {
-    const now = new Date();
-    if (period === "week") {
-      const weekAgo = new Date(now);
-      weekAgo.setDate(weekAgo.getDate() - 7);
-      return dailyStats.filter((d) => new Date(d.date) >= weekAgo);
-    }
-    if (period === "month") {
-      const monthAgo = new Date(now);
-      monthAgo.setMonth(monthAgo.getMonth() - 1);
-      return dailyStats.filter((d) => new Date(d.date) >= monthAgo);
-    }
-    return dailyStats;
-  }, [period]);
+  const completedCalls = calls.filter((c) => c.successRate > 0);
+  const totalCalls = calls.length;
+  const avgScore =
+    completedCalls.length > 0
+      ? Math.round(
+        completedCalls.reduce((sum, c) => sum + c.successRate, 0) /
+        completedCalls.length
+      )
+      : 0;
+  const bestScore =
+    completedCalls.length > 0
+      ? Math.max(...completedCalls.map((c) => c.successRate))
+      : 0;
+  const totalMinutes = Math.round(
+    calls.reduce((sum, c) => {
+      const parts = c.duration.split(":");
+      return sum + (parseInt(parts[0] || "0") * 60 + parseInt(parts[1] || "0"));
+    }, 0) / 60
+  );
 
-  const chartData = filteredStats.map((d) => ({
-    ...d,
-    dateLabel: formatDateShort(d.date),
-  }));
+  // Chart: score over time (grouped by date)
+  const scoreOverTime = useMemo(() => {
+    const byDate: Record<string, { calls: number; totalRate: number }> = {};
+    calls.forEach((call) => {
+      if (call.successRate <= 0) return;
+      const dateKey = formatDateShort(call.date);
+      if (!byDate[dateKey]) {
+        byDate[dateKey] = { calls: 0, totalRate: 0 };
+      }
+      byDate[dateKey].calls += 1;
+      byDate[dateKey].totalRate += call.successRate;
+    });
+    return Object.entries(byDate).map(([dateLabel, data]) => ({
+      dateLabel,
+      score: Math.round(data.totalRate / data.calls),
+    }));
+  }, [calls]);
 
-  const categoryBarColors = [
-    "#22c55e",
-    "#EF4444",
-    "#3b82f6",
-    "#f59e0b",
-    "#8b5cf6",
+  // Chart: calls per day
+  const callsPerDay = useMemo(() => {
+    const byDate: Record<string, number> = {};
+    calls.forEach((call) => {
+      const dateKey = formatDateShort(call.date);
+      byDate[dateKey] = (byDate[dateKey] || 0) + 1;
+    });
+    return Object.entries(byDate).map(([dateLabel, count]) => ({
+      dateLabel,
+      count,
+    }));
+  }, [calls]);
+
+  // Score distribution
+  const scoreDistribution = useMemo(() => {
+    const buckets = [
+      { range: "0-30", count: 0, color: "#EF4444" },
+      { range: "31-50", count: 0, color: "#F59E0B" },
+      { range: "51-70", count: 0, color: "#3B82F6" },
+      { range: "71-100", count: 0, color: "#22C55E" },
+    ];
+    completedCalls.forEach((c) => {
+      if (c.successRate <= 30) buckets[0].count++;
+      else if (c.successRate <= 50) buckets[1].count++;
+      else if (c.successRate <= 70) buckets[2].count++;
+      else buckets[3].count++;
+    });
+    return buckets;
+  }, [completedCalls]);
+
+  const statCards = [
+    {
+      label: "Celkem hovorů",
+      value: totalCalls.toString(),
+      icon: Phone,
+      bg: "bg-neutral-50",
+      iconColor: "text-neutral-600",
+    },
+    {
+      label: "Průměrné skóre",
+      value: avgScore > 0 ? `${avgScore}%` : "—",
+      icon: TrendingUp,
+      bg: "bg-green-50",
+      iconColor: "text-green-600",
+    },
+    {
+      label: "Nejlepší skóre",
+      value: bestScore > 0 ? `${bestScore}%` : "—",
+      icon: Award,
+      bg: "bg-amber-50",
+      iconColor: "text-amber-600",
+    },
+    {
+      label: "Celkový čas tréninku",
+      value: totalMinutes > 0 ? `${totalMinutes} min` : "—",
+      icon: Clock,
+      bg: "bg-blue-50",
+      iconColor: "text-blue-600",
+    },
   ];
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-neutral-200 border-t-primary-500" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
       <div>
         <h1 className="text-2xl font-bold text-neutral-900">Statistiky</h1>
         <p className="text-sm text-neutral-500 mt-1">
-          Detailní přehled vašeho výkonu a pokroku
+          Přehled vašeho pokroku z reálných hovorů
         </p>
       </div>
 
-      {/* Period Selector */}
-      <div className="flex flex-wrap gap-2">
-        {periodTabs.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setPeriod(tab.key)}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-              period === tab.key
-                ? "bg-neutral-900 text-white"
-                : "bg-white text-neutral-600 border border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50"
-            }`}
-          >
-            {tab.label}
-          </button>
+      {/* Stat Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {statCards.map((stat) => (
+          <Card key={stat.label}>
+            <CardContent className="p-5">
+              <div className="flex items-center gap-3">
+                <div
+                  className={`flex items-center justify-center w-10 h-10 rounded-lg ${stat.bg}`}
+                >
+                  <stat.icon className={`w-5 h-5 ${stat.iconColor}`} />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs text-neutral-500 truncate">
+                    {stat.label}
+                  </p>
+                  <p className="text-lg font-semibold text-neutral-900">
+                    {stat.value}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         ))}
       </div>
 
-      {/* Charts 2x2 Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {/* 1. Success Rate Trend */}
+      {/* No data state */}
+      {totalCalls === 0 && (
         <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Trend úspěšnosti</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-60">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  data={chartData}
-                  margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis
-                    dataKey="dateLabel"
-                    tick={{ fontSize: 11, fill: "#9ca3af" }}
-                    tickLine={false}
-                    axisLine={{ stroke: "#e5e7eb" }}
-                  />
-                  <YAxis
-                    tick={{ fontSize: 11, fill: "#9ca3af" }}
-                    tickLine={false}
-                    axisLine={{ stroke: "#e5e7eb" }}
-                    domain={[40, 100]}
-                    unit="%"
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      borderRadius: "8px",
-                      border: "1px solid #e5e7eb",
-                      fontSize: "12px",
-                    }}
-                    formatter={(value: any) => [`${value}%`, "Úspěšnost"]}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="successRate"
-                    stroke="#22c55e"
-                    strokeWidth={2}
-                    dot={{ r: 3, fill: "#22c55e" }}
-                    activeDot={{ r: 5 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
+          <CardContent className="py-16 text-center">
+            <Phone className="w-10 h-10 mx-auto mb-3 text-neutral-300" />
+            <p className="text-neutral-500 font-medium">
+              Zatím žádná data
+            </p>
+            <p className="text-sm text-neutral-400 mt-1">
+              Zrealizujte první tréninkový hovor pro zobrazení statistik
+            </p>
           </CardContent>
         </Card>
+      )}
 
-        {/* 2. Calls per Day */}
+      {/* Score over time */}
+      {scoreOverTime.length > 1 && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Počet hovorů za den</CardTitle>
+            <CardTitle>Vývoj skóre</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-60">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={chartData}
-                  margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis
-                    dataKey="dateLabel"
-                    tick={{ fontSize: 11, fill: "#9ca3af" }}
-                    tickLine={false}
-                    axisLine={{ stroke: "#e5e7eb" }}
-                  />
-                  <YAxis
-                    tick={{ fontSize: 11, fill: "#9ca3af" }}
-                    tickLine={false}
-                    axisLine={{ stroke: "#e5e7eb" }}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      borderRadius: "8px",
-                      border: "1px solid #e5e7eb",
-                      fontSize: "12px",
-                    }}
-                    formatter={(value: any) => [`${value}`, "Hovorů"]}
-                  />
-                  <Bar dataKey="calls" fill="#EF4444" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* 3. Performance by Category */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Výkon podle kategorie</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-60">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={performanceByCategory}
-                  layout="vertical"
-                  margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
-                >
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke="#f0f0f0"
-                    horizontal={false}
-                  />
-                  <XAxis
-                    type="number"
-                    tick={{ fontSize: 11, fill: "#9ca3af" }}
-                    tickLine={false}
-                    axisLine={{ stroke: "#e5e7eb" }}
-                    domain={[0, 100]}
-                    unit="%"
-                  />
-                  <YAxis
-                    type="category"
-                    dataKey="category"
-                    tick={{ fontSize: 10, fill: "#6b7280" }}
-                    tickLine={false}
-                    axisLine={{ stroke: "#e5e7eb" }}
-                    width={90}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      borderRadius: "8px",
-                      border: "1px solid #e5e7eb",
-                      fontSize: "12px",
-                    }}
-                    formatter={(value: any) => [`${value}%`, "Úspěšnost"]}
-                  />
-                  <Bar dataKey="successRate" radius={[0, 4, 4, 0]}>
-                    {performanceByCategory.map((_, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={
-                          categoryBarColors[index % categoryBarColors.length]
-                        }
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* 4. Filler Words Trend */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">
-              Trend výplňových slov
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-60">
+            <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart
-                  data={fillerWordsTrend}
+                  data={scoreOverTime}
                   margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
                 >
                   <defs>
                     <linearGradient
-                      id="fillerGradient"
+                      id="scoreGrad"
                       x1="0"
                       y1="0"
                       x2="0"
@@ -304,84 +204,119 @@ export default function StatistikyPage() {
                     >
                       <stop
                         offset="5%"
-                        stopColor="#f59e0b"
+                        stopColor="#EF4444"
                         stopOpacity={0.2}
                       />
                       <stop
                         offset="95%"
-                        stopColor="#f59e0b"
+                        stopColor="#EF4444"
                         stopOpacity={0}
                       />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                   <XAxis
-                    dataKey="day"
-                    tick={{ fontSize: 11, fill: "#9ca3af" }}
+                    dataKey="dateLabel"
+                    tick={{ fontSize: 12, fill: "#6b7280" }}
                     tickLine={false}
                     axisLine={{ stroke: "#e5e7eb" }}
                   />
                   <YAxis
-                    tick={{ fontSize: 11, fill: "#9ca3af" }}
+                    tick={{ fontSize: 12, fill: "#6b7280" }}
                     tickLine={false}
                     axisLine={{ stroke: "#e5e7eb" }}
+                    domain={[0, 100]}
+                    unit="%"
                   />
                   <Tooltip
                     contentStyle={{
                       borderRadius: "8px",
                       border: "1px solid #e5e7eb",
-                      fontSize: "12px",
+                      boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)",
                     }}
-                    formatter={(value: any) => [
-                      `${value}`,
-                      "Výplňových slov",
-                    ]}
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    formatter={(value: any) => [`${value}%`, "Skóre"]}
                   />
                   <Area
                     type="monotone"
-                    dataKey="count"
-                    stroke="#f59e0b"
+                    dataKey="score"
+                    stroke="#EF4444"
                     strokeWidth={2}
-                    fill="url(#fillerGradient)"
+                    fill="url(#scoreGrad)"
                   />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
-      </div>
+      )}
 
-      {/* Personal Records */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Osobní rekordy</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-            {personalRecords.map((record) => (
-              <div
-                key={record.label}
-                className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl border border-neutral-100 bg-white"
-              >
-                <div
-                  className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl shrink-0 ${record.bg}`}
-                >
-                  <record.icon className={`w-5 h-5 sm:w-6 sm:h-6 ${record.color}`} />
+      {/* Calls per day + Score distribution */}
+      {completedCalls.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Calls per day */}
+          {callsPerDay.length > 1 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Počet hovorů za den</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="h-56">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={callsPerDay}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis
+                        dataKey="dateLabel"
+                        tick={{ fontSize: 12, fill: "#6b7280" }}
+                        tickLine={false}
+                      />
+                      <YAxis
+                        tick={{ fontSize: 12, fill: "#6b7280" }}
+                        tickLine={false}
+                        allowDecimals={false}
+                      />
+                      <Tooltip />
+                      <Bar dataKey="count" fill="#EF4444" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </div>
-                <div className="min-w-0">
-                  <p className="text-xs text-neutral-400 font-medium">
-                    {record.label}
-                  </p>
-                  <p className="text-sm sm:text-base font-semibold text-neutral-900 truncate">
-                    {record.value}
-                  </p>
-                  <p className="text-xs text-neutral-500 truncate">{record.detail}</p>
-                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Score distribution */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Rozložení skóre</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-56">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={scoreDistribution}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis
+                      dataKey="range"
+                      tick={{ fontSize: 12, fill: "#6b7280" }}
+                      tickLine={false}
+                    />
+                    <YAxis
+                      tick={{ fontSize: 12, fill: "#6b7280" }}
+                      tickLine={false}
+                      allowDecimals={false}
+                    />
+                    <Tooltip />
+                    <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                      {scoreDistribution.map((entry, index) => (
+                        <Cell key={index} fill={entry.color} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }
