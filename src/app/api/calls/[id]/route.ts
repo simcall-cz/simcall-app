@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
+import { getUserFromRequest } from "@/lib/auth";
 
 // GET /api/calls/[id] - Get a single call with transcript and feedback
 export async function GET(
@@ -7,6 +8,11 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const user = await getUserFromRequest(request);
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { id } = await params;
     const supabase = createServerClient();
 
@@ -22,6 +28,7 @@ export async function GET(
       `
       )
       .eq("id", id)
+      .eq("user_id", user.id)
       .order("sort_order", {
         referencedTable: "transcripts",
         ascending: true,
@@ -51,6 +58,11 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const user = await getUserFromRequest(request);
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { id } = await params;
     const supabase = createServerClient();
     const body = await request.json();
@@ -77,6 +89,7 @@ export async function PATCH(
       .from("calls")
       .update(updateData)
       .eq("id", id)
+      .eq("user_id", user.id)
       .select()
       .single();
 

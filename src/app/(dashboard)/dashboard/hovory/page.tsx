@@ -16,6 +16,7 @@ import {
   Loader2,
   PhoneOff,
 } from "lucide-react";
+import { getAuthHeaders } from "@/lib/auth";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -102,7 +103,8 @@ function CallDetailModal({
   useEffect(() => {
     async function fetchDetail() {
       try {
-        const res = await fetch(`/api/calls/${callId}`);
+        const headers = await getAuthHeaders();
+        const res = await fetch(`/api/calls/${callId}`, { headers });
         if (res.ok) {
           const data = await res.json();
           const row = data.call;

@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
+import { getUserFromRequest } from "@/lib/auth";
 
 // GET /api/calls - List all calls for the current user
 export async function GET(request: NextRequest) {
   try {
+    const user = await getUserFromRequest(request);
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const supabase = createServerClient();
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get("limit") || "20");
@@ -20,7 +26,7 @@ export async function GET(request: NextRequest) {
         feedback (*)
       `
       )
-      .eq("user_id", "user-1")
+      .eq("user_id", user.id)
       .order("date", { ascending: false })
       .range(offset, offset + limit - 1);
 
@@ -47,6 +53,11 @@ export async function GET(request: NextRequest) {
 // POST /api/calls - Create a new call (start training session)
 export async function POST(request: NextRequest) {
   try {
+    const user = await getUserFromRequest(request);
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const supabase = createServerClient();
     const body = await request.json();
     const { agent_id, scenario_id } = body;
@@ -98,7 +109,7 @@ export async function POST(request: NextRequest) {
     const { data: call, error: callError } = await supabase
       .from("calls")
       .insert({
-        user_id: "user-1",
+        user_id: user.id,
         agent_id,
         scenario_id,
         status: "pending",

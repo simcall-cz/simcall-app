@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useConversation } from "@elevenlabs/react";
+import { getAuthHeaders } from "@/lib/auth";
 
 export type CallPhase =
   | "idle"
@@ -85,34 +86,37 @@ export function useTrainingCall(options: UseTrainingCallOptions = {}) {
 
       if (currentCallId) {
         // Step 1: Update call record with conversation_id and duration
-        fetch(`/api/calls/${currentCallId}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            status: "processing",
-            duration_seconds: finalDuration,
-            conversation_id: currentConversationId,
-          }),
-        })
-          .then(() => {
-            // Step 2: Trigger server-side processing
-            // (fetches transcript from ElevenLabs, sends to ChatGPT, stores in Supabase)
-            return fetch(`/api/calls/${currentCallId}/process`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
+        getAuthHeaders().then((headers) => {
+          fetch(`/api/calls/${currentCallId}`, {
+            method: "PATCH",
+            headers,
+            body: JSON.stringify({
+              status: "processing",
+              duration_seconds: finalDuration,
+              conversation_id: currentConversationId,
+            }),
+          })
+            .then(() => {
+              // Step 2: Trigger server-side processing
+              return getAuthHeaders().then((processHeaders) =>
+                fetch(`/api/calls/${currentCallId}/process`, {
+                  method: "POST",
+                  headers: processHeaders,
+                })
+              );
+            })
+            .then((res) => res.json())
+            .then((result) => {
+              console.log("Call processing result:", result);
+              setState((prev) => ({ ...prev, phase: "completed" }));
+              optionsRef.current.onCallEnded?.(currentCallId);
+            })
+            .catch((err) => {
+              console.error("Failed to process call:", err);
+              // Still mark as completed so the user isn't stuck
+              setState((prev) => ({ ...prev, phase: "completed" }));
             });
-          })
-          .then((res) => res.json())
-          .then((result) => {
-            console.log("Call processing result:", result);
-            setState((prev) => ({ ...prev, phase: "completed" }));
-            optionsRef.current.onCallEnded?.(currentCallId);
-          })
-          .catch((err) => {
-            console.error("Failed to process call:", err);
-            // Still mark as completed so the user isn't stuck
-            setState((prev) => ({ ...prev, phase: "completed" }));
-          });
+        });
       } else {
         // No callId — still mark as completed so UI isn't stuck
         setState((prev) => ({ ...prev, phase: "completed" }));
@@ -157,9 +161,10 @@ export function useTrainingCall(options: UseTrainingCallOptions = {}) {
         }));
 
         // 1. Get signed URL from our API
+        const headers = await getAuthHeaders();
         const response = await fetch("/api/calls", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers,
           body: JSON.stringify({
             agent_id: agentId,
             scenario_id: scenarioId,
@@ -193,9 +198,10 @@ export function useTrainingCall(options: UseTrainingCallOptions = {}) {
         }));
 
         // 3. Update call record with conversation_id
+        const patchHeaders = await getAuthHeaders();
         await fetch(`/api/calls/${call_id}`, {
           method: "PATCH",
-          headers: { "Content-Type": "application/json" },
+          headers: patchHeaders,
           body: JSON.stringify({
             status: "active",
             conversation_id: convId,

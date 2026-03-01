@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import type { CallRecord } from "@/types/dashboard";
 import { adaptCallsToRecords } from "@/lib/adapters";
+import { getAuthHeaders } from "@/lib/auth";
 
 interface UseCallHistoryOptions {
   limit?: number;
@@ -37,7 +38,8 @@ export function useCallHistory(
         params.set("status", status);
       }
 
-      const response = await fetch(`/api/calls?${params}`);
+      const headers = await getAuthHeaders();
+      const response = await fetch(`/api/calls?${params}`, { headers });
 
       if (!response.ok) {
         throw new Error("Nepodařilo se načíst hovory");
