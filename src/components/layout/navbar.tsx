@@ -18,6 +18,8 @@ const navItems: NavItem[] = [
   { label: "Pro manažery", href: "/pro-manazery" },
   { label: "Ceník", href: "/cenik" },
   { label: "FAQ", href: "/faq" },
+  { label: "O nás", href: "/o-nas" },
+  { label: "Kontakt", href: "/kontakt" },
 ];
 
 export function Navbar() {
@@ -56,8 +58,8 @@ export function Navbar() {
         <nav className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-0.5">
-            <span className="text-xl font-bold text-neutral-800">ELITE</span>
-            <span className="text-xl font-bold text-primary-500">AI</span>
+            <span className="text-xl font-bold text-neutral-800">Sim</span>
+            <span className="text-xl font-bold text-primary-500">Call</span>
           </Link>
 
           {/* Desktop Navigation */}

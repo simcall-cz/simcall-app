@@ -88,8 +88,8 @@ export function Sidebar({ variant, isOpen, onClose }: SidebarProps) {
       {/* Logo */}
       <div className="flex items-center justify-between h-16 px-6 border-b border-neutral-100">
         <Link href="/" className="flex items-center gap-0.5">
-          <span className="text-xl font-bold text-neutral-800">ELITE</span>
-          <span className="text-xl font-bold text-primary-500">AI</span>
+          <span className="text-xl font-bold text-neutral-800">Sim</span>
+          <span className="text-xl font-bold text-primary-500">Call</span>
         </Link>
         <button
           onClick={onClose}

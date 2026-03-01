@@ -34,9 +34,9 @@ import {
 } from "@/components/ui/card";
 
 export const metadata: Metadata = {
-  title: "Pro manažery | ELITE AI",
+  title: "Pro manažery | SimCall",
   description:
-    "Posuňte celý tým na novou úroveň. ELITE AI nabízí manažerský dashboard, sledování výkonnosti týmu a měřitelné výsledky školení.",
+    "Posuňte celý tým na novou úroveň. SimCall nabízí manažerský dashboard, sledování výkonnosti týmu a měřitelné výsledky školení.",
 };
 
 const painPoints = [
@@ -193,93 +193,93 @@ export default function ProManageryPage() {
           <ScrollReveal delay={0.1}>
             <div className="mt-12 max-w-5xl mx-auto relative">
               <Badge variant="secondary" className="absolute -top-3 left-6 z-10">Ukázkový přehled</Badge>
-            <Card className="overflow-hidden border-neutral-200">
-              <CardContent className="p-6 sm:p-8">
-                {/* Team Summary Bar */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-neutral-100">
-                  <div>
-                    <h3 className="text-lg font-semibold text-neutral-800">
-                      Přehled týmu
-                    </h3>
-                    <p className="text-sm text-neutral-500">
-                      Únor 2026 - 4 aktivní makléři
-                    </p>
-                  </div>
-                  <div className="flex gap-6">
-                    <div className="text-center">
-                      <p className="text-2xl font-bold text-primary-600">
-                        80 %
-                      </p>
-                      <p className="text-xs text-neutral-500">
-                        Průměrná úspěšnost
+              <Card className="overflow-hidden border-neutral-200">
+                <CardContent className="p-6 sm:p-8">
+                  {/* Team Summary Bar */}
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-neutral-100">
+                    <div>
+                      <h3 className="text-lg font-semibold text-neutral-800">
+                        Přehled týmu
+                      </h3>
+                      <p className="text-sm text-neutral-500">
+                        Únor 2026 - 4 aktivní makléři
                       </p>
                     </div>
-                    <div className="text-center">
-                      <p className="text-2xl font-bold text-green-600">
-                        +12 %
-                      </p>
-                      <p className="text-xs text-neutral-500">
-                        Oproti minulému měsíci
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Team Members Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                  {teamMembers.map((member) => (
-                    <div
-                      key={member.initials}
-                      className="bg-neutral-50 rounded-xl p-4 border border-neutral-100 text-center"
-                    >
-                      <div className="w-12 h-12 rounded-full bg-primary-500 text-white flex items-center justify-center text-sm font-bold mx-auto">
-                        {member.initials}
+                    <div className="flex gap-6">
+                      <div className="text-center">
+                        <p className="text-2xl font-bold text-primary-600">
+                          80 %
+                        </p>
+                        <p className="text-xs text-neutral-500">
+                          Průměrná úspěšnost
+                        </p>
                       </div>
-                      <p className="mt-3 text-sm font-semibold text-neutral-800">
-                        {member.name}
-                      </p>
-                      <p className="text-xs text-neutral-500">{member.role}</p>
-                      <p className="mt-2 text-lg font-bold text-primary-600">
-                        {member.rate}
-                      </p>
-                      <p className="text-xs text-neutral-400">Úspěšnost</p>
+                      <div className="text-center">
+                        <p className="text-2xl font-bold text-green-600">
+                          +12 %
+                        </p>
+                        <p className="text-xs text-neutral-500">
+                          Oproti minulému měsíci
+                        </p>
+                      </div>
                     </div>
-                  ))}
-                </div>
+                  </div>
 
-                {/* Performance Summary Bar */}
-                <div>
-                  <h4 className="text-sm font-semibold text-neutral-700 mb-3">
-                    Výkonnost týmu dle kategorie
-                  </h4>
-                  <div className="space-y-3">
-                    {[
-                      { label: "Cold calling", value: 68 },
-                      { label: "Práce s námitkami", value: 75 },
-                      { label: "Closing", value: 62 },
-                      { label: "Follow-up", value: 82 },
-                    ].map((item) => (
-                      <div key={item.label}>
-                        <div className="flex justify-between items-center mb-1">
-                          <span className="text-sm text-neutral-600">
-                            {item.label}
-                          </span>
-                          <span className="text-sm font-semibold text-neutral-800">
-                            {item.value} %
-                          </span>
+                  {/* Team Members Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    {teamMembers.map((member) => (
+                      <div
+                        key={member.initials}
+                        className="bg-neutral-50 rounded-xl p-4 border border-neutral-100 text-center"
+                      >
+                        <div className="w-12 h-12 rounded-full bg-primary-500 text-white flex items-center justify-center text-sm font-bold mx-auto">
+                          {member.initials}
                         </div>
-                        <div className="w-full bg-neutral-100 rounded-full h-2">
-                          <div
-                            className="bg-primary-500 h-2 rounded-full"
-                            style={{ width: `${item.value}%` }}
-                          />
-                        </div>
+                        <p className="mt-3 text-sm font-semibold text-neutral-800">
+                          {member.name}
+                        </p>
+                        <p className="text-xs text-neutral-500">{member.role}</p>
+                        <p className="mt-2 text-lg font-bold text-primary-600">
+                          {member.rate}
+                        </p>
+                        <p className="text-xs text-neutral-400">Úspěšnost</p>
                       </div>
                     ))}
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+
+                  {/* Performance Summary Bar */}
+                  <div>
+                    <h4 className="text-sm font-semibold text-neutral-700 mb-3">
+                      Výkonnost týmu dle kategorie
+                    </h4>
+                    <div className="space-y-3">
+                      {[
+                        { label: "Cold calling", value: 68 },
+                        { label: "Práce s námitkami", value: 75 },
+                        { label: "Closing", value: 62 },
+                        { label: "Follow-up", value: 82 },
+                      ].map((item) => (
+                        <div key={item.label}>
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="text-sm text-neutral-600">
+                              {item.label}
+                            </span>
+                            <span className="text-sm font-semibold text-neutral-800">
+                              {item.value} %
+                            </span>
+                          </div>
+                          <div className="w-full bg-neutral-100 rounded-full h-2">
+                            <div
+                              className="bg-primary-500 h-2 rounded-full"
+                              style={{ width: `${item.value}%` }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </ScrollReveal>
         </Container>
@@ -325,7 +325,7 @@ export default function ProManageryPage() {
             <SectionHeader
               badge="ROI"
               title="Návratnost investice"
-              subtitle="Srovnejte tradiční přístup ke školení s ELITE AI a rozhodněte se na základě dat."
+              subtitle="Srovnejte tradiční přístup ke školení s SimCall a rozhodněte se na základě dat."
             />
           </ScrollReveal>
 
@@ -394,7 +394,7 @@ export default function ProManageryPage() {
               </Card>
             </ScrollReveal>
 
-            {/* ELITE AI */}
+            {/* SimCall */}
             <ScrollReveal delay={0.1}>
               <Card className="h-full border-green-200">
                 <CardHeader>
@@ -402,7 +402,7 @@ export default function ProManageryPage() {
                     <div className="w-10 h-10 rounded-full bg-green-50 text-green-500 flex items-center justify-center">
                       <Shield className="w-5 h-5" />
                     </div>
-                    <CardTitle>ELITE AI</CardTitle>
+                    <CardTitle>SimCall</CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -470,7 +470,7 @@ export default function ProManageryPage() {
                 Připraveni posunout svůj tým?
               </h2>
               <p className="mt-4 text-lg text-neutral-400 leading-relaxed">
-                Domluvte si nezávaznou demo prezentaci a zjistěte, jak ELITE AI
+                Domluvte si nezávaznou demo prezentaci a zjistěte, jak SimCall
                 pomůže právě vašemu týmu.
               </p>
               <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">

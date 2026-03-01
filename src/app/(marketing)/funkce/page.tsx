@@ -31,9 +31,9 @@ import { aiAgents } from "@/data/ai-agents";
 import { scenarios } from "@/data/scenarios";
 
 export const metadata: Metadata = {
-  title: "Funkce | ELITE AI",
+  title: "Funkce | SimCall",
   description:
-    "Objevte všechny funkce ELITE AI platformy: 10 AI hlasových agentů, realistické scénáře, detailní zpětná vazba a gamifikace pro realitní makléře.",
+    "Objevte všechny funkce SimCall platformy: 10 AI hlasových agentů, realistické scénáře, detailní zpětná vazba a gamifikace pro realitní makléře.",
 };
 
 const difficultyConfig = {
@@ -470,15 +470,14 @@ export default function FunkcePage() {
                         className={`flex items-center gap-3 p-2 rounded-lg ${entry.rank <= 3 ? "bg-neutral-50" : ""}`}
                       >
                         <span
-                          className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                            entry.rank === 1
+                          className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${entry.rank === 1
                               ? "bg-yellow-100 text-yellow-700"
                               : entry.rank === 2
                                 ? "bg-neutral-200 text-neutral-700"
                                 : entry.rank === 3
                                   ? "bg-orange-100 text-orange-700"
                                   : "bg-white text-neutral-500"
-                          }`}
+                            }`}
                         >
                           {entry.rank}
                         </span>
@@ -489,13 +488,12 @@ export default function FunkcePage() {
                           {entry.score}%
                         </span>
                         <span
-                          className={`text-xs ${
-                            entry.trend.startsWith("+")
+                          className={`text-xs ${entry.trend.startsWith("+")
                               ? "text-green-600"
                               : entry.trend === "0"
                                 ? "text-neutral-400"
                                 : "text-red-500"
-                          }`}
+                            }`}
                         >
                           {entry.trend === "0" ? "-" : entry.trend}
                         </span>
@@ -558,7 +556,7 @@ export default function FunkcePage() {
                 Připraveni na lepší hovory?
               </h2>
               <p className="mt-4 text-lg text-neutral-400 leading-relaxed">
-                Vyzkoušejte ELITE AI zdarma. Bez závazků, bez kreditní karty.
+                Vyzkoušejte SimCall zdarma. Bez závazků, bez kreditní karty.
               </p>
               <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/demo">

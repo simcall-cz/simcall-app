@@ -28,7 +28,7 @@ const footerLinks = {
   kontakt: {
     title: "Kontakt",
     links: [
-      { label: "info@eliteai.cz", href: "mailto:info@eliteai.cz" },
+      { label: "simcallcz@gmail.com", href: "mailto:simcallcz@gmail.com" },
       { label: "+420 123 456 789", href: "tel:+420123456789" },
     ],
   },
@@ -44,8 +44,8 @@ export function Footer() {
             {/* Logo Column */}
             <div className="col-span-2 md:col-span-1">
               <Link href="/" className="flex items-center gap-0.5">
-                <span className="text-xl font-bold text-white">ELITE</span>
-                <span className="text-xl font-bold text-primary-500">AI</span>
+                <span className="text-xl font-bold text-white">Sim</span>
+                <span className="text-xl font-bold text-primary-500">Call</span>
               </Link>
               <p className="mt-4 text-sm text-neutral-400 leading-relaxed">
                 Trénink hovorů s AI pro realitní makléře. Zlepšete své prodejní
@@ -79,7 +79,7 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-neutral-800 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-neutral-500">
-            &copy; {new Date().getFullYear()} ELITE AI. Všechna práva vyhrazena.
+            &copy; {new Date().getFullYear()} SimCall. Všechna práva vyhrazena.
           </p>
           <div className="flex items-center gap-6">
             <Link

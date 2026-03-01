@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "ELITE AI | Trénink hovorů s AI pro realitní makléře",
+  title: "SimCall | Trénink hovorů s AI pro realitní makléře",
   description:
     "Zlepšete své prodejní dovednosti s AI tréninkem hovorů. Realistické simulace, okamžitá zpětná vazba a personalizované lekce pro realitní makléře.",
 };

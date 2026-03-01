@@ -7,9 +7,9 @@ import { Container } from "@/components/shared/container";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
-  title: "404 - Stránka nenalezena | ELITE AI",
+  title: "404 - Stránka nenalezena | SimCall",
   description:
-    "Omlouváme se, ale stránka kterou hledáte neexistuje. Vraťte se na hlavní stránku ELITE AI.",
+    "Omlouváme se, ale stránka kterou hledáte neexistuje. Vraťte se na hlavní stránku SimCall.",
 };
 
 export default function NotFound() {

@@ -42,7 +42,7 @@ export default function FAQPage() {
           <SectionHeader
             badge="FAQ"
             title="Časté dotazy"
-            subtitle="Odpovědi na nejčastější otázky o ELITE AI"
+            subtitle="Odpovědi na nejčastější otázky o SimCall"
           />
         </ScrollReveal>
 
@@ -56,11 +56,10 @@ export default function FAQPage() {
                   setActiveCategory(category.key);
                   setOpenIndex(null);
                 }}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                  activeCategory === category.key
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${activeCategory === category.key
                     ? "bg-primary-500 text-white"
                     : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200"
-                }`}
+                  }`}
               >
                 {category.label}
               </button>
@@ -122,11 +121,11 @@ export default function FAQPage() {
                 <Button>Kontaktujte nás</Button>
               </Link>
               <a
-                href="mailto:info@eliteai.cz"
+                href="mailto:simcallcz@gmail.com"
                 className="flex items-center gap-2 text-sm text-neutral-500 hover:text-neutral-800 transition-colors"
               >
                 <Mail className="w-4 h-4" />
-                info@eliteai.cz
+                simcallcz@gmail.com
               </a>
             </div>
           </div>

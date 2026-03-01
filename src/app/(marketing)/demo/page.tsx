@@ -67,7 +67,7 @@ export default function DemoPage() {
           <ScrollReveal direction="left">
             <div>
               <h1 className="text-3xl font-bold text-neutral-800 tracking-tight">
-                Vyzkoušejte ELITE AI
+                Vyzkoušejte SimCall
               </h1>
               <p className="mt-4 text-lg text-neutral-500 leading-relaxed">
                 Získejte přístup k demo verzi a přesvědčte se sami

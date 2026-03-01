@@ -3,15 +3,15 @@ import type { FAQ } from "@/types";
 export const faqItems: FAQ[] = [
   // General (4)
   {
-    question: "Co je ELITE AI a jak funguje?",
+    question: "Co je SimCall a jak funguje?",
     answer:
-      "ELITE AI je tréninková platforma pro realitní makléře, která využívá pokročilou umělou inteligenci k simulaci reálných telefonních hovorů. Trénujete s AI agenty, kteří představují různé typy klientů, a po každém hovoru získáte detailní zpětnou vazbu a doporučení ke zlepšení.",
+      "SimCall je tréninková platforma pro realitní makléře, která využívá pokročilou umělou inteligenci k simulaci reálných telefonních hovorů. Trénujete s AI agenty, kteří představují různé typy klientů, a po každém hovoru získáte detailní zpětnou vazbu a doporučení ke zlepšení.",
     category: "general",
   },
   {
-    question: "Pro koho je ELITE AI určen?",
+    question: "Pro koho je SimCall určen?",
     answer:
-      "ELITE AI je navržen primárně pro realitní makléře, kteří chtějí zlepšit své dovednosti v cold callingu a telefonní komunikaci. Platforma je vhodná jak pro začínající makléře, kteří si chtějí vybudovat sebevědomí, tak pro zkušené profesionály, kteří chtějí zdokonalit svůj přístup. Nabízíme také řešení pro manažery realitních kanceláří, kteří chtějí trénovat celý tým.",
+      "SimCall je navržen primárně pro realitní makléře, kteří chtějí zlepšit své dovednosti v cold callingu a telefonní komunikaci. Platforma je vhodná jak pro začínající makléře, kteří si chtějí vybudovat sebevědomí, tak pro zkušené profesionály, kteří chtějí zdokonalit svůj přístup. Nabízíme také řešení pro manažery realitních kanceláří, kteří chtějí trénovat celý tým.",
     category: "general",
   },
   {
@@ -37,13 +37,13 @@ export const faqItems: FAQ[] = [
   {
     question: "Funguje platforma v češtině?",
     answer:
-      "Ano, ELITE AI je plně lokalizována do českého jazyka. AI agenti mluví česky s přirozeným přízvukem, všechny scénáře reflektují český realitní trh a zpětná vazba je kompletně v češtině. Pracujeme na tom, aby komunikace byla co nejpřirozenější a odpovídala reálným situacím na českém trhu.",
+      "Ano, SimCall je plně lokalizována do českého jazyka. AI agenti mluví česky s přirozeným přízvukem, všechny scénáře reflektují český realitní trh a zpětná vazba je kompletně v češtině. Pracujeme na tom, aby komunikace byla co nejpřirozenější a odpovídala reálným situacím na českém trhu.",
     category: "technology",
   },
   {
     question: "Jaké technické požadavky jsou potřeba?",
     answer:
-      "K používání ELITE AI potřebujete pouze moderní webový prohlížeč (Chrome, Firefox, Safari nebo Edge), stabilní internetové připojení a mikrofon. Aplikace funguje na počítači, tabletu i mobilním telefonu. Není potřeba instalovat žádný software. Doporučujeme používat sluchátka s mikrofonem pro nejlepší kvalitu hovoru.",
+      "K používání SimCall potřebujete pouze moderní webový prohlížeč (Chrome, Firefox, Safari nebo Edge), stabilní internetové připojení a mikrofon. Aplikace funguje na počítači, tabletu i mobilním telefonu. Není potřeba instalovat žádný software. Doporučujeme používat sluchátka s mikrofonem pro nejlepší kvalitu hovoru.",
     category: "technology",
   },
   {
@@ -55,7 +55,7 @@ export const faqItems: FAQ[] = [
 
   // Pricing (4)
   {
-    question: "Mohu si ELITE AI vyzkoušet zdarma?",
+    question: "Mohu si SimCall vyzkoušet zdarma?",
     answer:
       "Ano, nabízíme 14denní bezplatnou zkušební verzi plánu Professional bez nutnosti zadávat platební údaje. Během zkušební doby máte plný přístup ke všem AI agentům, scénářům a analytickým nástrojům. Po uplynutí zkušební doby se můžete rozhodnout, který plán vám vyhovuje.",
     category: "pricing",
@@ -87,7 +87,7 @@ export const faqItems: FAQ[] = [
     category: "security",
   },
   {
-    question: "Je ELITE AI v souladu s GDPR?",
+    question: "Je SimCall v souladu s GDPR?",
     answer:
       "Ano, plně dodržujeme nařízení GDPR. Zpracováváme pouze data nezbytná pro provoz služby. Máte plnou kontrolu nad svými daty, včetně práva na jejich export a smazání. Nahrávky hovorů jsou automaticky anonymizovány a můžete požádat o jejich kompletní vymazání kdykoli.",
     category: "security",

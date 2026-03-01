@@ -35,8 +35,8 @@ const contactInfo = [
   {
     icon: Mail,
     label: "E-mail",
-    value: "info@eliteai.cz",
-    href: "mailto:info@eliteai.cz",
+    value: "simcallcz@gmail.com",
+    href: "mailto:simcallcz@gmail.com",
   },
   {
     icon: Phone,

@@ -23,10 +23,10 @@ export default function AuthLayout({
         <div className="relative z-10">
           <Link href="/" className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-500">
-              <span className="text-lg font-black text-white">E</span>
+              <span className="text-lg font-black text-white">S</span>
             </div>
             <span className="text-xl font-bold tracking-tight">
-              ELITE <span className="text-primary-400">AI</span>
+              Sim<span className="text-primary-400">Call</span>
             </span>
           </Link>
         </div>
@@ -62,7 +62,7 @@ export default function AuthLayout({
         {/* Testimonial */}
         <div className="relative z-10 rounded-xl bg-white/5 border border-white/10 p-6">
           <p className="text-sm italic text-neutral-300 leading-relaxed">
-            &ldquo;Za první měsíc jsem zvýšil úspěšnost svých hovorů o 40 %. ELITE AI
+            &ldquo;Za první měsíc jsem zvýšil úspěšnost svých hovorů o 40 %. SimCall
             mi pomáhá trénovat přesně ty situace, ve kterých jsem dříve selhal.&rdquo;
           </p>
           <div className="mt-4 flex items-center gap-3">
@@ -84,10 +84,10 @@ export default function AuthLayout({
           <div className="mb-8 lg:hidden">
             <Link href="/" className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-500">
-                <span className="text-lg font-black text-white">E</span>
+                <span className="text-lg font-black text-white">S</span>
               </div>
               <span className="text-xl font-bold tracking-tight text-neutral-900">
-                ELITE <span className="text-primary-500">AI</span>
+                Sim<span className="text-primary-500">Call</span>
               </span>
             </Link>
           </div>

@@ -24,8 +24,8 @@ export function DashboardTopbar({ onMenuClick }: DashboardTopbarProps) {
 
         {/* Mobile Logo */}
         <Link href="/" className="flex items-center gap-0.5 lg:hidden">
-          <span className="text-lg font-bold text-neutral-800">ELITE</span>
-          <span className="text-lg font-bold text-primary-500">AI</span>
+          <span className="text-lg font-bold text-neutral-800">Sim</span>
+          <span className="text-lg font-bold text-primary-500">Call</span>
         </Link>
 
         {/* Breadcrumb */}

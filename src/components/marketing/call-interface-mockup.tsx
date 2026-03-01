@@ -36,7 +36,7 @@ export function CallInterfaceMockup({ className }: CallInterfaceMockupProps) {
           <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
           <div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
           <span className="ml-3 text-[11px] text-white/30 font-mono">
-            ELITE AI — Tréninkový hovor
+            SimCall — Tréninkový hovor
           </span>
         </div>
 

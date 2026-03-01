@@ -39,62 +39,62 @@ const comparisonFeatures: {
   professional: string | boolean;
   enterprise: string | boolean;
 }[] = [
-  {
-    label: "Počet AI agentů",
-    starter: "5",
-    professional: "10",
-    enterprise: "10 + vlastní",
-  },
-  {
-    label: "Počet scénářů",
-    starter: "5",
-    professional: "Všechny + vlastní",
-    enterprise: "Neomezené",
-  },
-  {
-    label: "Hovory za měsíc",
-    starter: "20",
-    professional: "Neomezené",
-    enterprise: "Neomezené",
-  },
-  {
-    label: "Analýza hovorů",
-    starter: "Základní",
-    professional: "Pokročilá",
-    enterprise: "Pokročilá",
-  },
-  { label: "Přepis hovoru", starter: true, professional: true, enterprise: true },
-  {
-    label: "Gamifikace",
-    starter: false,
-    professional: true,
-    enterprise: true,
-  },
-  {
-    label: "Manažerský dashboard",
-    starter: false,
-    professional: false,
-    enterprise: true,
-  },
-  {
-    label: "API přístup",
-    starter: false,
-    professional: false,
-    enterprise: true,
-  },
-  {
-    label: "Prioritní podpora",
-    starter: false,
-    professional: true,
-    enterprise: true,
-  },
-  {
-    label: "Vlastní scénáře",
-    starter: false,
-    professional: true,
-    enterprise: true,
-  },
-];
+    {
+      label: "Počet AI agentů",
+      starter: "5",
+      professional: "10",
+      enterprise: "10 + vlastní",
+    },
+    {
+      label: "Počet scénářů",
+      starter: "5",
+      professional: "Všechny + vlastní",
+      enterprise: "Neomezené",
+    },
+    {
+      label: "Hovory za měsíc",
+      starter: "20",
+      professional: "Neomezené",
+      enterprise: "Neomezené",
+    },
+    {
+      label: "Analýza hovorů",
+      starter: "Základní",
+      professional: "Pokročilá",
+      enterprise: "Pokročilá",
+    },
+    { label: "Přepis hovoru", starter: true, professional: true, enterprise: true },
+    {
+      label: "Gamifikace",
+      starter: false,
+      professional: true,
+      enterprise: true,
+    },
+    {
+      label: "Manažerský dashboard",
+      starter: false,
+      professional: false,
+      enterprise: true,
+    },
+    {
+      label: "API přístup",
+      starter: false,
+      professional: false,
+      enterprise: true,
+    },
+    {
+      label: "Prioritní podpora",
+      starter: false,
+      professional: true,
+      enterprise: true,
+    },
+    {
+      label: "Vlastní scénáře",
+      starter: false,
+      professional: true,
+      enterprise: true,
+    },
+  ];
 
 function FAQItem({ faq }: { faq: FAQ }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -109,9 +109,8 @@ function FAQItem({ faq }: { faq: FAQ }) {
           {faq.question}
         </span>
         <ChevronDown
-          className={`w-5 h-5 text-neutral-400 shrink-0 transition-transform ${
-            isOpen ? "rotate-180" : ""
-          }`}
+          className={`w-5 h-5 text-neutral-400 shrink-0 transition-transform ${isOpen ? "rotate-180" : ""
+            }`}
         />
       </button>
       {isOpen && (
@@ -157,29 +156,25 @@ export default function CenikPage() {
           <ScrollReveal>
             <div className="flex items-center justify-center gap-4 mb-12">
               <span
-                className={`text-sm font-medium ${
-                  !isAnnual ? "text-neutral-800" : "text-neutral-400"
-                }`}
+                className={`text-sm font-medium ${!isAnnual ? "text-neutral-800" : "text-neutral-400"
+                  }`}
               >
                 Měsíčně
               </span>
               <button
                 onClick={() => setIsAnnual(!isAnnual)}
-                className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${
-                  isAnnual ? "bg-primary-500" : "bg-neutral-300"
-                }`}
+                className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${isAnnual ? "bg-primary-500" : "bg-neutral-300"
+                  }`}
                 aria-label="Přepnout na roční fakturaci"
               >
                 <span
-                  className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${
-                    isAnnual ? "translate-x-6" : "translate-x-1"
-                  }`}
+                  className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${isAnnual ? "translate-x-6" : "translate-x-1"
+                    }`}
                 />
               </button>
               <span
-                className={`text-sm font-medium ${
-                  isAnnual ? "text-neutral-800" : "text-neutral-400"
-                }`}
+                className={`text-sm font-medium ${isAnnual ? "text-neutral-800" : "text-neutral-400"
+                  }`}
               >
                 Ročně
               </span>
@@ -196,11 +191,10 @@ export default function CenikPage() {
             {pricingPlans.map((plan, index) => (
               <ScrollReveal key={plan.id} delay={index * 0.05}>
                 <Card
-                  className={`h-full flex flex-col relative ${
-                    plan.highlighted
+                  className={`h-full flex flex-col relative ${plan.highlighted
                       ? "border-2 border-primary-500 shadow-lg"
                       : ""
-                  }`}
+                    }`}
                 >
                   {plan.highlighted && (
                     <div className="absolute -top-3 left-1/2 -translate-x-1/2">
@@ -303,11 +297,10 @@ export default function CenikPage() {
                             )
                           ) : (
                             <span
-                              className={`font-medium ${
-                                plan === "professional"
+                              className={`font-medium ${plan === "professional"
                                   ? "text-primary-600"
                                   : "text-neutral-700"
-                              }`}
+                                }`}
                             >
                               {feature[plan]}
                             </span>
@@ -353,7 +346,7 @@ export default function CenikPage() {
                 Připraveni začít?
               </h2>
               <p className="mt-4 text-lg text-neutral-400 leading-relaxed">
-                Vyzkoušejte ELITE AI zdarma na 14 dní. Žádná platební karta,
+                Vyzkoušejte SimCall zdarma na 14 dní. Žádná platební karta,
                 žádné závazky.
               </p>
               <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">

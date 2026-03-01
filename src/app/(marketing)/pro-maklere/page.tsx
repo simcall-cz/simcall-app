@@ -33,9 +33,9 @@ import {
 } from "@/components/ui/card";
 
 export const metadata: Metadata = {
-  title: "Pro makléře | ELITE AI",
+  title: "Pro makléře | SimCall",
   description:
-    "Staňte se jedničkou ve svém týmu. ELITE AI pomáhá realitním makléřům zlepšit cold calling, zvýšit konverze a získat sebevědomí při telefonování.",
+    "Staňte se jedničkou ve svém týmu. SimCall pomáhá realitním makléřům zlepšit cold calling, zvýšit konverze a získat sebevědomí při telefonování.",
 };
 
 const painPoints = [
@@ -130,7 +130,7 @@ export default function ProMaklerePage() {
             <SectionHeader
               badge="Výzvy"
               title="Znáte to?"
-              subtitle="Tyto problémy trápí většinu realitních makléřů. ELITE AI je řeší všechny."
+              subtitle="Tyto problémy trápí většinu realitních makléřů. SimCall je řeší všechny."
             />
           </ScrollReveal>
 
@@ -166,8 +166,8 @@ export default function ProMaklerePage() {
           <ScrollReveal>
             <SectionHeader
               badge="Řešení"
-              title="ELITE AI má odpověď na každý problém"
-              subtitle="Pro každou výzvu existuje konkrétní řešení. Podívejte se, jak vám ELITE AI pomůže."
+              title="SimCall má odpověď na každý problém"
+              subtitle="Pro každou výzvu existuje konkrétní řešení. Podívejte se, jak vám SimCall pomůže."
             />
           </ScrollReveal>
 
@@ -179,9 +179,8 @@ export default function ProMaklerePage() {
                 direction={index % 2 === 0 ? "left" : "right"}
               >
                 <div
-                  className={`flex flex-col md:flex-row items-center gap-8 ${
-                    index % 2 !== 0 ? "md:flex-row-reverse" : ""
-                  }`}
+                  className={`flex flex-col md:flex-row items-center gap-8 ${index % 2 !== 0 ? "md:flex-row-reverse" : ""
+                    }`}
                 >
                   <div className="flex-1">
                     <IconBox className="mb-4">
@@ -213,7 +212,7 @@ export default function ProMaklerePage() {
             <SectionHeader
               badge="Pro koho"
               title="Ať jste nováček nebo profík"
-              subtitle="ELITE AI se přizpůsobí vaší úrovni a pomůže vám růst bez ohledu na zkušenosti."
+              subtitle="SimCall se přizpůsobí vaší úrovni a pomůže vám růst bez ohledu na zkušenosti."
             />
           </ScrollReveal>
 
@@ -467,13 +466,12 @@ export default function ProMaklerePage() {
                           <p className="text-xs text-neutral-400">{call.time}</p>
                         </div>
                         <span
-                          className={`text-sm font-semibold ${
-                            call.score >= 80
+                          className={`text-sm font-semibold ${call.score >= 80
                               ? "text-green-600"
                               : call.score >= 60
                                 ? "text-yellow-600"
                                 : "text-red-500"
-                          }`}
+                            }`}
                         >
                           {call.score} %
                         </span>

@@ -7,7 +7,7 @@ export const testimonials: Testimonial[] = [
     role: "Senior realitní makléř",
     company: "RE/MAX Alfa",
     quote:
-      "ELITE AI kompletně změnilo můj přístup k cold callingu. Za 3 měsíce používání se moje úspěšnost domlouvání schůzek zvedla o 40 %. AI agenti jsou neuvěřitelně realistickí a zpětná vazba po každém hovoru mi ukázala chyby, kterých jsem si nebyl vědom.",
+      "SimCall kompletně změnilo můj přístup k cold callingu. Za 3 měsíce používání se moje úspěšnost domlouvání schůzek zvedla o 40 %. AI agenti jsou neuvěřitelně realistickí a zpětná vazba po každém hovoru mi ukázala chyby, kterých jsem si nebyl vědom.",
     rating: 5,
     avatarInitials: "PN",
   },
@@ -17,7 +17,7 @@ export const testimonials: Testimonial[] = [
     role: "Manažerka pobočky",
     company: "Century 21 Praha",
     quote:
-      "Jako manažerka 12členného týmu oceňuji především přehled o výkonnosti jednotlivých makléřů. Vidím přesně, kde má kdo slabiny, a můžu přizpůsobit koučink. Nováčci se díky ELITE AI zapracují dvakrát rychleji než dříve.",
+      "Jako manažerka 12členného týmu oceňuji především přehled o výkonnosti jednotlivých makléřů. Vidím přesně, kde má kdo slabiny, a můžu přizpůsobit koučink. Nováčci se díky SimCall zapracují dvakrát rychleji než dříve.",
     rating: 5,
     avatarInitials: "KH",
   },
@@ -27,7 +27,7 @@ export const testimonials: Testimonial[] = [
     role: "Realitní makléř",
     company: "M&M Reality",
     quote:
-      "Jako začínající makléř jsem se bál telefonovat cizím lidem. S ELITE AI jsem si mohl nacvičit desítky hovorů bez stresu. Po měsíci tréninku jsem měl takové sebevědomí, že jsem hned první týden domluvil 5 schůzek. Jednoznačně doporučuji.",
+      "Jako začínající makléř jsem se bál telefonovat cizím lidem. S SimCall jsem si mohl nacvičit desítky hovorů bez stresu. Po měsíci tréninku jsem měl takové sebevědomí, že jsem hned první týden domluvil 5 schůzek. Jednoznačně doporučuji.",
     rating: 5,
     avatarInitials: "TV",
   },
@@ -47,7 +47,7 @@ export const testimonials: Testimonial[] = [
     role: "Ředitel",
     company: "Beneš Reality Group",
     quote:
-      "Implementovali jsme ELITE AI pro celou firmu s 30 makléři. Za první kvartál se nám průměrná úspěšnost cold callů zvýšila o 25 % a obrat vzrostl o 18 %. ROI se nám vrátilo už v prvním měsíci. Enterprise řešení přesně splnilo naše očekávání.",
+      "Implementovali jsme SimCall pro celou firmu s 30 makléři. Za první kvartál se nám průměrná úspěšnost cold callů zvýšila o 25 % a obrat vzrostl o 18 %. ROI se nám vrátilo už v prvním měsíci. Enterprise řešení přesně splnilo naše očekávání.",
     rating: 5,
     avatarInitials: "RB",
   },
