@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { Check, Target, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -13,15 +13,31 @@ export function AnalyticsMockup({ className, compact }: AnalyticsMockupProps) {
   const score = 78;
   const circumference = 2 * Math.PI * 42;
   const scoreOffset = circumference * (1 - score / 100);
+  const ref = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.7, delay: 0.2 }}
+    <div
+      ref={ref}
       className={cn(
-        "relative rounded-2xl bg-white border border-neutral-200 shadow-xl overflow-hidden",
+        "relative rounded-2xl bg-white border border-neutral-200 shadow-xl overflow-hidden transition-all duration-500 ease-out",
+        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6",
         className
       )}
     >
@@ -125,6 +141,6 @@ export function AnalyticsMockup({ className, compact }: AnalyticsMockupProps) {
           </div>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 }
