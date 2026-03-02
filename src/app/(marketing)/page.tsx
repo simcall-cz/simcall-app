@@ -10,9 +10,10 @@ import {
   User,
   Users,
   Check,
-  Phone,
   Sparkles,
-  Zap,
+  Trophy,
+  Wand2,
+  Building2,
 } from "lucide-react";
 
 import { Container } from "@/components/shared/container";
@@ -22,7 +23,7 @@ import { GradientText } from "@/components/shared/gradient-text";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-import { CallInterfaceMockup } from "@/components/marketing/call-interface-mockup";
+import { HeroMockup } from "@/components/marketing/hero-mockup";
 import { AnalyticsMockup } from "@/components/marketing/analytics-mockup";
 import { PricingTeaser } from "@/components/marketing/pricing-teaser";
 
@@ -49,32 +50,70 @@ const difficultyLabels = {
 const steps = [
   {
     num: "01",
-    icon: Phone,
+    icon: Mic,
     title: "Vyberte scénář",
-    desc: "Zvolte si typ hovoru a AI agenta, se kterým chcete trénovat.",
+    desc: "Zvolte AI agenta a typ hovoru — od studeného kontaktu po náročné námitky.",
   },
   {
     num: "02",
-    icon: Mic,
+    icon: BarChart3,
     title: "Zavolejte AI agentovi",
-    desc: "Hovor probíhá v reálném čase přímo ve vašem prohlížeči.",
+    desc: "Hovor probíhá v reálném čase přímo ve vašem prohlížeči. Bez instalace.",
   },
   {
     num: "03",
-    icon: BarChart3,
+    icon: TrendingUp,
     title: "Získejte zpětnou vazbu",
-    desc: "Okamžitá analýza se skóre, přepisem a doporučeními.",
+    desc: "Okamžitá AI analýza se skóre, přepisem, výplňovými slovy a doporučeními.",
   },
 ];
 
 /* ------------------------------------------------------------------ */
-/*  Feature bullets                                                     */
+/*  Features                                                            */
 /* ------------------------------------------------------------------ */
-const featureBullets = [
-  { icon: Mic, text: "10 AI agentů s vlastní osobností" },
-  { icon: FileText, text: "Realistické scénáře z praxe" },
-  { icon: BarChart3, text: "Detailní analýza po každém hovoru" },
-  { icon: TrendingUp, text: "Sledování pokroku v čase" },
+const features = [
+  {
+    icon: Sparkles,
+    title: "AI analýza každého hovoru",
+    desc: "Automatické vyhodnocení se skóre, silnými stránkami a konkrétními tipy ke zlepšení.",
+    tag: "Solo",
+    tagColor: "bg-primary-50 text-primary-600",
+  },
+  {
+    icon: FileText,
+    title: "Přepis a nahrávka",
+    desc: "Kompletní přepis hovoru, detekce výplňových slov a možnost exportu do PDF/CSV.",
+    tag: "Solo",
+    tagColor: "bg-primary-50 text-primary-600",
+  },
+  {
+    icon: TrendingUp,
+    title: "Sledování pokroku",
+    desc: "Detailní statistiky vašeho zlepšení v čase. Vidíte přesně, kde rostete.",
+    tag: "Solo",
+    tagColor: "bg-primary-50 text-primary-600",
+  },
+  {
+    icon: BarChart3,
+    title: "Manager dashboard",
+    desc: "Přehled výkonu celého týmu na jednom místě. Analytika každého makléře.",
+    tag: "Team",
+    tagColor: "bg-blue-50 text-blue-600",
+  },
+  {
+    icon: Trophy,
+    title: "Žebříčky v týmu",
+    desc: "Gamifikace motivující makléře k pravidelnému tréninku. Sdílená banka hovorů.",
+    tag: "Team",
+    tagColor: "bg-blue-50 text-blue-600",
+  },
+  {
+    icon: Wand2,
+    title: "AI agenti na míru",
+    desc: "Scénáře z reálných situací vaší firmy. White-label řešení pod vaší značkou.",
+    tag: "Enterprise",
+    tagColor: "bg-purple-50 text-purple-600",
+  },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -82,13 +121,14 @@ const featureBullets = [
 /* ------------------------------------------------------------------ */
 export default function HomePage() {
   const showcaseAgents = aiAgents.slice(0, 5);
+  const extraAgentsCount = aiAgents.length - 5;
 
   return (
     <>
       {/* ============================================ */}
-      {/* HERO - Split layout                          */}
+      {/* HERO                                         */}
       {/* ============================================ */}
-      <section className="relative overflow-hidden pt-16 pb-12 sm:pt-24 sm:pb-20 lg:pt-28 lg:pb-24">
+      <section className="relative overflow-hidden pt-16 pb-16 sm:pt-24 sm:pb-24 lg:pt-28 lg:pb-28">
         {/* Background decoration */}
         <div className="pointer-events-none absolute inset-0 -z-10">
           <div className="absolute top-20 right-0 w-[500px] h-[500px] rounded-full bg-primary-50/60 blur-3xl" />
@@ -105,17 +145,21 @@ export default function HomePage() {
 
               <ScrollReveal delay={0.1}>
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-neutral-800 leading-[1.1]">
-                  Trénujte hovory{" "}
-                  <GradientText>s&nbsp;AI.</GradientText>
+                  První{" "}
+                  <GradientText>AI simulátor</GradientText>
+                  <br />
+                  pro realitní makléře
+                  <br />
+                  v&nbsp;Česku
                 </h1>
               </ScrollReveal>
 
               <ScrollReveal delay={0.2}>
                 <ul className="mt-6 space-y-2.5">
                   {[
-                    "Realistické simulace hovorů s AI agenty",
-                    "Okamžitá zpětná vazba a analýza",
-                    "Přepis, skóre a doporučení ke zlepšení",
+                    "Trénujte na reálných scénářích z praxe",
+                    "Okamžitá AI analýza s přepisem a skóre",
+                    "Přehled výkonu pro makléře i manažery",
                   ].map((item) => (
                     <li
                       key={item}
@@ -130,9 +174,9 @@ export default function HomePage() {
 
               <ScrollReveal delay={0.3}>
                 <div className="mt-8 flex flex-col sm:flex-row gap-3">
-                  <Link href="/demo">
+                  <Link href="/registrace">
                     <Button size="lg" className="group w-full sm:w-auto">
-                      Vyzkoušet demo
+                      Začít zdarma
                       <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </Link>
@@ -146,12 +190,15 @@ export default function HomePage() {
                     </Button>
                   </Link>
                 </div>
+                <p className="mt-3 text-xs text-neutral-400">
+                  Zdarma: 5 hovorů a 2 AI agenti. Bez kreditní karty.
+                </p>
               </ScrollReveal>
             </div>
 
-            {/* Right: Call Interface Mockup */}
+            {/* Right: Hero Mockup */}
             <div className="flex justify-center lg:justify-end">
-              <CallInterfaceMockup />
+              <HeroMockup />
             </div>
           </div>
         </Container>
@@ -173,7 +220,6 @@ export default function HomePage() {
             {steps.map((step, index) => (
               <ScrollReveal key={step.num} delay={index * 0.1}>
                 <div className="relative text-center p-6 rounded-2xl border border-neutral-100 bg-white hover:shadow-lg transition-shadow">
-                  {/* Step number */}
                   <span className="text-5xl font-black text-neutral-100">
                     {step.num}
                   </span>
@@ -189,7 +235,6 @@ export default function HomePage() {
                     {step.desc}
                   </p>
 
-                  {/* Connecting arrow (hidden on last + mobile) */}
                   {index < 2 && (
                     <div className="hidden md:block absolute top-1/2 -right-4 sm:-right-5 -translate-y-1/2 text-neutral-200">
                       <ArrowRight className="w-5 h-5" />
@@ -203,73 +248,58 @@ export default function HomePage() {
       </section>
 
       {/* ============================================ */}
-      {/* PRODUCT SHOWCASE - Call Interface + Features  */}
+      {/* FEATURES GRID                                */}
       {/* ============================================ */}
       <section className="py-16 sm:py-24 bg-neutral-50/80">
         <Container>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-            {/* Left: Mockup */}
-            <div className="flex justify-center order-2 lg:order-1">
-              <CallInterfaceMockup className="max-w-xs sm:max-w-sm" />
-            </div>
+          <ScrollReveal>
+            <SectionHeader
+              badge="Funkce"
+              title="Vše, co potřebujete ke zvýšení úspěšnosti"
+              subtitle="Od individuálního tréninku po správu celého týmu."
+            />
+          </ScrollReveal>
 
-            {/* Right: Text */}
-            <div className="order-1 lg:order-2">
-              <ScrollReveal>
-                <Badge className="mb-4">Produkt</Badge>
-                <h2 className="text-3xl sm:text-4xl font-bold text-neutral-800 tracking-tight">
-                  Realistické hovory{" "}
-                  <GradientText>s AI agenty</GradientText>
-                </h2>
-                <p className="mt-3 text-neutral-500 leading-relaxed">
-                  10 unikátních osobností. Každý reaguje jinak, má vlastní
-                  námitky a komunikační styl.
-                </p>
-              </ScrollReveal>
-
-              <ScrollReveal delay={0.1}>
-                <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {featureBullets.map((f) => (
-                    <div
-                      key={f.text}
-                      className="flex items-start gap-3 p-3 rounded-xl bg-white border border-neutral-100"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center shrink-0">
-                        <f.icon className="w-4 h-4 text-primary-500" />
-                      </div>
-                      <span className="text-sm text-neutral-700 leading-snug mt-1">
-                        {f.text}
-                      </span>
+          <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl mx-auto">
+            {features.map((feature, index) => (
+              <ScrollReveal key={feature.title} delay={index * 0.07}>
+                <div className="h-full bg-white rounded-2xl border border-neutral-100 p-6 hover:shadow-lg transition-shadow group">
+                  <div className="flex items-start justify-between gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center shrink-0 group-hover:bg-primary-100 transition-colors">
+                      <feature.icon className="w-5 h-5 text-primary-500" />
                     </div>
-                  ))}
+                    <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${feature.tagColor}`}>
+                      {feature.tag}
+                    </span>
+                  </div>
+                  <h3 className="font-semibold text-neutral-800 text-sm leading-snug">
+                    {feature.title}
+                  </h3>
+                  <p className="mt-2 text-sm text-neutral-500 leading-relaxed">
+                    {feature.desc}
+                  </p>
                 </div>
               </ScrollReveal>
-
-              <ScrollReveal delay={0.2}>
-                <div className="mt-8 flex flex-col sm:flex-row gap-3">
-                  <Link href="/funkce">
-                    <Button variant="outline" className="group w-full sm:w-auto">
-                      Prozkoumat funkce
-                      <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                    </Button>
-                  </Link>
-                  <Link href="/demo">
-                    <Button className="w-full sm:w-auto">
-                      Vyzkoušet demo
-                    </Button>
-                  </Link>
-                </div>
-              </ScrollReveal>
-            </div>
+            ))}
           </div>
+
+          <ScrollReveal delay={0.3}>
+            <div className="mt-10 text-center">
+              <Link href="/cenik">
+                <Button variant="outline" className="group">
+                  Porovnat všechny plány
+                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                </Button>
+              </Link>
+            </div>
+          </ScrollReveal>
         </Container>
       </section>
 
       {/* ============================================ */}
-      {/* ANALYTICS SHOWCASE - Feedback mockup          */}
+      {/* ANALYTICS SHOWCASE                           */}
       {/* ============================================ */}
       <section className="py-16 sm:py-24 bg-neutral-900 relative overflow-hidden">
-        {/* Glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary-500/5 rounded-full blur-3xl pointer-events-none" />
 
         <Container>
@@ -291,10 +321,10 @@ export default function HomePage() {
               <ScrollReveal delay={0.1}>
                 <ul className="mt-6 space-y-3">
                   {[
-                    "Celkové skóre a splněné cíle",
-                    "Kompletní přepis hovoru",
+                    "Celkové skóre a splněné cíle hovoru",
+                    "Kompletní přepis s časovými razítky",
                     "Identifikace výplňových slov",
-                    "Konkrétní tipy ke zlepšení",
+                    "Personalizované tipy ke zlepšení",
                   ].map((item) => (
                     <li
                       key={item}
@@ -308,14 +338,20 @@ export default function HomePage() {
               </ScrollReveal>
 
               <ScrollReveal delay={0.2}>
-                <div className="mt-8">
-                  <Link href="/funkce">
+                <div className="mt-8 flex gap-3">
+                  <Link href="/registrace">
+                    <Button size="sm" className="group">
+                      Vyzkoušet zdarma
+                      <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                    </Button>
+                  </Link>
+                  <Link href="/cenik">
                     <Button
                       variant="outline"
-                      className="border-neutral-700 text-neutral-300 hover:bg-neutral-800 hover:text-white hover:border-neutral-600 group"
+                      size="sm"
+                      className="border-neutral-700 text-neutral-300 hover:bg-neutral-800 hover:text-white hover:border-neutral-600"
                     >
-                      Zjistit více
-                      <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                      Zobrazit ceník
                     </Button>
                   </Link>
                 </div>
@@ -331,7 +367,7 @@ export default function HomePage() {
       </section>
 
       {/* ============================================ */}
-      {/* AUDIENCE SPLIT - Pro makléře / Pro manažery   */}
+      {/* AUDIENCE SPLIT - Makléři / Manažeři          */}
       {/* ============================================ */}
       <section className="py-16 sm:py-24">
         <Container>
@@ -355,9 +391,10 @@ export default function HomePage() {
                 </h3>
                 <ul className="mt-4 space-y-2.5">
                   {[
-                    "Trénujte bez stresu, kdykoliv",
-                    "Získejte okamžitou zpětnou vazbu",
-                    "Zlepšujte se s každým hovorem",
+                    "AI analýza hovoru s přepisem a skóre",
+                    "Personalizovaná doporučení ke zlepšení",
+                    "Export přepisů do PDF a CSV",
+                    "Sledování pokroku v čase",
                   ].map((item) => (
                     <li
                       key={item}
@@ -369,10 +406,10 @@ export default function HomePage() {
                   ))}
                 </ul>
                 <Link
-                  href="/pro-maklere"
+                  href="/cenik"
                   className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-primary-500 hover:text-primary-600 transition-colors group"
                 >
-                  Více pro makléře
+                  Solo plán od 490 Kč/měs.
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                 </Link>
               </div>
@@ -390,9 +427,10 @@ export default function HomePage() {
                 </h3>
                 <ul className="mt-4 space-y-2.5">
                   {[
-                    "Přehled o výkonnosti celého týmu",
-                    "Data pro efektivní koučink",
-                    "Měřitelná návratnost investice",
+                    "Manager dashboard s přehledem týmu",
+                    "Analytika výkonu každého makléře",
+                    "Žebříčky motivující celý tým",
+                    "Sdílená banka hovorů pro tým",
                   ].map((item) => (
                     <li
                       key={item}
@@ -404,27 +442,60 @@ export default function HomePage() {
                   ))}
                 </ul>
                 <Link
-                  href="/pro-manazery"
+                  href="/cenik"
                   className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-blue-500 hover:text-blue-600 transition-colors group"
                 >
-                  Více pro manažery
+                  Team plán od 2 490 Kč/měs.
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                 </Link>
               </div>
             </ScrollReveal>
           </div>
+
+          {/* Enterprise teaser */}
+          <ScrollReveal delay={0.15}>
+            <div className="mt-6 max-w-4xl mx-auto rounded-2xl border border-neutral-200 bg-white p-6 sm:p-8 hover:shadow-lg transition-shadow relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-purple-400" />
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
+                <div className="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center shrink-0">
+                  <Building2 className="w-6 h-6 text-purple-500" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold text-neutral-800">
+                    Pro velké realitní kanceláře
+                  </h3>
+                  <p className="mt-1 text-sm text-neutral-500">
+                    White-label řešení, vlastní AI agenti ze situací vaší firmy a dedikovaný vývojář. Cena dohodou.
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {["White-label", "Vlastní AI agenti na míru", "Dedikovaný vývojář"].map((item) => (
+                      <span key={item} className="text-[11px] font-medium bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full">
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <Link href="/domluvit-schuzku" className="shrink-0">
+                  <Button variant="outline" className="border-purple-200 text-purple-600 hover:bg-purple-50 hover:border-purple-300 group whitespace-nowrap">
+                    Domluvit schůzku
+                    <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </ScrollReveal>
         </Container>
       </section>
 
       {/* ============================================ */}
-      {/* AI AGENTS - Compact avatar strip              */}
+      {/* AI AGENTS                                    */}
       {/* ============================================ */}
       <section className="py-16 sm:py-24 bg-neutral-50/80">
         <Container>
           <ScrollReveal>
             <SectionHeader
               badge="AI Agenti"
-              title="10 unikátních osobností"
+              title={`${aiAgents.length}+ unikátních osobností`}
               subtitle="Od skeptických klientů po investory. Připravte se na cokoli."
             />
           </ScrollReveal>
@@ -442,12 +513,13 @@ export default function HomePage() {
                     {agent.name}
                   </p>
                   <span
-                    className={`mt-1 text-[11px] px-2 py-0.5 rounded-full font-medium ${agent.difficulty === "easy"
+                    className={`mt-1 text-[11px] px-2 py-0.5 rounded-full font-medium ${
+                      agent.difficulty === "easy"
                         ? "bg-green-100 text-green-700"
                         : agent.difficulty === "medium"
                           ? "bg-yellow-100 text-yellow-700"
                           : "bg-red-100 text-red-700"
-                      }`}
+                    }`}
                   >
                     {difficultyLabels[agent.difficulty]}
                   </span>
@@ -455,24 +527,25 @@ export default function HomePage() {
               </ScrollReveal>
             ))}
 
-            {/* +5 more indicator */}
-            <ScrollReveal delay={0.3}>
-              <div className="flex flex-col items-center">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-neutral-200 text-neutral-500 flex items-center justify-center text-lg font-bold">
-                  +5
+            {extraAgentsCount > 0 && (
+              <ScrollReveal delay={0.3}>
+                <div className="flex flex-col items-center">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-neutral-200 text-neutral-500 flex items-center justify-center text-lg font-bold">
+                    +{extraAgentsCount}
+                  </div>
+                  <p className="mt-2.5 text-sm font-medium text-neutral-500 text-center">
+                    dalších
+                  </p>
                 </div>
-                <p className="mt-2.5 text-sm font-medium text-neutral-500 text-center">
-                  dalších
-                </p>
-              </div>
-            </ScrollReveal>
+              </ScrollReveal>
+            )}
           </div>
 
           <ScrollReveal delay={0.35}>
             <div className="mt-10 text-center">
-              <Link href="/funkce">
+              <Link href="/registrace">
                 <Button variant="outline" className="group">
-                  Zobrazit všechny agenty
+                  Vyzkoušet zdarma — 5 hovorů
                   <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                 </Button>
               </Link>
@@ -482,7 +555,7 @@ export default function HomePage() {
       </section>
 
       {/* ============================================ */}
-      {/* PRICING TEASER                                */}
+      {/* PRICING TEASER                               */}
       {/* ============================================ */}
       <section className="py-16 sm:py-24">
         <Container>
@@ -512,7 +585,7 @@ export default function HomePage() {
       </section>
 
       {/* ============================================ */}
-      {/* FINAL CTA                                     */}
+      {/* FINAL CTA                                    */}
       {/* ============================================ */}
       <section className="py-20 sm:py-28 bg-neutral-900 relative overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-primary-500/5 rounded-full blur-3xl pointer-events-none" />
@@ -523,12 +596,12 @@ export default function HomePage() {
                 Připraveni na lepší hovory?
               </h2>
               <p className="mt-3 sm:mt-4 text-base sm:text-lg text-neutral-400 leading-relaxed">
-                Vyzkoušejte demo zdarma. Bez závazků, bez kreditní karty.
+                Začněte zdarma. 5 hovorů a 2 AI agenti bez kreditní karty.
               </p>
               <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/demo">
+                <Link href="/registrace">
                   <Button size="lg" className="group w-full sm:w-auto">
-                    Vyzkoušet demo zdarma
+                    Začít zdarma
                     <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
