@@ -29,7 +29,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useCallHistory } from "@/hooks/useCallHistory";
-import { getCurrentUserProfile } from "@/lib/auth";
+import { getUserSessionInfo } from "@/lib/auth";
 
 const FREE_CALLS_LIMIT = 3;
 
@@ -627,18 +627,14 @@ function PaidDashboard({
 export default function DashboardPage() {
   const today = formatFullDate(new Date().toISOString());
   const { calls, isLoading } = useCallHistory({ limit: 50 });
-  const [userProfile, setUserProfile] = useState<{
-    fullName: string;
-    role: "free" | "paid";
-  } | null>(null);
+  const [userName, setUserName] = useState("uživateli");
+  const [userRole, setUserRole] = useState<"free" | "paid" | null>(null);
 
   useEffect(() => {
-    getCurrentUserProfile().then((profile) => {
-      if (profile) {
-        setUserProfile({
-          fullName: profile.fullName || "uživateli",
-          role: profile.role,
-        });
+    getUserSessionInfo().then((info) => {
+      if (info) {
+        setUserName(info.fullName?.split(" ")[0] || "uživateli");
+        setUserRole(info.role);
       }
     });
   }, []);
@@ -669,17 +665,7 @@ export default function DashboardPage() {
     }));
   }, [calls]);
 
-  const userName = userProfile?.fullName?.split(" ")[0] || "uživateli";
-  const isFree = userProfile?.role === "free";
-
-  // Show loading while fetching profile
-  if (!userProfile) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-8 h-8 animate-spin text-neutral-400" />
-      </div>
-    );
-  }
+  const isFree = userRole === "free";
 
   if (isFree) {
     return (

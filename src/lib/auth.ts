@@ -20,7 +20,29 @@ export async function getAuthHeaders(): Promise<HeadersInit> {
 }
 
 /**
- * Client-side: get current user's profile (id, role, name, email)
+ * Client-side: get user role & name fast from session (no DB query)
+ * Uses user_metadata stored during signup — instant, no network call
+ */
+export async function getUserSessionInfo() {
+  const supabase = getSupabase();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (!session?.user) return null;
+
+  return {
+    id: session.user.id,
+    email: session.user.email || "",
+    fullName:
+      session.user.user_metadata?.full_name || "",
+    role:
+      (session.user.user_metadata?.role as "free" | "paid") || "free",
+  };
+}
+
+/**
+ * Client-side: get current user's full profile from DB (slower, more data)
  */
 export async function getCurrentUserProfile() {
   const supabase = getSupabase();
