@@ -37,7 +37,7 @@ const enterpriseFeatures = [
   "White-label — SimCall pod vaší značkou",
   "Vlastní AI agenti a scénáře na míru",
   "Dedikovaný account manažer",
-  "Neomezený počet hovorů a agentů",
+  "Počet hovorů a agentů dohodou",
   "Manager dashboard a analytika týmu",
   "Onboarding a školení celého týmu",
 ];

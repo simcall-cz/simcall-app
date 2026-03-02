@@ -53,13 +53,13 @@ const comparisonFeatures: {
     label: "Počet hovorů",
     solo: "50 – 1 000",
     team: "250 – 5 000",
-    enterprise: "Neomezené",
+    enterprise: "Dohodou",
   },
   {
     label: "Počet AI agentů",
     solo: "5 – 100",
     team: "25 – 500",
-    enterprise: "Neomezené + vlastní",
+    enterprise: "Dohodou + vlastní",
   },
   { label: "AI analýza hovoru", solo: true, team: true, enterprise: true },
   { label: "Přepis hovoru", solo: true, team: true, enterprise: true },
@@ -303,19 +303,14 @@ export default function CenikPage() {
   return (
     <>
       {/* Header Section */}
-      <section className="py-20 sm:py-28">
+      <section className="pt-12 sm:pt-16 pb-8 sm:pb-10">
         <Container>
           <ScrollReveal>
             <div className="text-center max-w-3xl mx-auto">
-              <Badge className="mb-4">Ceník</Badge>
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-neutral-800 tracking-tight">
+              <h1 className="text-3xl sm:text-4xl font-bold text-neutral-800 tracking-tight">
                 Vyberte si balíček{" "}
                 <GradientText>podle potřeb</GradientText>
               </h1>
-              <p className="mt-6 text-lg text-neutral-500 leading-relaxed max-w-2xl mx-auto">
-                Začněte s malým balíčkem a postupně rozšiřujte jak roste vaše
-                potřeba. Platíte jen za to, co skutečně využijete.
-              </p>
             </div>
           </ScrollReveal>
         </Container>

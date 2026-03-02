@@ -5,77 +5,77 @@ export const faqItems: FAQ[] = [
   {
     question: "Co je SimCall a jak funguje?",
     answer:
-      "SimCall je tréninková platforma pro realitní makléře, která využívá pokročilou umělou inteligenci k simulaci reálných telefonních hovorů. Trénujete s AI agenty, kteří představují různé typy klientů, a po každém hovoru získáte detailní zpětnou vazbu a doporučení ke zlepšení.",
+      "SimCall je tréninková platforma pro realitní makléře. Zavoláte AI agentovi, který simuluje reálného klienta — reaguje přirozeně, má vlastní osobnost a námitky. Po každém hovoru dostanete detailní AI analýzu s konkrétními doporučeními ke zlepšení.",
     category: "general",
   },
   {
     question: "Pro koho je SimCall určen?",
     answer:
-      "SimCall je navržen primárně pro realitní makléře, kteří chtějí zlepšit své dovednosti v cold callingu a telefonní komunikaci. Platforma je vhodná jak pro začínající makléře, kteří si chtějí vybudovat sebevědomí, tak pro zkušené profesionály, kteří chtějí zdokonalit svůj přístup. Nabízíme také řešení pro manažery realitních kanceláří, kteří chtějí trénovat celý tým.",
+      "Primárně pro realitní makléře — jak začínající, kteří si chtějí vybudovat sebevědomí při cold callingu, tak zkušené profesionály, kteří chtějí zlepšit svůj přístup. Plán Team je určen pro realitní kanceláře, které chtějí systematicky trénovat celý tým a sledovat pokrok zaměstnanců.",
+    category: "general",
+  },
+  {
+    question: "Mohu si SimCall vyzkoušet zdarma?",
+    answer:
+      "Ano. Po registraci získáte zdarma 5 tréninkových hovorů a přístup ke 2 AI agentům. Díky tomu si můžete vyzkoušet, jak platforma funguje, ještě než se rozhodnete pro placený balíček.",
     category: "general",
   },
   {
     question: "Jak se liší trénink s AI od reálného hovoru?",
     answer:
-      "Naši AI agenti jsou navrženi tak, aby co nejvěrněji simulovali reálné klienty. Reagují přirozeně, mají vlastní osobnosti, námitky a komunikační styly. Hlavní výhoda oproti reálným hovorům je, že můžete trénovat bez stresu, opakovat scénáře a získat okamžitou zpětnou vazbu. Není to náhrada za reálnou praxi, ale výborný doplněk, který vás připraví na různé situace.",
-    category: "general",
-  },
-  {
-    question: "Kolik času denně bych měl věnovat tréninku?",
-    answer:
-      "Doporučujeme 15-30 minut denně, tedy 2-3 tréninkové hovory. Pravidelnost je důležitější než délka. Naši nejúspěšnější uživatelé trénují každé ráno před tím, než začnou volat reálným klientům. Už po 2 týdnech pravidelného tréninku uvidíte měřitelné zlepšení ve vašich výsledcích.",
+      "AI agenti reagují v reálném čase, mají různé osobnosti a scénáře odpovídají českému realitnímu trhu. Hlavní výhoda je, že můžete trénovat bez stresu, opakovat scénáře a dostanete okamžitou zpětnou vazbu. Není to náhrada za praxi, ale výborná příprava.",
     category: "general",
   },
 
   // Technology (4)
   {
-    question: "Jakou technologii AI hlasových agentů používáte?",
-    answer:
-      "Využíváme nejmodernější jazykové modely a technologii syntézy řeči optimalizovanou pro český jazyk. Naši AI agenti rozumí kontextu, reagují na vaše odpovědi v reálném čase a přizpůsobují svůj komunikační styl podle průběhu hovoru. Technologie je neustále vylepšována na základě zpětné vazby uživatelů.",
-    category: "technology",
-  },
-  {
     question: "Funguje platforma v češtině?",
     answer:
-      "Ano, SimCall je plně lokalizována do českého jazyka. AI agenti mluví česky s přirozeným přízvukem, všechny scénáře reflektují český realitní trh a zpětná vazba je kompletně v češtině. Pracujeme na tom, aby komunikace byla co nejpřirozenější a odpovídala reálným situacím na českém trhu.",
+      "Ano, SimCall je kompletně v češtině. AI agenti mluví česky, scénáře reflektují český realitní trh a zpětná vazba je v češtině. Neustále pracujeme na tom, aby konverzace byla co nejpřirozenější.",
     category: "technology",
   },
   {
     question: "Jaké technické požadavky jsou potřeba?",
     answer:
-      "K používání SimCall potřebujete pouze moderní webový prohlížeč (Chrome, Firefox, Safari nebo Edge), stabilní internetové připojení a mikrofon. Aplikace funguje na počítači, tabletu i mobilním telefonu. Není potřeba instalovat žádný software. Doporučujeme používat sluchátka s mikrofonem pro nejlepší kvalitu hovoru.",
+      "Stačí moderní webový prohlížeč (Chrome, Firefox, Safari nebo Edge), stabilní internet a mikrofon. Funguje na počítači, tabletu i mobilu — není potřeba nic instalovat. Doporučujeme sluchátka s mikrofonem pro nejlepší kvalitu.",
     category: "technology",
   },
   {
-    question: "Jak přesná je analýza hovorů?",
+    question: "Jak funguje AI analýza hovoru?",
     answer:
-      "Naše AI analýza hodnotí více než 20 parametrů každého hovoru, včetně tónu hlasu, tempa řeči, použitých technik, práce s námitkami a celkové struktury hovoru. Přesnost rozpoznávání řeči v češtině je nad 95 %. Analýza identifikuje i výplňová slova, přerušení a momenty váhání. Zpětná vazba je konzistentní a objektivní.",
+      "Po každém hovoru AI analyzuje váš výkon — hodnotí práci s námitkami, strukturu hovoru, tempo řeči a použité techniky. Dostanete konkrétní skóre, silné stránky i oblasti ke zlepšení s personalizovanými doporučeními.",
+    category: "technology",
+  },
+  {
+    question: "Kolik AI agentů je k dispozici?",
+    answer:
+      "Počet agentů závisí na vašem balíčku — od 5 agentů v nejmenším Solo balíčku až po stovky v největších. Každý agent má jinou osobnost, obtížnost a scénář. Ve free verzi máte k dispozici 2 agenty pro vyzkoušení.",
     category: "technology",
   },
 
   // Pricing (4)
   {
-    question: "Mohu si SimCall vyzkoušet zdarma?",
+    question: "Jak funguje ceník a platby?",
     answer:
-      "Ano, nabízíme 14denní bezplatnou zkušební verzi plánu Professional bez nutnosti zadávat platební údaje. Během zkušební doby máte plný přístup ke všem AI agentům, scénářům a analytickým nástrojům. Po uplynutí zkušební doby se můžete rozhodnout, který plán vám vyhovuje.",
+      "Nabízíme balíčky Solo (pro jednotlivce, od 490 Kč/měs) a Team (pro firmy, od 2 490 Kč/měs). Platíte měsíčně za zvolený počet hovorů. Můžete platit kartou online nebo bankovním převodem na fakturu. Balíček lze kdykoliv změnit nebo zrušit.",
     category: "pricing",
   },
   {
-    question: "Jaké jsou platební podmínky?",
+    question: "Co je ve free verzi zdarma?",
     answer:
-      "Nabízíme měsíční a roční fakturaci. U roční fakturace ušetříte přibližně 15 % oproti měsíční platbě. Přijímáme platební karty, bankovní převody a firemní faktury. Předplatné můžete kdykoliv zrušit, a to bez jakýchkoliv poplatků nebo sankcí.",
+      "Po registraci dostanete 5 hovorů a přístup ke 2 AI agentům úplně zdarma. Můžete si vyzkoušet celý průběh — hovor, přepis, AI analýzu a doporučení. Žádná platební karta není potřeba.",
     category: "pricing",
   },
   {
-    question: "Mohu kdykoliv změnit nebo zrušit předplatné?",
+    question: "Mohu kdykoliv změnit nebo zrušit balíček?",
     answer:
-      "Ano, plán můžete kdykoli upgradovat, downgradovat nebo zrušit přímo z nastavení vašeho účtu. Při upgradu se rozdíl v ceně rozpočítá na zbývající období. Při zrušení máte přístup do konce zaplaceného období. Nevyžadujeme žádnou minimální dobu závazku.",
+      "Ano, balíček můžete kdykoli upgradovat na vyšší nebo zrušit z nastavení účtu. Při zrušení máte přístup do konce zaplaceného období. Žádné skryté poplatky ani závazky.",
     category: "pricing",
   },
   {
-    question: "Nabízíte slevy pro větší týmy?",
+    question: "Nabízíte Enterprise řešení pro velké týmy?",
     answer:
-      "Ano, pro týmy nad 5 členů nabízíme individuální cenovou nabídku v rámci plánu Enterprise. Čím větší tým, tím výhodnější cena na uživatele. Kontaktujte nás pro nezávaznou konzultaci a kalkulaci přesné ceny pro váš tým. Nabízíme také speciální podmínky pro franšízové sítě.",
+      "Ano. Enterprise plán zahrnuje white-label branding, vlastní AI agenty a scénáře na míru, dedikovaného account manažera a individuální počet hovorů a agentů. Cena je dohodou — domluvte si nezávaznou schůzku a připravíme nabídku přímo pro vás.",
     category: "pricing",
   },
 
@@ -83,25 +83,25 @@ export const faqItems: FAQ[] = [
   {
     question: "Jak jsou chráněna moje data a nahrávky?",
     answer:
-      "Bezpečnost dat je naší prioritou. Veškerá data jsou šifrována jak při přenosu (TLS 1.3), tak v úložišti (AES-256). Nahrávky hovorů jsou uloženy v zabezpečeném cloudovém prostředí na serverech v EU. Přístup k datům je striktně omezen a chráněn vícefaktorovou autentizací.",
+      "Veškerá data jsou šifrována při přenosu i v úložišti. Nahrávky hovorů jsou uloženy v zabezpečeném cloudovém prostředí na serverech v EU. Přístup k datům je striktně omezen.",
     category: "security",
   },
   {
     question: "Je SimCall v souladu s GDPR?",
     answer:
-      "Ano, plně dodržujeme nařízení GDPR. Zpracováváme pouze data nezbytná pro provoz služby. Máte plnou kontrolu nad svými daty, včetně práva na jejich export a smazání. Nahrávky hovorů jsou automaticky anonymizovány a můžete požádat o jejich kompletní vymazání kdykoli.",
+      "Ano, plně dodržujeme GDPR. Zpracováváme pouze data nezbytná pro provoz služby. Máte plnou kontrolu nad svými daty včetně práva na export a smazání. Nahrávky můžete kdykoliv vymazat.",
     category: "security",
   },
   {
     question: "Kdo má přístup k mým tréninkovým hovorům?",
     answer:
-      "K vašim nahrávkám máte přístup pouze vy a váš manažer (pokud používáte týmový plán a dáte k tomu souhlas). Žádná třetí strana nemá přístup k obsahu vašich hovorů. AI analýza probíhá automaticky a anonymně. Nahrávky nepoužíváme k trénování AI modelů bez vašeho výslovného souhlasu.",
+      "K nahrávkám máte přístup pouze vy. Pokud používáte Team plán, váš manažer vidí pouze souhrnné statistiky a analýzy — ne samotné nahrávky, pokud k tomu nedáte souhlas. Žádná třetí strana k vašim hovorům přístup nemá.",
     category: "security",
   },
   {
-    question: "Jaké bezpečnostní certifikace máte?",
+    question: "Používáte moje nahrávky k trénování AI?",
     answer:
-      "Naše infrastruktura je provozována na certifikovaných cloudových službách s certifikacemi ISO 27001, SOC 2 Type II a provádíme pravidelné bezpečnostní audity. Penetrační testy provádíme čtvrtletně s nezávislou bezpečnostní firmou. Máme implementovány standardní bezpečnostní postupy včetně monitoringu a incident response plánu.",
+      "Ne. Vaše nahrávky nepoužíváme k trénování AI modelů bez vašeho výslovného souhlasu. AI analýza probíhá automaticky a data z hovorů slouží výhradně pro vaši zpětnou vazbu.",
     category: "security",
   },
 ];

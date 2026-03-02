@@ -93,8 +93,8 @@ export const pricingPlans: PricingPlan[] = [
         tooltip:
           "Přímý kontakt na vašeho osobního vývojáře ze SimCall, který vám pomůže s čímkoli — od nastavení po nové analytiky a funkce na míru",
       },
-      { label: "Neomezený počet hovorů" },
-      { label: "Neomezený počet agentů + vlastní agenti" },
+      { label: "Počet hovorů a agentů dohodou" },
+      { label: "Vlastní agenti na míru" },
     ],
     highlighted: false,
     cta: "Domluvit schůzku",
