@@ -6,31 +6,31 @@ import { ScrollReveal } from "@/components/shared/scroll-reveal";
 
 const plans = [
   {
-    name: "Starter",
-    price: "1 490 Kč",
+    name: "Solo",
+    price: "od 490 Kč",
     period: "/měsíc",
     description: "Pro jednotlivé makléře",
-    features: ["5 AI agentů", "20 hovorů/měsíc", "Základní analýza"],
+    features: ["Až 100 agentů", "50–1 000 hovorů/měsíc", "AI analýza a scoring"],
     highlighted: false,
-    href: "/cenik",
+    href: "/checkout?plan=solo&tier=0",
   },
   {
-    name: "Professional",
-    price: "2 990 Kč",
+    name: "Team",
+    price: "od 2 490 Kč",
     period: "/měsíc",
-    description: "Pro ambiciózní makléře",
-    features: ["Všech 10 agentů", "Neomezené hovory", "Pokročilá analýza"],
+    description: "Pro firmy a týmy",
+    features: ["Manager dashboard", "Správa celého týmu", "Sdílená banka hovorů"],
     highlighted: true,
-    href: "/demo",
+    href: "/checkout?plan=team&tier=0",
   },
   {
     name: "Enterprise",
     price: "Na míru",
     period: "",
-    description: "Pro týmy a kanceláře",
-    features: ["Manažerský dashboard", "Vlastní scénáře", "API přístup"],
+    description: "Kompletní řešení",
+    features: ["White-label branding", "Vlastní AI agenti", "Dedikovaný manažer"],
     highlighted: false,
-    href: "/kontakt",
+    href: "/domluvit-schuzku",
   },
 ];
 
@@ -112,7 +112,7 @@ export function PricingTeaser() {
                 className="w-full group"
                 size="sm"
               >
-                {plan.highlighted ? "Vyzkoušet zdarma" : "Více info"}
+                {plan.highlighted ? "Vybrat Team" : plan.name === "Enterprise" ? "Domluvit schůzku" : "Vybrat Solo"}
                 <ArrowRight className="ml-1.5 w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
               </Button>
             </Link>

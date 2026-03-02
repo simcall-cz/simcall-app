@@ -2,65 +2,102 @@ import type { PricingPlan } from "@/types";
 
 export const pricingPlans: PricingPlan[] = [
   {
-    id: "starter",
-    name: "Starter",
-    price: "1 490 Kč/měsíc",
-    priceAnnual: "1 290 Kč/měsíc",
+    id: "solo",
+    name: "Solo",
     description:
-      "Ideální pro jednotlivé makléře, kteří chtějí zlepšit své telefonní dovednosti a zvýšit úspěšnost hovorů.",
+      "Pro jednotlivé makléře, kteří chtějí zlepšit své telefonní dovednosti a zvýšit úspěšnost hovorů.",
+    tiers: [
+      { calls: 50, agents: 5, price: 490 },
+      { calls: 100, agents: 10, price: 990 },
+      { calls: 250, agents: 25, price: 1990 },
+      { calls: 500, agents: 50, price: 3490 },
+      { calls: 1000, agents: 100, price: 4990 },
+    ],
     features: [
-      "5 AI agentů k tréninku",
-      "5 scénářů",
-      "20 tréninkových hovorů měsíčně",
-      "Základní analýza hovorů",
-      "Přepis hovoru",
-      "Sledování pokroku",
-      "E-mailová podpora",
+      { label: "AI analýza hovoru" },
+      { label: "Přepis hovoru" },
+      { label: "Historie hovorů a nahrávky" },
+      { label: "Sledování pokroku a podrobné statistiky" },
+      { label: "Personalizovaná doporučení" },
+      { label: "Pokročilá analýza (detailní scoring)" },
+      { label: "Export přepisů (PDF/CSV)" },
     ],
     highlighted: false,
-    cta: "Začít s Free Trial",
+    cta: "Vybrat Solo",
+    ctaLink: "/checkout",
   },
   {
-    id: "professional",
-    name: "Professional",
-    price: "2 990 Kč/měsíc",
-    priceAnnual: "2 490 Kč/měsíc",
+    id: "team",
+    name: "Team",
     description:
-      "Pro ambiciózní makléře, kteří chtějí maximální pokrok. Neomezený přístup ke všem funkcím a pokročilá analytika.",
+      "Pro firmy a týmy. Správa celého týmu z jednoho místa s neomezeným počtem členů.",
+    tiers: [
+      { calls: 250, agents: 25, price: 2490 },
+      { calls: 500, agents: 50, price: 4490 },
+      { calls: 1000, agents: 100, price: 7990 },
+      { calls: 2500, agents: 250, price: 14990 },
+      { calls: 5000, agents: 500, price: 24990 },
+    ],
     features: [
-      "Všech 10 AI agentů",
-      "Všechny scénáře + vlastní",
-      "Neomezené tréninkové hovory",
-      "Pokročilá analýza hovorů",
-      "Detailní feedback a doporučení",
-      "Gamifikace a žebříčky",
-      "Lekce a vzdělávací obsah",
-      "Achievementy a odznaky",
-      "Prioritní podpora",
+      { label: "Vše ze Solo" },
+      {
+        label: "Manager dashboard",
+        tooltip: "Přehled výkonu celého týmu na jednom místě",
+      },
+      { label: "Neomezený počet uživatelských profilů" },
+      {
+        label: "Správa týmu",
+        tooltip:
+          "Vytvářejte a spravujte účty členů týmu přímo z dashboardu",
+      },
+      {
+        label: "Analytika zaměstnanců",
+        tooltip:
+          "Sledujte pokrok, úspěšnost a aktivitu každého člena",
+      },
+      {
+        label: "Žebříčky v týmu",
+        tooltip:
+          "Gamifikace — srovnání výkonu mezi členy motivuje ke zlepšení",
+      },
+      {
+        label: "Sdílená banka hovorů",
+        tooltip:
+          "Hovory se čerpají ze společného poolu, rozdělíte jak potřebujete",
+      },
     ],
     highlighted: true,
-    cta: "Vyzkoušet zdarma na 14 dní",
+    cta: "Vybrat Team",
+    ctaLink: "/checkout",
   },
   {
     id: "enterprise",
     name: "Enterprise",
-    price: "Na míru",
-    priceAnnual: "Na míru",
     description:
-      "Pro realitní kanceláře a týmy. Kompletní řešení s manažerským přehledem, CRM integrací a vlastní konfigurací.",
+      "Kompletní řešení na míru pro velké realitní kanceláře s vlastním brandingem a dedikovanou podporou.",
+    tiers: [],
     features: [
-      "Vše z Professional",
-      "Manažerský dashboard",
-      "Přehled výkonnosti týmu",
-      "CRM integrace",
-      "Vlastní scénáře a AI agenti",
-      "Firemní branding",
-      "API přístup",
-      "Dedikovaný account manažer",
-      "Onboarding a školení týmu",
-      "SLA garantovaná dostupnost",
+      { label: "Vše z Team" },
+      {
+        label: "White-label",
+        tooltip:
+          "Vlastní logo a branding — SimCall vystupuje pod značkou vaší firmy",
+      },
+      {
+        label: "Vlastní AI agenti a scénáře na míru",
+        tooltip:
+          "Vytvořte scénáře z reálných situací vaší firmy — zaškolte tým na problémy, které jste už v praxi řešili, a předejděte opakovaným chybám",
+      },
+      {
+        label: "Dedikovaný account manažer",
+        tooltip:
+          "Přímý kontakt na vašeho osobního vývojáře ze SimCall, který vám pomůže s čímkoli — od nastavení po nové analytiky a funkce na míru",
+      },
+      { label: "Neomezený počet hovorů" },
+      { label: "Neomezený počet agentů + vlastní agenti" },
     ],
     highlighted: false,
-    cta: "Kontaktujte nás",
+    cta: "Domluvit schůzku",
+    ctaLink: "/domluvit-schuzku",
   },
 ];

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -10,18 +10,21 @@ import {
   Shield,
   Lock,
   ChevronLeft,
+  ChevronDown,
   Loader2,
   ArrowRight,
   Receipt,
   Sparkles,
+  User,
+  Users,
 } from "lucide-react";
 
 import { Container } from "@/components/shared/container";
 import { ScrollReveal } from "@/components/shared/scroll-reveal";
 import { pricingPlans } from "@/data/pricing";
+import type { PricingPlan } from "@/types";
 
 type PaymentMethod = "card" | "invoice";
-type BillingPeriod = "monthly" | "annual";
 
 interface BillingForm {
   fullName: string;
@@ -51,6 +54,12 @@ const emptyForm: BillingForm = {
   note: "",
 };
 
+const planIcons = {
+  solo: User,
+  team: Users,
+  enterprise: Building2,
+} as const;
+
 export default function CheckoutPageWrapper() {
   return (
     <Suspense
@@ -71,30 +80,22 @@ export default function CheckoutPageWrapper() {
 
 function CheckoutPage() {
   const searchParams = useSearchParams();
-  const planParam = searchParams.get("plan") || "professional";
-  const billingParam = (searchParams.get("billing") as BillingPeriod) || "monthly";
+  const planParam = searchParams.get("plan") || "solo";
+  const tierParam = parseInt(searchParams.get("tier") || "0") || 0;
 
-  const [selectedPlan, setSelectedPlan] = useState(planParam);
-  const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>(billingParam);
+  const [selectedPlanId, setSelectedPlanId] = useState<"solo" | "team">(
+    planParam === "team" ? "team" : "solo"
+  );
+  const [tierIndex, setTierIndex] = useState(tierParam);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("card");
   const [form, setForm] = useState<BillingForm>(emptyForm);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof BillingForm, string>>>({});
   const [submitted, setSubmitted] = useState(false);
 
-  const plan = pricingPlans.find((p) => p.id === selectedPlan) || pricingPlans[1];
-  const isEnterprise = plan.id === "enterprise";
-  const price = billingPeriod === "annual" ? plan.priceAnnual : plan.price;
-
-  // Parse numeric price for summary
-  const numericPrice = price.match(/[\d\s]+/)?.[0]?.replace(/\s/g, "") || "0";
-  const priceNum = parseInt(numericPrice) || 0;
-  const annualTotal = billingPeriod === "annual" ? priceNum * 12 : null;
-
-  useEffect(() => {
-    if (searchParams.get("plan")) setSelectedPlan(searchParams.get("plan")!);
-    if (searchParams.get("billing")) setBillingPeriod(searchParams.get("billing") as BillingPeriod);
-  }, [searchParams]);
+  const plan = pricingPlans.find((p) => p.id === selectedPlanId) as PricingPlan;
+  const safeTierIndex = Math.min(tierIndex, plan.tiers.length - 1);
+  const tier = plan.tiers[safeTierIndex];
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -106,18 +107,23 @@ function CheckoutPage() {
     }
   };
 
+  const handlePlanChange = (id: "solo" | "team") => {
+    setSelectedPlanId(id);
+    setTierIndex(0);
+  };
+
   const validate = (): boolean => {
     const newErrors: Partial<Record<keyof BillingForm, string>> = {};
 
-    if (!form.fullName.trim()) newErrors.fullName = "Zadejte jmeno";
+    if (!form.fullName.trim()) newErrors.fullName = "Zadejte jméno";
     if (!form.email.trim()) newErrors.email = "Zadejte e-mail";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
-      newErrors.email = "Neplatny format e-mailu";
+      newErrors.email = "Neplatný formát e-mailu";
 
     if (paymentMethod === "invoice") {
-      if (!form.street.trim()) newErrors.street = "Zadejte ulici a cislo popisne";
-      if (!form.city.trim()) newErrors.city = "Zadejte mesto";
-      if (!form.zip.trim()) newErrors.zip = "Zadejte PSC";
+      if (!form.street.trim()) newErrors.street = "Zadejte ulici a číslo popisné";
+      if (!form.city.trim()) newErrors.city = "Zadejte město";
+      if (!form.zip.trim()) newErrors.zip = "Zadejte PSČ";
     }
 
     setErrors(newErrors);
@@ -129,10 +135,8 @@ function CheckoutPage() {
     if (!validate()) return;
 
     setIsSubmitting(true);
-
-    // Simulate submission - will be replaced with Stripe / invoice API
+    // Simulate — will be replaced with Stripe / invoice API
     await new Promise((resolve) => setTimeout(resolve, 1500));
-
     setIsSubmitting(false);
     setSubmitted(true);
   };
@@ -149,60 +153,27 @@ function CheckoutPage() {
               </div>
               <h1 className="text-2xl sm:text-3xl font-bold text-neutral-800">
                 {paymentMethod === "card"
-                  ? "Objednavka prijata!"
+                  ? "Objednávka přijata!"
                   : "Faktura bude vystavena"}
               </h1>
               <p className="mt-4 text-neutral-500 leading-relaxed">
                 {paymentMethod === "card"
-                  ? "Dekujeme za objednavku. Platebni brana Stripe bude brzy napojena. Budeme vas kontaktovat na e-mail."
-                  : `Dekujeme za objednavku planu ${plan.name}. Fakturu zasleme na ${form.email} do 24 hodin. Po prijeti platby aktivujeme vas ucet.`}
+                  ? "Děkujeme za objednávku. Platební brána Stripe bude brzy napojena. Budeme vás kontaktovat na e-mail."
+                  : `Děkujeme za objednávku plánu ${plan.name} (${tier.calls} hovorů). Fakturu zašleme na ${form.email} do 24 hodin. Po přijetí platby aktivujeme váš účet.`}
               </p>
               <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
                 <Link
                   href="/dashboard"
                   className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary-500 px-6 py-3 text-sm font-semibold text-white hover:bg-primary-600 transition-colors"
                 >
-                  Prejit do dashboardu
+                  Přejít do dashboardu
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link
                   href="/"
                   className="inline-flex items-center justify-center gap-2 rounded-lg border border-neutral-200 px-6 py-3 text-sm font-medium text-neutral-600 hover:bg-neutral-50 transition-colors"
                 >
-                  Zpet na hlavni stranku
-                </Link>
-              </div>
-            </ScrollReveal>
-          </div>
-        </Container>
-      </section>
-    );
-  }
-
-  // Enterprise → contact page
-  if (isEnterprise) {
-    return (
-      <section className="py-20 sm:py-28">
-        <Container>
-          <div className="max-w-lg mx-auto text-center">
-            <ScrollReveal>
-              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary-100">
-                <Building2 className="h-8 w-8 text-primary-600" />
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-neutral-800">
-                Enterprise plan
-              </h1>
-              <p className="mt-4 text-neutral-500 leading-relaxed">
-                Pro Enterprise plan s vlastni konfiguraci nas prosim kontaktujte.
-                Pripravime nabidku na miru pro vas tym.
-              </p>
-              <div className="mt-8">
-                <Link
-                  href="/kontakt"
-                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary-500 px-6 py-3 text-sm font-semibold text-white hover:bg-primary-600 transition-colors"
-                >
-                  Kontaktujte nas
-                  <ArrowRight className="h-4 w-4" />
+                  Zpět na hlavní stránku
                 </Link>
               </div>
             </ScrollReveal>
@@ -222,7 +193,7 @@ function CheckoutPage() {
             className="inline-flex items-center gap-1.5 text-sm text-neutral-500 hover:text-neutral-800 transition-colors mb-8"
           >
             <ChevronLeft className="h-4 w-4" />
-            Zpet na cenik
+            Zpět na ceník
           </Link>
         </ScrollReveal>
 
@@ -231,10 +202,10 @@ function CheckoutPage() {
           <div className="lg:col-span-2">
             <ScrollReveal>
               <h1 className="text-2xl sm:text-3xl font-bold text-neutral-800">
-                Dokoncit objednavku
+                Dokončit objednávku
               </h1>
               <p className="mt-2 text-neutral-500">
-                Vyplnte fakturacni udaje a vyberte zpusob platby.
+                Vyberte balíček, vyplňte fakturační údaje a zvolte způsob platby.
               </p>
             </ScrollReveal>
 
@@ -243,25 +214,35 @@ function CheckoutPage() {
               <ScrollReveal delay={0.05}>
                 <div>
                   <h2 className="text-sm font-semibold text-neutral-800 uppercase tracking-wider mb-3">
-                    Vybrany plan
+                    Plán
                   </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {pricingPlans
-                      .filter((p) => p.id !== "enterprise")
-                      .map((p) => {
-                        const isSelected = selectedPlan === p.id;
-                        return (
-                          <button
-                            key={p.id}
-                            type="button"
-                            onClick={() => setSelectedPlan(p.id)}
-                            className={`text-left rounded-xl border-2 p-4 transition-all ${
-                              isSelected
-                                ? "border-primary-500 bg-primary-50/50 shadow-sm"
-                                : "border-neutral-200 hover:border-neutral-300"
-                            }`}
-                          >
-                            <div className="flex items-center justify-between">
+                    {(["solo", "team"] as const).map((id) => {
+                      const p = pricingPlans.find((pl) => pl.id === id)!;
+                      const Icon = planIcons[id];
+                      const isSelected = selectedPlanId === id;
+                      return (
+                        <button
+                          key={id}
+                          type="button"
+                          onClick={() => handlePlanChange(id)}
+                          className={`text-left rounded-xl border-2 p-4 transition-all ${
+                            isSelected
+                              ? "border-primary-500 bg-primary-50/50 shadow-sm"
+                              : "border-neutral-200 hover:border-neutral-300"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2.5">
+                              <div
+                                className={`flex h-8 w-8 items-center justify-center rounded-lg ${
+                                  isSelected
+                                    ? "bg-primary-500 text-white"
+                                    : "bg-neutral-100 text-neutral-500"
+                                }`}
+                              >
+                                <Icon className="h-4 w-4" />
+                              </div>
                               <div>
                                 <span className="font-semibold text-neutral-800">
                                   {p.name}
@@ -273,51 +254,46 @@ function CheckoutPage() {
                                   </span>
                                 )}
                               </div>
-                              <div
-                                className={`flex h-5 w-5 items-center justify-center rounded-full border-2 ${
-                                  isSelected
-                                    ? "border-primary-500 bg-primary-500"
-                                    : "border-neutral-300"
-                                }`}
-                              >
-                                {isSelected && (
-                                  <Check className="h-3 w-3 text-white" />
-                                )}
-                              </div>
                             </div>
-                            <p className="mt-1 text-sm text-neutral-500">
-                              {billingPeriod === "annual" ? p.priceAnnual : p.price}
-                            </p>
-                          </button>
-                        );
-                      })}
+                            <div
+                              className={`flex h-5 w-5 items-center justify-center rounded-full border-2 ${
+                                isSelected
+                                  ? "border-primary-500 bg-primary-500"
+                                  : "border-neutral-300"
+                              }`}
+                            >
+                              {isSelected && (
+                                <Check className="h-3 w-3 text-white" />
+                              )}
+                            </div>
+                          </div>
+                          <p className="mt-2 text-xs text-neutral-500">
+                            {p.description}
+                          </p>
+                        </button>
+                      );
+                    })}
                   </div>
 
-                  {/* Billing period toggle */}
-                  <div className="mt-4 flex items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setBillingPeriod("monthly")}
-                      className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-                        billingPeriod === "monthly"
-                          ? "bg-neutral-800 text-white"
-                          : "bg-neutral-100 text-neutral-500 hover:bg-neutral-200"
-                      }`}
-                    >
-                      Mesicne
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setBillingPeriod("annual")}
-                      className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-                        billingPeriod === "annual"
-                          ? "bg-neutral-800 text-white"
-                          : "bg-neutral-100 text-neutral-500 hover:bg-neutral-200"
-                      }`}
-                    >
-                      Rocne
-                      <span className="ml-1.5 text-green-500 text-xs font-bold">-15%</span>
-                    </button>
+                  {/* Tier selector */}
+                  <div className="mt-4">
+                    <label className="text-xs font-medium text-neutral-500 uppercase tracking-wider mb-2 block">
+                      Počet hovorů / měsíc
+                    </label>
+                    <div className="relative">
+                      <select
+                        value={safeTierIndex}
+                        onChange={(e) => setTierIndex(Number(e.target.value))}
+                        className="w-full appearance-none rounded-lg border border-neutral-200 bg-white px-4 py-3 text-sm font-medium text-neutral-800 pr-10 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 cursor-pointer"
+                      >
+                        {plan.tiers.map((t, i) => (
+                          <option key={i} value={i}>
+                            {t.calls} hovorů / {t.agents} agentů — {t.price.toLocaleString("cs-CZ")} Kč/měs
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400 pointer-events-none" />
+                    </div>
                   </div>
                 </div>
               </ScrollReveal>
@@ -326,7 +302,7 @@ function CheckoutPage() {
               <ScrollReveal delay={0.1}>
                 <div>
                   <h2 className="text-sm font-semibold text-neutral-800 uppercase tracking-wider mb-4">
-                    Kontaktni udaje
+                    Kontaktní údaje
                   </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
@@ -334,7 +310,7 @@ function CheckoutPage() {
                         htmlFor="fullName"
                         className="mb-1.5 block text-sm font-medium text-neutral-700"
                       >
-                        Cele jmeno *
+                        Celé jméno *
                       </label>
                       <input
                         id="fullName"
@@ -343,7 +319,7 @@ function CheckoutPage() {
                         autoComplete="name"
                         value={form.fullName}
                         onChange={handleChange}
-                        placeholder="Jan Novak"
+                        placeholder="Jan Novák"
                         className={`w-full rounded-lg border px-4 py-2.5 text-sm text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 ${
                           errors.fullName ? "border-red-400" : "border-neutral-300"
                         }`}
@@ -401,7 +377,7 @@ function CheckoutPage() {
               <ScrollReveal delay={0.15}>
                 <div>
                   <h2 className="text-sm font-semibold text-neutral-800 uppercase tracking-wider mb-4">
-                    Zpusob platby
+                    Způsob platby
                   </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {/* Card payment */}
@@ -442,7 +418,7 @@ function CheckoutPage() {
                       </div>
                     </button>
 
-                    {/* Invoice / bank transfer */}
+                    {/* Invoice */}
                     <button
                       type="button"
                       onClick={() => setPaymentMethod("invoice")}
@@ -464,7 +440,7 @@ function CheckoutPage() {
                       <div>
                         <p className="font-semibold text-neutral-800">Fakturou</p>
                         <p className="text-xs text-neutral-500 mt-0.5">
-                          Bankovni prevod, splatnost 14 dni
+                          Bankovní převod, splatnost 14 dní
                         </p>
                       </div>
                       <div
@@ -483,37 +459,33 @@ function CheckoutPage() {
                 </div>
               </ScrollReveal>
 
-              {/* Card payment placeholder */}
+              {/* Card placeholder */}
               {paymentMethod === "card" && (
                 <ScrollReveal delay={0.05}>
                   <div className="rounded-xl border border-dashed border-neutral-300 bg-neutral-50 p-6 text-center">
                     <CreditCard className="h-8 w-8 text-neutral-400 mx-auto mb-3" />
                     <p className="text-sm font-medium text-neutral-600">
-                      Platebni brana Stripe
+                      Platební brána Stripe
                     </p>
                     <p className="text-xs text-neutral-400 mt-1">
-                      Stripe Checkout bude brzy napojen. Zatim pouzijte platbu fakturou.
+                      Stripe Checkout bude brzy napojen. Zatím použijte platbu fakturou.
                     </p>
                   </div>
                 </ScrollReveal>
               )}
 
-              {/* Invoice form fields */}
+              {/* Invoice form */}
               {paymentMethod === "invoice" && (
                 <ScrollReveal delay={0.05}>
                   <div className="space-y-6">
-                    {/* Company info */}
                     <div>
                       <h2 className="text-sm font-semibold text-neutral-800 uppercase tracking-wider mb-4">
-                        Fakturacni udaje
+                        Fakturační údaje
                       </h2>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="sm:col-span-2">
-                          <label
-                            htmlFor="companyName"
-                            className="mb-1.5 block text-sm font-medium text-neutral-700"
-                          >
-                            Nazev firmy / Jmeno
+                          <label htmlFor="companyName" className="mb-1.5 block text-sm font-medium text-neutral-700">
+                            Název firmy / Jméno
                           </label>
                           <input
                             id="companyName"
@@ -521,17 +493,13 @@ function CheckoutPage() {
                             type="text"
                             value={form.companyName}
                             onChange={handleChange}
-                            placeholder="Reality s.r.o. nebo Jan Novak"
+                            placeholder="Reality s.r.o. nebo Jan Novák"
                             className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
                           />
                         </div>
                         <div>
-                          <label
-                            htmlFor="ico"
-                            className="mb-1.5 block text-sm font-medium text-neutral-700"
-                          >
-                            ICO{" "}
-                            <span className="text-neutral-400 font-normal">(nepovinne)</span>
+                          <label htmlFor="ico" className="mb-1.5 block text-sm font-medium text-neutral-700">
+                            IČO <span className="text-neutral-400 font-normal">(nepovinné)</span>
                           </label>
                           <input
                             id="ico"
@@ -545,12 +513,8 @@ function CheckoutPage() {
                           />
                         </div>
                         <div>
-                          <label
-                            htmlFor="dic"
-                            className="mb-1.5 block text-sm font-medium text-neutral-700"
-                          >
-                            DIC{" "}
-                            <span className="text-neutral-400 font-normal">(nepovinne)</span>
+                          <label htmlFor="dic" className="mb-1.5 block text-sm font-medium text-neutral-700">
+                            DIČ <span className="text-neutral-400 font-normal">(nepovinné)</span>
                           </label>
                           <input
                             id="dic"
@@ -565,18 +529,14 @@ function CheckoutPage() {
                       </div>
                     </div>
 
-                    {/* Address */}
                     <div>
                       <h2 className="text-sm font-semibold text-neutral-800 uppercase tracking-wider mb-4">
-                        Fakturacni adresa
+                        Fakturační adresa
                       </h2>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="sm:col-span-2">
-                          <label
-                            htmlFor="street"
-                            className="mb-1.5 block text-sm font-medium text-neutral-700"
-                          >
-                            Ulice a cislo popisne *
+                          <label htmlFor="street" className="mb-1.5 block text-sm font-medium text-neutral-700">
+                            Ulice a číslo popisné *
                           </label>
                           <input
                             id="street"
@@ -585,21 +545,16 @@ function CheckoutPage() {
                             autoComplete="street-address"
                             value={form.street}
                             onChange={handleChange}
-                            placeholder="Vinohradska 123"
+                            placeholder="Vinohradská 123"
                             className={`w-full rounded-lg border px-4 py-2.5 text-sm text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 ${
                               errors.street ? "border-red-400" : "border-neutral-300"
                             }`}
                           />
-                          {errors.street && (
-                            <p className="mt-1 text-xs text-red-500">{errors.street}</p>
-                          )}
+                          {errors.street && <p className="mt-1 text-xs text-red-500">{errors.street}</p>}
                         </div>
                         <div>
-                          <label
-                            htmlFor="city"
-                            className="mb-1.5 block text-sm font-medium text-neutral-700"
-                          >
-                            Mesto *
+                          <label htmlFor="city" className="mb-1.5 block text-sm font-medium text-neutral-700">
+                            Město *
                           </label>
                           <input
                             id="city"
@@ -613,16 +568,11 @@ function CheckoutPage() {
                               errors.city ? "border-red-400" : "border-neutral-300"
                             }`}
                           />
-                          {errors.city && (
-                            <p className="mt-1 text-xs text-red-500">{errors.city}</p>
-                          )}
+                          {errors.city && <p className="mt-1 text-xs text-red-500">{errors.city}</p>}
                         </div>
                         <div>
-                          <label
-                            htmlFor="zip"
-                            className="mb-1.5 block text-sm font-medium text-neutral-700"
-                          >
-                            PSC *
+                          <label htmlFor="zip" className="mb-1.5 block text-sm font-medium text-neutral-700">
+                            PSČ *
                           </label>
                           <input
                             id="zip"
@@ -637,16 +587,11 @@ function CheckoutPage() {
                               errors.zip ? "border-red-400" : "border-neutral-300"
                             }`}
                           />
-                          {errors.zip && (
-                            <p className="mt-1 text-xs text-red-500">{errors.zip}</p>
-                          )}
+                          {errors.zip && <p className="mt-1 text-xs text-red-500">{errors.zip}</p>}
                         </div>
                         <div className="sm:col-span-2">
-                          <label
-                            htmlFor="country"
-                            className="mb-1.5 block text-sm font-medium text-neutral-700"
-                          >
-                            Stat
+                          <label htmlFor="country" className="mb-1.5 block text-sm font-medium text-neutral-700">
+                            Stát
                           </label>
                           <select
                             id="country"
@@ -655,21 +600,17 @@ function CheckoutPage() {
                             onChange={handleChange}
                             className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 bg-white transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
                           >
-                            <option value="CZ">Ceska republika</option>
+                            <option value="CZ">Česká republika</option>
                             <option value="SK">Slovensko</option>
                           </select>
                         </div>
                       </div>
                     </div>
 
-                    {/* Note */}
                     <div>
-                      <label
-                        htmlFor="note"
-                        className="mb-1.5 block text-sm font-medium text-neutral-700"
-                      >
-                        Poznamka k objednavce{" "}
-                        <span className="text-neutral-400 font-normal">(nepovinne)</span>
+                      <label htmlFor="note" className="mb-1.5 block text-sm font-medium text-neutral-700">
+                        Poznámka k objednávce{" "}
+                        <span className="text-neutral-400 font-normal">(nepovinné)</span>
                       </label>
                       <textarea
                         id="note"
@@ -677,7 +618,7 @@ function CheckoutPage() {
                         rows={3}
                         value={form.note}
                         onChange={handleChange}
-                        placeholder="Dalsi informace k fakturaci..."
+                        placeholder="Další informace k fakturaci..."
                         className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 resize-none"
                       />
                     </div>
@@ -685,22 +626,22 @@ function CheckoutPage() {
                 </ScrollReveal>
               )}
 
-              {/* Submit button */}
+              {/* Submit */}
               <ScrollReveal delay={0.2}>
                 <button
                   type="submit"
-                  disabled={isSubmitting || (paymentMethod === "card")}
+                  disabled={isSubmitting || paymentMethod === "card"}
                   className="w-full rounded-xl bg-primary-500 px-6 py-4 text-sm font-semibold text-white transition-colors hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      Zpracovavam...
+                      Zpracovávám...
                     </>
                   ) : paymentMethod === "card" ? (
                     <>
                       <Lock className="h-4 w-4" />
-                      Zaplatit kartou (pripravujeme)
+                      Zaplatit kartou (připravujeme)
                     </>
                   ) : (
                     <>
@@ -712,7 +653,7 @@ function CheckoutPage() {
 
                 {paymentMethod === "card" && (
                   <p className="mt-3 text-center text-xs text-neutral-400">
-                    Platba kartou bude dostupna po napojeni Stripe. Pouzijte prosim platbu fakturou.
+                    Platba kartou bude dostupná po napojení Stripe. Použijte prosím platbu fakturou.
                   </p>
                 )}
               </ScrollReveal>
@@ -722,15 +663,11 @@ function CheckoutPage() {
                 <div className="flex items-center justify-center gap-6 pt-4 border-t border-neutral-100">
                   <div className="flex items-center gap-1.5 text-xs text-neutral-400">
                     <Shield className="h-3.5 w-3.5" />
-                    <span>Zabezpecena platba</span>
+                    <span>Zabezpečená platba</span>
                   </div>
                   <div className="flex items-center gap-1.5 text-xs text-neutral-400">
                     <Lock className="h-3.5 w-3.5" />
-                    <span>SSL sifrovani</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-xs text-neutral-400">
-                    <Check className="h-3.5 w-3.5" />
-                    <span>14 dni zdarma</span>
+                    <span>SSL šifrování</span>
                   </div>
                 </div>
               </ScrollReveal>
@@ -741,7 +678,6 @@ function CheckoutPage() {
           <div className="lg:col-span-1">
             <ScrollReveal delay={0.1}>
               <div className="sticky top-24 rounded-2xl border border-neutral-200 bg-white shadow-sm overflow-hidden">
-                {/* Header */}
                 <div className="bg-neutral-50 px-6 py-4 border-b border-neutral-100">
                   <h2 className="font-semibold text-neutral-800">
                     Shrnutí objednávky
@@ -749,18 +685,19 @@ function CheckoutPage() {
                 </div>
 
                 <div className="p-6 space-y-5">
-                  {/* Plan info */}
-                  <div className="flex items-center justify-between">
-                    <div>
+                  {/* Plan + tier info */}
+                  <div>
+                    <div className="flex items-center justify-between">
                       <p className="font-semibold text-neutral-800">{plan.name}</p>
-                      <p className="text-xs text-neutral-400 mt-0.5">
-                        {billingPeriod === "annual" ? "Rocni fakturace" : "Mesicni fakturace"}
+                      <p className="font-bold text-neutral-800">
+                        {tier.price.toLocaleString("cs-CZ")} Kč
                       </p>
                     </div>
-                    <p className="font-bold text-neutral-800">{price}</p>
+                    <p className="text-xs text-neutral-400 mt-1">
+                      {tier.calls} hovorů / {tier.agents} agentů / měsíc
+                    </p>
                   </div>
 
-                  {/* Divider */}
                   <div className="border-t border-neutral-100" />
 
                   {/* Features */}
@@ -768,7 +705,7 @@ function CheckoutPage() {
                     {plan.features.slice(0, 5).map((feature, i) => (
                       <div key={i} className="flex items-center gap-2">
                         <Check className="h-3.5 w-3.5 text-green-500 shrink-0" />
-                        <span className="text-xs text-neutral-600">{feature}</span>
+                        <span className="text-xs text-neutral-600">{feature.label}</span>
                       </div>
                     ))}
                     {plan.features.length > 5 && (
@@ -778,47 +715,30 @@ function CheckoutPage() {
                     )}
                   </div>
 
-                  {/* Divider */}
                   <div className="border-t border-neutral-100" />
 
                   {/* Price breakdown */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-neutral-500">Plan {plan.name}</span>
-                      <span className="text-neutral-800">{price}</span>
+                      <span className="text-neutral-500">{plan.name} ({tier.calls} hovorů)</span>
+                      <span className="text-neutral-800">{tier.price.toLocaleString("cs-CZ")} Kč</span>
                     </div>
-                    {billingPeriod === "annual" && annualTotal && (
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-neutral-500">Rocne celkem</span>
-                        <span className="text-neutral-800">
-                          {annualTotal.toLocaleString("cs-CZ")} Kc
-                        </span>
-                      </div>
-                    )}
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-neutral-500">DPH (21%)</span>
                       <span className="text-neutral-800">
-                        {Math.round(priceNum * 0.21).toLocaleString("cs-CZ")} Kc
+                        {Math.round(tier.price * 0.21).toLocaleString("cs-CZ")} Kč
                       </span>
                     </div>
                   </div>
 
-                  {/* Divider */}
                   <div className="border-t border-neutral-200" />
 
                   {/* Total */}
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-neutral-800">Celkem / mesíc</span>
+                    <span className="font-bold text-neutral-800">Celkem / měsíc</span>
                     <span className="text-xl font-bold text-neutral-800">
-                      {Math.round(priceNum * 1.21).toLocaleString("cs-CZ")} Kc
+                      {Math.round(tier.price * 1.21).toLocaleString("cs-CZ")} Kč
                     </span>
-                  </div>
-
-                  {/* Trial note */}
-                  <div className="rounded-lg bg-green-50 border border-green-100 p-3">
-                    <p className="text-xs text-green-700 font-medium">
-                      Prvních 14 dní zdarma. Platba se strhne až po skončení zkušební doby.
-                    </p>
                   </div>
                 </div>
               </div>

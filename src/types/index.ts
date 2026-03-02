@@ -29,15 +29,26 @@ export interface Testimonial {
   avatarInitials: string;
 }
 
+export interface PricingTier {
+  calls: number;
+  agents: number;
+  price: number;
+}
+
+export interface PricingFeature {
+  label: string;
+  tooltip?: string;
+}
+
 export interface PricingPlan {
-  id: string;
+  id: "solo" | "team" | "enterprise";
   name: string;
-  price: string;
-  priceAnnual: string;
   description: string;
-  features: string[];
+  tiers: PricingTier[];
+  features: PricingFeature[];
   highlighted: boolean;
   cta: string;
+  ctaLink: string;
 }
 
 export interface FAQ {
