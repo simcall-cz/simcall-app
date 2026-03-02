@@ -226,7 +226,14 @@ export default function CenikPage() {
                     </ul>
                   </CardContent>
                   <CardFooter>
-                    <Link href="/demo" className="w-full">
+                    <Link
+                      href={
+                        plan.id === "enterprise"
+                          ? "/kontakt"
+                          : `/checkout?plan=${plan.id}&billing=${isAnnual ? "annual" : "monthly"}`
+                      }
+                      className="w-full"
+                    >
                       <Button
                         variant={plan.highlighted ? "default" : "outline"}
                         className="w-full"
@@ -350,7 +357,7 @@ export default function CenikPage() {
                 žádné závazky.
               </p>
               <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/demo">
+                <Link href="/checkout?plan=professional">
                   <Button size="lg" className="group">
                     Začít zdarma
                     <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
