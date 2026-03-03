@@ -71,3 +71,27 @@ CREATE TABLE IF NOT EXISTS support_tickets (
 ALTER TABLE support_tickets ENABLE ROW LEVEL SECURITY;
 CREATE INDEX IF NOT EXISTS idx_support_tickets_user_id ON support_tickets(user_id);
 CREATE INDEX IF NOT EXISTS idx_support_tickets_status ON support_tickets(status);
+
+-- 7. Create companies table
+CREATE TABLE IF NOT EXISTS companies (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL DEFAULT 'Můj tým',
+  owner_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE companies ENABLE ROW LEVEL SECURITY;
+
+-- 8. Create company_members table
+CREATE TABLE IF NOT EXISTS company_members (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  company_id UUID REFERENCES companies(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  role TEXT DEFAULT 'agent' CHECK (role IN ('manager','agent')),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(company_id, user_id)
+);
+
+ALTER TABLE company_members ENABLE ROW LEVEL SECURITY;
+CREATE INDEX IF NOT EXISTS idx_company_members_company_id ON company_members(company_id);
+CREATE INDEX IF NOT EXISTS idx_company_members_user_id ON company_members(user_id);

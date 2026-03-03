@@ -125,8 +125,8 @@ export async function GET(request: NextRequest) {
 // POST /api/manager/team - Add a team member by email
 export async function POST(request: NextRequest) {
   try {
-    const { isManager, user, companyId } = await verifyManager(request);
-    if (!isManager || !user || !companyId) {
+    const { isManager, user, companyId: existingCompanyId } = await verifyManager(request);
+    if (!isManager || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -139,6 +139,44 @@ export async function POST(request: NextRequest) {
         { error: "Email is required" },
         { status: 400 }
       );
+    }
+
+    // Auto-create company if team_manager has none
+    let companyId = existingCompanyId;
+    if (!companyId) {
+      // Check if user already owns a company
+      const { data: existingCompany } = await supabase
+        .from("companies")
+        .select("id")
+        .eq("owner_id", user.id)
+        .limit(1)
+        .single();
+
+      if (existingCompany) {
+        companyId = existingCompany.id;
+      } else {
+        // Create new company
+        const { data: newCompany, error: companyErr } = await supabase
+          .from("companies")
+          .insert({ name: "Můj tým", owner_id: user.id })
+          .select("id")
+          .single();
+
+        if (companyErr || !newCompany) {
+          return NextResponse.json(
+            { error: "Nepodařilo se vytvořit tým: " + (companyErr?.message || "") },
+            { status: 500 }
+          );
+        }
+        companyId = newCompany.id;
+
+        // Add manager as the first member
+        await supabase.from("company_members").insert({
+          company_id: companyId,
+          user_id: user.id,
+          role: "manager",
+        });
+      }
     }
 
     // Look up user by email in profiles
@@ -155,6 +193,14 @@ export async function POST(request: NextRequest) {
             "Uživatel s tímto emailem nebyl nalezen. Musí se nejprve zaregistrovat.",
         },
         { status: 404 }
+      );
+    }
+
+    // Cannot add yourself
+    if (profile.id === user.id) {
+      return NextResponse.json(
+        { error: "Nemůžete přidat sami sebe — jste již manažer týmu." },
+        { status: 400 }
       );
     }
 
@@ -189,10 +235,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Update user's profile with team plan role and company
+    // Update user's profile role to team
     await supabase
       .from("profiles")
-      .update({ role: "team", company_id: companyId })
+      .update({ role: "team" })
       .eq("id", profile.id);
 
     return NextResponse.json({
@@ -216,8 +262,8 @@ export async function POST(request: NextRequest) {
 // DELETE /api/manager/team - Remove a team member
 export async function DELETE(request: NextRequest) {
   try {
-    const { isManager, user, companyId } = await verifyManager(request);
-    if (!isManager || !user || !companyId) {
+    const { isManager, user, companyId: existingCompanyId } = await verifyManager(request);
+    if (!isManager || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -240,6 +286,25 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
+    // Find company ID — use existing or look up from companies table
+    let companyId = existingCompanyId;
+    if (!companyId) {
+      const { data: company } = await supabase
+        .from("companies")
+        .select("id")
+        .eq("owner_id", user.id)
+        .limit(1)
+        .single();
+      companyId = company?.id || null;
+    }
+
+    if (!companyId) {
+      return NextResponse.json(
+        { error: "Nebyl nalezen žádný tým." },
+        { status: 404 }
+      );
+    }
+
     // Remove from company_members
     const { error: deleteError } = await supabase
       .from("company_members")
@@ -254,10 +319,10 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Reset user's profile to demo
+    // Reset user's profile to free
     await supabase
       .from("profiles")
-      .update({ role: "demo", company_id: null })
+      .update({ role: "free" })
       .eq("id", userId);
 
     return NextResponse.json({ success: true });
