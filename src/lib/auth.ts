@@ -315,12 +315,12 @@ export async function verifyManager(request: NextRequest): Promise<{ isManager: 
   // 2. Fallback: check profiles.role for team_manager (admin-assigned)
   const { data: profile } = await db
     .from("profiles")
-    .select("role, company_id")
+    .select("role")
     .eq("id", user.id)
     .single();
 
   if (profile && (profile.role === "team_manager" || profile.role === "admin")) {
-    return { isManager: true, user, companyId: profile.company_id || null };
+    return { isManager: true, user, companyId: null };
   }
 
   return { isManager: false, user, companyId: null };

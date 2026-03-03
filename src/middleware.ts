@@ -118,7 +118,7 @@ async function getUserProfile(userId: string) {
 
     const { data } = await supabase
       .from("profiles")
-      .select("role, company_id")
+      .select("role")
       .eq("id", userId)
       .single();
 
