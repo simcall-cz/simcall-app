@@ -298,6 +298,8 @@ export async function verifyManager(request: NextRequest): Promise<{ isManager: 
   if (!user) return { isManager: false, user: null, companyId: null };
 
   const db = createServerClient();
+
+  // 1. Check company_members for manager role
   const { data: member } = await db
     .from("company_members")
     .select("company_id, role")
@@ -306,9 +308,20 @@ export async function verifyManager(request: NextRequest): Promise<{ isManager: 
     .limit(1)
     .single();
 
-  return {
-    isManager: !!member,
-    user,
-    companyId: member?.company_id || null,
-  };
+  if (member) {
+    return { isManager: true, user, companyId: member.company_id };
+  }
+
+  // 2. Fallback: check profiles.role for team_manager (admin-assigned)
+  const { data: profile } = await db
+    .from("profiles")
+    .select("role, company_id")
+    .eq("id", user.id)
+    .single();
+
+  if (profile && (profile.role === "team_manager" || profile.role === "admin")) {
+    return { isManager: true, user, companyId: profile.company_id || null };
+  }
+
+  return { isManager: false, user, companyId: null };
 }

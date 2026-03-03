@@ -5,27 +5,43 @@ import { verifyManager } from "@/lib/auth";
 // GET /api/manager/stats - Team statistics for the manager dashboard
 export async function GET(request: NextRequest) {
   try {
-    const { isManager, companyId } = await verifyManager(request);
-    if (!isManager || !companyId) {
+    const { isManager, user, companyId } = await verifyManager(request);
+    if (!isManager || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const supabase = createServerClient();
 
-    // Get all company members
-    const { data: members, error: membersError } = await supabase
-      .from("company_members")
-      .select("user_id, role, profiles:user_id (id, full_name, email)")
-      .eq("company_id", companyId);
+    // If no company, show the manager's own data
+    let memberIds: string[];
+    let members: { user_id: string; role: string; profiles: { id: string; full_name: string; email: string } | null }[] = [];
 
-    if (membersError) {
-      return NextResponse.json(
-        { error: membersError.message },
-        { status: 500 }
-      );
+    if (companyId) {
+      const { data: companyMembers, error: membersError } = await supabase
+        .from("company_members")
+        .select("user_id, role, profiles:user_id (id, full_name, email)")
+        .eq("company_id", companyId);
+
+      if (membersError) {
+        return NextResponse.json({ error: membersError.message }, { status: 500 });
+      }
+      members = (companyMembers || []) as unknown as typeof members;
+      memberIds = members.map((m) => m.user_id);
+    } else {
+      // No company — show own data
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("id, full_name, email")
+        .eq("id", user.id)
+        .single();
+
+      members = [{
+        user_id: user.id,
+        role: "manager",
+        profiles: profile || { id: user.id, full_name: "", email: user.email || "" },
+      }];
+      memberIds = [user.id];
     }
-
-    const memberIds = (members || []).map((m) => m.user_id);
 
     if (memberIds.length === 0) {
       return NextResponse.json({

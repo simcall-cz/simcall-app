@@ -5,24 +5,38 @@ import { verifyManager } from "@/lib/auth";
 // GET /api/manager/team - List team members with stats
 export async function GET(request: NextRequest) {
   try {
-    const { isManager, companyId } = await verifyManager(request);
-    if (!isManager || !companyId) {
+    const { isManager, user, companyId } = await verifyManager(request);
+    if (!isManager || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const supabase = createServerClient();
 
-    // Get all company members joined with profiles
-    const { data: members, error: membersError } = await supabase
-      .from("company_members")
-      .select("user_id, role, profiles:user_id (id, full_name, email)")
-      .eq("company_id", companyId);
+    let rawMembers: { user_id: string; role: string; profiles: { id: string; full_name: string; email: string } | null }[];
 
-    if (membersError) {
-      return NextResponse.json(
-        { error: membersError.message },
-        { status: 500 }
-      );
+    if (companyId) {
+      const { data: companyMembers, error: membersError } = await supabase
+        .from("company_members")
+        .select("user_id, role, profiles:user_id (id, full_name, email)")
+        .eq("company_id", companyId);
+
+      if (membersError) {
+        return NextResponse.json({ error: membersError.message }, { status: 500 });
+      }
+      rawMembers = (companyMembers || []) as unknown as typeof rawMembers;
+    } else {
+      // No company — show manager as single-person team
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("id, full_name, email")
+        .eq("id", user.id)
+        .single();
+
+      rawMembers = [{
+        user_id: user.id,
+        role: "manager",
+        profiles: profile || { id: user.id, full_name: "", email: user.email || "" },
+      }];
     }
 
     // Current month boundaries
@@ -32,22 +46,15 @@ export async function GET(request: NextRequest) {
 
     // Build enriched member list with call stats
     const enrichedMembers = await Promise.all(
-      (members || []).map(async (member) => {
-        const profile = member.profiles as unknown as {
-          id: string;
-          full_name: string;
-          email: string;
-        } | null;
-
+      rawMembers.map(async (member) => {
+        const profile = member.profiles;
         const userId = member.user_id;
 
-        // Total calls
         const { count: totalCalls } = await supabase
           .from("calls")
           .select("*", { count: "exact", head: true })
           .eq("user_id", userId);
 
-        // Average score
         const { data: scoreData } = await supabase
           .from("calls")
           .select("score")
@@ -62,7 +69,6 @@ export async function GET(request: NextRequest) {
               ) / 10
             : null;
 
-        // Calls this month
         const { count: callsThisMonth } = await supabase
           .from("calls")
           .select("*", { count: "exact", head: true })
@@ -88,11 +94,15 @@ export async function GET(request: NextRequest) {
       0
     );
 
-    // Get team subscription for calls limit
+    // Get team subscription for calls limit — try manager's subscription
+    const managerId = companyId
+      ? rawMembers.find((m) => m.role === "manager")?.user_id
+      : user.id;
+
     const { data: teamSub } = await supabase
       .from("subscriptions")
       .select("calls_limit")
-      .eq("user_id", members?.find((m) => m.role === "manager")?.user_id)
+      .eq("user_id", managerId || user.id)
       .eq("status", "active")
       .order("created_at", { ascending: false })
       .limit(1)
