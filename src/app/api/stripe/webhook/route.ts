@@ -112,40 +112,44 @@ export async function POST(request: NextRequest) {
 
         // If user exists, update their profile role to match the plan
         if (userId && subscription) {
+          // Team plan buyers become team_manager; solo buyers become solo
+          const profileRole = plan === "team" ? "team_manager" : plan;
           await db
             .from("profiles")
             .update({
-              role: plan,
-              subscription_id: subscription.id,
+              role: profileRole,
               updated_at: new Date().toISOString(),
             })
             .eq("id", userId);
         }
 
         // For team plans, create a company and add the owner as manager
-        if (plan === "team" && subscription) {
-          const { data: company } = await db
+        if (plan === "team" && userId) {
+          // Check if user already has a company
+          const { data: existingCompany } = await db
             .from("companies")
-            .insert({
-              name: customerName ? `${customerName} – Team` : "Team",
-              subscription_id: subscription.id,
-              owner_id: userId || null,
-            })
             .select("id")
+            .eq("owner_id", userId)
+            .limit(1)
             .single();
 
-          if (company && userId) {
-            await db.from("company_members").insert({
-              company_id: company.id,
-              user_id: userId,
-              role: "manager",
-            });
+          if (!existingCompany) {
+            const { data: company } = await db
+              .from("companies")
+              .insert({
+                name: customerName ? `${customerName} – Team` : "Můj tým",
+                owner_id: userId,
+              })
+              .select("id")
+              .single();
 
-            // Also link the user profile to this company
-            await db
-              .from("profiles")
-              .update({ company_id: company.id })
-              .eq("id", userId);
+            if (company) {
+              await db.from("company_members").insert({
+                company_id: company.id,
+                user_id: userId,
+                role: "manager",
+              });
+            }
           }
         }
 

@@ -2,13 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
 import { getUserFromRequest } from "@/lib/auth";
 
-// Default limits per role (when no Stripe subscription exists)
-const ROLE_DEFAULTS: Record<string, { plan: string; callsLimit: number; agentsLimit: number }> = {
-  solo: { plan: "solo", callsLimit: 50, agentsLimit: 5 },
-  team: { plan: "team", callsLimit: 250, agentsLimit: 25 },
-  team_manager: { plan: "team", callsLimit: 250, agentsLimit: 25 },
-};
-
 // GET /api/subscription - Get current user's subscription info
 export async function GET(request: NextRequest) {
   try {
@@ -19,36 +12,21 @@ export async function GET(request: NextRequest) {
 
     const supabase = createServerClient();
 
-    // Try to fetch active subscription from Stripe
-    let subscription = null;
-    try {
-      const { data } = await supabase
-        .from("subscriptions")
-        .select("*")
-        .eq("user_id", user.id)
-        .eq("status", "active")
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .single();
-      subscription = data;
-    } catch {
-      // subscriptions table may not exist yet
+    // 1. Try to fetch user's own active subscription (for solo/team_manager who bought directly)
+    const { data: ownSub } = await supabase
+      .from("subscriptions")
+      .select("*")
+      .eq("user_id", user.id)
+      .eq("status", "active")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .single();
+
+    if (ownSub) {
+      return NextResponse.json(formatSub(ownSub));
     }
 
-    if (subscription) {
-      return NextResponse.json({
-        plan: subscription.plan,
-        tier: subscription.tier,
-        callsUsed: subscription.calls_used,
-        callsLimit: subscription.calls_limit,
-        agentsLimit: subscription.agents_limit,
-        status: subscription.status,
-        currentPeriodEnd: subscription.current_period_end,
-        stripeCustomerId: subscription.stripe_customer_id,
-      });
-    }
-
-    // No Stripe subscription — check profile role
+    // 2. Check profile role
     const { data: profile } = await supabase
       .from("profiles")
       .select("role")
@@ -56,31 +34,44 @@ export async function GET(request: NextRequest) {
       .single();
 
     const role = profile?.role || "free";
+
+    // 3. If user is a team member, inherit manager's subscription
+    if (role === "team") {
+      const managerSub = await getManagerSubscription(supabase, user.id);
+      if (managerSub) {
+        // Count the team member's own calls this month as their usage
+        const callsUsed = await countCallsThisMonth(supabase, user.id);
+        return NextResponse.json({
+          ...formatSub(managerSub),
+          callsUsed,
+          isTeamMember: true,
+          managerPlan: true,
+        });
+      }
+    }
+
+    // 4. Role-based defaults (admin-assigned, no Stripe subscription)
+    const ROLE_DEFAULTS: Record<string, { plan: string; callsLimit: number; agentsLimit: number }> = {
+      solo: { plan: "solo", callsLimit: 50, agentsLimit: 5 },
+      team: { plan: "team", callsLimit: 250, agentsLimit: 25 },
+      team_manager: { plan: "team", callsLimit: 250, agentsLimit: 25 },
+    };
+
     const defaults = ROLE_DEFAULTS[role];
-
     if (defaults) {
-      // Paid role set by admin — count calls this month as usage
-      const startOfMonth = new Date();
-      startOfMonth.setDate(1);
-      startOfMonth.setHours(0, 0, 0, 0);
-
-      const { count } = await supabase
-        .from("calls")
-        .select("*", { count: "exact", head: true })
-        .eq("user_id", user.id)
-        .gte("date", startOfMonth.toISOString());
-
+      const callsUsed = await countCallsThisMonth(supabase, user.id);
       return NextResponse.json({
         plan: defaults.plan,
         tier: 1,
-        callsUsed: count || 0,
+        callsUsed,
         callsLimit: defaults.callsLimit,
         agentsLimit: defaults.agentsLimit,
         status: "active",
+        isTeamMember: role === "team",
       });
     }
 
-    // Free user — count total calls as usage
+    // 5. Free user
     const { count } = await supabase
       .from("calls")
       .select("*", { count: "exact", head: true })
@@ -101,4 +92,75 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function formatSub(sub: any) {
+  return {
+    plan: sub.plan,
+    tier: sub.tier,
+    callsUsed: sub.calls_used,
+    callsLimit: sub.calls_limit,
+    agentsLimit: sub.agents_limit,
+    status: sub.status,
+    currentPeriodEnd: sub.current_period_end,
+    stripeCustomerId: sub.stripe_customer_id,
+  };
+}
+
+async function countCallsThisMonth(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: any,
+  userId: string
+): Promise<number> {
+  const startOfMonth = new Date();
+  startOfMonth.setDate(1);
+  startOfMonth.setHours(0, 0, 0, 0);
+
+  const { count } = await supabase
+    .from("calls")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .gte("date", startOfMonth.toISOString());
+
+  return count || 0;
+}
+
+async function getManagerSubscription(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: any,
+  userId: string
+) {
+  // Find the company this user belongs to
+  const { data: membership } = await supabase
+    .from("company_members")
+    .select("company_id")
+    .eq("user_id", userId)
+    .limit(1)
+    .single();
+
+  if (!membership) return null;
+
+  // Find the manager of this company
+  const { data: manager } = await supabase
+    .from("company_members")
+    .select("user_id")
+    .eq("company_id", membership.company_id)
+    .eq("role", "manager")
+    .limit(1)
+    .single();
+
+  if (!manager) return null;
+
+  // Get the manager's subscription
+  const { data: sub } = await supabase
+    .from("subscriptions")
+    .select("*")
+    .eq("user_id", manager.user_id)
+    .eq("status", "active")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .single();
+
+  return sub;
 }

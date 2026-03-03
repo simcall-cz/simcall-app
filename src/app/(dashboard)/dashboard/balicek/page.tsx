@@ -28,6 +28,7 @@ interface SubscriptionData {
   status: string;
   currentPeriodEnd?: string;
   stripeCustomerId?: string;
+  isTeamMember?: boolean;
 }
 
 const planLabels: Record<string, string> = {
@@ -115,6 +116,7 @@ export default function BalicekPage() {
     : 0;
   const remaining = Math.max(0, sub.callsLimit - sub.callsUsed);
   const isPaid = sub.plan !== "demo";
+  const isTeamMember = !!sub.isTeamMember;
   const daysLeft = sub.currentPeriodEnd ? getDaysRemaining(sub.currentPeriodEnd) : null;
   const currentTiers = tierDetails[sub.plan] || [];
   const currentTierIndex = sub.tier ? sub.tier - 1 : 0;
@@ -155,11 +157,11 @@ export default function BalicekPage() {
                     )}
                   </h2>
                   <Badge variant={isPaid ? "success" : "secondary"}>
-                    {isPaid ? "Aktivní" : "Demo účet"}
+                    {isPaid ? (isTeamMember ? "Člen týmu" : "Aktivní") : "Demo účet"}
                   </Badge>
                 </div>
               </div>
-              {isPaid && sub.stripeCustomerId && (
+              {isPaid && sub.stripeCustomerId && !isTeamMember && (
                 <Button
                   onClick={handlePortal}
                   disabled={isPortalLoading}
@@ -264,8 +266,35 @@ export default function BalicekPage() {
         </Card>
       </motion.div>
 
-      {/* Upgrade / Downgrade Options */}
-      {isPaid && currentTiers.length > 0 && (
+      {/* Team member info */}
+      {isTeamMember && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center shrink-0">
+                  <Users className="w-6 h-6 text-purple-600" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-neutral-900">
+                    Váš balíček spravuje manažer týmu
+                  </h3>
+                  <p className="text-sm text-neutral-500 mt-0.5">
+                    Upgrade a downgrade balíčku může provádět pouze manažer vašeho týmu. Pokud potřebujete změnu, kontaktujte svého manažera.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {/* Upgrade / Downgrade Options — only for solo/team_manager, NOT team members */}
+      {isPaid && !isTeamMember && currentTiers.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
