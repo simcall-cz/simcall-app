@@ -8,12 +8,12 @@ import {
   BarChart3,
   User,
   Users,
-  Headphones,
   X,
   DollarSign,
   Shield,
   Bot,
   UserPlus,
+  MessageSquare,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -90,6 +90,11 @@ const adminNavItems: SidebarNavItem[] = [
     label: "Agenti",
     href: "/admin/agenti",
     icon: <Bot className="w-5 h-5" />,
+  },
+  {
+    label: "Dotazy",
+    href: "/admin/dotazy",
+    icon: <MessageSquare className="w-5 h-5" />,
   },
 ];
 

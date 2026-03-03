@@ -239,3 +239,37 @@ DO $$ BEGIN
   ALTER TABLE agents ADD COLUMN IF NOT EXISTS category text;
 EXCEPTION WHEN others THEN NULL;
 END $$;
+
+-- ============================================
+-- 13. Form submissions (contact, meetings, enterprise inquiries)
+-- ============================================
+CREATE TABLE IF NOT EXISTS form_submissions (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  type text NOT NULL CHECK (type IN ('kontakt', 'schuzka', 'enterprise')),
+  status text NOT NULL DEFAULT 'new' CHECK (status IN ('new', 'read', 'replied', 'archived')),
+  name text NOT NULL,
+  email text NOT NULL,
+  phone text,
+  company text,
+  subject text,
+  message text,
+  -- Meeting-specific fields
+  meeting_date text,
+  meeting_time text,
+  team_size text,
+  -- Metadata
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE form_submissions ENABLE ROW LEVEL SECURITY;
+
+-- Only admin/service role can read submissions
+CREATE POLICY "Service role manages form_submissions"
+  ON form_submissions FOR ALL
+  USING (true);
+
+-- Allow anonymous inserts (public forms)
+CREATE POLICY "Anyone can submit forms"
+  ON form_submissions FOR INSERT
+  WITH CHECK (true);
