@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
-import { Phone, TrendingUp, Clock, Award } from "lucide-react";
+import { useMemo, useEffect, useState } from "react";
+import { Phone, TrendingUp, Clock, Award, Lock } from "lucide-react";
+import Link from "next/link";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -15,7 +16,9 @@ import {
   Cell,
 } from "recharts";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useCallHistory } from "@/hooks/useCallHistory";
+import { getUserSessionInfo } from "@/lib/auth";
 
 function formatDateShort(dateStr: string) {
   const date = new Date(dateStr);
@@ -24,6 +27,13 @@ function formatDateShort(dateStr: string) {
 
 export default function StatistikyPage() {
   const { calls, isLoading } = useCallHistory({ limit: 200 });
+  const [isFree, setIsFree] = useState(false);
+
+  useEffect(() => {
+    getUserSessionInfo().then((info) => {
+      if (info?.role === "free") setIsFree(true);
+    });
+  }, []);
 
   const completedCalls = calls.filter((c) => c.successRate > 0);
   const totalCalls = calls.length;
@@ -132,7 +142,7 @@ export default function StatistikyPage() {
     );
   }
 
-  return (
+  const pageContent = (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-neutral-900">Statistiky</h1>
@@ -319,4 +329,35 @@ export default function StatistikyPage() {
       )}
     </div>
   );
+
+  if (isFree) {
+    return (
+      <div className="relative">
+        {/* Blurred content */}
+        <div className="blur-sm pointer-events-none select-none opacity-60">
+          {pageContent}
+        </div>
+
+        {/* Lock overlay */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="bg-white rounded-2xl border border-neutral-200 shadow-xl p-8 text-center max-w-sm mx-4">
+            <div className="w-14 h-14 rounded-full bg-neutral-100 flex items-center justify-center mx-auto mb-4">
+              <Lock className="w-7 h-7 text-neutral-500" />
+            </div>
+            <h3 className="text-lg font-bold text-neutral-900">Statistiky jsou zamčeny</h3>
+            <p className="mt-2 text-sm text-neutral-500 leading-relaxed">
+              Podrobné statistiky jsou dostupné od plánu Solo (od 490 Kč/měs).
+            </p>
+            <Link href="/cenik" className="mt-5 block">
+              <Button className="w-full">
+                Vybrat plán
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return pageContent;
 }

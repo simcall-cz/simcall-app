@@ -6,15 +6,8 @@ const footerLinks = {
     title: "Produkt",
     links: [
       { label: "Funkce", href: "/funkce" },
+      { label: "AI Simulátor", href: "/ai-simulator" },
       { label: "Ceník", href: "/cenik" },
-      { label: "Demo", href: "/demo" },
-    ],
-  },
-  proKoho: {
-    title: "Pro koho",
-    links: [
-      { label: "Makléře", href: "/pro-maklere" },
-      { label: "Manažery", href: "/pro-manazery" },
     ],
   },
   spolecnost: {
@@ -40,7 +33,7 @@ export function Footer() {
       <Container>
         <div className="py-10 sm:py-16">
           {/* Top Section */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-6 sm:gap-8 lg:gap-12">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 lg:gap-12">
             {/* Logo Column */}
             <div className="col-span-2 md:col-span-1">
               <Link href="/" className="flex items-center gap-0.5">

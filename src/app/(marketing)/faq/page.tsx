@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ChevronDown, Mail } from "lucide-react";
+import { ChevronDown, Mail, ArrowRight } from "lucide-react";
 
 import { Container } from "@/components/shared/container";
-import { SectionHeader } from "@/components/shared/section-header";
 import { ScrollReveal } from "@/components/shared/scroll-reveal";
 import { faqItems } from "@/data/faq";
 import { Button } from "@/components/ui/button";
@@ -34,99 +33,124 @@ export default function FAQPage() {
   };
 
   return (
-    <section className="py-16 sm:py-24">
-      <Container>
-        {/* Page Header */}
-        <ScrollReveal>
-          <SectionHeader
-            badge="FAQ"
-            title="Časté dotazy"
-            subtitle="Odpovědi na nejčastější otázky o SimCall"
-          />
-        </ScrollReveal>
-
-        {/* Category Filter */}
-        <ScrollReveal delay={0.1}>
-          <div className="mt-10 flex flex-wrap justify-center gap-2">
-            {categories.map((category) => (
-              <button
-                key={category.key}
-                onClick={() => {
-                  setActiveCategory(category.key);
-                  setOpenIndex(null);
-                }}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${activeCategory === category.key
-                    ? "bg-primary-500 text-white"
-                    : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200"
-                  }`}
-              >
-                {category.label}
-              </button>
-            ))}
+    <>
+      {/* HERO */}
+      <section className="relative overflow-hidden pt-12 pb-14 sm:pt-16 sm:pb-20 bg-neutral-900">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-primary-500/8 rounded-full blur-3xl pointer-events-none" />
+        <Container>
+          <div className="text-center max-w-2xl mx-auto relative">
+            <ScrollReveal>
+              <div className="inline-flex items-center gap-2 bg-white/10 text-white/80 text-xs font-medium px-3 py-1.5 rounded-full mb-5">
+                FAQ
+              </div>
+              <h1 className="text-4xl sm:text-5xl font-bold text-white tracking-tight leading-[1.1]">
+                Časté dotazy
+              </h1>
+              <p className="mt-4 text-lg text-neutral-400">
+                Odpovědi na nejčastější otázky o SimCall.
+              </p>
+            </ScrollReveal>
           </div>
-        </ScrollReveal>
+        </Container>
+      </section>
 
-        {/* FAQ Accordion */}
-        <div className="mt-12 max-w-3xl mx-auto space-y-3">
-          {filteredItems.map((item, index) => (
-            <ScrollReveal key={`${activeCategory}-${index}`} delay={index * 0.05}>
-              <div className="bg-white border border-neutral-100 rounded-xl shadow-card overflow-hidden">
+      {/* CONTENT */}
+      <section className="py-12 sm:py-20">
+        <Container>
+          {/* Category Filter */}
+          <ScrollReveal>
+            <div className="flex flex-wrap justify-center gap-2">
+              {categories.map((category) => (
                 <button
-                  onClick={() => handleToggle(index)}
-                  className="w-full flex items-center justify-between p-5 text-left transition-colors hover:bg-neutral-50"
-                >
-                  <span className="font-medium text-neutral-800 pr-4">
-                    {item.question}
-                  </span>
-                  <ChevronDown
-                    className={`w-5 h-5 text-neutral-400 shrink-0 transition-transform duration-200 ${
-                      openIndex === index ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
-
-                <div
-                  className={`grid transition-all duration-300 ease-in-out ${
-                    openIndex === index
-                      ? "grid-rows-[1fr] opacity-100"
-                      : "grid-rows-[0fr] opacity-0"
+                  key={category.key}
+                  onClick={() => {
+                    setActiveCategory(category.key);
+                    setOpenIndex(null);
+                  }}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                    activeCategory === category.key
+                      ? "bg-neutral-900 text-white shadow-sm"
+                      : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200"
                   }`}
                 >
-                  <div className="overflow-hidden">
-                    <div className="px-5 pb-5 text-neutral-500 leading-relaxed">
-                      {item.answer}
+                  {category.label}
+                </button>
+              ))}
+            </div>
+          </ScrollReveal>
+
+          {/* FAQ Accordion */}
+          <div className="mt-10 max-w-3xl mx-auto space-y-2.5">
+            {filteredItems.map((item, index) => (
+              <ScrollReveal key={`${activeCategory}-${index}`} delay={index * 0.03}>
+                <div
+                  className={`border rounded-2xl overflow-hidden transition-all duration-200 ${
+                    openIndex === index
+                      ? "border-primary-200 bg-primary-50/30 shadow-sm"
+                      : "border-neutral-100 bg-white hover:border-neutral-200"
+                  }`}
+                >
+                  <button
+                    onClick={() => handleToggle(index)}
+                    className="w-full flex items-center justify-between px-5 py-4 text-left transition-colors"
+                  >
+                    <span className="font-medium text-neutral-800 pr-4 text-sm sm:text-base">
+                      {item.question}
+                    </span>
+                    <ChevronDown
+                      className={`w-5 h-5 text-neutral-400 shrink-0 transition-transform duration-200 ${
+                        openIndex === index ? "rotate-180 text-primary-500" : ""
+                      }`}
+                    />
+                  </button>
+
+                  <div
+                    className={`grid transition-all duration-300 ease-in-out ${
+                      openIndex === index
+                        ? "grid-rows-[1fr] opacity-100"
+                        : "grid-rows-[0fr] opacity-0"
+                    }`}
+                  >
+                    <div className="overflow-hidden">
+                      <div className="px-5 pb-5 text-sm text-neutral-500 leading-relaxed border-t border-primary-100/50 pt-3">
+                        {item.answer}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </ScrollReveal>
-          ))}
-        </div>
-
-        {/* Contact CTA */}
-        <ScrollReveal delay={0.2}>
-          <div className="mt-16 text-center bg-neutral-50 rounded-2xl p-8 sm:p-12 max-w-2xl mx-auto">
-            <h3 className="text-xl font-bold text-neutral-800">
-              Nenašli jste odpověď?
-            </h3>
-            <p className="mt-3 text-neutral-500">
-              Neváhejte nás kontaktovat. Rádi vám pomůžeme s jakýmkoliv dotazem.
-            </p>
-            <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/kontakt">
-                <Button>Kontaktujte nás</Button>
-              </Link>
-              <a
-                href="mailto:simcallcz@gmail.com"
-                className="flex items-center gap-2 text-sm text-neutral-500 hover:text-neutral-800 transition-colors"
-              >
-                <Mail className="w-4 h-4" />
-                simcallcz@gmail.com
-              </a>
-            </div>
+              </ScrollReveal>
+            ))}
           </div>
-        </ScrollReveal>
-      </Container>
-    </section>
+
+          {/* Contact CTA */}
+          <ScrollReveal delay={0.2}>
+            <div className="mt-16 text-center bg-neutral-50 border border-neutral-100 rounded-3xl p-8 sm:p-12 max-w-2xl mx-auto">
+              <div className="text-3xl mb-3">💬</div>
+              <h3 className="text-xl font-bold text-neutral-800">
+                Nenašli jste odpověď?
+              </h3>
+              <p className="mt-2 text-neutral-500 text-sm">
+                Napište nám nebo domluvte schůzku — odpovíme do 24 hodin.
+              </p>
+              <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <Link href="/kontakt">
+                  <Button className="group">
+                    Napsat dotaz
+                    <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                  </Button>
+                </Link>
+                <a
+                  href="mailto:simcallcz@gmail.com"
+                  className="flex items-center gap-2 text-sm text-neutral-500 hover:text-neutral-800 transition-colors"
+                >
+                  <Mail className="w-4 h-4" />
+                  simcallcz@gmail.com
+                </a>
+              </div>
+            </div>
+          </ScrollReveal>
+        </Container>
+      </section>
+    </>
   );
 }

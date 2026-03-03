@@ -102,7 +102,7 @@ function FreeDashboard({
             </h1>
             <Badge variant="secondary" className="text-xs">
               <Zap className="w-3 h-3 mr-1" />
-              Free
+              Demo
             </Badge>
           </div>
           <p className="text-sm text-neutral-500 mt-1">{today}</p>
@@ -129,7 +129,7 @@ function FreeDashboard({
             <div className="flex items-center gap-2">
               <Phone className="w-4 h-4 text-neutral-500" />
               <span className="text-sm font-medium text-neutral-700">
-                Využití hovorů tento měsíc
+                Využití demo hovorů celkem
               </span>
             </div>
             <span className="text-sm font-bold text-neutral-900">
@@ -148,8 +148,7 @@ function FreeDashboard({
           </div>
           {totalCalls >= FREE_CALLS_LIMIT && (
             <p className="text-xs text-red-500 mt-2">
-              Dosáhli jste limitu {FREE_CALLS_LIMIT} hovorů/měsíc. Upgradujte
-              na Premium pro neomezené hovory.
+              Dosáhli jste limitu {FREE_CALLS_LIMIT} hovorů v demo verzi. Vyberte plán pro neomezené hovory.
             </p>
           )}
         </CardContent>
@@ -307,7 +306,7 @@ function FreeDashboard({
               <div className="flex items-center gap-2 mb-2">
                 <Crown className="w-5 h-5 text-primary-500" />
                 <h3 className="text-lg font-bold text-neutral-900">
-                  Upgradujte na Premium
+                  Vyberte svůj plán
                 </h3>
               </div>
               <p className="text-sm text-neutral-600 mb-3">
@@ -315,10 +314,10 @@ function FreeDashboard({
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                 {[
-                  "Neomezené tréninkové hovory",
-                  "10 různých AI agentů",
-                  "Detailní ChatGPT analýza",
-                  "Přepis hovoru s highlight",
+                  "Až 1 000 hovorů/měsíc (Solo plán)",
+                  "500 AI agentů k výběru",
+                  "Detailní AI analýza hovoru",
+                  "Přepis hovoru s exportem PDF",
                   "Sledování pokroku a grafy",
                   "Personalizovaná doporučení",
                 ].map((feature) => (
@@ -333,12 +332,12 @@ function FreeDashboard({
               </div>
             </div>
             <div className="text-center sm:text-right shrink-0">
-              <p className="text-2xl font-bold text-neutral-900">990 Kč</p>
+              <p className="text-2xl font-bold text-neutral-900">od 490 Kč</p>
               <p className="text-xs text-neutral-400 mb-3">/ měsíc</p>
               <Link href="/cenik">
                 <Button size="lg" className="whitespace-nowrap">
                   <Sparkles className="w-4 h-4 mr-2" />
-                  Upgradovat
+                  Vybrat plán
                 </Button>
               </Link>
             </div>
