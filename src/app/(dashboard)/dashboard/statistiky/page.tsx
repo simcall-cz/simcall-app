@@ -18,7 +18,7 @@ import {
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useCallHistory } from "@/hooks/useCallHistory";
-import { getUserSessionInfo } from "@/lib/auth";
+import { getAuthHeaders } from "@/lib/auth";
 
 function formatDateShort(dateStr: string) {
   const date = new Date(dateStr);
@@ -30,8 +30,15 @@ export default function StatistikyPage() {
   const [isFree, setIsFree] = useState(false);
 
   useEffect(() => {
-    getUserSessionInfo().then((info) => {
-      if (info?.role === "free") setIsFree(true);
+    getAuthHeaders().then((headers) => {
+      fetch("/api/subscription", { headers })
+        .then((res) => res.json())
+        .then((data) => {
+          if (!data || data.error || data.plan === "demo") {
+            setIsFree(true);
+          }
+        })
+        .catch(() => setIsFree(true));
     });
   }, []);
 

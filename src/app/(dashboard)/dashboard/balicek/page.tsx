@@ -10,8 +10,11 @@ import {
   Users,
   Zap,
   TrendingUp,
+  Calendar,
+  ArrowDown,
+  ArrowUp,
 } from "lucide-react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getAuthHeaders } from "@/lib/auth";
@@ -32,6 +35,30 @@ const planLabels: Record<string, string> = {
   solo: "Solo",
   team: "Team",
 };
+
+const tierDetails: Record<string, { calls: number; price: number }[]> = {
+  solo: [
+    { calls: 50, price: 490 },
+    { calls: 100, price: 990 },
+    { calls: 250, price: 1990 },
+    { calls: 500, price: 3490 },
+    { calls: 1000, price: 4990 },
+  ],
+  team: [
+    { calls: 250, price: 2490 },
+    { calls: 500, price: 4490 },
+    { calls: 1000, price: 7990 },
+    { calls: 2500, price: 14990 },
+    { calls: 5000, price: 24990 },
+  ],
+};
+
+function getDaysRemaining(endDate: string): number {
+  const now = new Date();
+  const end = new Date(endDate);
+  const diff = end.getTime() - now.getTime();
+  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+}
 
 export default function BalicekPage() {
   const [sub, setSub] = useState<SubscriptionData | null>(null);
@@ -88,6 +115,9 @@ export default function BalicekPage() {
     : 0;
   const remaining = Math.max(0, sub.callsLimit - sub.callsUsed);
   const isPaid = sub.plan !== "demo";
+  const daysLeft = sub.currentPeriodEnd ? getDaysRemaining(sub.currentPeriodEnd) : null;
+  const currentTiers = tierDetails[sub.plan] || [];
+  const currentTierIndex = sub.tier ? sub.tier - 1 : 0;
 
   return (
     <div className="space-y-6">
@@ -101,7 +131,7 @@ export default function BalicekPage() {
         </p>
       </motion.div>
 
-      {/* Plan Info */}
+      {/* Plan Info Card */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -109,6 +139,7 @@ export default function BalicekPage() {
       >
         <Card>
           <CardContent className="p-6">
+            {/* Header */}
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center">
@@ -119,7 +150,7 @@ export default function BalicekPage() {
                     {planLabels[sub.plan] || sub.plan}
                     {isPaid && (
                       <span className="text-neutral-400 font-normal ml-2 text-sm">
-                        Tier {sub.tier}
+                        · {sub.callsLimit} hovorů/měs
                       </span>
                     )}
                   </h2>
@@ -140,13 +171,13 @@ export default function BalicekPage() {
                   ) : (
                     <ArrowUpRight className="w-4 h-4" />
                   )}
-                  Spravovat předplatné
+                  Stripe portál
                 </Button>
               )}
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
               <div className="bg-neutral-50 rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <Phone className="w-4 h-4 text-neutral-400" />
@@ -178,6 +209,22 @@ export default function BalicekPage() {
                   {sub.agentsLimit}
                 </p>
               </div>
+              <div className="bg-neutral-50 rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <Calendar className="w-4 h-4 text-neutral-400" />
+                  <span className="text-xs text-neutral-500">Obnovení</span>
+                </div>
+                <p className="text-2xl font-bold text-neutral-900">
+                  {daysLeft !== null ? (
+                    <>
+                      {daysLeft}
+                      <span className="text-sm font-normal text-neutral-400"> dní</span>
+                    </>
+                  ) : (
+                    "—"
+                  )}
+                </p>
+              </div>
             </div>
 
             {/* Usage Bar */}
@@ -204,69 +251,106 @@ export default function BalicekPage() {
                   }`}
                 />
               </div>
-              {usagePercent >= 80 && (
-                <p className="text-xs text-amber-600 mt-2">
-                  ⚠️ Blížíte se k limitu hovorů. Zvažte upgrade balíčku.
-                </p>
-              )}
             </div>
 
-            {/* Upgrade CTA */}
-            {!isPaid && (
-              <div className="mt-6 p-4 bg-gradient-to-r from-primary-50 to-blue-50 rounded-xl border border-primary-100">
-                <div className="flex items-center gap-3">
-                  <TrendingUp className="w-5 h-5 text-primary-600 shrink-0" />
-                  <div className="flex-1">
-                    <p className="font-medium text-neutral-900 text-sm">
-                      Upgradujte na placený plán
-                    </p>
-                    <p className="text-xs text-neutral-500 mt-0.5">
-                      Získejte více hovorů, agentů a pokročilé funkce
-                    </p>
-                  </div>
-                  <Button
-                    size="sm"
-                    onClick={() => (window.location.href = "/cenik")}
-                    className="shrink-0"
-                  >
-                    Ceník
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {isPaid && usagePercent >= 90 && !sub.stripeCustomerId && (
-              <div className="mt-6 p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-100">
-                <div className="flex items-center gap-3">
-                  <TrendingUp className="w-5 h-5 text-amber-600 shrink-0" />
-                  <div className="flex-1">
-                    <p className="font-medium text-neutral-900 text-sm">
-                      Zvyšte svůj balíček
-                    </p>
-                    <p className="text-xs text-neutral-500 mt-0.5">
-                      Vaše hovory dochází. Přejděte na vyšší tier.
-                    </p>
-                  </div>
-                  <Button
-                    size="sm"
-                    onClick={() => (window.location.href = "/cenik")}
-                    className="shrink-0"
-                  >
-                    Ceník
-                  </Button>
-                </div>
-              </div>
-            )}
-
+            {/* Rebill date */}
             {sub.currentPeriodEnd && (
-              <p className="text-xs text-neutral-400 mt-4">
-                Další obnova:{" "}
-                {new Date(sub.currentPeriodEnd).toLocaleDateString("cs-CZ")}
+              <p className="text-xs text-neutral-400 mt-3">
+                Další obnova: {new Date(sub.currentPeriodEnd).toLocaleDateString("cs-CZ")}
+                {daysLeft !== null && ` (za ${daysLeft} dní)`}
               </p>
             )}
           </CardContent>
         </Card>
       </motion.div>
+
+      {/* Upgrade / Downgrade Options */}
+      {isPaid && currentTiers.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <Card>
+            <CardContent className="p-6">
+              <h3 className="text-lg font-bold text-neutral-900 mb-1">
+                Změnit balíček
+              </h3>
+              <p className="text-sm text-neutral-500 mb-4">
+                Přejděte na jiný tier. Při upgradu zaplatíte jen doplatek za zbývající dny.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {currentTiers.map((t, idx) => {
+                  const isCurrentTier = idx === currentTierIndex;
+                  const isUpgrade = idx > currentTierIndex;
+                  return (
+                    <button
+                      key={idx}
+                      disabled={isCurrentTier}
+                      onClick={() => (window.location.href = "/cenik")}
+                      className={`p-4 rounded-xl border text-left transition-all ${
+                        isCurrentTier
+                          ? "border-primary-300 bg-primary-50 cursor-default"
+                          : "border-neutral-200 bg-white hover:border-primary-300 hover:shadow-sm cursor-pointer"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-semibold text-neutral-900">
+                          {t.calls} hovorů
+                        </span>
+                        {isCurrentTier ? (
+                          <Badge variant="default">Aktuální</Badge>
+                        ) : isUpgrade ? (
+                          <ArrowUp className="w-4 h-4 text-green-500" />
+                        ) : (
+                          <ArrowDown className="w-4 h-4 text-amber-500" />
+                        )}
+                      </div>
+                      <p className="text-lg font-bold text-neutral-900">
+                        {t.price.toLocaleString("cs-CZ")} Kč
+                        <span className="text-xs font-normal text-neutral-400">/měs</span>
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {/* Free → Paid CTA */}
+      {!isPaid && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-100 to-blue-100 flex items-center justify-center shrink-0">
+                  <TrendingUp className="w-6 h-6 text-primary-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-bold text-neutral-900">
+                    Upgradujte na placený plán
+                  </h3>
+                  <p className="text-sm text-neutral-500 mt-0.5">
+                    Získejte více hovorů, agentů a pokročilé funkce. Vyberte si z plánu Solo (od 490 Kč) nebo Team (od 2 490 Kč).
+                  </p>
+                </div>
+                <Button
+                  onClick={() => (window.location.href = "/cenik")}
+                  className="shrink-0"
+                >
+                  Zobrazit ceník
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
     </div>
   );
 }
