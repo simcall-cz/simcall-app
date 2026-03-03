@@ -40,6 +40,35 @@ const roleBadge: Record<
 
 const allRoles = ["free", "solo", "team", "team_manager"] as const;
 
+// Combined role+tier options for the admin dropdown
+const PLAN_OPTIONS = [
+  { value: "free", label: "Free (3 hovory)" },
+  { value: "solo:1", label: "Solo · 50 hovorů" },
+  { value: "solo:2", label: "Solo · 100 hovorů" },
+  { value: "solo:3", label: "Solo · 250 hovorů" },
+  { value: "solo:4", label: "Solo · 500 hovorů" },
+  { value: "solo:5", label: "Solo · 1 000 hovorů" },
+  { value: "team:1", label: "Team · 250 hovorů" },
+  { value: "team:2", label: "Team · 500 hovorů" },
+  { value: "team:3", label: "Team · 1 000 hovorů" },
+  { value: "team:4", label: "Team · 2 500 hovorů" },
+  { value: "team:5", label: "Team · 5 000 hovorů" },
+  { value: "team_manager:1", label: "Team Manager · 250 hovorů" },
+  { value: "team_manager:2", label: "Team Manager · 500 hovorů" },
+  { value: "team_manager:3", label: "Team Manager · 1 000 hovorů" },
+  { value: "team_manager:4", label: "Team Manager · 2 500 hovorů" },
+  { value: "team_manager:5", label: "Team Manager · 5 000 hovorů" },
+];
+
+function getUserPlanValue(user: AdminUser): string {
+  const sub = user.subscriptions;
+  if (!sub || user.role === "free") return "free";
+  if (["solo", "team", "team_manager"].includes(user.role) && sub.tier) {
+    return `${user.role}:${sub.tier}`;
+  }
+  return user.role === "solo" ? "solo:1" : user.role === "team" ? "team:1" : user.role === "team_manager" ? "team_manager:1" : "free";
+}
+
 function timeAgo(dateStr: string) {
   const diff = Date.now() - new Date(dateStr).getTime();
   const hours = Math.floor(diff / 3600000);
@@ -199,29 +228,25 @@ export default function AdminUzivatelePage() {
                           </div>
                         </div>
 
-                        {/* Role — editable dropdown */}
+                        {/* Role + Tier — combined dropdown */}
                         <div className="hidden lg:block">
                           <select
-                            value={user.role}
+                            value={getUserPlanValue(user)}
                             onChange={async (e) => {
-                              const newRole = e.target.value;
+                              const val = e.target.value;
+                              const [newRole, tierStr] = val.includes(":") ? val.split(":") : [val, undefined];
+                              const tier = tierStr ? parseInt(tierStr) : undefined;
                               setChangingRoleId(user.id);
                               try {
                                 const authHeaders = await getAuthHeaders();
                                 const res = await fetch("/api/admin/users", {
                                   method: "PATCH",
                                   headers: { ...authHeaders, "Content-Type": "application/json" },
-                                  body: JSON.stringify({ userId: user.id, planRole: newRole }),
+                                  body: JSON.stringify({ userId: user.id, planRole: newRole, tier }),
                                 });
                                 if (!res.ok) throw new Error();
-                                // Update local state
-                                setUsers((prev) =>
-                                  prev.map((u) =>
-                                    u.id === user.id ? { ...u, role: newRole } : u
-                                  )
-                                );
+                                await fetchUsers();
                               } catch {
-                                // Reload on failure
                                 await fetchUsers();
                               } finally {
                                 setChangingRoleId(null);
@@ -230,9 +255,9 @@ export default function AdminUzivatelePage() {
                             disabled={changingRoleId === user.id}
                             className="text-xs font-medium rounded-md border border-neutral-200 bg-white px-2 py-1 text-neutral-700 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 disabled:opacity-50"
                           >
-                            {allRoles.map((r) => (
-                              <option key={r} value={r}>
-                                {roleBadge[r]?.label || r}
+                            {PLAN_OPTIONS.map((opt) => (
+                              <option key={opt.value} value={opt.value}>
+                                {opt.label}
                               </option>
                             ))}
                           </select>

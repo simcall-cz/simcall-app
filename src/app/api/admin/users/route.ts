@@ -82,8 +82,32 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+// Tier configs (mirrors pricing page)
+const TIER_CONFIG: Record<string, { calls: number; agents: number }[]> = {
+  solo: [
+    { calls: 50, agents: 5 },
+    { calls: 100, agents: 10 },
+    { calls: 250, agents: 25 },
+    { calls: 500, agents: 50 },
+    { calls: 1000, agents: 100 },
+  ],
+  team: [
+    { calls: 250, agents: 25 },
+    { calls: 500, agents: 50 },
+    { calls: 1000, agents: 100 },
+    { calls: 2500, agents: 250 },
+    { calls: 5000, agents: 500 },
+  ],
+  team_manager: [
+    { calls: 250, agents: 25 },
+    { calls: 500, agents: 50 },
+    { calls: 1000, agents: 100 },
+    { calls: 2500, agents: 250 },
+    { calls: 5000, agents: 500 },
+  ],
+};
 
-// PATCH /api/admin/users - Update a user's plan_role
+// PATCH /api/admin/users - Update a user's role and subscription
 export async function PATCH(request: NextRequest) {
   try {
     const { isAdmin } = await verifyAdmin(request);
@@ -93,7 +117,7 @@ export async function PATCH(request: NextRequest) {
 
     const db = createServerClient();
     const body = await request.json();
-    const { userId, planRole } = body;
+    const { userId, planRole, tier } = body;
 
     if (!userId || !planRole) {
       return NextResponse.json(
@@ -110,22 +134,85 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    const { data, error } = await db
+    // 1. Update profile role
+    const { error: profileError } = await db
       .from("profiles")
       .update({
         role: planRole,
         updated_at: new Date().toISOString(),
       })
-      .eq("id", userId)
-      .select()
-      .single();
+      .eq("id", userId);
 
-    if (error) {
-      console.error("Admin update user error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    if (profileError) {
+      console.error("Admin update profile error:", profileError);
+      return NextResponse.json({ error: profileError.message }, { status: 500 });
     }
 
-    return NextResponse.json({ user: data });
+    // 2. Handle subscription
+    if (planRole === "free") {
+      // Deactivate any existing subscription
+      await db
+        .from("subscriptions")
+        .update({ status: "cancelled", updated_at: new Date().toISOString() })
+        .eq("user_id", userId)
+        .eq("status", "active");
+    } else if (tier && TIER_CONFIG[planRole]) {
+      const tierIndex = tier - 1; // tier is 1-based
+      const config = TIER_CONFIG[planRole]?.[tierIndex];
+      if (!config) {
+        return NextResponse.json({ error: "Invalid tier" }, { status: 400 });
+      }
+
+      const plan = planRole === "team_manager" ? "team" : planRole;
+
+      // Check if user already has an active subscription
+      const { data: existingSub } = await db
+        .from("subscriptions")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("status", "active")
+        .limit(1)
+        .single();
+
+      const now = new Date().toISOString();
+      const endOfMonth = new Date();
+      endOfMonth.setMonth(endOfMonth.getMonth() + 1);
+      endOfMonth.setDate(1);
+      endOfMonth.setHours(0, 0, 0, 0);
+
+      if (existingSub) {
+        // Update existing subscription
+        await db
+          .from("subscriptions")
+          .update({
+            plan,
+            tier,
+            calls_limit: config.calls,
+            agents_limit: config.agents,
+            updated_at: now,
+          })
+          .eq("id", existingSub.id);
+      } else {
+        // Create new subscription
+        await db
+          .from("subscriptions")
+          .insert({
+            user_id: userId,
+            plan,
+            tier,
+            status: "active",
+            calls_used: 0,
+            calls_limit: config.calls,
+            agents_limit: config.agents,
+            current_period_start: now,
+            current_period_end: endOfMonth.toISOString(),
+            created_at: now,
+            updated_at: now,
+          });
+      }
+    }
+
+    return NextResponse.json({ success: true });
   } catch (err) {
     console.error("PATCH /api/admin/users error:", err);
     return NextResponse.json(
