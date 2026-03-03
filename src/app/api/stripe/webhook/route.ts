@@ -1,0 +1,270 @@
+import { NextRequest, NextResponse } from "next/server";
+import Stripe from "stripe";
+import { getStripe } from "@/lib/stripe";
+import { createServerClient } from "@/lib/supabase";
+
+// Required for raw body access and consistent behavior
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+// ====================================================================
+// Helpers
+// ====================================================================
+
+function json(data: unknown, status = 200) {
+  return NextResponse.json(data, { status });
+}
+
+// ====================================================================
+// POST /api/stripe/webhook
+// ====================================================================
+
+export async function POST(request: NextRequest) {
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!webhookSecret) {
+    console.error("[stripe/webhook] STRIPE_WEBHOOK_SECRET is not set");
+    return json({ error: "Webhook secret not configured" }, 500);
+  }
+
+  // ------------------------------------------------------------------
+  // 1. Read raw body & verify signature
+  // ------------------------------------------------------------------
+  let event: Stripe.Event;
+
+  try {
+    const rawBody = await request.text();
+    const signature = request.headers.get("stripe-signature");
+
+    if (!signature) {
+      return json({ error: "Missing stripe-signature header" }, 400);
+    }
+
+    const stripe = getStripe();
+    event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    console.error("[stripe/webhook] Signature verification failed:", message);
+    return json({ error: `Webhook signature verification failed: ${message}` }, 400);
+  }
+
+  // ------------------------------------------------------------------
+  // 2. Handle events
+  // ------------------------------------------------------------------
+  const db = createServerClient();
+
+  try {
+    switch (event.type) {
+      // ================================================================
+      // checkout.session.completed
+      // ================================================================
+      case "checkout.session.completed": {
+        const session = event.data.object as Stripe.Checkout.Session;
+        const metadata = session.metadata || {};
+
+        const plan = metadata.plan || "solo";
+        const tier = parseInt(metadata.tier || "0", 10);
+        const callsLimit = parseInt(metadata.calls_limit || "0", 10);
+        const agentsLimit = parseInt(metadata.agents_limit || "0", 10);
+        const userId = metadata.user_id || null;
+        const customerName = metadata.customer_name || "";
+
+        // Create subscription record
+        const { data: subscription, error: subError } = await db
+          .from("subscriptions")
+          .insert({
+            user_id: userId || null,
+            plan,
+            tier,
+            status: "active",
+            calls_limit: callsLimit,
+            calls_used: 0,
+            agents_limit: agentsLimit,
+            stripe_customer_id: session.customer as string,
+            stripe_subscription_id: session.subscription as string,
+            customer_name: customerName,
+            customer_email: session.customer_email || session.customer_details?.email || "",
+            current_period_start: new Date().toISOString(),
+            current_period_end: null, // will be set by invoice.payment_succeeded
+          })
+          .select("id")
+          .single();
+
+        if (subError) {
+          console.error("[stripe/webhook] Failed to create subscription:", subError);
+          break;
+        }
+
+        // If user already exists, update their profile
+        if (userId && subscription) {
+          await db
+            .from("profiles")
+            .update({
+              plan_role: plan,
+              subscription_id: subscription.id,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", userId);
+        }
+
+        // For team plans, create a company and add the owner as manager
+        if (plan === "team" && subscription) {
+          const { data: company } = await db
+            .from("companies")
+            .insert({
+              name: customerName ? `${customerName} – Team` : "Team",
+              subscription_id: subscription.id,
+              owner_id: userId || null,
+            })
+            .select("id")
+            .single();
+
+          if (company && userId) {
+            await db.from("company_members").insert({
+              company_id: company.id,
+              user_id: userId,
+              role: "manager",
+            });
+
+            // Also link the user profile to this company
+            await db
+              .from("profiles")
+              .update({ company_id: company.id })
+              .eq("id", userId);
+          }
+        }
+
+        console.log(`[stripe/webhook] checkout.session.completed — plan=${plan} tier=${tier} userId=${userId}`);
+        break;
+      }
+
+      // ================================================================
+      // customer.subscription.updated
+      // ================================================================
+      case "customer.subscription.updated": {
+        const subscription = event.data.object as Stripe.Subscription;
+        const stripeSubId = subscription.id;
+        const status = subscription.status; // active, past_due, canceled, etc.
+
+        // Map Stripe status to our status
+        const dbStatus =
+          status === "active" ? "active" :
+          status === "past_due" ? "past_due" :
+          status === "canceled" ? "cancelled" :
+          status === "trialing" ? "trialing" :
+          status;
+
+        await db
+          .from("subscriptions")
+          .update({
+            status: dbStatus,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("stripe_subscription_id", stripeSubId);
+
+        console.log(`[stripe/webhook] customer.subscription.updated — ${stripeSubId} → ${dbStatus}`);
+        break;
+      }
+
+      // ================================================================
+      // customer.subscription.deleted
+      // ================================================================
+      case "customer.subscription.deleted": {
+        const subscription = event.data.object as Stripe.Subscription;
+        const stripeSubId = subscription.id;
+
+        // Mark subscription as cancelled
+        const { data: sub } = await db
+          .from("subscriptions")
+          .update({
+            status: "cancelled",
+            updated_at: new Date().toISOString(),
+          })
+          .eq("stripe_subscription_id", stripeSubId)
+          .select("user_id")
+          .single();
+
+        // Reset user's plan role to demo
+        if (sub?.user_id) {
+          await db
+            .from("profiles")
+            .update({
+              plan_role: "demo",
+              subscription_id: null,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", sub.user_id);
+        }
+
+        console.log(`[stripe/webhook] customer.subscription.deleted — ${stripeSubId}`);
+        break;
+      }
+
+      // ================================================================
+      // invoice.payment_succeeded
+      // ================================================================
+      case "invoice.payment_succeeded": {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const invoice = event.data.object as any;
+        const stripeSubId = invoice.subscription as string | null;
+
+        if (stripeSubId) {
+          const periodStart = invoice.period_start
+            ? new Date((invoice.period_start as number) * 1000).toISOString()
+            : null;
+          const periodEnd = invoice.period_end
+            ? new Date((invoice.period_end as number) * 1000).toISOString()
+            : null;
+
+          await db
+            .from("subscriptions")
+            .update({
+              calls_used: 0,
+              current_period_start: periodStart,
+              current_period_end: periodEnd,
+              status: "active",
+              updated_at: new Date().toISOString(),
+            })
+            .eq("stripe_subscription_id", stripeSubId);
+
+          console.log(`[stripe/webhook] invoice.payment_succeeded — ${stripeSubId} calls reset`);
+        }
+        break;
+      }
+
+      // ================================================================
+      // invoice.payment_failed
+      // ================================================================
+      case "invoice.payment_failed": {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const failedInvoice = event.data.object as any;
+        const stripeSubId = failedInvoice.subscription as string | null;
+
+        if (stripeSubId) {
+          await db
+            .from("subscriptions")
+            .update({
+              status: "past_due",
+              updated_at: new Date().toISOString(),
+            })
+            .eq("stripe_subscription_id", stripeSubId);
+
+          console.log(`[stripe/webhook] invoice.payment_failed — ${stripeSubId} → past_due`);
+        }
+        break;
+      }
+
+      // ================================================================
+      // Unhandled event types (silently acknowledge)
+      // ================================================================
+      default:
+        console.log(`[stripe/webhook] Unhandled event type: ${event.type}`);
+    }
+  } catch (error: unknown) {
+    console.error(`[stripe/webhook] Error handling ${event.type}:`, error);
+    // Return 200 anyway — Stripe will retry on 4xx/5xx and we don't
+    // want retries for processing errors (would create duplicate data).
+    return json({ received: true, error: "Processing error" });
+  }
+
+  return json({ received: true });
+}

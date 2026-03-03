@@ -1,123 +1,160 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import Link from "next/link";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   Users,
-  ArrowUp,
-  ArrowDown,
-  Minus,
+  UserPlus,
   Phone,
-  Clock,
-  ChevronDown,
-  SlidersHorizontal,
+  Loader2,
+  AlertCircle,
+  Trash2,
+  X,
 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { teamMembers, teamSummary } from "@/data/dashboard/team-data";
-import type { TeamMember } from "@/types/dashboard";
 
-type SortKey = "name" | "successRate" | "callsThisMonth";
-type TrendFilter = "all" | "up" | "down" | "stable";
-
-function getTrendIcon(trend: TeamMember["trend"]) {
-  switch (trend) {
-    case "up":
-      return <ArrowUp className="w-4 h-4 text-green-500" />;
-    case "down":
-      return <ArrowDown className="w-4 h-4 text-red-500" />;
-    case "stable":
-      return <Minus className="w-4 h-4 text-neutral-400" />;
-  }
+interface TeamMember {
+  userId: string;
+  fullName: string;
+  email: string;
+  role: string;
+  totalCalls: number;
+  avgScore: number | null;
+  callsThisMonth: number;
 }
-
-function getTrendColor(trend: TeamMember["trend"]): string {
-  switch (trend) {
-    case "up":
-      return "bg-green-500";
-    case "down":
-      return "bg-red-500";
-    case "stable":
-      return "bg-neutral-400";
-  }
-}
-
-function formatLastActive(dateStr: string): string {
-  const date = new Date(dateStr);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-  if (diffHours < 1) return "Právě aktivní";
-  if (diffHours < 24) return `Před ${diffHours} h`;
-  if (diffDays === 1) return "Včera";
-  return `Před ${diffDays} dny`;
-}
-
-const sortOptions: { key: SortKey; label: string }[] = [
-  { key: "name", label: "Jméno" },
-  { key: "successRate", label: "Úspěšnost" },
-  { key: "callsThisMonth", label: "Počet hovorů" },
-];
-
-const trendOptions: { key: TrendFilter; label: string }[] = [
-  { key: "all", label: "Všechny trendy" },
-  { key: "up", label: "Rostoucí" },
-  { key: "down", label: "Klesající" },
-  { key: "stable", label: "Stabilní" },
-];
 
 export default function TeamPage() {
-  const [sortBy, setSortBy] = useState<SortKey>("successRate");
-  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
-  const [trendFilter, setTrendFilter] = useState<TrendFilter>("all");
-  const [showSortDropdown, setShowSortDropdown] = useState(false);
-  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const [members, setMembers] = useState<TeamMember[]>([]);
+  const [teamCallsUsed, setTeamCallsUsed] = useState(0);
+  const [teamCallsLimit, setTeamCallsLimit] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredAndSorted = useMemo(() => {
-    let result = [...teamMembers];
+  // Add member form
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [addEmail, setAddEmail] = useState("");
+  const [addLoading, setAddLoading] = useState(false);
+  const [addError, setAddError] = useState<string | null>(null);
+  const [addSuccess, setAddSuccess] = useState<string | null>(null);
 
-    if (trendFilter !== "all") {
-      result = result.filter((m) => m.trend === trendFilter);
+  // Delete confirmation
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  async function fetchTeam() {
+    try {
+      setIsLoading(true);
+      const res = await fetch("/api/manager/team");
+      if (!res.ok) throw new Error("Nepodařilo se načíst tým");
+      const data = await res.json();
+      setMembers(data.members || []);
+      setTeamCallsUsed(data.teamCallsUsed || 0);
+      setTeamCallsLimit(data.teamCallsLimit || 0);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Chyba při načítání");
+    } finally {
+      setIsLoading(false);
     }
+  }
 
-    result.sort((a, b) => {
-      let comparison = 0;
-      switch (sortBy) {
-        case "name":
-          comparison = a.name.localeCompare(b.name, "cs");
-          break;
-        case "successRate":
-          comparison = a.successRate - b.successRate;
-          break;
-        case "callsThisMonth":
-          comparison = a.callsThisMonth - b.callsThisMonth;
-          break;
+  useEffect(() => {
+    fetchTeam();
+
+    // Check for hash to auto-open add form
+    if (typeof window !== "undefined" && window.location.hash === "#pridat") {
+      setShowAddForm(true);
+    }
+  }, []);
+
+  async function handleAddMember(e: React.FormEvent) {
+    e.preventDefault();
+    if (!addEmail.trim()) return;
+
+    setAddLoading(true);
+    setAddError(null);
+    setAddSuccess(null);
+
+    try {
+      const res = await fetch("/api/manager/team", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: addEmail.trim() }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Nepodařilo se přidat člena");
       }
-      return sortDir === "desc" ? -comparison : comparison;
-    });
 
-    return result;
-  }, [sortBy, sortDir, trendFilter]);
-
-  const activeThisWeek = teamMembers.filter((m) => {
-    const lastActive = new Date(m.lastActive);
-    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    return lastActive > weekAgo;
-  }).length;
-
-  const handleSort = (key: SortKey) => {
-    if (sortBy === key) {
-      setSortDir(sortDir === "desc" ? "asc" : "desc");
-    } else {
-      setSortBy(key);
-      setSortDir("desc");
+      setAddSuccess(
+        `${data.member.fullName || data.member.email} byl přidán do týmu.`
+      );
+      setAddEmail("");
+      await fetchTeam();
+    } catch (err) {
+      setAddError(err instanceof Error ? err.message : "Chyba");
+    } finally {
+      setAddLoading(false);
     }
-    setShowSortDropdown(false);
-  };
+  }
+
+  async function handleRemoveMember(userId: string) {
+    setDeleteLoading(true);
+    try {
+      const res = await fetch("/api/manager/team", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Nepodařilo se odebrat člena");
+      }
+
+      setDeletingId(null);
+      await fetchTeam();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Chyba");
+    } finally {
+      setDeleteLoading(false);
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-8 h-8 animate-spin text-neutral-400" />
+      </div>
+    );
+  }
+
+  if (error && members.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-3">
+        <AlertCircle className="w-10 h-10 text-red-400" />
+        <p className="text-neutral-600">{error}</p>
+        <button
+          onClick={() => {
+            setError(null);
+            fetchTeam();
+          }}
+          className="text-sm text-primary-500 hover:underline"
+        >
+          Zkusit znovu
+        </button>
+      </div>
+    );
+  }
+
+  const usagePercentage =
+    teamCallsLimit > 0
+      ? Math.min(100, Math.round((teamCallsUsed / teamCallsLimit) * 100))
+      : 0;
 
   return (
     <div className="space-y-6">
@@ -126,14 +163,71 @@ export default function TeamPage() {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
+        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
       >
-        <h1 className="text-2xl font-bold text-neutral-900">Můj tým</h1>
-        <p className="text-neutral-500 mt-1">
-          Spravujte a sledujte výkon jednotlivých makléřů
-        </p>
+        <div>
+          <h1 className="text-2xl font-bold text-neutral-900">Můj tým</h1>
+          <p className="text-neutral-500 mt-1">
+            Spravujte a sledujte výkon jednotlivých členů
+          </p>
+        </div>
+        <Button onClick={() => setShowAddForm(!showAddForm)}>
+          <UserPlus className="w-4 h-4 mr-2" />
+          Přidat člena
+        </Button>
       </motion.div>
 
-      {/* Summary Bar */}
+      {/* Add Member Form */}
+      {showAddForm && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          id="pridat"
+        >
+          <Card className="border-primary-200">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="text-base">Přidat nového člena</CardTitle>
+              <button
+                onClick={() => {
+                  setShowAddForm(false);
+                  setAddError(null);
+                  setAddSuccess(null);
+                }}
+                className="p-1 hover:bg-neutral-100 rounded"
+              >
+                <X className="w-4 h-4 text-neutral-400" />
+              </button>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleAddMember} className="flex gap-3">
+                <input
+                  type="email"
+                  placeholder="Email uživatele (musí být registrován)..."
+                  value={addEmail}
+                  onChange={(e) => setAddEmail(e.target.value)}
+                  required
+                  className="flex-1 px-4 py-2.5 rounded-lg border border-neutral-200 text-sm text-neutral-900 placeholder-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+                />
+                <Button type="submit" disabled={addLoading}>
+                  {addLoading ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    "Přidat"
+                  )}
+                </Button>
+              </form>
+              {addError && (
+                <p className="text-sm text-red-500 mt-2">{addError}</p>
+              )}
+              {addSuccess && (
+                <p className="text-sm text-green-600 mt-2">{addSuccess}</p>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {/* Team Usage Bar */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -149,223 +243,180 @@ export default function TeamPage() {
                 <div>
                   <p className="text-xs text-neutral-500">Celkem členů</p>
                   <p className="text-lg font-bold text-neutral-900">
-                    {teamSummary.totalMembers}
+                    {members.length}
                   </p>
                 </div>
               </div>
               <div className="h-8 w-px bg-neutral-200 hidden sm:block" />
-              <div>
-                <p className="text-xs text-neutral-500">Průměrná úspěšnost</p>
-                <p className="text-lg font-bold text-neutral-900">
-                  {teamSummary.avgSuccessRate}%
-                </p>
-              </div>
-              <div className="h-8 w-px bg-neutral-200 hidden sm:block" />
-              <div>
-                <p className="text-xs text-neutral-500">Aktivní tento týden</p>
-                <p className="text-lg font-bold text-neutral-900">
-                  {activeThisWeek}
-                </p>
+              <div className="flex-1 min-w-[200px]">
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-xs text-neutral-500">
+                    Využití týmových hovorů
+                  </p>
+                  <p className="text-sm font-bold text-neutral-900">
+                    {teamCallsUsed} / {teamCallsLimit || "∞"}
+                  </p>
+                </div>
+                <div className="w-full bg-neutral-100 rounded-full h-2">
+                  <div
+                    className={`h-2 rounded-full transition-all ${
+                      usagePercentage >= 90
+                        ? "bg-red-500"
+                        : usagePercentage >= 70
+                        ? "bg-amber-500"
+                        : "bg-primary-500"
+                    }`}
+                    style={{ width: `${usagePercentage}%` }}
+                  />
+                </div>
               </div>
             </div>
           </CardContent>
         </Card>
       </motion.div>
 
-      {/* Sort & Filter Controls */}
-      <motion.div
-        className="flex flex-wrap items-center gap-3"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.1 }}
-      >
-        {/* Sort Dropdown */}
-        <div className="relative">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              setShowSortDropdown(!showSortDropdown);
-              setShowFilterDropdown(false);
-            }}
-            className="flex items-center gap-2"
-          >
-            <span className="text-neutral-500">Řadit:</span>
-            <span className="font-medium">
-              {sortOptions.find((o) => o.key === sortBy)?.label}
-            </span>
-            <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
-          </Button>
-          {showSortDropdown && (
-            <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-neutral-200 rounded-lg shadow-lg z-20 py-1">
-              {sortOptions.map((option) => (
-                <button
-                  key={option.key}
-                  onClick={() => handleSort(option.key)}
-                  className={`w-full text-left px-3 py-2 text-sm hover:bg-neutral-50 transition-colors ${
-                    sortBy === option.key
-                      ? "text-red-600 font-medium"
-                      : "text-neutral-700"
-                  }`}
-                >
-                  {option.label}
-                  {sortBy === option.key && (
-                    <span className="ml-2 text-xs text-neutral-400">
-                      {sortDir === "desc" ? "↓" : "↑"}
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Filter Dropdown */}
-        <div className="relative">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              setShowFilterDropdown(!showFilterDropdown);
-              setShowSortDropdown(false);
-            }}
-            className="flex items-center gap-2"
-          >
-            <SlidersHorizontal className="w-3.5 h-3.5 text-neutral-400" />
-            <span className="text-neutral-500">Filtr:</span>
-            <span className="font-medium">
-              {trendOptions.find((o) => o.key === trendFilter)?.label}
-            </span>
-            <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
-          </Button>
-          {showFilterDropdown && (
-            <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-neutral-200 rounded-lg shadow-lg z-20 py-1">
-              {trendOptions.map((option) => (
-                <button
-                  key={option.key}
-                  onClick={() => {
-                    setTrendFilter(option.key);
-                    setShowFilterDropdown(false);
-                  }}
-                  className={`w-full text-left px-3 py-2 text-sm hover:bg-neutral-50 transition-colors ${
-                    trendFilter === option.key
-                      ? "text-red-600 font-medium"
-                      : "text-neutral-700"
-                  }`}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {trendFilter !== "all" && (
-          <button
-            onClick={() => setTrendFilter("all")}
-            className="text-xs text-neutral-500 hover:text-neutral-700 transition-colors underline"
-          >
-            Zrušit filtr
-          </button>
-        )}
-
-        <span className="text-sm text-neutral-400 ml-auto">
-          {filteredAndSorted.length}{" "}
-          {filteredAndSorted.length === 1 ? "makléř" : "makléřů"}
-        </span>
-      </motion.div>
-
       {/* Team Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredAndSorted.map((member, index) => (
-          <motion.div
-            key={member.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.1 + index * 0.04 }}
-          >
-            <Card className="hover:shadow-card-hover transition-shadow h-full">
-              <CardContent className="p-5">
-                <div className="flex items-start gap-4">
-                  {/* Avatar */}
-                  <div
-                    className={`w-12 h-12 rounded-full flex items-center justify-center text-white text-sm font-semibold shrink-0 ${getTrendColor(
-                      member.trend
-                    )}`}
-                  >
-                    {member.avatarInitials}
-                  </div>
+      {members.length === 0 ? (
+        <div className="text-center py-12">
+          <Users className="w-12 h-12 mx-auto mb-3 text-neutral-300" />
+          <p className="text-neutral-500 font-medium">Váš tým je zatím prázdný</p>
+          <p className="text-sm text-neutral-400 mt-1">
+            Přidejte první členy pomocí tlačítka výše
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {members.map((member, index) => (
+            <motion.div
+              key={member.userId}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.1 + index * 0.04 }}
+            >
+              <Card className="hover:shadow-card-hover transition-shadow h-full">
+                <CardContent className="p-5">
+                  <div className="flex items-start gap-4">
+                    {/* Avatar */}
+                    <div className="w-12 h-12 rounded-full bg-primary-50 flex items-center justify-center text-primary-600 text-sm font-semibold shrink-0">
+                      {member.fullName
+                        ? member.fullName
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")
+                        : member.email?.[0]?.toUpperCase() || "?"}
+                    </div>
 
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-neutral-900 truncate">
-                      {member.name}
-                    </h3>
-                    <p className="text-sm text-neutral-500">{member.role}</p>
-                  </div>
-                </div>
-
-                {/* Stats */}
-                <div className="mt-5 space-y-3">
-                  {/* Success Rate */}
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-neutral-500">Úspěšnost</span>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-xl font-bold text-neutral-900">
-                        {member.successRate}%
-                      </span>
-                      {getTrendIcon(member.trend)}
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-neutral-900 truncate">
+                        {member.fullName || "Bez jména"}
+                      </h3>
+                      <p className="text-xs text-neutral-500 truncate">
+                        {member.email}
+                      </p>
+                      <Badge
+                        variant={
+                          member.role === "manager" ? "success" : "secondary"
+                        }
+                        className="mt-1"
+                      >
+                        {member.role === "manager" ? "Manažer" : "Makléř"}
+                      </Badge>
                     </div>
                   </div>
 
-                  {/* Calls */}
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-neutral-500 flex items-center gap-1.5">
-                      <Phone className="w-3.5 h-3.5" />
-                      Hovorů tento měsíc
-                    </span>
-                    <span className="font-medium text-neutral-700">
-                      {member.callsThisMonth}
-                    </span>
+                  {/* Stats */}
+                  <div className="mt-5 space-y-3">
+                    {/* Score */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-neutral-500">
+                        Průměrné skóre
+                      </span>
+                      <span
+                        className={`text-xl font-bold ${
+                          member.avgScore !== null && member.avgScore >= 70
+                            ? "text-green-600"
+                            : member.avgScore !== null && member.avgScore >= 50
+                            ? "text-amber-600"
+                            : member.avgScore !== null
+                            ? "text-red-600"
+                            : "text-neutral-400"
+                        }`}
+                      >
+                        {member.avgScore !== null
+                          ? `${member.avgScore}%`
+                          : "—"}
+                      </span>
+                    </div>
+
+                    {/* Calls */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-neutral-500 flex items-center gap-1.5">
+                        <Phone className="w-3.5 h-3.5" />
+                        Tento měsíc
+                      </span>
+                      <span className="font-medium text-neutral-700">
+                        {member.callsThisMonth}
+                      </span>
+                    </div>
+
+                    {/* Total Calls */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-neutral-500">
+                        Celkem hovorů
+                      </span>
+                      <span className="text-sm text-neutral-500">
+                        {member.totalCalls}
+                      </span>
+                    </div>
                   </div>
 
-                  {/* Last Active */}
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-neutral-500 flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5" />
-                      Poslední aktivita
-                    </span>
-                    <span className="text-sm text-neutral-500">
-                      {formatLastActive(member.lastActive)}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Detail Button */}
-                <div className="mt-5 pt-4 border-t border-neutral-100">
-                  <Link href={`/manager/makler/${member.id}`}>
-                    <Button variant="outline" size="sm" className="w-full">
-                      Zobrazit detail
-                    </Button>
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
-      </div>
-
-      {filteredAndSorted.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-neutral-500">
-            Žádní makléři neodpovídají zvoleným filtrům.
-          </p>
-          <button
-            onClick={() => setTrendFilter("all")}
-            className="mt-2 text-sm text-red-500 hover:text-red-600 underline"
-          >
-            Zobrazit všechny
-          </button>
+                  {/* Remove Button (not for managers) */}
+                  {member.role !== "manager" && (
+                    <div className="mt-5 pt-4 border-t border-neutral-100">
+                      {deletingId === member.userId ? (
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-red-600 flex-1">
+                            Opravdu odebrat?
+                          </span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setDeletingId(null)}
+                            disabled={deleteLoading}
+                          >
+                            Ne
+                          </Button>
+                          <Button
+                            size="sm"
+                            className="bg-red-500 hover:bg-red-600 text-white"
+                            onClick={() => handleRemoveMember(member.userId)}
+                            disabled={deleteLoading}
+                          >
+                            {deleteLoading ? (
+                              <Loader2 className="w-3 h-3 animate-spin" />
+                            ) : (
+                              "Ano"
+                            )}
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full text-red-500 hover:text-red-600 hover:border-red-200"
+                          onClick={() => setDeletingId(member.userId)}
+                        >
+                          <Trash2 className="w-3.5 h-3.5 mr-2" />
+                          Odebrat z týmu
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
         </div>
       )}
     </div>

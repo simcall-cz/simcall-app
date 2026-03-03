@@ -135,10 +135,48 @@ function CheckoutPage() {
     if (!validate()) return;
 
     setIsSubmitting(true);
-    // Simulate — will be replaced with Stripe / invoice API
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsSubmitting(false);
-    setSubmitted(true);
+
+    try {
+      if (paymentMethod === "card") {
+        // Stripe checkout
+        const res = await fetch("/api/stripe/create-checkout-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            plan: selectedPlanId,
+            tier: tier.calls,
+            email: form.email,
+            name: form.fullName,
+            phone: form.phone,
+            companyName: form.companyName,
+          }),
+        });
+
+        const data = await res.json();
+
+        if (data.url) {
+          window.location.href = data.url;
+          return;
+        }
+
+        if (data.error) {
+          alert(data.error);
+        }
+      } else {
+        // Invoice — redirect to thank you page
+        const params = new URLSearchParams({
+          method: "invoice",
+          plan: selectedPlanId,
+          tier: tier.calls.toString(),
+        });
+        window.location.href = `/dekujeme?${params.toString()}`;
+        return;
+      }
+    } catch {
+      alert("Došlo k chybě. Zkuste to prosím znovu.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Success state
@@ -723,11 +761,8 @@ function CheckoutPage() {
                       <span className="text-neutral-500">{plan.name} ({tier.calls} hovorů)</span>
                       <span className="text-neutral-800">{tier.price.toLocaleString("cs-CZ")} Kč</span>
                     </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-neutral-500">DPH (21%)</span>
-                      <span className="text-neutral-800">
-                        {Math.round(tier.price * 0.21).toLocaleString("cs-CZ")} Kč
-                      </span>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-neutral-400">Cena je včetně DPH</span>
                     </div>
                   </div>
 
@@ -737,7 +772,7 @@ function CheckoutPage() {
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-neutral-800">Celkem / měsíc</span>
                     <span className="text-xl font-bold text-neutral-800">
-                      {Math.round(tier.price * 1.21).toLocaleString("cs-CZ")} Kč
+                      {tier.price.toLocaleString("cs-CZ")} Kč
                     </span>
                   </div>
                 </div>

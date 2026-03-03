@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
-import { getUserFromRequest } from "@/lib/auth";
+import { getUserFromRequest, checkCallLimit, incrementCallUsage } from "@/lib/auth";
 
 // GET /api/calls - List all calls for the current user
 export async function GET(request: NextRequest) {
@@ -69,6 +69,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // ---- Call limit check ----
+    const limitCheck = await checkCallLimit(user.id);
+    if (!limitCheck.canCall) {
+      return NextResponse.json(
+        {
+          error: "Limit hovorů vyčerpán",
+          callsUsed: limitCheck.used,
+          callsLimit: limitCheck.limit,
+          planRole: limitCheck.planRole,
+        },
+        { status: 403 }
+      );
+    }
+
     // Look up ElevenLabs agent ID
     const { data: agent, error: agentError } = await supabase
       .from("agents")
@@ -124,6 +138,9 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    // ---- Increment usage counter ----
+    await incrementCallUsage(user.id);
 
     return NextResponse.json({
       call_id: call.id,

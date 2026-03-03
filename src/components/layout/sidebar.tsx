@@ -10,10 +10,10 @@ import {
   Users,
   Headphones,
   X,
-  Building2,
   DollarSign,
-  Server,
   Shield,
+  Bot,
+  UserPlus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -64,9 +64,9 @@ const managerNavItems: SidebarNavItem[] = [
     icon: <Users className="w-5 h-5" />,
   },
   {
-    label: "Nahrávky",
-    href: "/manager/nahravky",
-    icon: <Headphones className="w-5 h-5" />,
+    label: "Přidat člena",
+    href: "/manager/tym#pridat",
+    icon: <UserPlus className="w-5 h-5" />,
   },
 ];
 
@@ -75,11 +75,6 @@ const adminNavItems: SidebarNavItem[] = [
     label: "Přehled",
     href: "/admin",
     icon: <LayoutDashboard className="w-5 h-5" />,
-  },
-  {
-    label: "Firmy",
-    href: "/admin/firmy",
-    icon: <Building2 className="w-5 h-5" />,
   },
   {
     label: "Uživatelé",
@@ -92,9 +87,9 @@ const adminNavItems: SidebarNavItem[] = [
     icon: <DollarSign className="w-5 h-5" />,
   },
   {
-    label: "Systém",
-    href: "/admin/system",
-    icon: <Server className="w-5 h-5" />,
+    label: "Agenti",
+    href: "/admin/agenti",
+    icon: <Bot className="w-5 h-5" />,
   },
 ];
 

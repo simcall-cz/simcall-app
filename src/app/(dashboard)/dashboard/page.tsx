@@ -15,6 +15,7 @@ import {
   Check,
   BarChart3,
   Sparkles,
+  AlertTriangle,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -30,8 +31,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useCallHistory } from "@/hooks/useCallHistory";
 import { getUserSessionInfo } from "@/lib/auth";
-
-const FREE_CALLS_LIMIT = 3;
 
 function formatDateShort(dateStr: string) {
   const date = new Date(dateStr);
@@ -72,6 +71,16 @@ function getSuccessRateBg(rate: number) {
   return "bg-red-50 text-red-700";
 }
 
+interface SubscriptionInfo {
+  plan: string;
+  tier: number;
+  callsUsed: number;
+  callsLimit: number;
+  agentsLimit: number;
+  status: string;
+  currentPeriodEnd?: string;
+}
+
 /* ============================================================
    FREE DASHBOARD — limited view with upgrade CTAs
    ============================================================ */
@@ -80,15 +89,18 @@ function FreeDashboard({
   today,
   calls,
   isLoading,
-  totalCalls,
+  subscription,
 }: {
   userName: string;
   today: string;
   calls: ReturnType<typeof useCallHistory>["calls"];
   isLoading: boolean;
-  totalCalls: number;
+  subscription: SubscriptionInfo;
 }) {
-  const callsRemaining = Math.max(0, FREE_CALLS_LIMIT - totalCalls);
+  const callsRemaining = Math.max(
+    0,
+    subscription.callsLimit - subscription.callsUsed
+  );
   const recentCalls = calls.slice(0, 3);
 
   return (
@@ -111,14 +123,16 @@ function FreeDashboard({
           <Link href="/dashboard/hovory/novy-hovor">
             <Button>
               <PhoneCall className="w-4 h-4 mr-2" />
-              Nový hovor ({callsRemaining}/{FREE_CALLS_LIMIT})
+              Nový hovor ({callsRemaining}/{subscription.callsLimit})
             </Button>
           </Link>
         ) : (
-          <Button disabled className="opacity-50 cursor-not-allowed">
-            <Lock className="w-4 h-4 mr-2" />
-            Limit vyčerpán
-          </Button>
+          <Link href="/cenik">
+            <Button className="bg-amber-500 hover:bg-amber-600">
+              <Crown className="w-4 h-4 mr-2" />
+              Upgrade — limit vyčerpán
+            </Button>
+          </Link>
         )}
       </div>
 
@@ -133,22 +147,25 @@ function FreeDashboard({
               </span>
             </div>
             <span className="text-sm font-bold text-neutral-900">
-              {totalCalls} / {FREE_CALLS_LIMIT}
+              {subscription.callsUsed} / {subscription.callsLimit}
             </span>
           </div>
           <div className="w-full bg-neutral-100 rounded-full h-2.5">
             <div
               className={`h-2.5 rounded-full transition-all ${
-                totalCalls >= FREE_CALLS_LIMIT ? "bg-red-500" : "bg-primary-500"
+                subscription.callsUsed >= subscription.callsLimit
+                  ? "bg-red-500"
+                  : "bg-primary-500"
               }`}
               style={{
-                width: `${Math.min(100, (totalCalls / FREE_CALLS_LIMIT) * 100)}%`,
+                width: `${Math.min(100, (subscription.callsUsed / subscription.callsLimit) * 100)}%`,
               }}
             />
           </div>
-          {totalCalls >= FREE_CALLS_LIMIT && (
+          {subscription.callsUsed >= subscription.callsLimit && (
             <p className="text-xs text-red-500 mt-2">
-              Dosáhli jste limitu {FREE_CALLS_LIMIT} hovorů v demo verzi. Vyberte plán pro neomezené hovory.
+              Dosáhli jste limitu {subscription.callsLimit} hovorů v demo verzi.
+              Vyberte plán pro více hovorů.
             </p>
           )}
         </CardContent>
@@ -167,7 +184,7 @@ function FreeDashboard({
                   Celkem hovorů
                 </p>
                 <p className="text-lg font-semibold text-neutral-900 truncate">
-                  {isLoading ? "..." : totalCalls.toString()}
+                  {isLoading ? "..." : subscription.callsUsed.toString()}
                 </p>
               </div>
             </div>
@@ -184,7 +201,7 @@ function FreeDashboard({
                   Detailní statistiky
                 </p>
                 <p className="text-sm text-neutral-400 truncate">
-                  Pouze v Premium
+                  Pouze v placeném plánu
                 </p>
               </div>
               <Lock className="w-4 h-4 text-neutral-300 ml-auto" />
@@ -291,7 +308,7 @@ function FreeDashboard({
             <div className="text-center relative z-20">
               <BarChart3 className="w-12 h-12 mx-auto mb-3 text-neutral-200" />
               <p className="text-sm text-neutral-400">
-                Detailní grafy dostupné v Premium
+                Detailní grafy dostupné v placeném plánu
               </p>
             </div>
           </div>
@@ -349,7 +366,7 @@ function FreeDashboard({
 }
 
 /* ============================================================
-   PAID DASHBOARD — full dashboard (original)
+   PAID DASHBOARD — full dashboard with usage tracking
    ============================================================ */
 function PaidDashboard({
   userName,
@@ -359,6 +376,7 @@ function PaidDashboard({
   totalCalls,
   avgSuccessRate,
   chartData,
+  subscription,
 }: {
   userName: string;
   today: string;
@@ -367,8 +385,26 @@ function PaidDashboard({
   totalCalls: number;
   avgSuccessRate: number;
   chartData: { dateLabel: string; successRate: number }[];
+  subscription: SubscriptionInfo;
 }) {
   const recentCalls = calls.slice(0, 5);
+  const callsRemaining = Math.max(
+    0,
+    subscription.callsLimit - subscription.callsUsed
+  );
+  const usagePercentage = Math.min(
+    100,
+    Math.round((subscription.callsUsed / subscription.callsLimit) * 100)
+  );
+  const isLowOnCalls = usagePercentage >= 80;
+  const isOutOfCalls = subscription.callsUsed >= subscription.callsLimit;
+
+  const planLabel =
+    subscription.plan === "solo"
+      ? "Solo"
+      : subscription.plan === "team"
+      ? "Team"
+      : subscription.plan;
 
   const stats = [
     {
@@ -392,18 +428,128 @@ function PaidDashboard({
       {/* Welcome Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900">
-            Dobrý den, {userName}!
-          </h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-neutral-900">
+              Dobrý den, {userName}!
+            </h1>
+            <Badge variant="default" className="text-xs capitalize">
+              {planLabel} {subscription.tier}
+            </Badge>
+          </div>
           <p className="text-sm text-neutral-500 mt-1">{today}</p>
         </div>
-        <Link href="/dashboard/hovory/novy-hovor">
-          <Button>
-            <PhoneCall className="w-4 h-4 mr-2" />
-            Nový tréninkový hovor
-          </Button>
-        </Link>
+        {isOutOfCalls ? (
+          <Link href="/cenik">
+            <Button className="bg-amber-500 hover:bg-amber-600">
+              <Crown className="w-4 h-4 mr-2" />
+              Zvýšit limit
+            </Button>
+          </Link>
+        ) : (
+          <Link href="/dashboard/hovory/novy-hovor">
+            <Button>
+              <PhoneCall className="w-4 h-4 mr-2" />
+              Nový tréninkový hovor
+            </Button>
+          </Link>
+        )}
       </div>
+
+      {/* Subscription Usage Meter */}
+      <Card
+        className={
+          isLowOnCalls
+            ? "border-amber-200"
+            : isOutOfCalls
+            ? "border-red-200"
+            : ""
+        }
+      >
+        <CardContent className="p-5">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Phone className="w-4 h-4 text-neutral-500" />
+              <span className="text-sm font-medium text-neutral-700">
+                Využití hovorů ({planLabel} {subscription.tier})
+              </span>
+            </div>
+            <span className="text-sm font-bold text-neutral-900">
+              {subscription.callsUsed} / {subscription.callsLimit}
+            </span>
+          </div>
+          <div className="w-full bg-neutral-100 rounded-full h-2.5">
+            <div
+              className={`h-2.5 rounded-full transition-all ${
+                isOutOfCalls
+                  ? "bg-red-500"
+                  : isLowOnCalls
+                  ? "bg-amber-500"
+                  : "bg-primary-500"
+              }`}
+              style={{ width: `${usagePercentage}%` }}
+            />
+          </div>
+          <div className="flex items-center justify-between mt-2">
+            <p className="text-xs text-neutral-400">
+              Zbývá {callsRemaining} hovorů
+            </p>
+            {subscription.currentPeriodEnd && (
+              <p className="text-xs text-neutral-400">
+                Obnovení:{" "}
+                {new Date(subscription.currentPeriodEnd).toLocaleDateString(
+                  "cs-CZ"
+                )}
+              </p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Low on calls warning */}
+      {isLowOnCalls && !isOutOfCalls && (
+        <Card className="border-amber-200 bg-amber-50">
+          <CardContent className="p-4 flex items-center gap-3">
+            <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-amber-800">
+                Blížíte se limitu hovorů
+              </p>
+              <p className="text-xs text-amber-600 mt-0.5">
+                Zbývá vám {callsRemaining} hovorů. Zvyšte limit pro
+                nepřerušený trénink.
+              </p>
+            </div>
+            <Link href="/cenik">
+              <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white shrink-0">
+                Zvýšit limit
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Out of calls CTA */}
+      {isOutOfCalls && (
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="p-4 flex items-center gap-3">
+            <Lock className="w-5 h-5 text-red-500 shrink-0" />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-red-800">
+                Vyčerpali jste limit hovorů
+              </p>
+              <p className="text-xs text-red-600 mt-0.5">
+                Pro pokračování v tréninku přejděte na vyšší balíček.
+              </p>
+            </div>
+            <Link href="/cenik">
+              <Button size="sm" className="bg-red-500 hover:bg-red-600 text-white shrink-0">
+                <Crown className="w-4 h-4 mr-1" />
+                Zvýšit balíček
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Quick Stats Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -528,12 +674,14 @@ function PaidDashboard({
               <p className="text-sm text-neutral-400 mt-1">
                 Začněte svůj první tréninkový hovor
               </p>
-              <Link href="/dashboard/hovory/novy-hovor">
-                <Button className="mt-4" size="sm">
-                  <PhoneCall className="w-4 h-4 mr-2" />
-                  Nový hovor
-                </Button>
-              </Link>
+              {!isOutOfCalls && (
+                <Link href="/dashboard/hovory/novy-hovor">
+                  <Button className="mt-4" size="sm">
+                    <PhoneCall className="w-4 h-4 mr-2" />
+                    Nový hovor
+                  </Button>
+                </Link>
+              )}
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -598,24 +746,27 @@ function PaidDashboard({
       </Card>
 
       {/* Quick Action */}
-      <Card className="border-primary-100 bg-gradient-to-r from-primary-50/50 to-white">
-        <CardContent className="p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div>
-            <h3 className="text-lg font-semibold text-neutral-900">
-              Připraveni na další trénink?
-            </h3>
-            <p className="text-sm text-neutral-500 mt-1">
-              Začněte nový tréninkový hovor a zlepšete své prodejní dovednosti.
-            </p>
-          </div>
-          <Link href="/dashboard/hovory/novy-hovor">
-            <Button size="lg" className="whitespace-nowrap">
-              <PhoneCall className="w-5 h-5 mr-2" />
-              Nový tréninkový hovor
-            </Button>
-          </Link>
-        </CardContent>
-      </Card>
+      {!isOutOfCalls && (
+        <Card className="border-primary-100 bg-gradient-to-r from-primary-50/50 to-white">
+          <CardContent className="p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-semibold text-neutral-900">
+                Připraveni na další trénink?
+              </h3>
+              <p className="text-sm text-neutral-500 mt-1">
+                Začněte nový tréninkový hovor a zlepšete své prodejní
+                dovednosti.
+              </p>
+            </div>
+            <Link href="/dashboard/hovory/novy-hovor">
+              <Button size="lg" className="whitespace-nowrap">
+                <PhoneCall className="w-5 h-5 mr-2" />
+                Nový tréninkový hovor
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
@@ -628,14 +779,39 @@ export default function DashboardPage() {
   const { calls, isLoading } = useCallHistory({ limit: 50 });
   const [userName, setUserName] = useState("uživateli");
   const [userRole, setUserRole] = useState<"free" | "paid" | null>(null);
+  const [subscription, setSubscription] = useState<SubscriptionInfo>({
+    plan: "demo",
+    tier: 0,
+    callsUsed: 0,
+    callsLimit: 3,
+    agentsLimit: 1,
+    status: "active",
+  });
 
   useEffect(() => {
+    // Fetch user session info
     getUserSessionInfo().then((info) => {
       if (info) {
         setUserName(info.fullName?.split(" ")[0] || "uživateli");
         setUserRole(info.role);
       }
     });
+
+    // Fetch subscription data
+    fetch("/api/subscription")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && !data.error) {
+          setSubscription(data);
+          // Override role based on subscription
+          if (data.plan !== "demo") {
+            setUserRole("paid");
+          }
+        }
+      })
+      .catch(() => {
+        // Fallback to demo
+      });
   }, []);
 
   const totalCalls = calls.length;
@@ -664,7 +840,7 @@ export default function DashboardPage() {
     }));
   }, [calls]);
 
-  const isFree = userRole === "free";
+  const isFree = userRole === "free" || subscription.plan === "demo";
 
   if (isFree) {
     return (
@@ -673,7 +849,7 @@ export default function DashboardPage() {
         today={today}
         calls={calls}
         isLoading={isLoading}
-        totalCalls={totalCalls}
+        subscription={subscription}
       />
     );
   }
@@ -687,6 +863,7 @@ export default function DashboardPage() {
       totalCalls={totalCalls}
       avgSuccessRate={avgSuccessRate}
       chartData={chartData}
+      subscription={subscription}
     />
   );
 }
