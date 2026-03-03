@@ -22,13 +22,13 @@ type PlanType = "free" | "paid";
 const plans = [
   {
     id: "free" as PlanType,
-    name: "Zdarma",
+    name: "Demo",
     price: "0 Kč",
     period: "navždy",
     icon: Zap,
     description: "Ideální pro vyzkoušení",
     features: [
-      "3 tréninkové hovory / měsíc",
+      "3 tréninkové hovory celkem",
       "1 AI agent (Petr Svoboda)",
       "Základní zpětná vazba",
       "Historie hovorů",
@@ -41,17 +41,17 @@ const plans = [
   },
   {
     id: "paid" as PlanType,
-    name: "Premium",
-    price: "990 Kč",
+    name: "Solo",
+    price: "od 490 Kč",
     period: "/ měsíc",
     icon: Crown,
     description: "Pro profesionální makléře",
     features: [
-      "Neomezené tréninkové hovory",
-      "10 různých AI agentů",
-      "Detailní ChatGPT analýza",
-      "Přepis hovoru s highlight",
-      "Sledování pokroku",
+      "500 AI agentů k výběru",
+      "Až 1 000 hovorů/měsíc",
+      "Detailní AI analýza hovoru",
+      "Přepis hovoru s exportem PDF",
+      "Sledování pokroku a statistiky",
       "Personalizovaná doporučení",
       "Prioritní podpora",
     ],
@@ -297,7 +297,7 @@ export default function RegistracePage() {
             <span className="text-sm font-medium text-neutral-700">
               Plán:{" "}
               <span className="text-primary-600">
-                {selectedPlan === "paid" ? "Premium (990 Kč/měsíc)" : "Zdarma"}
+                {selectedPlan === "paid" ? "Solo (od 490 Kč/měs)" : "Demo"}
               </span>
             </span>
             <button
