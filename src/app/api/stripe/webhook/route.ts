@@ -65,8 +65,24 @@ export async function POST(request: NextRequest) {
         const tier = parseInt(metadata.tier || "0", 10);
         const callsLimit = parseInt(metadata.calls_limit || "0", 10);
         const agentsLimit = parseInt(metadata.agents_limit || "0", 10);
-        const userId = metadata.user_id || null;
+        let userId = metadata.user_id || null;
         const customerName = metadata.customer_name || "";
+        const customerEmail = metadata.customer_email || session.customer_email || session.customer_details?.email || "";
+
+        // If no user_id in metadata, try to find user by email
+        if (!userId && customerEmail) {
+          const { data: profile } = await db
+            .from("profiles")
+            .select("id")
+            .eq("email", customerEmail.toLowerCase())
+            .limit(1)
+            .single();
+
+          if (profile) {
+            userId = profile.id;
+            console.log(`[stripe/webhook] Found user by email: ${customerEmail} → ${userId}`);
+          }
+        }
 
         // Create subscription record
         const { data: subscription, error: subError } = await db
@@ -81,8 +97,6 @@ export async function POST(request: NextRequest) {
             agents_limit: agentsLimit,
             stripe_customer_id: session.customer as string,
             stripe_subscription_id: session.subscription as string,
-            customer_name: customerName,
-            customer_email: session.customer_email || session.customer_details?.email || "",
             current_period_start: new Date().toISOString(),
             current_period_end: null, // will be set by invoice.payment_succeeded
           })
@@ -94,7 +108,7 @@ export async function POST(request: NextRequest) {
           break;
         }
 
-        // If user already exists, update their profile
+        // If user exists, update their profile role to match the plan
         if (userId && subscription) {
           await db
             .from("profiles")

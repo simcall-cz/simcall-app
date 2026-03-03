@@ -12,7 +12,6 @@ import {
   ChevronLeft,
   ChevronDown,
   Loader2,
-  ArrowRight,
   Receipt,
   Sparkles,
   User,
@@ -22,6 +21,7 @@ import {
 import { Container } from "@/components/shared/container";
 import { ScrollReveal } from "@/components/shared/scroll-reveal";
 import { pricingPlans } from "@/data/pricing";
+import { getAuthHeaders } from "@/lib/auth";
 import type { PricingPlan } from "@/types";
 
 type PaymentMethod = "card" | "invoice";
@@ -91,7 +91,7 @@ function CheckoutPage() {
   const [form, setForm] = useState<BillingForm>(emptyForm);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof BillingForm, string>>>({});
-  const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const plan = pricingPlans.find((p) => p.id === selectedPlanId) as PricingPlan;
   const safeTierIndex = Math.min(tierIndex, plan.tiers.length - 1);
@@ -105,6 +105,7 @@ function CheckoutPage() {
     if (errors[name as keyof BillingForm]) {
       setErrors((prev) => ({ ...prev, [name]: undefined }));
     }
+    setSubmitError(null);
   };
 
   const handlePlanChange = (id: "solo" | "team") => {
@@ -135,13 +136,16 @@ function CheckoutPage() {
     if (!validate()) return;
 
     setIsSubmitting(true);
+    setSubmitError(null);
 
     try {
       if (paymentMethod === "card") {
-        // Stripe checkout
+        // Stripe checkout — send auth headers if logged in
+        const headers = await getAuthHeaders();
+
         const res = await fetch("/api/stripe/create-checkout-session", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers,
           body: JSON.stringify({
             plan: selectedPlanId,
             tier: tier.calls,
@@ -160,10 +164,23 @@ function CheckoutPage() {
         }
 
         if (data.error) {
-          alert(data.error);
+          setSubmitError(data.error);
         }
       } else {
-        // Invoice — redirect to thank you page
+        // Invoice — submit form to forms API and redirect to thank you page
+        await fetch("/api/forms/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: "enterprise",
+            name: form.fullName,
+            email: form.email,
+            phone: form.phone,
+            company: form.companyName,
+            message: `Objednávka fakturou: ${plan.name} ${tier.calls} hovorů (${tier.price} Kč/měs). IČO: ${form.ico || "—"}, DIČ: ${form.dic || "—"}. Adresa: ${form.street}, ${form.city} ${form.zip}. Poznámka: ${form.note || "—"}`,
+          }),
+        });
+
         const params = new URLSearchParams({
           method: "invoice",
           plan: selectedPlanId,
@@ -173,53 +190,11 @@ function CheckoutPage() {
         return;
       }
     } catch {
-      alert("Došlo k chybě. Zkuste to prosím znovu.");
+      setSubmitError("Došlo k chybě. Zkuste to prosím znovu.");
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  // Success state
-  if (submitted) {
-    return (
-      <section className="py-20 sm:py-28">
-        <Container>
-          <div className="max-w-lg mx-auto text-center">
-            <ScrollReveal>
-              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-                <Check className="h-8 w-8 text-green-600" />
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-neutral-800">
-                {paymentMethod === "card"
-                  ? "Objednávka přijata!"
-                  : "Faktura bude vystavena"}
-              </h1>
-              <p className="mt-4 text-neutral-500 leading-relaxed">
-                {paymentMethod === "card"
-                  ? "Děkujeme za objednávku. Platební brána Stripe bude brzy napojena. Budeme vás kontaktovat na e-mail."
-                  : `Děkujeme za objednávku plánu ${plan.name} (${tier.calls} hovorů). Fakturu zašleme na ${form.email} do 24 hodin. Po přijetí platby aktivujeme váš účet.`}
-              </p>
-              <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-                <Link
-                  href="/dashboard"
-                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary-500 px-6 py-3 text-sm font-semibold text-white hover:bg-primary-600 transition-colors"
-                >
-                  Přejít do dashboardu
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-                <Link
-                  href="/"
-                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-neutral-200 px-6 py-3 text-sm font-medium text-neutral-600 hover:bg-neutral-50 transition-colors"
-                >
-                  Zpět na hlavní stránku
-                </Link>
-              </div>
-            </ScrollReveal>
-          </div>
-        </Container>
-      </section>
-    );
-  }
 
   return (
     <section className="py-12 sm:py-20">
@@ -243,7 +218,7 @@ function CheckoutPage() {
                 Dokončit objednávku
               </h1>
               <p className="mt-2 text-neutral-500">
-                Vyberte balíček, vyplňte fakturační údaje a zvolte způsob platby.
+                Vyberte balíček, vyplňte údaje a zvolte způsob platby.
               </p>
             </ScrollReveal>
 
@@ -344,10 +319,7 @@ function CheckoutPage() {
                   </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label
-                        htmlFor="fullName"
-                        className="mb-1.5 block text-sm font-medium text-neutral-700"
-                      >
+                      <label htmlFor="fullName" className="mb-1.5 block text-sm font-medium text-neutral-700">
                         Celé jméno *
                       </label>
                       <input
@@ -362,15 +334,10 @@ function CheckoutPage() {
                           errors.fullName ? "border-red-400" : "border-neutral-300"
                         }`}
                       />
-                      {errors.fullName && (
-                        <p className="mt-1 text-xs text-red-500">{errors.fullName}</p>
-                      )}
+                      {errors.fullName && <p className="mt-1 text-xs text-red-500">{errors.fullName}</p>}
                     </div>
                     <div>
-                      <label
-                        htmlFor="email"
-                        className="mb-1.5 block text-sm font-medium text-neutral-700"
-                      >
+                      <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-neutral-700">
                         E-mail *
                       </label>
                       <input
@@ -385,15 +352,10 @@ function CheckoutPage() {
                           errors.email ? "border-red-400" : "border-neutral-300"
                         }`}
                       />
-                      {errors.email && (
-                        <p className="mt-1 text-xs text-red-500">{errors.email}</p>
-                      )}
+                      {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email}</p>}
                     </div>
                     <div className="sm:col-span-2">
-                      <label
-                        htmlFor="phone"
-                        className="mb-1.5 block text-sm font-medium text-neutral-700"
-                      >
+                      <label htmlFor="phone" className="mb-1.5 block text-sm font-medium text-neutral-700">
                         Telefon
                       </label>
                       <input
@@ -418,7 +380,6 @@ function CheckoutPage() {
                     Způsob platby
                   </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {/* Card payment */}
                     <button
                       type="button"
                       onClick={() => setPaymentMethod("card")}
@@ -428,35 +389,22 @@ function CheckoutPage() {
                           : "border-neutral-200 hover:border-neutral-300"
                       }`}
                     >
-                      <div
-                        className={`flex h-10 w-10 items-center justify-center rounded-lg shrink-0 ${
-                          paymentMethod === "card"
-                            ? "bg-primary-500 text-white"
-                            : "bg-neutral-100 text-neutral-500"
-                        }`}
-                      >
+                      <div className={`flex h-10 w-10 items-center justify-center rounded-lg shrink-0 ${
+                        paymentMethod === "card" ? "bg-primary-500 text-white" : "bg-neutral-100 text-neutral-500"
+                      }`}>
                         <CreditCard className="h-5 w-5" />
                       </div>
                       <div>
                         <p className="font-semibold text-neutral-800">Kartou online</p>
-                        <p className="text-xs text-neutral-500 mt-0.5">
-                          Visa, Mastercard, Apple Pay
-                        </p>
+                        <p className="text-xs text-neutral-500 mt-0.5">Visa, Mastercard, Apple Pay</p>
                       </div>
-                      <div
-                        className={`ml-auto mt-0.5 flex h-5 w-5 items-center justify-center rounded-full border-2 shrink-0 ${
-                          paymentMethod === "card"
-                            ? "border-primary-500 bg-primary-500"
-                            : "border-neutral-300"
-                        }`}
-                      >
-                        {paymentMethod === "card" && (
-                          <Check className="h-3 w-3 text-white" />
-                        )}
+                      <div className={`ml-auto mt-0.5 flex h-5 w-5 items-center justify-center rounded-full border-2 shrink-0 ${
+                        paymentMethod === "card" ? "border-primary-500 bg-primary-500" : "border-neutral-300"
+                      }`}>
+                        {paymentMethod === "card" && <Check className="h-3 w-3 text-white" />}
                       </div>
                     </button>
 
-                    {/* Invoice */}
                     <button
                       type="button"
                       onClick={() => setPaymentMethod("invoice")}
@@ -466,53 +414,26 @@ function CheckoutPage() {
                           : "border-neutral-200 hover:border-neutral-300"
                       }`}
                     >
-                      <div
-                        className={`flex h-10 w-10 items-center justify-center rounded-lg shrink-0 ${
-                          paymentMethod === "invoice"
-                            ? "bg-primary-500 text-white"
-                            : "bg-neutral-100 text-neutral-500"
-                        }`}
-                      >
+                      <div className={`flex h-10 w-10 items-center justify-center rounded-lg shrink-0 ${
+                        paymentMethod === "invoice" ? "bg-primary-500 text-white" : "bg-neutral-100 text-neutral-500"
+                      }`}>
                         <Receipt className="h-5 w-5" />
                       </div>
                       <div>
                         <p className="font-semibold text-neutral-800">Fakturou</p>
-                        <p className="text-xs text-neutral-500 mt-0.5">
-                          Bankovní převod, splatnost 14 dní
-                        </p>
+                        <p className="text-xs text-neutral-500 mt-0.5">Bankovní převod, splatnost 14 dní</p>
                       </div>
-                      <div
-                        className={`ml-auto mt-0.5 flex h-5 w-5 items-center justify-center rounded-full border-2 shrink-0 ${
-                          paymentMethod === "invoice"
-                            ? "border-primary-500 bg-primary-500"
-                            : "border-neutral-300"
-                        }`}
-                      >
-                        {paymentMethod === "invoice" && (
-                          <Check className="h-3 w-3 text-white" />
-                        )}
+                      <div className={`ml-auto mt-0.5 flex h-5 w-5 items-center justify-center rounded-full border-2 shrink-0 ${
+                        paymentMethod === "invoice" ? "border-primary-500 bg-primary-500" : "border-neutral-300"
+                      }`}>
+                        {paymentMethod === "invoice" && <Check className="h-3 w-3 text-white" />}
                       </div>
                     </button>
                   </div>
                 </div>
               </ScrollReveal>
 
-              {/* Card placeholder */}
-              {paymentMethod === "card" && (
-                <ScrollReveal delay={0.05}>
-                  <div className="rounded-xl border border-dashed border-neutral-300 bg-neutral-50 p-6 text-center">
-                    <CreditCard className="h-8 w-8 text-neutral-400 mx-auto mb-3" />
-                    <p className="text-sm font-medium text-neutral-600">
-                      Platební brána Stripe
-                    </p>
-                    <p className="text-xs text-neutral-400 mt-1">
-                      Stripe Checkout bude brzy napojen. Zatím použijte platbu fakturou.
-                    </p>
-                  </div>
-                </ScrollReveal>
-              )}
-
-              {/* Invoice form */}
+              {/* Invoice form — only for invoice payment */}
               {paymentMethod === "invoice" && (
                 <ScrollReveal delay={0.05}>
                   <div className="space-y-6">
@@ -525,150 +446,65 @@ function CheckoutPage() {
                           <label htmlFor="companyName" className="mb-1.5 block text-sm font-medium text-neutral-700">
                             Název firmy / Jméno
                           </label>
-                          <input
-                            id="companyName"
-                            name="companyName"
-                            type="text"
-                            value={form.companyName}
-                            onChange={handleChange}
-                            placeholder="Reality s.r.o. nebo Jan Novák"
-                            className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
-                          />
+                          <input id="companyName" name="companyName" type="text" value={form.companyName} onChange={handleChange} placeholder="Reality s.r.o. nebo Jan Novák" className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20" />
                         </div>
                         <div>
-                          <label htmlFor="ico" className="mb-1.5 block text-sm font-medium text-neutral-700">
-                            IČO <span className="text-neutral-400 font-normal">(nepovinné)</span>
-                          </label>
-                          <input
-                            id="ico"
-                            name="ico"
-                            type="text"
-                            value={form.ico}
-                            onChange={handleChange}
-                            placeholder="12345678"
-                            maxLength={8}
-                            className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
-                          />
+                          <label htmlFor="ico" className="mb-1.5 block text-sm font-medium text-neutral-700">IČO <span className="text-neutral-400 font-normal">(nepovinné)</span></label>
+                          <input id="ico" name="ico" type="text" value={form.ico} onChange={handleChange} placeholder="12345678" maxLength={8} className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20" />
                         </div>
                         <div>
-                          <label htmlFor="dic" className="mb-1.5 block text-sm font-medium text-neutral-700">
-                            DIČ <span className="text-neutral-400 font-normal">(nepovinné)</span>
-                          </label>
-                          <input
-                            id="dic"
-                            name="dic"
-                            type="text"
-                            value={form.dic}
-                            onChange={handleChange}
-                            placeholder="CZ12345678"
-                            className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
-                          />
+                          <label htmlFor="dic" className="mb-1.5 block text-sm font-medium text-neutral-700">DIČ <span className="text-neutral-400 font-normal">(nepovinné)</span></label>
+                          <input id="dic" name="dic" type="text" value={form.dic} onChange={handleChange} placeholder="CZ12345678" className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20" />
                         </div>
                       </div>
                     </div>
-
                     <div>
-                      <h2 className="text-sm font-semibold text-neutral-800 uppercase tracking-wider mb-4">
-                        Fakturační adresa
-                      </h2>
+                      <h2 className="text-sm font-semibold text-neutral-800 uppercase tracking-wider mb-4">Fakturační adresa</h2>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="sm:col-span-2">
-                          <label htmlFor="street" className="mb-1.5 block text-sm font-medium text-neutral-700">
-                            Ulice a číslo popisné *
-                          </label>
-                          <input
-                            id="street"
-                            name="street"
-                            type="text"
-                            autoComplete="street-address"
-                            value={form.street}
-                            onChange={handleChange}
-                            placeholder="Vinohradská 123"
-                            className={`w-full rounded-lg border px-4 py-2.5 text-sm text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 ${
-                              errors.street ? "border-red-400" : "border-neutral-300"
-                            }`}
-                          />
+                          <label htmlFor="street" className="mb-1.5 block text-sm font-medium text-neutral-700">Ulice a číslo popisné *</label>
+                          <input id="street" name="street" type="text" autoComplete="street-address" value={form.street} onChange={handleChange} placeholder="Vinohradská 123" className={`w-full rounded-lg border px-4 py-2.5 text-sm text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 ${errors.street ? "border-red-400" : "border-neutral-300"}`} />
                           {errors.street && <p className="mt-1 text-xs text-red-500">{errors.street}</p>}
                         </div>
                         <div>
-                          <label htmlFor="city" className="mb-1.5 block text-sm font-medium text-neutral-700">
-                            Město *
-                          </label>
-                          <input
-                            id="city"
-                            name="city"
-                            type="text"
-                            autoComplete="address-level2"
-                            value={form.city}
-                            onChange={handleChange}
-                            placeholder="Praha"
-                            className={`w-full rounded-lg border px-4 py-2.5 text-sm text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 ${
-                              errors.city ? "border-red-400" : "border-neutral-300"
-                            }`}
-                          />
+                          <label htmlFor="city" className="mb-1.5 block text-sm font-medium text-neutral-700">Město *</label>
+                          <input id="city" name="city" type="text" autoComplete="address-level2" value={form.city} onChange={handleChange} placeholder="Praha" className={`w-full rounded-lg border px-4 py-2.5 text-sm text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 ${errors.city ? "border-red-400" : "border-neutral-300"}`} />
                           {errors.city && <p className="mt-1 text-xs text-red-500">{errors.city}</p>}
                         </div>
                         <div>
-                          <label htmlFor="zip" className="mb-1.5 block text-sm font-medium text-neutral-700">
-                            PSČ *
-                          </label>
-                          <input
-                            id="zip"
-                            name="zip"
-                            type="text"
-                            autoComplete="postal-code"
-                            value={form.zip}
-                            onChange={handleChange}
-                            placeholder="110 00"
-                            maxLength={6}
-                            className={`w-full rounded-lg border px-4 py-2.5 text-sm text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 ${
-                              errors.zip ? "border-red-400" : "border-neutral-300"
-                            }`}
-                          />
+                          <label htmlFor="zip" className="mb-1.5 block text-sm font-medium text-neutral-700">PSČ *</label>
+                          <input id="zip" name="zip" type="text" autoComplete="postal-code" value={form.zip} onChange={handleChange} placeholder="110 00" maxLength={6} className={`w-full rounded-lg border px-4 py-2.5 text-sm text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 ${errors.zip ? "border-red-400" : "border-neutral-300"}`} />
                           {errors.zip && <p className="mt-1 text-xs text-red-500">{errors.zip}</p>}
                         </div>
                         <div className="sm:col-span-2">
-                          <label htmlFor="country" className="mb-1.5 block text-sm font-medium text-neutral-700">
-                            Stát
-                          </label>
-                          <select
-                            id="country"
-                            name="country"
-                            value={form.country}
-                            onChange={handleChange}
-                            className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 bg-white transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
-                          >
+                          <label htmlFor="country" className="mb-1.5 block text-sm font-medium text-neutral-700">Stát</label>
+                          <select id="country" name="country" value={form.country} onChange={handleChange} className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 bg-white transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20">
                             <option value="CZ">Česká republika</option>
                             <option value="SK">Slovensko</option>
                           </select>
                         </div>
                       </div>
                     </div>
-
                     <div>
-                      <label htmlFor="note" className="mb-1.5 block text-sm font-medium text-neutral-700">
-                        Poznámka k objednávce{" "}
-                        <span className="text-neutral-400 font-normal">(nepovinné)</span>
-                      </label>
-                      <textarea
-                        id="note"
-                        name="note"
-                        rows={3}
-                        value={form.note}
-                        onChange={handleChange}
-                        placeholder="Další informace k fakturaci..."
-                        className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 resize-none"
-                      />
+                      <label htmlFor="note" className="mb-1.5 block text-sm font-medium text-neutral-700">Poznámka k objednávce <span className="text-neutral-400 font-normal">(nepovinné)</span></label>
+                      <textarea id="note" name="note" rows={3} value={form.note} onChange={handleChange} placeholder="Další informace k fakturaci..." className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 resize-none" />
                     </div>
                   </div>
                 </ScrollReveal>
+              )}
+
+              {/* Error */}
+              {submitError && (
+                <div className="rounded-lg bg-red-50 border border-red-200 p-4 text-sm text-red-600">
+                  {submitError}
+                </div>
               )}
 
               {/* Submit */}
               <ScrollReveal delay={0.2}>
                 <button
                   type="submit"
-                  disabled={isSubmitting || paymentMethod === "card"}
+                  disabled={isSubmitting}
                   className="w-full rounded-xl bg-primary-500 px-6 py-4 text-sm font-semibold text-white transition-colors hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? (
@@ -679,7 +515,7 @@ function CheckoutPage() {
                   ) : paymentMethod === "card" ? (
                     <>
                       <Lock className="h-4 w-4" />
-                      Zaplatit kartou (připravujeme)
+                      Zaplatit kartou — {tier.price.toLocaleString("cs-CZ")} Kč/měs
                     </>
                   ) : (
                     <>
@@ -691,7 +527,7 @@ function CheckoutPage() {
 
                 {paymentMethod === "card" && (
                   <p className="mt-3 text-center text-xs text-neutral-400">
-                    Platba kartou bude dostupná po napojení Stripe. Použijte prosím platbu fakturou.
+                    Budete přesměrováni na zabezpečenou platební bránu Stripe
                   </p>
                 )}
               </ScrollReveal>
@@ -717,28 +553,17 @@ function CheckoutPage() {
             <ScrollReveal delay={0.1}>
               <div className="sticky top-24 rounded-2xl border border-neutral-200 bg-white shadow-sm overflow-hidden">
                 <div className="bg-neutral-50 px-6 py-4 border-b border-neutral-100">
-                  <h2 className="font-semibold text-neutral-800">
-                    Shrnutí objednávky
-                  </h2>
+                  <h2 className="font-semibold text-neutral-800">Shrnutí objednávky</h2>
                 </div>
-
                 <div className="p-6 space-y-5">
-                  {/* Plan + tier info */}
                   <div>
                     <div className="flex items-center justify-between">
                       <p className="font-semibold text-neutral-800">{plan.name}</p>
-                      <p className="font-bold text-neutral-800">
-                        {tier.price.toLocaleString("cs-CZ")} Kč
-                      </p>
+                      <p className="font-bold text-neutral-800">{tier.price.toLocaleString("cs-CZ")} Kč</p>
                     </div>
-                    <p className="text-xs text-neutral-400 mt-1">
-                      {tier.calls} hovorů / {tier.agents} agentů / měsíc
-                    </p>
+                    <p className="text-xs text-neutral-400 mt-1">{tier.calls} hovorů / {tier.agents} agentů / měsíc</p>
                   </div>
-
                   <div className="border-t border-neutral-100" />
-
-                  {/* Features */}
                   <div className="space-y-2">
                     {plan.features.slice(0, 5).map((feature, i) => (
                       <div key={i} className="flex items-center gap-2">
@@ -747,15 +572,10 @@ function CheckoutPage() {
                       </div>
                     ))}
                     {plan.features.length > 5 && (
-                      <p className="text-xs text-neutral-400 pl-5">
-                        + dalších {plan.features.length - 5} funkcí
-                      </p>
+                      <p className="text-xs text-neutral-400 pl-5">+ dalších {plan.features.length - 5} funkcí</p>
                     )}
                   </div>
-
                   <div className="border-t border-neutral-100" />
-
-                  {/* Price breakdown */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-neutral-500">{plan.name} ({tier.calls} hovorů)</span>
@@ -765,15 +585,10 @@ function CheckoutPage() {
                       <span className="text-neutral-400">Cena je včetně DPH</span>
                     </div>
                   </div>
-
                   <div className="border-t border-neutral-200" />
-
-                  {/* Total */}
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-neutral-800">Celkem / měsíc</span>
-                    <span className="text-xl font-bold text-neutral-800">
-                      {tier.price.toLocaleString("cs-CZ")} Kč
-                    </span>
+                    <span className="text-xl font-bold text-neutral-800">{tier.price.toLocaleString("cs-CZ")} Kč</span>
                   </div>
                 </div>
               </div>

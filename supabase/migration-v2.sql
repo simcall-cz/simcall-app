@@ -9,7 +9,7 @@
 -- ============================================
 CREATE TABLE IF NOT EXISTS subscriptions (
   id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
   plan text NOT NULL CHECK (plan IN ('solo', 'team')),
   tier integer NOT NULL,
   status text NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'cancelled', 'past_due', 'trialing')),

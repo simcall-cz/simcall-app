@@ -21,7 +21,7 @@ export function getStripe(): Stripe {
 }
 
 // ============================================================
-// Price mapping: plan + tier → price in CZK
+// Price mapping: plan + tier → price in CZK + agents limit
 // All prices INCLUDE DPH (VAT)
 // ============================================================
 
@@ -42,6 +42,33 @@ export const PLAN_PRICES: Record<string, Record<number, { price: number; agents:
   },
 };
 
+// ============================================================
+// Stripe Price ID mapping from environment variables
+// Set these in Vercel / .env.local:
+//   STRIPE_PRICE_SOLO_50=price_xxx
+//   STRIPE_PRICE_SOLO_100=price_xxx
+//   ...etc
+// ============================================================
+
+export function getStripePriceId(plan: string, tier: number): string | null {
+  const envKey = `STRIPE_PRICE_${plan.toUpperCase()}_${tier}`;
+  return process.env[envKey] || null;
+}
+
+/**
+ * Get all configured Stripe price IDs (for debugging)
+ */
+export function getAllConfiguredPrices(): Record<string, string | null> {
+  const result: Record<string, string | null> = {};
+  for (const [plan, tiers] of Object.entries(PLAN_PRICES)) {
+    for (const tier of Object.keys(tiers)) {
+      const key = `${plan}_${tier}`;
+      result[key] = getStripePriceId(plan, parseInt(tier));
+    }
+  }
+  return result;
+}
+
 /**
  * Get price details for a plan + tier combo
  */
@@ -59,6 +86,7 @@ export function getPlanDisplayName(plan: string, tier: number): string {
 
 // ============================================================
 // Stripe Checkout Session creation
+// Uses real Stripe Price IDs from env vars
 // ============================================================
 
 interface CreateCheckoutParams {
@@ -66,7 +94,7 @@ interface CreateCheckoutParams {
   tier: number;
   customerEmail: string;
   customerName: string;
-  userId?: string; // if user already has account
+  userId?: string;
   successUrl: string;
   cancelUrl: string;
 }
@@ -79,23 +107,23 @@ export async function createCheckoutSession(params: CreateCheckoutParams) {
     throw new Error(`Invalid plan/tier: ${params.plan}/${params.tier}`);
   }
 
+  // Get real Stripe price ID from env
+  const stripePriceId = getStripePriceId(params.plan, params.tier);
+
+  if (!stripePriceId) {
+    throw new Error(
+      `Stripe price ID not configured for ${params.plan}/${params.tier}. ` +
+      `Set STRIPE_PRICE_${params.plan.toUpperCase()}_${params.tier} in environment variables.`
+    );
+  }
+
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
     payment_method_types: ["card"],
     customer_email: params.customerEmail,
     line_items: [
       {
-        price_data: {
-          currency: "czk",
-          product_data: {
-            name: `SimCall ${getPlanDisplayName(params.plan, params.tier)}`,
-            description: `${params.tier} hovorů/měsíc, ${planPrice.agents} AI agentů`,
-          },
-          unit_amount: planPrice.price * 100, // Stripe uses smallest currency unit (haléře)
-          recurring: {
-            interval: "month",
-          },
-        },
+        price: stripePriceId,
         quantity: 1,
       },
     ],
@@ -106,6 +134,7 @@ export async function createCheckoutSession(params: CreateCheckoutParams) {
       agents_limit: planPrice.agents.toString(),
       user_id: params.userId || "",
       customer_name: params.customerName,
+      customer_email: params.customerEmail,
     },
     success_url: params.successUrl,
     cancel_url: params.cancelUrl,

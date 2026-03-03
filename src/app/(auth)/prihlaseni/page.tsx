@@ -8,6 +8,14 @@ import { supabase } from "@/lib/supabase";
 
 export default function PrihlaseniPage() {
   const router = useRouter();
+  // Get redirect URL from query params (set by middleware)
+  const getRedirectUrl = () => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("redirect") || "/dashboard";
+    }
+    return "/dashboard";
+  };
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -58,7 +66,7 @@ export default function PrihlaseniPage() {
       }
 
       if (data.session) {
-        router.push("/dashboard");
+        router.push(getRedirectUrl());
       }
     } catch (err) {
       console.error("Login error:", err);
