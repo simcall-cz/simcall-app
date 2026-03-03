@@ -13,71 +13,52 @@ export async function GET(request: NextRequest) {
 
     const db = createServerClient();
 
-    // Run all queries in parallel for performance
-    const [
-      usersResult,
-      callsResult,
-      activeSubsResult,
-      allSubsResult,
-      recentUsersResult,
-      callsTodayResult,
-    ] = await Promise.all([
-      // Total users
+    // Core queries that should always work
+    const [usersResult, callsResult, callsTodayResult, recentUsersResult] = await Promise.all([
       db.from("profiles").select("*", { count: "exact", head: true }),
-
-      // Total calls
       db.from("calls").select("*", { count: "exact", head: true }),
-
-      // Active subscriptions
-      db
-        .from("subscriptions")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "active"),
-
-      // All active subscriptions with plan/tier for MRR and revenue-by-plan
-      db
-        .from("subscriptions")
-        .select("plan, tier")
-        .eq("status", "active"),
-
-      // Recent registrations (last 10)
-      db
-        .from("profiles")
-        .select("id, email, full_name, plan_role, created_at")
-        .order("created_at", { ascending: false })
-        .limit(10),
-
-      // Calls today
-      db
-        .from("calls")
-        .select("*", { count: "exact", head: true })
-        .gte("date", new Date().toISOString().split("T")[0]),
+      db.from("calls").select("*", { count: "exact", head: true }).gte("date", new Date().toISOString().split("T")[0]),
+      db.from("profiles").select("id, email, full_name, role, created_at").order("created_at", { ascending: false }).limit(10),
     ]);
 
-    // Calculate MRR from active subscriptions
+    // Subscription queries — table may not exist yet
+    let activeSubsCount = 0;
     let mrr = 0;
     const revenueByPlan: Record<string, { count: number; revenue: number }> = {};
 
-    if (allSubsResult.data) {
-      for (const sub of allSubsResult.data) {
-        const planPrices = PLAN_PRICES[sub.plan];
-        const tierPrice = planPrices?.[sub.tier];
-        const price = tierPrice?.price || 0;
+    try {
+      const { count } = await db
+        .from("subscriptions")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "active");
+      activeSubsCount = count || 0;
 
-        mrr += price;
+      const { data: allSubs } = await db
+        .from("subscriptions")
+        .select("plan, tier")
+        .eq("status", "active");
 
-        if (!revenueByPlan[sub.plan]) {
-          revenueByPlan[sub.plan] = { count: 0, revenue: 0 };
+      if (allSubs) {
+        for (const sub of allSubs) {
+          const planPrices = PLAN_PRICES[sub.plan];
+          const tierPrice = planPrices?.[sub.tier];
+          const price = tierPrice?.price || 0;
+          mrr += price;
+          if (!revenueByPlan[sub.plan]) {
+            revenueByPlan[sub.plan] = { count: 0, revenue: 0 };
+          }
+          revenueByPlan[sub.plan].count += 1;
+          revenueByPlan[sub.plan].revenue += price;
         }
-        revenueByPlan[sub.plan].count += 1;
-        revenueByPlan[sub.plan].revenue += price;
       }
+    } catch {
+      // subscriptions table may not exist
     }
 
     return NextResponse.json({
       totalUsers: usersResult.count || 0,
       totalCalls: callsResult.count || 0,
-      activeSubscriptions: activeSubsResult.count || 0,
+      activeSubscriptions: activeSubsCount,
       mrr,
       recentRegistrations: recentUsersResult.data || [],
       callsToday: callsTodayResult.count || 0,

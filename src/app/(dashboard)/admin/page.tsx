@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { getAuthHeaders } from "@/lib/auth";
 
 interface AdminStats {
   totalUsers: number;
@@ -24,7 +25,7 @@ interface AdminStats {
     id: string;
     email: string;
     full_name: string;
-    plan_role: string;
+    role: string;
     created_at: string;
   }[];
   revenueByPlan: Record<string, { count: number; revenue: number }>;
@@ -60,7 +61,8 @@ export default function AdminOverviewPage() {
   useEffect(() => {
     async function fetchStats() {
       try {
-        const res = await fetch("/api/admin/stats");
+        const headers = await getAuthHeaders();
+        const res = await fetch("/api/admin/stats", { headers });
         if (!res.ok) throw new Error("Nepodařilo se načíst statistiky");
         const data = await res.json();
         setStats(data);
@@ -351,9 +353,9 @@ export default function AdminOverviewPage() {
                       </p>
                     </div>
                     <Badge
-                      variant={planBadgeColor[reg.plan_role] || "secondary"}
+                      variant={planBadgeColor[reg.role] || "secondary"}
                     >
-                      {planLabel[reg.plan_role] || reg.plan_role}
+                      {planLabel[reg.role] || reg.role}
                     </Badge>
                     <div className="hidden sm:flex items-center gap-1 text-xs text-neutral-400 shrink-0">
                       <Clock className="w-3 h-3" />

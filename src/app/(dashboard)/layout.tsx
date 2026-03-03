@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { Sidebar } from "@/components/layout/sidebar";
 import { DashboardTopbar } from "@/components/layout/dashboard-topbar";
+import { supabase } from "@/lib/supabase";
 
 export default function DashboardLayout({
   children,
@@ -11,13 +12,38 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const pathname = usePathname();
 
-  const variant: "agent" | "manager" | "admin" = pathname.startsWith("/admin")
-    ? "admin"
-    : pathname.startsWith("/manager")
-    ? "manager"
-    : "agent";
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        // Get role from profile
+        supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", user.id)
+          .single()
+          .then(({ data }) => {
+            setUserRole(data?.role || "free");
+          });
+      }
+    });
+  }, []);
+
+  // Determine sidebar variant from URL path + user role
+  let variant: "agent" | "manager" | "team_manager" | "admin";
+  if (pathname.startsWith("/admin")) {
+    variant = "admin";
+  } else if (userRole === "admin") {
+    variant = "admin";
+  } else if (userRole === "team_manager") {
+    variant = "team_manager";
+  } else if (pathname.startsWith("/manager")) {
+    variant = "manager";
+  } else {
+    variant = "agent";
+  }
 
   return (
     <div className="flex h-screen overflow-hidden bg-neutral-25">

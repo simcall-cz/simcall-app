@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Loader2, Mail } from "lucide-react";
+import { Eye, EyeOff, Loader2, Mail, AlertCircle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 export default function PrihlaseniPage() {
@@ -48,17 +48,23 @@ export default function PrihlaseniPage() {
     setIsLoading(true);
 
     try {
+      console.log("[LOGIN] Attempting signInWithPassword for:", formData.email);
       const { data, error: signInError } =
         await supabase.auth.signInWithPassword({
           email: formData.email,
           password: formData.password,
         });
 
+      console.log("[LOGIN] Result:", { data, signInError });
+
       if (signInError) {
+        console.error("[LOGIN] Sign in error:", signInError);
         if (signInError.message.includes("Invalid login")) {
-          setError("Nesprávný e-mail nebo heslo");
+          setError("Nesprávný e-mail nebo heslo. Zkontrolujte prosím zadané údaje.");
         } else if (signInError.message.includes("Email not confirmed")) {
-          setError("Potvrďte prosím svůj e-mail. Zkontrolujte svou schránku.");
+          setError("E-mail ještě nebyl potvrzen. Zkontrolujte svou e-mailovou schránku.");
+        } else if (signInError.message.includes("Too many requests")) {
+          setError("Příliš mnoho pokusů. Zkuste to prosím za chvíli.");
         } else {
           setError(signInError.message);
         }
@@ -66,7 +72,14 @@ export default function PrihlaseniPage() {
       }
 
       if (data.session) {
-        router.push(getRedirectUrl());
+        console.log("[LOGIN] Session obtained, setting cookie and redirecting...");
+        // Set auth cookie so middleware can read it
+        document.cookie = `sb-access-token=${data.session.access_token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
+        // Use full page reload so middleware picks up the new auth cookies
+        window.location.href = getRedirectUrl();
+      } else {
+        console.warn("[LOGIN] No session in response");
+        setError("Přihlášení se nezdařilo — žádná session");
       }
     } catch (err) {
       console.error("Login error:", err);
@@ -271,8 +284,9 @@ export default function PrihlaseniPage() {
 
         {/* Error */}
         {error && (
-          <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
-            {error}
+          <div className="flex items-center gap-2 rounded-lg bg-red-50 border border-red-200 p-3.5 text-sm text-red-700">
+            <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
+            <span>{error}</span>
           </div>
         )}
 

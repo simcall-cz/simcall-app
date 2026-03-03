@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { getAuthHeaders } from "@/lib/auth";
 
 interface Subscription {
   id: string;
@@ -71,9 +72,10 @@ export default function FinancniPrehledPage() {
   useEffect(() => {
     async function fetchData() {
       try {
+        const headers = await getAuthHeaders();
         const [subsRes, statsRes] = await Promise.all([
-          fetch("/api/admin/subscriptions"),
-          fetch("/api/admin/stats"),
+          fetch("/api/admin/subscriptions", { headers }),
+          fetch("/api/admin/stats", { headers }),
         ]);
 
         if (!subsRes.ok || !statsRes.ok) {

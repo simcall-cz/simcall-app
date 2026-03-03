@@ -14,30 +14,15 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
 
     const search = searchParams.get("search") || "";
-    const planRole = searchParams.get("plan_role") || "";
+    const planRole = searchParams.get("role") || "";
     const limit = parseInt(searchParams.get("limit") || "20");
     const offset = parseInt(searchParams.get("offset") || "0");
 
-    // Build query for profiles with subscription join
+    // Build query for profiles — no join (subscriptions table may not exist)
     let query = db
       .from("profiles")
       .select(
-        `
-        id,
-        email,
-        full_name,
-        plan_role,
-        created_at,
-        subscriptions (
-          id,
-          plan,
-          tier,
-          status,
-          calls_used,
-          calls_limit,
-          current_period_end
-        )
-      `,
+        `id, email, full_name, role, created_at`,
         { count: "exact" }
       )
       .order("created_at", { ascending: false })
@@ -50,9 +35,9 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Apply plan_role filter
+    // Apply role filter
     if (planRole) {
-      query = query.eq("plan_role", planRole);
+      query = query.eq("role", planRole);
     }
 
     const { data, count, error } = await query;
@@ -62,8 +47,29 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    // Try to fetch subscriptions separately (table may not exist)
+    let subsMap: Record<string, unknown> = {};
+    try {
+      const { data: subs } = await db
+        .from("subscriptions")
+        .select("user_id, id, plan, tier, status, calls_used, calls_limit, current_period_end")
+        .eq("status", "active");
+      if (subs) {
+        for (const s of subs) {
+          if (s.user_id) subsMap[s.user_id] = s;
+        }
+      }
+    } catch {
+      // subscriptions table may not exist yet
+    }
+
+    const users = (data || []).map((u) => ({
+      ...u,
+      subscriptions: subsMap[u.id] || null,
+    }));
+
     return NextResponse.json({
-      users: data || [],
+      users,
       total: count || 0,
       limit,
       offset,
@@ -96,10 +102,10 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    const validRoles = ["demo", "solo", "team", "admin"];
+    const validRoles = ["free", "solo", "team", "team_manager"];
     if (!validRoles.includes(planRole)) {
       return NextResponse.json(
-        { error: `Invalid planRole. Must be one of: ${validRoles.join(", ")}` },
+        { error: `Invalid role. Must be one of: ${validRoles.join(", ")}` },
         { status: 400 }
       );
     }
@@ -107,7 +113,7 @@ export async function PATCH(request: NextRequest) {
     const { data, error } = await db
       .from("profiles")
       .update({
-        plan_role: planRole,
+        role: planRole,
         updated_at: new Date().toISOString(),
       })
       .eq("id", userId)

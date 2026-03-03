@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { getAuthHeaders } from "@/lib/auth";
 
 interface LeaderboardEntry {
   userId: string;
@@ -55,7 +56,8 @@ export default function ManagerOverviewPage() {
   useEffect(() => {
     async function fetchStats() {
       try {
-        const res = await fetch("/api/manager/stats");
+        const headers = await getAuthHeaders();
+        const res = await fetch("/api/manager/stats", { headers });
         if (!res.ok) throw new Error("Nepodařilo se načíst statistiky týmu");
         const data = await res.json();
         setStats(data);

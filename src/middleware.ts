@@ -46,9 +46,9 @@ export async function middleware(request: NextRequest) {
 
   // ---- Manager routes: require team plan ----
   if (pathname.startsWith("/manager")) {
-    // Check if user has team plan via profile
+    // Check if user has team/team_manager plan via profile
     const profile = await getUserProfile(user.id);
-    if (!profile || (profile.plan_role !== "team" && profile.plan_role !== "admin")) {
+    if (!profile || !["team", "team_manager", "admin"].includes(profile.role)) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
   }
@@ -65,6 +65,12 @@ function getTokenFromRequest(request: NextRequest): string | null {
   const authHeader = request.headers.get("authorization");
   if (authHeader?.startsWith("Bearer ")) {
     return authHeader.replace("Bearer ", "");
+  }
+
+  // Check explicit auth cookie (set by login page)
+  const explicitToken = request.cookies.get("sb-access-token")?.value;
+  if (explicitToken && explicitToken.length > 20) {
+    return explicitToken;
   }
 
   // Check Supabase session cookies
@@ -112,7 +118,7 @@ async function getUserProfile(userId: string) {
 
     const { data } = await supabase
       .from("profiles")
-      .select("plan_role, company_id")
+      .select("role, company_id")
       .eq("id", userId)
       .single();
 

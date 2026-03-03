@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { getStripe } from "@/lib/stripe";
 import { createServerClient } from "@/lib/supabase";
+import { getResend, FROM_EMAIL } from "@/lib/resend";
+import OrderConfirmationEmail from "@/emails/OrderConfirmationEmail";
 
 // Required for raw body access and consistent behavior
 export const runtime = "nodejs";
@@ -113,7 +115,7 @@ export async function POST(request: NextRequest) {
           await db
             .from("profiles")
             .update({
-              plan_role: plan,
+              role: plan,
               subscription_id: subscription.id,
               updated_at: new Date().toISOString(),
             })
@@ -145,6 +147,24 @@ export async function POST(request: NextRequest) {
               .update({ company_id: company.id })
               .eq("id", userId);
           }
+        }
+
+        // Send order confirmation email
+        const orderEmail = session.customer_email || session.customer_details?.email;
+        if (orderEmail) {
+          const resend = getResend();
+          resend.emails.send({
+            from: FROM_EMAIL,
+            to: [orderEmail],
+            subject: "Potvrzení objednávky — SimCall ✅",
+            react: OrderConfirmationEmail({
+              customerName: customerName || "zákazníku",
+              plan,
+              tier,
+              callsLimit,
+              customerEmail: orderEmail,
+            }),
+          }).catch((err) => console.error("[email] Order confirmation failed:", err));
         }
 
         console.log(`[stripe/webhook] checkout.session.completed — plan=${plan} tier=${tier} userId=${userId}`);
@@ -202,7 +222,7 @@ export async function POST(request: NextRequest) {
           await db
             .from("profiles")
             .update({
-              plan_role: "demo",
+              role: "demo",
               subscription_id: null,
               updated_at: new Date().toISOString(),
             })

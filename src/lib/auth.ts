@@ -110,7 +110,7 @@ export async function getCurrentUserProfile() {
     email,
     fullName: profile?.full_name || session.user.user_metadata?.full_name || "",
     role: (profile?.role as "free" | "paid") || "free",
-    planRole: isAdminEmail(email) ? "admin" as PlanRole : ((profile?.plan_role as PlanRole) || "demo"),
+    planRole: isAdminEmail(email) ? "admin" as PlanRole : ((profile?.role as PlanRole) || "demo"),
     companyId: profile?.company_id || null,
     subscriptionId: profile?.subscription_id || null,
   };
@@ -268,13 +268,13 @@ export async function getUserPlanRole(userId: string): Promise<PlanRole> {
 
   const { data: profile } = await db
     .from("profiles")
-    .select("plan_role, email")
+    .select("role, email")
     .eq("id", userId)
     .single();
 
   if (!profile) return "demo";
   if (isAdminEmail(profile.email)) return "admin";
-  return (profile.plan_role as PlanRole) || "demo";
+  return (profile.role as PlanRole) || "demo";
 }
 
 /**

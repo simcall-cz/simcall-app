@@ -1,14 +1,60 @@
 "use client";
 
-import { Phone, TrendingUp, Clock, Award, PhoneCall } from "lucide-react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { Phone, TrendingUp, Clock, Award, PhoneCall, Loader2, CreditCard } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useCallHistory } from "@/hooks/useCallHistory";
+import { supabase } from "@/lib/supabase";
+
+interface UserInfo {
+  fullName: string;
+  email: string;
+}
+
+interface SubscriptionInfo {
+  plan: string;
+  tier: number;
+  callsUsed: number;
+  callsLimit: number;
+  status: string;
+  currentPeriodEnd?: string;
+}
+
+const planLabels: Record<string, string> = {
+  demo: "Demo (zdarma)",
+  solo: "Solo",
+  team: "Team",
+};
 
 export default function ProfilPage() {
   const { calls, isLoading } = useCallHistory({ limit: 200 });
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [subscription, setSubscription] = useState<SubscriptionInfo | null>(null);
+
+  useEffect(() => {
+    // Fetch user info from Supabase session
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        setUserInfo({
+          fullName: user.user_metadata?.full_name || user.email?.split("@")[0] || "Uživatel",
+          email: user.email || "—",
+        });
+      }
+    });
+
+    // Fetch subscription
+    fetch("/api/subscription")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && !data.error) {
+          setSubscription(data);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const completedCalls = calls.filter((c) => c.successRate > 0);
   const totalCalls = calls.length;
@@ -94,6 +140,15 @@ export default function ProfilPage() {
     );
   }
 
+  const initials = userInfo?.fullName
+    ? userInfo.fullName
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2)
+    : "?";
+
   return (
     <div className="space-y-6">
       <div>
@@ -102,6 +157,70 @@ export default function ProfilPage() {
           Váš přehled a výkonnost
         </p>
       </div>
+
+      {/* User Identity Card */}
+      <Card>
+        <CardContent className="p-5">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-full bg-primary-50 flex items-center justify-center text-primary-600 text-lg font-bold shrink-0">
+              {initials}
+            </div>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-lg font-semibold text-neutral-900 truncate">
+                {userInfo?.fullName || "Uživatel"}
+              </h2>
+              <p className="text-sm text-neutral-500 truncate">
+                {userInfo?.email || "—"}
+              </p>
+              <div className="flex items-center gap-2 mt-1.5">
+                <Badge
+                  variant={
+                    subscription?.plan === "solo" || subscription?.plan === "team"
+                      ? "success"
+                      : "secondary"
+                  }
+                >
+                  {planLabels[subscription?.plan || "demo"] || subscription?.plan || "Demo"}
+                </Badge>
+                {subscription?.currentPeriodEnd && (
+                  <span className="text-xs text-neutral-400">
+                    do {new Date(subscription.currentPeriodEnd).toLocaleDateString("cs-CZ")}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Usage bar */}
+          {subscription && (
+            <div className="mt-4 pt-4 border-t border-neutral-100">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs text-neutral-500 flex items-center gap-1.5">
+                  <CreditCard className="w-3.5 h-3.5" />
+                  Využití hovorů
+                </span>
+                <span className="text-sm font-medium text-neutral-700">
+                  {subscription.callsUsed} / {subscription.callsLimit}
+                </span>
+              </div>
+              <div className="w-full bg-neutral-100 rounded-full h-2">
+                <div
+                  className={`h-2 rounded-full transition-all ${
+                    subscription.callsUsed / subscription.callsLimit >= 0.9
+                      ? "bg-red-500"
+                      : subscription.callsUsed / subscription.callsLimit >= 0.7
+                      ? "bg-amber-500"
+                      : "bg-primary-500"
+                  }`}
+                  style={{
+                    width: `${Math.min(100, Math.round((subscription.callsUsed / subscription.callsLimit) * 100))}%`,
+                  }}
+                />
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

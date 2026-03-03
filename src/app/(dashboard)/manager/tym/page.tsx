@@ -14,6 +14,7 @@ import {
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { getAuthHeaders } from "@/lib/auth";
 
 interface TeamMember {
   userId: string;
@@ -46,7 +47,8 @@ export default function TeamPage() {
   async function fetchTeam() {
     try {
       setIsLoading(true);
-      const res = await fetch("/api/manager/team");
+      const headers = await getAuthHeaders();
+      const res = await fetch("/api/manager/team", { headers });
       if (!res.ok) throw new Error("Nepodařilo se načíst tým");
       const data = await res.json();
       setMembers(data.members || []);
@@ -77,9 +79,10 @@ export default function TeamPage() {
     setAddSuccess(null);
 
     try {
+      const authHeaders = await getAuthHeaders();
       const res = await fetch("/api/manager/team", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { ...authHeaders, "Content-Type": "application/json" },
         body: JSON.stringify({ email: addEmail.trim() }),
       });
 
@@ -104,9 +107,10 @@ export default function TeamPage() {
   async function handleRemoveMember(userId: string) {
     setDeleteLoading(true);
     try {
+      const authHeaders = await getAuthHeaders();
       const res = await fetch("/api/manager/team", {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
+        headers: { ...authHeaders, "Content-Type": "application/json" },
         body: JSON.stringify({ userId }),
       });
 

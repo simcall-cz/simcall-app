@@ -182,7 +182,7 @@ export async function POST(request: NextRequest) {
     // Update user's profile with team plan role and company
     await supabase
       .from("profiles")
-      .update({ plan_role: "team", company_id: companyId })
+      .update({ role: "team", company_id: companyId })
       .eq("id", profile.id);
 
     return NextResponse.json({
@@ -247,7 +247,7 @@ export async function DELETE(request: NextRequest) {
     // Reset user's profile to demo
     await supabase
       .from("profiles")
-      .update({ plan_role: "demo", company_id: null })
+      .update({ role: "demo", company_id: null })
       .eq("id", userId);
 
     return NextResponse.json({ success: true });

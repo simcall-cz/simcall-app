@@ -1,14 +1,40 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, Bell, PhoneCall } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { Menu, PhoneCall, ChevronRight } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 
 interface DashboardTopbarProps {
   onMenuClick: () => void;
 }
 
+const breadcrumbLabels: Record<string, string> = {
+  dashboard: "Dashboard",
+  hovory: "Hovory",
+  "novy-hovor": "Nový hovor",
+  statistiky: "Statistiky",
+  profil: "Profil",
+  admin: "Admin",
+  uzivatele: "Uživatelé",
+  "financni-prehled": "Finance",
+  agenti: "Agenti",
+  dotazy: "Dotazy",
+  manager: "Manager",
+  tym: "Tým",
+};
+
 export function DashboardTopbar({ onMenuClick }: DashboardTopbarProps) {
+  const pathname = usePathname();
+
+  // Build breadcrumb segments
+  const segments = pathname.split("/").filter(Boolean);
+  const crumbs = segments.map((seg, i) => ({
+    label: breadcrumbLabels[seg] || seg,
+    href: "/" + segments.slice(0, i + 1).join("/"),
+    isLast: i === segments.length - 1,
+  }));
+
   return (
     <header className="h-14 sm:h-16 border-b border-neutral-100 bg-white flex items-center justify-between px-3 sm:px-6">
       {/* Left */}
@@ -29,22 +55,24 @@ export function DashboardTopbar({ onMenuClick }: DashboardTopbarProps) {
         </Link>
 
         {/* Breadcrumb */}
-        <nav className="hidden lg:flex items-center gap-2 text-sm">
-          <span className="text-neutral-400">Dashboard</span>
+        <nav className="hidden lg:flex items-center gap-1.5 text-sm">
+          {crumbs.map((crumb, i) => (
+            <span key={crumb.href} className="flex items-center gap-1.5">
+              {i > 0 && <ChevronRight className="w-3.5 h-3.5 text-neutral-300" />}
+              {crumb.isLast ? (
+                <span className="text-neutral-800 font-medium">{crumb.label}</span>
+              ) : (
+                <Link href={crumb.href} className="text-neutral-400 hover:text-neutral-600 transition-colors">
+                  {crumb.label}
+                </Link>
+              )}
+            </span>
+          ))}
         </nav>
       </div>
 
       {/* Right */}
       <div className="flex items-center gap-2 sm:gap-3">
-        {/* Notification Bell */}
-        <button
-          className="relative flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-lg hover:bg-neutral-50 transition-colors"
-          aria-label="Notifikace"
-        >
-          <Bell className="w-5 h-5 text-neutral-500" />
-          <span className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 w-2 h-2 bg-primary-500 rounded-full" />
-        </button>
-
         {/* New Call Button */}
         <Link
           href="/dashboard/hovory/novy-hovor"

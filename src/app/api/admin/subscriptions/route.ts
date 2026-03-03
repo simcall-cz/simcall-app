@@ -12,19 +12,24 @@ export async function GET(request: NextRequest) {
 
     const db = createServerClient();
 
-    const { data: subscriptions, error } = await db
-      .from("subscriptions")
-      .select(
-        "id, user_id, plan, tier, status, calls_used, calls_limit, agents_limit, stripe_customer_id, stripe_subscription_id, customer_name, customer_email, current_period_start, current_period_end, created_at, updated_at"
-      )
-      .order("created_at", { ascending: false });
+    try {
+      const { data: subscriptions, error } = await db
+        .from("subscriptions")
+        .select(
+          "id, user_id, plan, tier, status, calls_used, calls_limit, agents_limit, stripe_customer_id, stripe_subscription_id, customer_name, customer_email, current_period_start, current_period_end, created_at, updated_at"
+        )
+        .order("created_at", { ascending: false });
 
-    if (error) {
-      console.error("GET /api/admin/subscriptions error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      if (error) {
+        // Table may not exist — return empty
+        console.warn("Subscriptions query error (table may not exist):", error.message);
+        return NextResponse.json({ subscriptions: [] });
+      }
+
+      return NextResponse.json({ subscriptions: subscriptions || [] });
+    } catch {
+      return NextResponse.json({ subscriptions: [] });
     }
-
-    return NextResponse.json({ subscriptions: subscriptions || [] });
   } catch (err) {
     console.error("GET /api/admin/subscriptions error:", err);
     return NextResponse.json(
@@ -89,7 +94,7 @@ export async function PATCH(request: NextRequest) {
         await db
           .from("profiles")
           .update({
-            plan_role: "demo",
+            role: "demo",
             subscription_id: null,
             updated_at: new Date().toISOString(),
           })

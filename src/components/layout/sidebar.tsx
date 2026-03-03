@@ -1,6 +1,7 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   LayoutDashboard,
@@ -14,11 +15,14 @@ import {
   Bot,
   UserPlus,
   MessageSquare,
+  LogOut,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/lib/supabase";
 
 interface SidebarProps {
-  variant: "agent" | "manager" | "admin";
+  variant: "agent" | "manager" | "team_manager" | "admin";
   isOpen: boolean;
   onClose: () => void;
 }
@@ -54,19 +58,14 @@ const agentNavItems: SidebarNavItem[] = [
 
 const managerNavItems: SidebarNavItem[] = [
   {
-    label: "Přehled",
+    label: "Přehled týmu",
     href: "/manager",
     icon: <LayoutDashboard className="w-5 h-5" />,
   },
   {
-    label: "Tým",
+    label: "Správa týmu",
     href: "/manager/tym",
     icon: <Users className="w-5 h-5" />,
-  },
-  {
-    label: "Přidat člena",
-    href: "/manager/tym#pridat",
-    icon: <UserPlus className="w-5 h-5" />,
   },
 ];
 
@@ -100,12 +99,45 @@ const adminNavItems: SidebarNavItem[] = [
 
 export function Sidebar({ variant, isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
-  const navItems =
-    variant === "admin"
+  const router = useRouter();
+  const [userName, setUserName] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const isTeamManager = variant === "team_manager";
+  const isAdmin = variant === "admin";
+
+  const primaryNavItems =
+    isAdmin
       ? adminNavItems
       : variant === "manager"
       ? managerNavItems
       : agentNavItems;
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        setUserEmail(user.email || null);
+        setUserName(
+          user.user_metadata?.full_name ||
+          user.email?.split("@")[0] ||
+          null
+        );
+      }
+    });
+  }, []);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      // Clear auth cookie
+      document.cookie = "sb-access-token=; path=/; max-age=0; SameSite=Lax";
+      await supabase.auth.signOut();
+      window.location.href = "/prihlaseni";
+    } catch {
+      setIsLoggingOut(false);
+    }
+  };
 
   const isActive = (href: string) => {
     if (href === "/dashboard" || href === "/manager" || href === "/admin") {
@@ -113,6 +145,38 @@ export function Sidebar({ variant, isOpen, onClose }: SidebarProps) {
     }
     return pathname.startsWith(href);
   };
+
+  const initials = userName
+    ? userName
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2)
+    : userEmail?.[0]?.toUpperCase() || "?";
+
+  const renderNavLink = (item: SidebarNavItem) => (
+    <Link
+      key={item.href}
+      href={item.href}
+      onClick={onClose}
+      className={cn(
+        "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+        isActive(item.href)
+          ? "bg-primary-50 text-primary-500"
+          : "text-neutral-500 hover:text-neutral-800 hover:bg-neutral-50"
+      )}
+    >
+      <span
+        className={cn(
+          isActive(item.href) ? "text-primary-500" : "text-neutral-400"
+        )}
+      >
+        {item.icon}
+      </span>
+      {item.label}
+    </Link>
+  );
 
   const sidebarContent = (
     <div className="flex flex-col h-full">
@@ -123,10 +187,15 @@ export function Sidebar({ variant, isOpen, onClose }: SidebarProps) {
             <span className="text-xl font-bold text-neutral-800">Sim</span>
             <span className="text-xl font-bold text-primary-500">Call</span>
           </Link>
-          {variant === "admin" && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-primary-50 px-2 py-0.5 text-[10px] font-semibold text-primary-600 uppercase tracking-wider">
-              <Shield className="w-3 h-3" />
-              Admin
+          {(isAdmin || isTeamManager) && (
+            <span className={cn(
+              "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider",
+              isAdmin
+                ? "bg-primary-50 text-primary-600"
+                : "bg-purple-50 text-purple-600"
+            )}>
+              {isAdmin ? <Shield className="w-3 h-3" /> : <Users className="w-3 h-3" />}
+              {isAdmin ? "Admin" : "Manager"}
             </span>
           )}
         </div>
@@ -141,53 +210,57 @@ export function Sidebar({ variant, isOpen, onClose }: SidebarProps) {
 
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        {navItems.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            onClick={onClose}
-            className={cn(
-              "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-              isActive(item.href)
-                ? "bg-primary-50 text-primary-500"
-                : "text-neutral-500 hover:text-neutral-800 hover:bg-neutral-50"
-            )}
-          >
-            <span
-              className={cn(
-                isActive(item.href) ? "text-primary-500" : "text-neutral-400"
-              )}
-            >
-              {item.icon}
-            </span>
-            {item.label}
-          </Link>
-        ))}
+        {primaryNavItems.map(renderNavLink)}
+
+        {/* Manager section for team_manager */}
+        {isTeamManager && (
+          <>
+            <div className="pt-4 pb-2 px-3">
+              <p className="text-[10px] font-semibold text-neutral-400 uppercase tracking-wider">
+                Manager
+              </p>
+            </div>
+            {managerNavItems.map(renderNavLink)}
+          </>
+        )}
       </nav>
 
-      {/* User Info */}
-      <div className="border-t border-neutral-100 p-4">
+      {/* User Info + Logout */}
+      <div className="border-t border-neutral-100 p-4 space-y-3">
         <div className="flex items-center gap-3">
           <div className={cn(
             "w-9 h-9 rounded-full flex items-center justify-center",
-            variant === "admin" ? "bg-primary-100" : "bg-neutral-100"
+            isAdmin ? "bg-primary-100" : isTeamManager ? "bg-purple-100" : "bg-neutral-100"
           )}>
             <span className={cn(
               "text-xs font-medium",
-              variant === "admin" ? "text-primary-600" : "text-neutral-600"
+              isAdmin ? "text-primary-600" : isTeamManager ? "text-purple-600" : "text-neutral-600"
             )}>
-              {variant === "admin" ? "SC" : "JN"}
+              {initials}
             </span>
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-neutral-800 truncate">
-              {variant === "admin" ? "SimCall Admin" : "Jan Novák"}
+              {userName || "Uživatel"}
             </p>
             <p className="text-xs text-neutral-400 truncate">
-              {variant === "admin" ? "admin@simcall.cz" : "jan@realitka.cz"}
+              {userEmail || "—"}
             </p>
           </div>
         </div>
+
+        <button
+          onClick={handleLogout}
+          disabled={isLoggingOut}
+          className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm font-medium text-neutral-500 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
+        >
+          {isLoggingOut ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <LogOut className="w-4 h-4" />
+          )}
+          Odhlásit se
+        </button>
       </div>
     </div>
   );

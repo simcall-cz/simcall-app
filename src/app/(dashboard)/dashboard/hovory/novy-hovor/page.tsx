@@ -21,6 +21,7 @@ import { ActiveCall } from "@/components/call/ActiveCall";
 import { useTrainingCall } from "@/hooks/useTrainingCall";
 import { scenarios } from "@/data/scenarios";
 import { aiAgents } from "@/data/ai-agents";
+import { cn } from "@/lib/utils";
 
 const difficultyConfig = {
   easy: {
@@ -52,6 +53,7 @@ export default function NovyHovorPage() {
   const router = useRouter();
   const [selectedScenario, setSelectedScenario] = useState<string | null>(null);
   const [step, setStep] = useState<"select" | "confirm" | "call">("select");
+  const [selectedDifficulty, setSelectedDifficulty] = useState<"all" | "easy" | "medium" | "hard">("all");
 
   const {
     phase,
@@ -74,6 +76,10 @@ export default function NovyHovorPage() {
   const agent = scenario
     ? aiAgents.find((a) => a.id === scenario.agentId)
     : null;
+
+  const filteredScenarios = selectedDifficulty === "all"
+    ? scenarios
+    : scenarios.filter((s) => s.difficulty === selectedDifficulty);
 
   const handleSelectScenario = (scenarioId: string) => {
     setSelectedScenario(scenarioId);
@@ -247,7 +253,13 @@ export default function NovyHovorPage() {
         {(["all", "easy", "medium", "hard"] as const).map((diff) => (
           <button
             key={diff}
-            className="rounded-full border border-neutral-200 bg-white px-4 py-1.5 text-sm font-medium text-neutral-600 transition-colors hover:border-neutral-400 hover:text-neutral-900"
+            onClick={() => setSelectedDifficulty(diff)}
+            className={cn(
+              "rounded-full border px-4 py-1.5 text-sm font-medium transition-colors",
+              selectedDifficulty === diff
+                ? "border-primary-500 bg-primary-50 text-primary-600"
+                : "border-neutral-200 bg-white text-neutral-600 hover:border-neutral-400 hover:text-neutral-900"
+            )}
           >
             {diff === "all"
               ? "Všechny"
@@ -258,7 +270,7 @@ export default function NovyHovorPage() {
 
       {/* Scenarios Grid */}
       <div className="grid gap-4 md:grid-cols-2">
-        {scenarios.map((s, i) => {
+        {filteredScenarios.map((s, i) => {
           const a = aiAgents.find((ag) => ag.id === s.agentId);
           const diffConf = difficultyConfig[s.difficulty];
           const DiffIcon = diffConf.icon;

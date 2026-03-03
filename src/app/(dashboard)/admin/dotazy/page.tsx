@@ -17,6 +17,7 @@ import {
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { getAuthHeaders } from "@/lib/auth";
 
 interface FormSubmission {
   id: string;
@@ -99,7 +100,8 @@ export default function AdminDotazyPage() {
       if (typeFilter !== "all") params.set("type", typeFilter);
       if (statusFilter !== "all") params.set("status", statusFilter);
 
-      const res = await fetch(`/api/admin/forms?${params}`);
+      const headers = await getAuthHeaders();
+      const res = await fetch(`/api/admin/forms?${params}`, { headers });
       if (!res.ok) throw new Error("Nepodařilo se načíst dotazy");
       const data = await res.json();
       setSubmissions(data.submissions || []);
@@ -118,9 +120,10 @@ export default function AdminDotazyPage() {
   async function updateStatus(id: string, newStatus: string) {
     setUpdatingId(id);
     try {
+      const authHeaders = await getAuthHeaders();
       const res = await fetch("/api/admin/forms", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: { ...authHeaders, "Content-Type": "application/json" },
         body: JSON.stringify({ id, status: newStatus }),
       });
       if (!res.ok) throw new Error("Chyba");

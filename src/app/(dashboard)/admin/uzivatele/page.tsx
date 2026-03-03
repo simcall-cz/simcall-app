@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Search, Filter, Loader2, AlertCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { getAuthHeaders } from "@/lib/auth";
 
 interface SubscriptionInfo {
   id: string;
@@ -20,7 +21,7 @@ interface AdminUser {
   id: string;
   email: string;
   full_name: string | null;
-  plan_role: string;
+  role: string;
   created_at: string;
   subscriptions: SubscriptionInfo | null;
 }
@@ -29,11 +30,15 @@ const roleBadge: Record<
   string,
   { label: string; variant: "default" | "secondary" | "success" | "warning" }
 > = {
+  free: { label: "Free", variant: "secondary" },
   demo: { label: "Demo", variant: "secondary" },
   solo: { label: "Solo", variant: "default" },
   team: { label: "Team", variant: "success" },
+  team_manager: { label: "Team Manager", variant: "warning" },
   admin: { label: "Admin", variant: "warning" },
 };
+
+const allRoles = ["free", "solo", "team", "team_manager"] as const;
 
 function timeAgo(dateStr: string) {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -52,27 +57,29 @@ export default function AdminUzivatelePage() {
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [changingRoleId, setChangingRoleId] = useState<string | null>(null);
+
+  async function fetchUsers() {
+    try {
+      setIsLoading(true);
+      const params = new URLSearchParams({ limit: "100", offset: "0" });
+      if (search) params.set("search", search);
+      if (roleFilter !== "all") params.set("role", roleFilter);
+
+      const headers = await getAuthHeaders();
+      const res = await fetch(`/api/admin/users?${params}`, { headers });
+      if (!res.ok) throw new Error("Nepodařilo se načíst uživatele");
+      const data = await res.json();
+      setUsers(data.users || []);
+      setTotal(data.total || 0);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Chyba při načítání");
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   useEffect(() => {
-    async function fetchUsers() {
-      try {
-        setIsLoading(true);
-        const params = new URLSearchParams({ limit: "100", offset: "0" });
-        if (search) params.set("search", search);
-        if (roleFilter !== "all") params.set("plan_role", roleFilter);
-
-        const res = await fetch(`/api/admin/users?${params}`);
-        if (!res.ok) throw new Error("Nepodařilo se načíst uživatele");
-        const data = await res.json();
-        setUsers(data.users || []);
-        setTotal(data.total || 0);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Chyba při načítání");
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
     const debounce = setTimeout(fetchUsers, search ? 300 : 0);
     return () => clearTimeout(debounce);
   }, [search, roleFilter]);
@@ -128,10 +135,10 @@ export default function AdminUzivatelePage() {
           className="px-4 py-2.5 rounded-lg border border-neutral-200 text-sm text-neutral-700 bg-white focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
         >
           <option value="all">Všechny role</option>
-          <option value="demo">Demo</option>
+          <option value="free">Free</option>
           <option value="solo">Solo</option>
           <option value="team">Team</option>
-          <option value="admin">Admin</option>
+          <option value="team_manager">Team Manager</option>
         </select>
       </motion.div>
 
@@ -162,8 +169,8 @@ export default function AdminUzivatelePage() {
                 {/* Rows */}
                 <div className="divide-y divide-neutral-50">
                   {users.map((user) => {
-                    const role = roleBadge[user.plan_role] || {
-                      label: user.plan_role,
+                    const role = roleBadge[user.role] || {
+                      label: user.role,
                       variant: "secondary" as const,
                     };
                     const sub = user.subscriptions;
@@ -192,9 +199,43 @@ export default function AdminUzivatelePage() {
                           </div>
                         </div>
 
-                        {/* Role */}
+                        {/* Role — editable dropdown */}
                         <div className="hidden lg:block">
-                          <Badge variant={role.variant}>{role.label}</Badge>
+                          <select
+                            value={user.role}
+                            onChange={async (e) => {
+                              const newRole = e.target.value;
+                              setChangingRoleId(user.id);
+                              try {
+                                const authHeaders = await getAuthHeaders();
+                                const res = await fetch("/api/admin/users", {
+                                  method: "PATCH",
+                                  headers: { ...authHeaders, "Content-Type": "application/json" },
+                                  body: JSON.stringify({ userId: user.id, planRole: newRole }),
+                                });
+                                if (!res.ok) throw new Error();
+                                // Update local state
+                                setUsers((prev) =>
+                                  prev.map((u) =>
+                                    u.id === user.id ? { ...u, role: newRole } : u
+                                  )
+                                );
+                              } catch {
+                                // Reload on failure
+                                await fetchUsers();
+                              } finally {
+                                setChangingRoleId(null);
+                              }
+                            }}
+                            disabled={changingRoleId === user.id}
+                            className="text-xs font-medium rounded-md border border-neutral-200 bg-white px-2 py-1 text-neutral-700 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 disabled:opacity-50"
+                          >
+                            {allRoles.map((r) => (
+                              <option key={r} value={r}>
+                                {roleBadge[r]?.label || r}
+                              </option>
+                            ))}
+                          </select>
                         </div>
 
                         {/* Calls */}
