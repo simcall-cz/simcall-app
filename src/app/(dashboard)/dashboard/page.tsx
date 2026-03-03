@@ -30,7 +30,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useCallHistory } from "@/hooks/useCallHistory";
-import { getUserSessionInfo } from "@/lib/auth";
+import { getUserSessionInfo, getAuthHeaders } from "@/lib/auth";
 
 function formatDateShort(dateStr: string) {
   const date = new Date(dateStr);
@@ -789,29 +789,30 @@ export default function DashboardPage() {
   });
 
   useEffect(() => {
-    // Fetch user session info
+    // Fetch user name
     getUserSessionInfo().then((info) => {
       if (info) {
         setUserName(info.fullName?.split(" ")[0] || "uživateli");
-        setUserRole(info.role);
       }
     });
 
-    // Fetch subscription data
-    fetch("/api/subscription")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && !data.error) {
-          setSubscription(data);
-          // Override role based on subscription
-          if (data.plan !== "demo") {
-            setUserRole("paid");
+    // Fetch subscription data — this determines free vs paid
+    getAuthHeaders().then((headers) => {
+      fetch("/api/subscription", { headers })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && !data.error) {
+            setSubscription(data);
+            // plan !== "demo" means paid (solo, team, etc.)
+            setUserRole(data.plan !== "demo" ? "paid" : "free");
+          } else {
+            setUserRole("free");
           }
-        }
-      })
-      .catch(() => {
-        // Fallback to demo
-      });
+        })
+        .catch(() => {
+          setUserRole("free");
+        });
+    });
   }, []);
 
   const totalCalls = calls.length;
