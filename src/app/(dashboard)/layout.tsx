@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { Sidebar } from "@/components/layout/sidebar";
 import { DashboardTopbar } from "@/components/layout/dashboard-topbar";
-import { supabase } from "@/lib/supabase";
+import { getAuthHeaders } from "@/lib/auth";
 
 export default function DashboardLayout({
   children,
@@ -17,20 +17,17 @@ export default function DashboardLayout({
   const pathname = usePathname();
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) {
-        supabase
-          .from("profiles")
-          .select("role")
-          .eq("id", user.id)
-          .single()
-          .then(({ data }) => {
-            setUserRole(data?.role || "free");
-            setRoleLoaded(true);
-          });
-      } else {
-        setRoleLoaded(true);
-      }
+    getAuthHeaders().then((headers) => {
+      fetch("/api/me/role", { headers })
+        .then((res) => res.json())
+        .then((data) => {
+          setUserRole(data?.role || "free");
+          setRoleLoaded(true);
+        })
+        .catch(() => {
+          setUserRole("free");
+          setRoleLoaded(true);
+        });
     });
   }, []);
 
