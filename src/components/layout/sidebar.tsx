@@ -17,6 +17,8 @@ import {
   MessageSquare,
   LogOut,
   Loader2,
+  LifeBuoy,
+  CreditCard,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
@@ -53,6 +55,16 @@ const agentNavItems: SidebarNavItem[] = [
     label: "Profil",
     href: "/dashboard/profil",
     icon: <User className="w-5 h-5" />,
+  },
+  {
+    label: "Můj balíček",
+    href: "/dashboard/balicek",
+    icon: <CreditCard className="w-5 h-5" />,
+  },
+  {
+    label: "Podpora",
+    href: "/dashboard/podpora",
+    icon: <LifeBuoy className="w-5 h-5" />,
   },
 ];
 
@@ -94,6 +106,11 @@ const adminNavItems: SidebarNavItem[] = [
     label: "Dotazy",
     href: "/admin/dotazy",
     icon: <MessageSquare className="w-5 h-5" />,
+  },
+  {
+    label: "Podpora",
+    href: "/admin/podpora",
+    icon: <LifeBuoy className="w-5 h-5" />,
   },
 ];
 
