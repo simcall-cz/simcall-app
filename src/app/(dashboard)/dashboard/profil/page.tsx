@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useCallHistory } from "@/hooks/useCallHistory";
 import { supabase } from "@/lib/supabase";
+import { getAuthHeaders } from "@/lib/auth";
 
 interface UserInfo {
   fullName: string;
@@ -25,8 +26,10 @@ interface SubscriptionInfo {
 
 const planLabels: Record<string, string> = {
   demo: "Demo (zdarma)",
+  free: "Demo (zdarma)",
   solo: "Solo",
   team: "Team",
+  team_manager: "Team Manager",
 };
 
 export default function ProfilPage() {
@@ -45,15 +48,17 @@ export default function ProfilPage() {
       }
     });
 
-    // Fetch subscription
-    fetch("/api/subscription")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && !data.error) {
-          setSubscription(data);
-        }
-      })
-      .catch(() => {});
+    // Fetch subscription with auth headers
+    getAuthHeaders().then((headers) => {
+      fetch("/api/subscription", { headers })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && !data.error) {
+            setSubscription(data);
+          }
+        })
+        .catch(() => {});
+    });
   }, []);
 
   const completedCalls = calls.filter((c) => c.successRate > 0);
