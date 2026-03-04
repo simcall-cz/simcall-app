@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
 import { getUserFromRequest } from "@/lib/auth";
+import { notifySupportTicket } from "@/lib/notifications";
 
 // GET /api/tickets - Get current user's tickets
 export async function GET(request: NextRequest) {
@@ -63,6 +64,10 @@ export async function POST(request: NextRequest) {
       console.error("POST ticket error:", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
+
+    // Discord notification
+    const { data: profile } = await db.from("profiles").select("email").eq("id", user.id).single();
+    notifySupportTicket(profile?.email || user.email || "", subject.trim(), message.trim());
 
     return NextResponse.json({ ticket: data });
   } catch (err) {

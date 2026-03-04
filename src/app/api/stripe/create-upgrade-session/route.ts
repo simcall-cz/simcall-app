@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getStripe, PLAN_PRICES, getStripePriceId, getPlanPrice } from "@/lib/stripe";
 import { getUserFromRequest } from "@/lib/auth";
 import { createServerClient } from "@/lib/supabase";
+import { notifyPlanUpgrade, notifyPlanDowngrade } from "@/lib/notifications";
 
 // POST /api/stripe/create-upgrade-session
 // Handles plan changes:
@@ -131,6 +132,13 @@ export async function POST(request: NextRequest) {
               .update({ role: profileRole, updated_at: new Date().toISOString() })
               .eq("id", user.id);
 
+            // Discord notification
+            notifyPlanUpgrade(
+              customerEmail,
+              currentSub.plan, currentSub.tier,
+              plan, tier
+            );
+
             return NextResponse.json({
               success: true,
               upgraded: true,
@@ -167,12 +175,9 @@ export async function POST(request: NextRequest) {
             );
 
             // Store the scheduled downgrade in DB
-            // The actual subscription update will happen when the new period starts
-            // via the invoice.payment_succeeded webhook
             await db
               .from("subscriptions")
               .update({
-                // Keep current plan active but store scheduled change
                 scheduled_plan: plan,
                 scheduled_tier: tier,
                 scheduled_calls_limit: tier,
@@ -186,6 +191,13 @@ export async function POST(request: NextRequest) {
             const periodEnd = subData.current_period_end
               ? new Date(subData.current_period_end * 1000).toLocaleDateString("cs-CZ")
               : "konce období";
+
+            // Discord notification
+            notifyPlanDowngrade(
+              customerEmail,
+              currentSub.plan, currentSub.tier,
+              plan, tier
+            );
 
             return NextResponse.json({
               success: true,

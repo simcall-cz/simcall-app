@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getResend, FROM_EMAIL } from "@/lib/resend";
 import WelcomeEmail from "@/emails/WelcomeEmail";
+import { notifyNewRegistration } from "@/lib/notifications";
 
 // POST /api/email/welcome — Send welcome email after registration
 export async function POST(request: NextRequest) {
@@ -30,6 +31,7 @@ export async function POST(request: NextRequest) {
     }
 
     console.log(`[email/welcome] Sent to ${email}, id=${data?.id}`);
+    notifyNewRegistration(email, fullName || "");
     return NextResponse.json({ success: true, id: data?.id });
   } catch (err) {
     console.error("[email/welcome] Error:", err);

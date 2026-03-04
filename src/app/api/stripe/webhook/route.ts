@@ -5,6 +5,13 @@ import { createServerClient } from "@/lib/supabase";
 import { getResend, FROM_EMAIL } from "@/lib/resend";
 import OrderConfirmationEmail from "@/emails/OrderConfirmationEmail";
 import AccountCreatedEmail from "@/emails/AccountCreatedEmail";
+import {
+  notifyPaymentCompleted,
+  notifyAutoAccountCreated,
+  notifySubscriptionCancelled,
+  notifyPaymentFailed,
+  notifyRebill,
+} from "@/lib/notifications";
 
 // Required for raw body access and consistent behavior
 export const runtime = "nodejs";
@@ -318,6 +325,13 @@ export async function POST(request: NextRequest) {
         }
 
         console.log(`[stripe/webhook] checkout.session.completed — plan=${plan} tier=${tier} userId=${userId}`);
+
+        // Business notification
+        const amount = session.amount_total ? Math.round(session.amount_total / 100) : 0;
+        notifyPaymentCompleted(customerEmail, plan, tier, amount);
+        if (accountAutoCreated) {
+          notifyAutoAccountCreated(customerEmail, customerName, plan, tier);
+        }
         break;
       }
 
@@ -380,6 +394,7 @@ export async function POST(request: NextRequest) {
         }
 
         console.log(`[stripe/webhook] customer.subscription.deleted — ${stripeSubId}`);
+        notifySubscriptionCancelled(sub?.user_id || "", stripeSubId);
         break;
       }
 
@@ -448,6 +463,7 @@ export async function POST(request: NextRequest) {
           }
 
           console.log(`[stripe/webhook] invoice.payment_succeeded — ${stripeSubId} calls reset`);
+          notifyRebill(stripeSubId);
         }
         break;
       }
@@ -470,6 +486,7 @@ export async function POST(request: NextRequest) {
             .eq("stripe_subscription_id", stripeSubId);
 
           console.log(`[stripe/webhook] invoice.payment_failed — ${stripeSubId} → past_due`);
+          notifyPaymentFailed("", stripeSubId);
         }
         break;
       }

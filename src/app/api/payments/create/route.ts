@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
+import { notifyInvoiceOrder } from "@/lib/notifications";
 
 // POST /api/payments/create - Create a pending payment (for invoice orders)
 export async function POST(request: NextRequest) {
@@ -39,6 +40,9 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    // Discord notification
+    notifyInvoiceOrder(email, name || "", plan, tier, amount);
 
     return NextResponse.json({ payment });
   } catch (err) {

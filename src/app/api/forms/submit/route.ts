@@ -4,6 +4,7 @@ import { getResend, FROM_EMAIL, ADMIN_EMAIL } from "@/lib/resend";
 import ContactFormEmail from "@/emails/ContactFormEmail";
 import ContactAutoReplyEmail from "@/emails/ContactAutoReplyEmail";
 import MeetingBookedEmail from "@/emails/MeetingBookedEmail";
+import { notifyContactForm, notifyMeetingBooked } from "@/lib/notifications";
 
 // POST /api/forms/submit - Submit a form (contact, meeting, enterprise)
 export async function POST(request: NextRequest) {
@@ -100,6 +101,9 @@ export async function POST(request: NextRequest) {
         subject: "Děkujeme za zprávu — SimCall",
         react: ContactAutoReplyEmail({ name: trimmedName }),
       }).catch((err) => console.error("[email] Contact auto-reply failed:", err));
+
+      // 3. Discord notification
+      notifyContactForm(trimmedName, trimmedEmail, message?.trim() || "");
     }
 
     if (type === "schuzka" || type === "enterprise") {
@@ -129,6 +133,9 @@ export async function POST(request: NextRequest) {
         react: MeetingBookedEmail({ ...meetingProps, isAdminNotification: true }),
         replyTo: trimmedEmail,
       }).catch((err) => console.error("[email] Meeting admin notification failed:", err));
+
+      // 3. Discord notification
+      notifyMeetingBooked(trimmedName, trimmedEmail, meeting_date || "", meeting_time || "");
     }
 
     return NextResponse.json({ success: true, id: data.id });
