@@ -4,6 +4,7 @@ import { getStripe } from "@/lib/stripe";
 import { createServerClient } from "@/lib/supabase";
 import { getResend, FROM_EMAIL } from "@/lib/resend";
 import OrderConfirmationEmail from "@/emails/OrderConfirmationEmail";
+import AccountCreatedEmail from "@/emails/AccountCreatedEmail";
 
 // Required for raw body access and consistent behavior
 export const runtime = "nodejs";
@@ -72,6 +73,9 @@ export async function POST(request: NextRequest) {
         const customerEmail = metadata.customer_email || session.customer_email || session.customer_details?.email || "";
 
         // If no user_id in metadata, try to find user by email
+        let accountAutoCreated = false;
+        let temporaryPassword = "";
+
         if (!userId && customerEmail) {
           const { data: profile } = await db
             .from("profiles")
@@ -83,6 +87,52 @@ export async function POST(request: NextRequest) {
           if (profile) {
             userId = profile.id;
             console.log(`[stripe/webhook] Found user by email: ${customerEmail} → ${userId}`);
+          } else {
+            // ============================================================
+            // AUTO-CREATE ACCOUNT for users who paid without registering
+            // ============================================================
+            try {
+              // Generate a random 12-character password
+              temporaryPassword = Array.from(
+                { length: 12 },
+                () => 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%'[
+                  Math.floor(Math.random() * 59)
+                ]
+              ).join('');
+
+              const { data: newUser, error: createError } = await db.auth.admin.createUser({
+                email: customerEmail.toLowerCase(),
+                password: temporaryPassword,
+                email_confirm: true, // auto-confirm email
+                user_metadata: {
+                  full_name: customerName || customerEmail.split('@')[0],
+                  role: plan === 'team' ? 'team_manager' : plan,
+                },
+              });
+
+              if (createError || !newUser?.user) {
+                console.error('[stripe/webhook] Failed to auto-create user:', createError);
+              } else {
+                userId = newUser.user.id;
+                accountAutoCreated = true;
+
+                // Create profile record
+                await db
+                  .from('profiles')
+                  .insert({
+                    id: userId,
+                    email: customerEmail.toLowerCase(),
+                    full_name: customerName || customerEmail.split('@')[0],
+                    role: plan === 'team' ? 'team_manager' : plan,
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString(),
+                  });
+
+                console.log(`[stripe/webhook] Auto-created account for ${customerEmail} → ${userId}`);
+              }
+            } catch (autoCreateErr) {
+              console.error('[stripe/webhook] Auto-create account error:', autoCreateErr);
+            }
           }
         }
 
@@ -230,22 +280,41 @@ export async function POST(request: NextRequest) {
           }
         }
 
-        // Send order confirmation email
+        // Send appropriate email
         const orderEmail = session.customer_email || session.customer_details?.email;
         if (orderEmail) {
           const resend = getResend();
-          resend.emails.send({
-            from: FROM_EMAIL,
-            to: [orderEmail],
-            subject: "Potvrzení objednávky — SimCall ✅",
-            react: OrderConfirmationEmail({
-              customerName: customerName || "zákazníku",
-              plan,
-              tier,
-              callsLimit,
-              customerEmail: orderEmail,
-            }),
-          }).catch((err) => console.error("[email] Order confirmation failed:", err));
+
+          if (accountAutoCreated && temporaryPassword) {
+            // Send account-created email with credentials
+            resend.emails.send({
+              from: FROM_EMAIL,
+              to: [orderEmail],
+              subject: "Váš účet SimCall byl vytvořen — přihlašovací údaje 🔑",
+              react: AccountCreatedEmail({
+                customerName: customerName || "zákazníku",
+                email: orderEmail,
+                temporaryPassword,
+                plan,
+                tier,
+                callsLimit,
+              }),
+            }).catch((err) => console.error("[email] Account created email failed:", err));
+          } else {
+            // Send regular order confirmation
+            resend.emails.send({
+              from: FROM_EMAIL,
+              to: [orderEmail],
+              subject: "Potvrzení objednávky — SimCall ✅",
+              react: OrderConfirmationEmail({
+                customerName: customerName || "zákazníku",
+                plan,
+                tier,
+                callsLimit,
+                customerEmail: orderEmail,
+              }),
+            }).catch((err) => console.error("[email] Order confirmation failed:", err));
+          }
         }
 
         console.log(`[stripe/webhook] checkout.session.completed — plan=${plan} tier=${tier} userId=${userId}`);
