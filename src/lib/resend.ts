@@ -1,17 +1,15 @@
 import { Resend } from "resend";
 
-// Singleton Resend client
-let _resend: Resend | null = null;
-
+// Do not use a global _resend variable here, because in Vercel serverless
+// the env variables might not be available during the first module evaluation.
+// Always instantiate inside the getter using process.env directly.
 export function getResend(): Resend {
-  if (!_resend) {
-    const apiKey = process.env.RESEND_API_KEY;
-    if (!apiKey) {
-      throw new Error("RESEND_API_KEY is not set in environment variables");
-    }
-    _resend = new Resend(apiKey);
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.error("[resend] RESEND_API_KEY is missing in process.env");
+    throw new Error("RESEND_API_KEY is not set in environment variables");
   }
-  return _resend;
+  return new Resend(apiKey);
 }
 
 /**
