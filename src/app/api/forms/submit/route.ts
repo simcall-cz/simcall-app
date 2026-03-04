@@ -69,11 +69,11 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error("Form submission error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      // Don't return — still send emails and notifications below
     }
 
     // ================================================================
-    // Send emails (async, don't block response)
+    // Send emails and notifications (always, even if DB insert failed)
     // ================================================================
     const resend = getResend();
     const trimmedName = name.trim();
@@ -138,7 +138,11 @@ export async function POST(request: NextRequest) {
       notifyMeetingBooked(trimmedName, trimmedEmail, meeting_date || "", meeting_time || "");
     }
 
-    return NextResponse.json({ success: true, id: data.id });
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true, id: data?.id });
   } catch (err) {
     console.error("POST /api/forms/submit error:", err);
     return NextResponse.json(
