@@ -16,10 +16,14 @@ export function getResend(): Resend {
 
 /**
  * Default "from" address — must be a verified domain in Resend.
- * Falls back to Resend's testing domain if not set.
+ * Read at call time, not module load time (important for Vercel serverless).
  */
-export const FROM_EMAIL =
-  process.env.RESEND_FROM_EMAIL || "SimCall <onboarding@resend.dev>";
+export function getFromEmail(): string {
+  return process.env.RESEND_FROM_EMAIL || "SimCall <onboarding@resend.dev>";
+}
+
+// Keep the export for backward compatibility but make it a getter
+export const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "SimCall <onboarding@resend.dev>";
 
 /**
  * Admin email — receives notifications about new contacts, meetings, etc.

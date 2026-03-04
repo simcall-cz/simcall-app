@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
 import { notifyInvoiceOrder } from "@/lib/notifications";
-import { getResend, FROM_EMAIL } from "@/lib/resend";
+import { getResend, getFromEmail } from "@/lib/resend";
 import InvoiceOrderEmail from "@/emails/InvoiceOrderEmail";
 
 // POST /api/payments/create - Create a pending payment (for invoice orders)
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     try {
       const resend = getResend();
       await resend.emails.send({
-        from: FROM_EMAIL,
+        from: getFromEmail(),
         to: [email],
         subject: "Objednávka přijata — faktura bude vystavena do 24 hodin 📋",
         react: InvoiceOrderEmail({

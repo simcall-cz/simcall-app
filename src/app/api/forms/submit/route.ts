@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
-import { getResend, FROM_EMAIL, ADMIN_EMAIL } from "@/lib/resend";
+import { getResend, getFromEmail, ADMIN_EMAIL } from "@/lib/resend";
 import ContactFormEmail from "@/emails/ContactFormEmail";
 import ContactAutoReplyEmail from "@/emails/ContactAutoReplyEmail";
 import MeetingBookedEmail from "@/emails/MeetingBookedEmail";
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
     if (type === "kontakt") {
       // 1. Notify admin about new contact form submission
       resend.emails.send({
-        from: FROM_EMAIL,
+        from: getFromEmail(),
         to: [ADMIN_EMAIL],
         subject: `Nová zpráva z kontaktu: ${trimmedName}`,
         react: ContactFormEmail({
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
 
       // 2. Auto-reply to sender
       resend.emails.send({
-        from: FROM_EMAIL,
+        from: getFromEmail(),
         to: [trimmedEmail],
         subject: "Děkujeme za zprávu — SimCall",
         react: ContactAutoReplyEmail({ name: trimmedName }),
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
 
       // 1. Confirmation to customer
       resend.emails.send({
-        from: FROM_EMAIL,
+        from: getFromEmail(),
         to: [trimmedEmail],
         subject: `Schůzka potvrzena — ${meeting_date} v ${meeting_time}`,
         react: MeetingBookedEmail({ ...meetingProps, isAdminNotification: false }),
@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
 
       // 2. Notify admin
       resend.emails.send({
-        from: FROM_EMAIL,
+        from: getFromEmail(),
         to: [ADMIN_EMAIL],
         subject: `Nová schůzka: ${trimmedName} (${company?.trim() || "N/A"})`,
         react: MeetingBookedEmail({ ...meetingProps, isAdminNotification: true }),

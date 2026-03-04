@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { getStripe } from "@/lib/stripe";
 import { createServerClient } from "@/lib/supabase";
-import { getResend, FROM_EMAIL } from "@/lib/resend";
+import { getResend, getFromEmail } from "@/lib/resend";
 import OrderConfirmationEmail from "@/emails/OrderConfirmationEmail";
 import AccountCreatedEmail from "@/emails/AccountCreatedEmail";
 import {
@@ -295,7 +295,7 @@ export async function POST(request: NextRequest) {
           if (accountAutoCreated && temporaryPassword) {
             // Send account-created email with credentials
             resend.emails.send({
-              from: FROM_EMAIL,
+              from: getFromEmail(),
               to: [orderEmail],
               subject: "Váš účet SimCall byl vytvořen — přihlašovací údaje 🔑",
               react: AccountCreatedEmail({
@@ -310,7 +310,7 @@ export async function POST(request: NextRequest) {
           } else {
             // Send regular order confirmation
             resend.emails.send({
-              from: FROM_EMAIL,
+              from: getFromEmail(),
               to: [orderEmail],
               subject: "Potvrzení objednávky — SimCall ✅",
               react: OrderConfirmationEmail({

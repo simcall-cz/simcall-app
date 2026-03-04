@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getResend, FROM_EMAIL } from "@/lib/resend";
+import { getResend, getFromEmail } from "@/lib/resend";
 import WelcomeEmail from "@/emails/WelcomeEmail";
 import { notifyNewRegistration } from "@/lib/notifications";
 
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     const resend = getResend();
 
     const { data, error } = await resend.emails.send({
-      from: FROM_EMAIL,
+      from: getFromEmail(),
       to: [email],
       subject: "Vítejte v SimCall! 🎉",
       react: WelcomeEmail({ fullName: fullName || "uživateli", planName: planName || "Demo" }),
