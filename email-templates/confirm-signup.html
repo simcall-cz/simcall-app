@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Potvrďte svůj účet — SimCall</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f5f5f5;font-family:Inter,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color:#f5f5f5;padding:40px 16px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:520px;background-color:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e5e5e5;">
+          
+          <!-- Dark Header (matches announcement bar) -->
+          <tr>
+            <td style="background-color:#0a0a0a;padding:28px 32px;text-align:center;">
+              <span style="font-size:26px;font-weight:900;color:#ffffff;letter-spacing:-0.5px;">Sim</span><span style="font-size:26px;font-weight:900;color:#EF4444;letter-spacing:-0.5px;">Call</span>
+            </td>
+          </tr>
+
+          <!-- Red accent line -->
+          <tr>
+            <td style="background-color:#EF4444;height:3px;font-size:0;line-height:0;">&nbsp;</td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="padding:36px 32px 20px;">
+              <h2 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#171717;">Vítejte v SimCall! 🎉</h2>
+              <p style="margin:0 0 24px;font-size:15px;line-height:1.6;color:#525252;">
+                Děkujeme za registraci. Pro dokončení vytvoření účtu prosím potvrďte svůj email kliknutím na tlačítko níže.
+              </p>
+
+              <!-- CTA Button -->
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td align="center" style="padding:8px 0 28px;">
+                    <a href="{{ .ConfirmationURL }}" 
+                       style="display:inline-block;padding:14px 36px;background-color:#EF4444;color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;border-radius:10px;box-shadow:0 4px 14px rgba(239,68,68,0.3);">
+                      Potvrdit email
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Divider -->
+              <hr style="border:none;border-top:1px solid #e5e5e5;margin:0 0 24px;">
+
+              <!-- What's next -->
+              <h3 style="margin:0 0 12px;font-size:15px;font-weight:600;color:#171717;">Co vás čeká:</h3>
+              <table role="presentation" cellspacing="0" cellpadding="0" style="margin:0 0 24px;">
+                <tr>
+                  <td style="padding:6px 0;font-size:14px;color:#525252;">
+                    <span style="display:inline-block;width:24px;height:24px;background:#FEF2F2;border-radius:6px;text-align:center;line-height:24px;font-size:12px;color:#EF4444;font-weight:700;margin-right:10px;vertical-align:middle;">1</span>
+                    3 zkušební hovory s AI klienty zdarma
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:6px 0;font-size:14px;color:#525252;">
+                    <span style="display:inline-block;width:24px;height:24px;background:#FEF2F2;border-radius:6px;text-align:center;line-height:24px;font-size:12px;color:#EF4444;font-weight:700;margin-right:10px;vertical-align:middle;">2</span>
+                    AI analýza a zpětná vazba po každém hovoru
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:6px 0;font-size:14px;color:#525252;">
+                    <span style="display:inline-block;width:24px;height:24px;background:#FEF2F2;border-radius:6px;text-align:center;line-height:24px;font-size:12px;color:#EF4444;font-weight:700;margin-right:10px;vertical-align:middle;">3</span>
+                    Podrobné statistiky a přepisy hovorů
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Fallback link -->
+              <p style="margin:0;font-size:12px;color:#a3a3a3;line-height:1.5;">
+                Pokud tlačítko nefunguje, zkopírujte tento odkaz do prohlížeče:<br>
+                <a href="{{ .ConfirmationURL }}" style="color:#EF4444;word-break:break-all;">{{ .ConfirmationURL }}</a>
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding:24px 32px;background-color:#fafafa;border-top:1px solid #e5e5e5;text-align:center;">
+              <p style="margin:0 0 4px;font-size:12px;color:#a3a3a3;">
+                © 2026 SimCall — AI tréninkový simulátor pro realitní makléře
+              </p>
+              <p style="margin:0;font-size:12px;color:#a3a3a3;">
+                Pokud jste si účet nevytvořili, tento email ignorujte.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
