@@ -30,6 +30,8 @@ interface SubscriptionData {
   stripeCustomerId?: string;
   isTeamMember?: boolean;
   managerEmail?: string;
+  scheduledPlan?: string | null;
+  scheduledTier?: number | null;
 }
 
 const planLabels: Record<string, string> = {
@@ -273,6 +275,36 @@ export default function BalicekPage() {
         </Card>
       </motion.div>
 
+      {/* Scheduled downgrade banner */}
+      {sub.scheduledPlan && sub.scheduledTier && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+        >
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+                  <ArrowDown className="w-5 h-5 text-amber-600" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-neutral-800">
+                    Plánovaná změna: {sub.scheduledPlan.toUpperCase()} {sub.scheduledTier}
+                  </p>
+                  <p className="text-xs text-neutral-500">
+                    Aktivuje se {sub.currentPeriodEnd
+                      ? new Date(sub.currentPeriodEnd).toLocaleDateString("cs-CZ")
+                      : "na konci aktuálního období"
+                    }. Do té doby máte aktuální balíček.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
       {/* Team member info */}
       {isTeamMember && (
         <motion.div
@@ -320,12 +352,20 @@ export default function BalicekPage() {
                   const isCurrentTier = idx === currentTierIndex;
                   const isUpgrade = idx > currentTierIndex;
                   const isUpgradingThis = upgradingTier === t.calls;
+                  const isScheduledTier = sub.scheduledTier === t.calls && sub.scheduledPlan === sub.plan;
                   return (
                     <button
                       key={idx}
-                      disabled={isCurrentTier || upgradingTier !== null}
+                      disabled={isCurrentTier || isScheduledTier || upgradingTier !== null}
                       onClick={async () => {
-                        if (isCurrentTier) return;
+                        if (isCurrentTier || isScheduledTier) return;
+                        // Confirm downgrade
+                        if (!isUpgrade) {
+                          const confirmed = window.confirm(
+                            `Opravdu chcete downgrade na ${t.calls} hovorů? Změna se projeví na konci aktuálního období.`
+                          );
+                          if (!confirmed) return;
+                        }
                         setUpgradingTier(t.calls);
                         try {
                           const headers = await getAuthHeaders();
@@ -341,14 +381,18 @@ export default function BalicekPage() {
                           if (data.upgraded) {
                             // Direct upgrade succeeded — reload page
                             window.location.reload();
+                          } else if (data.scheduled) {
+                            // Downgrade scheduled — reload to show banner
+                            alert(data.message || "Downgrade naplánován");
+                            window.location.reload();
                           } else if (data.url) {
                             // Redirect to Stripe checkout
                             window.location.href = data.url;
                           } else {
-                            alert(data.error || "Nepodařilo se provést upgrade");
+                            alert(data.error || "Nepodařilo se provést změnu");
                           }
                         } catch {
-                          alert("Chyba při upgradu");
+                          alert("Chyba při změně plánu");
                         } finally {
                           setUpgradingTier(null);
                         }
@@ -356,6 +400,8 @@ export default function BalicekPage() {
                       className={`p-4 rounded-xl border text-left transition-all ${
                         isCurrentTier
                           ? "border-primary-300 bg-primary-50 cursor-default"
+                          : isScheduledTier
+                          ? "border-amber-300 bg-amber-50 cursor-default"
                           : "border-neutral-200 bg-white hover:border-primary-300 hover:shadow-sm cursor-pointer"
                       } ${upgradingTier !== null && !isUpgradingThis ? "opacity-50" : ""}`}
                     >
@@ -365,6 +411,8 @@ export default function BalicekPage() {
                         </span>
                         {isCurrentTier ? (
                           <Badge variant="default">Aktuální</Badge>
+                        ) : isScheduledTier ? (
+                          <Badge variant="warning">Plánováno</Badge>
                         ) : isUpgradingThis ? (
                           <Loader2 className="w-4 h-4 animate-spin text-primary-500" />
                         ) : isUpgrade ? (

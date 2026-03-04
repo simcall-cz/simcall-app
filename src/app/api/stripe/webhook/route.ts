@@ -330,6 +330,7 @@ export async function POST(request: NextRequest) {
             ? new Date((invoice.period_end as number) * 1000).toISOString()
             : null;
 
+          // Reset calls and update period
           await db
             .from("subscriptions")
             .update({
@@ -340,6 +341,42 @@ export async function POST(request: NextRequest) {
               updated_at: new Date().toISOString(),
             })
             .eq("stripe_subscription_id", stripeSubId);
+
+          // Check and apply scheduled plan changes (downgrades)
+          const { data: subRecord } = await db
+            .from("subscriptions")
+            .select("id, user_id, scheduled_plan, scheduled_tier, scheduled_calls_limit, scheduled_agents_limit")
+            .eq("stripe_subscription_id", stripeSubId)
+            .single();
+
+          if (subRecord?.scheduled_plan && subRecord?.scheduled_tier) {
+            // Apply the scheduled downgrade
+            await db
+              .from("subscriptions")
+              .update({
+                plan: subRecord.scheduled_plan,
+                tier: subRecord.scheduled_tier,
+                calls_limit: subRecord.scheduled_calls_limit || subRecord.scheduled_tier,
+                agents_limit: subRecord.scheduled_agents_limit || 5,
+                scheduled_plan: null,
+                scheduled_tier: null,
+                scheduled_calls_limit: null,
+                scheduled_agents_limit: null,
+                updated_at: new Date().toISOString(),
+              })
+              .eq("id", subRecord.id);
+
+            // Update profile role to match new plan
+            if (subRecord.user_id) {
+              const newRole = subRecord.scheduled_plan === "team" ? "team_manager" : subRecord.scheduled_plan;
+              await db
+                .from("profiles")
+                .update({ role: newRole, updated_at: new Date().toISOString() })
+                .eq("id", subRecord.user_id);
+            }
+
+            console.log(`[stripe/webhook] Applied scheduled downgrade: ${subRecord.scheduled_plan}/${subRecord.scheduled_tier} for sub ${subRecord.id}`);
+          }
 
           console.log(`[stripe/webhook] invoice.payment_succeeded — ${stripeSubId} calls reset`);
         }
