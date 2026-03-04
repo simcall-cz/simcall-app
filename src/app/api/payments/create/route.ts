@@ -7,7 +7,6 @@ import InvoiceOrderEmail from "@/emails/InvoiceOrderEmail";
 // POST /api/payments/create - Create a pending payment (for invoice orders)
 export async function POST(request: NextRequest) {
   try {
-    const db = createServerClient();
     const body = await request.json();
     const {
       plan, tier, amount, email, name, userId,
@@ -21,30 +20,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data: payment, error } = await db
-      .from("payments")
-      .insert({
-        user_id: userId || null,
-        user_email: email,
-        user_name: name || null,
-        plan,
-        tier,
-        amount,
-        method: "invoice",
-        status: "pending",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
-      .select()
-      .single();
-
-    if (error) {
-      console.error("Create payment error:", error);
-      return NextResponse.json(
-        { error: "Failed to create payment" },
-        { status: 500 }
-      );
-    }
+    // ================================================================
+    // 1. ALWAYS send email and Discord FIRST (before any DB operations)
+    // ================================================================
 
     // Send invoice order confirmation email
     try {
@@ -71,9 +49,36 @@ export async function POST(request: NextRequest) {
     }
 
     // Discord notification
-    notifyInvoiceOrder(email, name || "", plan, tier, amount);
+    await notifyInvoiceOrder(email, name || "", plan, tier, amount);
 
-    return NextResponse.json({ payment });
+    // ================================================================
+    // 2. Then try to save to DB (non-critical for user experience)
+    // ================================================================
+    try {
+      const db = createServerClient();
+      const { error } = await db
+        .from("payments")
+        .insert({
+          user_id: userId || null,
+          user_email: email,
+          user_name: name || null,
+          plan,
+          tier,
+          amount,
+          method: "invoice",
+          status: "pending",
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        });
+
+      if (error) {
+        console.error("Create payment DB error:", error);
+      }
+    } catch (dbErr) {
+      console.error("[payments/create] DB insert failed:", dbErr);
+    }
+
+    return NextResponse.json({ success: true });
   } catch (err) {
     console.error("POST /api/payments/create error:", err);
     return NextResponse.json(
