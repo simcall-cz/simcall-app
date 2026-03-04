@@ -91,4 +91,22 @@ export const aiAgents: AIAgent[] = [
     exampleScenario:
       "Tomáš prodává bytový dům v Ostravě za 12 mil Kč. Chce rychlý prodej do 2 měsíců. Vyžaduje konkrétní čísla a strategii.",
   },
+  {
+    id: "agent-6",
+    name: "Viktor Bílek",
+    personality: "Tichý skeptik",
+    description:
+      "Viktor prodává sklepní kóji (8 m²) v Pardubicích. Mluví pomalu a stroze, nechce se otevírat. Má špatné zkušenosti s makléři a různé odhady cen. Skrývá vadu (hliníkové rozvody). Obtížnost 6/10.",
+    difficulty: "medium",
+    avatarInitials: "VB",
+    traits: [
+      "Ostražitý",
+      "Skeptický",
+      "Strozý",
+      "Pomalý",
+      "Trpělivý",
+    ],
+    exampleScenario:
+      "Viktor prodává sklepní kóji 8 m² v Pardubicích-Dukle za 100-300 tis. Kč. Nespěchá, ale chce se zbavit nemovitosti po špatné zkušenosti s nájemníky.",
+  },
 ];

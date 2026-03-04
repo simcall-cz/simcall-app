@@ -16,4 +16,19 @@ export const scenarios: Scenario[] = [
     ],
     agentId: "agent-1",
   },
+  {
+    id: "scenario-6",
+    title: "Prodej sklepní kóje v Pardubicích",
+    description: "Viktor Bílek prodává sklepní kóji 8 m² v Pardubicích-Dukle. Mluví stroze a pomalu, nechce se otevírat. Má zmatené odhady od různých makléřů. Skrývá vadu — hliníkové rozvody (nebezpečí požáru). Cenová představa 100-300 tis. Kč.",
+    category: "cold-lead",
+    difficulty: "medium",
+    objectives: [
+      "Překonat počáteční strozí komunikaci a získat důvěru",
+      "Zjistit detaily nemovitosti včetně technického stavu",
+      "Odhalit skrytou vadu (hliníkové rozvody)",
+      "Pracovat s námitkami (provize, nespěch, mám kupce)",
+      "Domluvit si osobní schůzku a prohlídku"
+    ],
+    agentId: "agent-6"
+  },
 ];
