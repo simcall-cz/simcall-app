@@ -12,13 +12,14 @@ import {
   Mail,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { notifyNewRegistration } from "@/lib/notifications";
 
 export default function RegistracePage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
-    phone: "",
+    phone: "+420 ",
     password: "",
     confirmPassword: "",
   });
@@ -82,6 +83,9 @@ export default function RegistracePage() {
       }
 
       if (data.user) {
+        // Notify about new registration
+        notifyNewRegistration(formData.email, formData.fullName);
+
         // Check if session exists (email confirmation disabled)
         if (data.session) {
           // User is logged in immediately — set cookie and redirect

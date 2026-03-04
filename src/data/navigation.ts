@@ -34,8 +34,8 @@ export const mainNavItems: NavItem[] = [
 ];
 
 export const ctaNavItem: NavItem = {
-  label: "Vyzkoušet demo",
-  href: "/demo",
+  label: "Vyzkoušet zdarma",
+  href: "/registrace",
 };
 
 export const footerNavItems: {
@@ -47,7 +47,7 @@ export const footerNavItems: {
     items: [
       { label: "Funkce", href: "/funkce" },
       { label: "Ceník", href: "/cenik" },
-      { label: "Demo", href: "/demo" },
+      { label: "Vyzkoušet zdarma", href: "/registrace" },
       { label: "Changelog", href: "/changelog" },
     ],
   },

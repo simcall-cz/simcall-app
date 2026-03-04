@@ -43,7 +43,7 @@ interface BillingForm {
 const emptyForm: BillingForm = {
   fullName: "",
   email: "",
-  phone: "",
+  phone: "+420 ",
   companyName: "",
   ico: "",
   dic: "",

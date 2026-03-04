@@ -103,13 +103,13 @@ export function Navbar() {
                 Přihlásit se
               </Link>
               <Link
-                href="/demo"
+                href="/registrace"
                 className={cn(
                   buttonVariants({ size: "sm" }),
                   "shadow-md shadow-primary-500/20 hover:shadow-primary-500/30 transition-shadow group"
                 )}
               >
-                Vyzkoušet demo
+                Vyzkoušet zdarma
                 <ArrowRight className="ml-1.5 w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
               </Link>
             </div>
@@ -166,10 +166,10 @@ export function Navbar() {
                   Přihlásit se
                 </Link>
                 <Link
-                  href="/demo"
+                  href="/registrace"
                   className={cn(buttonVariants(), "w-full justify-center group")}
                 >
-                  Vyzkoušet demo
+                  Vyzkoušet zdarma
                   <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                 </Link>
               </div>

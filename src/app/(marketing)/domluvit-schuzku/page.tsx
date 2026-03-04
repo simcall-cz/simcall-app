@@ -80,7 +80,7 @@ export default function DomluvitSchuzku() {
   const [form, setForm] = useState({
     fullName: "",
     email: "",
-    phone: "",
+    phone: "+420 ",
     company: "",
     teamSize: "",
     note: "",
