@@ -193,6 +193,10 @@ function CheckoutPage() {
             amount: tier.price,
             email: form.email,
             name: form.fullName,
+            companyName: form.companyName,
+            ico: form.ico,
+            dic: form.dic,
+            address: `${form.street}, ${form.city} ${form.zip}`.trim(),
           }),
         });
 

@@ -1,13 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
 import { notifyInvoiceOrder } from "@/lib/notifications";
+import { getResend, FROM_EMAIL } from "@/lib/resend";
+import InvoiceOrderEmail from "@/emails/InvoiceOrderEmail";
 
 // POST /api/payments/create - Create a pending payment (for invoice orders)
 export async function POST(request: NextRequest) {
   try {
     const db = createServerClient();
     const body = await request.json();
-    const { plan, tier, amount, email, name, userId } = body;
+    const {
+      plan, tier, amount, email, name, userId,
+      companyName, ico, dic, address,
+    } = body;
 
     if (!plan || !tier || !amount || !email) {
       return NextResponse.json(
@@ -39,6 +44,30 @@ export async function POST(request: NextRequest) {
         { error: "Failed to create payment" },
         { status: 500 }
       );
+    }
+
+    // Send invoice order confirmation email
+    try {
+      const resend = getResend();
+      await resend.emails.send({
+        from: FROM_EMAIL,
+        to: [email],
+        subject: "Objednávka přijata — faktura bude vystavena do 24 hodin 📋",
+        react: InvoiceOrderEmail({
+          customerName: name || "zákazníku",
+          email,
+          plan,
+          tier,
+          amount,
+          companyName: companyName || "",
+          ico: ico || "",
+          dic: dic || "",
+          address: address || "",
+        }),
+      });
+      console.log(`[payments/create] Invoice order email sent to ${email}`);
+    } catch (emailErr) {
+      console.error("[payments/create] Email failed:", emailErr);
     }
 
     // Discord notification
