@@ -3,8 +3,6 @@
 // Sends real-time alerts to Discord webhook for business monitoring
 // ============================================================
 
-const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
-
 interface NotifyOptions {
   title: string;
   description?: string;
@@ -28,8 +26,11 @@ export const NotifyColors = {
  * Non-blocking — errors are logged but never thrown
  */
 export async function notifyBusiness(options: NotifyOptions): Promise<void> {
-  if (!DISCORD_WEBHOOK_URL) {
-    // Silently skip if not configured
+  // Read env var at CALL TIME, not module load time (important for Vercel serverless)
+  const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+  
+  if (!webhookUrl) {
+    console.warn("[notify] DISCORD_WEBHOOK_URL not set, skipping notification:", options.title);
     return;
   }
 
@@ -45,7 +46,7 @@ export async function notifyBusiness(options: NotifyOptions): Promise<void> {
       timestamp: new Date().toISOString(),
     };
 
-    await fetch(DISCORD_WEBHOOK_URL, {
+    await fetch(webhookUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
