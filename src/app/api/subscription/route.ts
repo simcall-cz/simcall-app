@@ -37,15 +37,16 @@ export async function GET(request: NextRequest) {
 
     // 3. If user is a team member, inherit manager's subscription
     if (role === "team") {
-      const managerSub = await getManagerSubscription(supabase, user.id);
-      if (managerSub) {
+      const managerResult = await getManagerSubscription(supabase, user.id);
+      if (managerResult) {
         // Count the team member's own calls this month as their usage
         const callsUsed = await countCallsThisMonth(supabase, user.id);
         return NextResponse.json({
-          ...formatSub(managerSub),
+          ...formatSub(managerResult.subscription),
           callsUsed,
           isTeamMember: true,
           managerPlan: true,
+          managerEmail: managerResult.managerEmail || null,
         });
       }
     }
@@ -130,7 +131,7 @@ async function getManagerSubscription(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: any,
   userId: string
-) {
+): Promise<{ subscription: any; managerEmail: string | null } | null> {
   // Find the company this user belongs to
   const { data: membership } = await supabase
     .from("company_members")
@@ -152,6 +153,13 @@ async function getManagerSubscription(
 
   if (!manager) return null;
 
+  // Get manager's email from profiles
+  const { data: managerProfile } = await supabase
+    .from("profiles")
+    .select("email")
+    .eq("id", manager.user_id)
+    .single();
+
   // Get the manager's subscription
   const { data: sub } = await supabase
     .from("subscriptions")
@@ -162,5 +170,10 @@ async function getManagerSubscription(
     .limit(1)
     .single();
 
-  return sub;
+  if (!sub) return null;
+
+  return {
+    subscription: sub,
+    managerEmail: managerProfile?.email || null,
+  };
 }

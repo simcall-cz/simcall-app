@@ -29,6 +29,7 @@ interface SubscriptionData {
   currentPeriodEnd?: string;
   stripeCustomerId?: string;
   isTeamMember?: boolean;
+  managerEmail?: string;
 }
 
 const planLabels: Record<string, string> = {
@@ -159,6 +160,11 @@ export default function BalicekPage() {
                   <Badge variant={isPaid ? "success" : "secondary"}>
                     {isPaid ? (isTeamMember ? "Člen týmu" : "Aktivní") : "Demo účet"}
                   </Badge>
+                  {isTeamMember && sub.managerEmail && (
+                    <span className="text-xs text-neutral-500 ml-2">
+                      Manažer: <span className="font-medium text-neutral-700">{sub.managerEmail}</span>
+                    </span>
+                  )}
                 </div>
               </div>
               {isPaid && sub.stripeCustomerId && !isTeamMember && (

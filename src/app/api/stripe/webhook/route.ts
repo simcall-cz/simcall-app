@@ -123,6 +123,29 @@ export async function POST(request: NextRequest) {
             .eq("id", userId);
         }
 
+        // Log payment record for admin overview
+        try {
+          const amountPaid = session.amount_total ? Math.round(session.amount_total / 100) : 0;
+          await db
+            .from("payments")
+            .insert({
+              user_id: userId || null,
+              user_email: customerEmail,
+              user_name: customerName || null,
+              plan,
+              tier,
+              amount: amountPaid,
+              method: "stripe",
+              status: "completed",
+              stripe_session_id: session.id,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            });
+        } catch (paymentLogErr) {
+          // Non-critical — don't break the webhook if payments table doesn't exist yet
+          console.warn("[stripe/webhook] Failed to log payment:", paymentLogErr);
+        }
+
         // For team plans, create a company and add the owner as manager
         if (plan === "team" && userId) {
           // Check if user already has a company

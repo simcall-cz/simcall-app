@@ -6,6 +6,7 @@ import Link from "next/link";
 import {
   LayoutDashboard,
   Phone,
+  PhoneCall,
   BarChart3,
   User,
   Users,
@@ -18,6 +19,7 @@ import {
   LogOut,
   Loader2,
   LifeBuoy,
+  Receipt,
   CreditCard,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -96,6 +98,16 @@ const adminNavItems: SidebarNavItem[] = [
     label: "Finance",
     href: "/admin/financni-prehled",
     icon: <DollarSign className="w-5 h-5" />,
+  },
+  {
+    label: "Hovory",
+    href: "/admin/hovory",
+    icon: <PhoneCall className="w-5 h-5" />,
+  },
+  {
+    label: "Platby",
+    href: "/admin/platby",
+    icon: <Receipt className="w-5 h-5" />,
   },
   {
     label: "Agenti",

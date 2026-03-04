@@ -26,7 +26,28 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ subscriptions: [] });
       }
 
-      return NextResponse.json({ subscriptions: subscriptions || [] });
+      // Enrich subscriptions with profile data for missing names
+      const enriched = await Promise.all(
+        (subscriptions || []).map(async (sub) => {
+          if (!sub.customer_name && sub.user_id) {
+            const { data: profile } = await db
+              .from("profiles")
+              .select("full_name, email")
+              .eq("id", sub.user_id)
+              .single();
+            if (profile) {
+              return {
+                ...sub,
+                customer_name: profile.full_name || null,
+                customer_email: sub.customer_email || profile.email || null,
+              };
+            }
+          }
+          return sub;
+        })
+      );
+
+      return NextResponse.json({ subscriptions: enriched });
     } catch {
       return NextResponse.json({ subscriptions: [] });
     }

@@ -167,7 +167,9 @@ function CheckoutPage() {
           setSubmitError(data.error);
         }
       } else {
-        // Invoice — submit form to forms API and redirect to thank you page
+        // Invoice — submit form to forms API and create pending payment
+        const headers = await getAuthHeaders();
+
         await fetch("/api/forms/submit", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -178,6 +180,19 @@ function CheckoutPage() {
             phone: form.phone,
             company: form.companyName,
             message: `Objednávka fakturou: ${plan.name} ${tier.calls} hovorů (${tier.price} Kč/měs). IČO: ${form.ico || "—"}, DIČ: ${form.dic || "—"}. Adresa: ${form.street}, ${form.city} ${form.zip}. Poznámka: ${form.note || "—"}`,
+          }),
+        });
+
+        // Create pending payment record for admin approval
+        await fetch("/api/payments/create", {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            plan: selectedPlanId,
+            tier: safeTierIndex + 1,
+            amount: tier.price,
+            email: form.email,
+            name: form.fullName,
           }),
         });
 

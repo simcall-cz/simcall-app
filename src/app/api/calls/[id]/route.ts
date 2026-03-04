@@ -16,7 +16,15 @@ export async function GET(
     const { id } = await params;
     const supabase = createServerClient();
 
-    const { data: call, error: callError } = await supabase
+    // Check if user is admin
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+    const isAdmin = profile?.role === "admin";
+
+    let query = supabase
       .from("calls")
       .select(
         `
@@ -27,8 +35,14 @@ export async function GET(
         transcripts (*)
       `
       )
-      .eq("id", id)
-      .eq("user_id", user.id)
+      .eq("id", id);
+
+    // Non-admins can only see their own calls
+    if (!isAdmin) {
+      query = query.eq("user_id", user.id);
+    }
+
+    const { data: call, error: callError } = await query
       .order("sort_order", {
         referencedTable: "transcripts",
         ascending: true,
