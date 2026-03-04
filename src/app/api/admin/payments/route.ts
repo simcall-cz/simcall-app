@@ -276,41 +276,45 @@ export async function PATCH(request: NextRequest) {
     if (customerEmail) {
       const resend = getResend();
 
-      if (accountAutoCreated && temporaryPassword) {
-        resend.emails.send({
-          from: getFromEmail(),
-          to: [customerEmail],
-          subject: "Váš účet SimCall byl vytvořen — přihlašovací údaje 🔑",
-          react: AccountCreatedEmail({
-            customerName,
-            email: customerEmail,
-            temporaryPassword,
-            plan: payment.plan,
-            tier: payment.tier,
-            callsLimit,
-          }),
-        }).catch(err => console.error("[email] Account created email failed:", err));
-      } else {
-        resend.emails.send({
-          from: getFromEmail(),
-          to: [customerEmail],
-          subject: "Potvrzení objednávky — SimCall ✅",
-          react: OrderConfirmationEmail({
-            customerName,
-            plan: payment.plan,
-            tier: payment.tier,
-            callsLimit,
-            customerEmail,
-          }),
-        }).catch(err => console.error("[email] Order confirmation email failed:", err));
+      try {
+        if (accountAutoCreated && temporaryPassword) {
+          await resend.emails.send({
+            from: getFromEmail(),
+            to: [customerEmail],
+            subject: "Váš účet SimCall byl vytvořen — přihlašovací údaje 🔑",
+            react: AccountCreatedEmail({
+              customerName,
+              email: customerEmail,
+              temporaryPassword,
+              plan: payment.plan,
+              tier: payment.tier,
+              callsLimit,
+            }),
+          });
+        } else {
+          await resend.emails.send({
+            from: getFromEmail(),
+            to: [customerEmail],
+            subject: "Potvrzení objednávky — SimCall ✅",
+            react: OrderConfirmationEmail({
+              customerName,
+              plan: payment.plan,
+              tier: payment.tier,
+              callsLimit,
+              customerEmail,
+            }),
+          });
+        }
+      } catch (err) {
+        console.error("[email] Email sending failed in admin payments:", err);
       }
     }
 
     // 6. Send Discord notifications
     if (customerEmail) {
-      notifyPaymentCompleted(customerEmail, payment.plan, payment.tier, payment.amount);
+      await notifyPaymentCompleted(customerEmail, payment.plan, payment.tier, payment.amount);
       if (accountAutoCreated) {
-        notifyAutoAccountCreated(customerEmail, customerName, payment.plan, payment.tier);
+        await notifyAutoAccountCreated(customerEmail, customerName, payment.plan, payment.tier);
       }
     }
 
