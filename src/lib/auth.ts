@@ -190,13 +190,12 @@ export function isAdminEmail(email: string): boolean {
 }
 
 /**
- * Server-side: check call limits for a user
+ * Helper: find the active subscription for a user.
+ * For team members without their own subscription, returns the manager's subscription.
  */
-export async function checkCallLimit(userId: string): Promise<CallLimitCheck> {
-  const db = createServerClient();
-
-  // 1. Check if user has active subscription
-  const { data: sub } = await db
+async function findSubscriptionForUser(db: ReturnType<typeof createServerClient>, userId: string) {
+  // 1. Own subscription
+  const { data: ownSub } = await db
     .from("subscriptions")
     .select("*")
     .eq("user_id", userId)
@@ -204,6 +203,49 @@ export async function checkCallLimit(userId: string): Promise<CallLimitCheck> {
     .order("created_at", { ascending: false })
     .limit(1)
     .single();
+
+  if (ownSub) return ownSub;
+
+  // 2. Team member → find manager's subscription via company_members
+  const { data: membership } = await db
+    .from("company_members")
+    .select("company_id")
+    .eq("user_id", userId)
+    .limit(1)
+    .single();
+
+  if (!membership) return null;
+
+  const { data: manager } = await db
+    .from("company_members")
+    .select("user_id")
+    .eq("company_id", membership.company_id)
+    .eq("role", "manager")
+    .limit(1)
+    .single();
+
+  if (!manager) return null;
+
+  const { data: managerSub } = await db
+    .from("subscriptions")
+    .select("*")
+    .eq("user_id", manager.user_id)
+    .eq("status", "active")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .single();
+
+  return managerSub;
+}
+
+/**
+ * Server-side: check call limits for a user
+ */
+export async function checkCallLimit(userId: string): Promise<CallLimitCheck> {
+  const db = createServerClient();
+
+  // Check own or manager's subscription
+  const sub = await findSubscriptionForUser(db, userId);
 
   if (sub) {
     const remaining = Math.max(0, sub.calls_limit - sub.calls_used);
@@ -216,7 +258,7 @@ export async function checkCallLimit(userId: string): Promise<CallLimitCheck> {
     };
   }
 
-  // 2. No subscription — demo user, check total calls
+  // No subscription — demo user, check total calls
   const { count } = await db
     .from("calls")
     .select("*", { count: "exact", head: true })
@@ -235,19 +277,12 @@ export async function checkCallLimit(userId: string): Promise<CallLimitCheck> {
 }
 
 /**
- * Server-side: increment call usage for subscribed user
+ * Server-side: increment call usage for subscribed user (or their manager's subscription)
  */
 export async function incrementCallUsage(userId: string): Promise<void> {
   const db = createServerClient();
 
-  const { data: sub } = await db
-    .from("subscriptions")
-    .select("id, calls_used")
-    .eq("user_id", userId)
-    .eq("status", "active")
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .single();
+  const sub = await findSubscriptionForUser(db, userId);
 
   if (sub) {
     await db
