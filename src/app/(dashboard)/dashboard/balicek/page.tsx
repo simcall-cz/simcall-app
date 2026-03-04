@@ -66,6 +66,7 @@ export default function BalicekPage() {
   const [sub, setSub] = useState<SubscriptionData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isPortalLoading, setIsPortalLoading] = useState(false);
+  const [upgradingTier, setUpgradingTier] = useState<number | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -312,22 +313,51 @@ export default function BalicekPage() {
                 Změnit balíček
               </h3>
               <p className="text-sm text-neutral-500 mb-4">
-                Přejděte na jiný tier. Při upgradu zaplatíte jen doplatek za zbývající dny.
+                Přejděte na jiný tier. Při upgradu zaplatíte jen poměrný doplatek za zbývající dny.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {currentTiers.map((t, idx) => {
                   const isCurrentTier = idx === currentTierIndex;
                   const isUpgrade = idx > currentTierIndex;
+                  const isUpgradingThis = upgradingTier === t.calls;
                   return (
                     <button
                       key={idx}
-                      disabled={isCurrentTier}
-                      onClick={() => (window.location.href = "/cenik")}
+                      disabled={isCurrentTier || upgradingTier !== null}
+                      onClick={async () => {
+                        if (isCurrentTier) return;
+                        setUpgradingTier(t.calls);
+                        try {
+                          const headers = await getAuthHeaders();
+                          const res = await fetch("/api/stripe/create-upgrade-session", {
+                            method: "POST",
+                            headers: { ...headers, "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                              plan: sub.plan,
+                              tier: t.calls,
+                            }),
+                          });
+                          const data = await res.json();
+                          if (data.upgraded) {
+                            // Direct upgrade succeeded — reload page
+                            window.location.reload();
+                          } else if (data.url) {
+                            // Redirect to Stripe checkout
+                            window.location.href = data.url;
+                          } else {
+                            alert(data.error || "Nepodařilo se provést upgrade");
+                          }
+                        } catch {
+                          alert("Chyba při upgradu");
+                        } finally {
+                          setUpgradingTier(null);
+                        }
+                      }}
                       className={`p-4 rounded-xl border text-left transition-all ${
                         isCurrentTier
                           ? "border-primary-300 bg-primary-50 cursor-default"
                           : "border-neutral-200 bg-white hover:border-primary-300 hover:shadow-sm cursor-pointer"
-                      }`}
+                      } ${upgradingTier !== null && !isUpgradingThis ? "opacity-50" : ""}`}
                     >
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm font-semibold text-neutral-900">
@@ -335,6 +365,8 @@ export default function BalicekPage() {
                         </span>
                         {isCurrentTier ? (
                           <Badge variant="default">Aktuální</Badge>
+                        ) : isUpgradingThis ? (
+                          <Loader2 className="w-4 h-4 animate-spin text-primary-500" />
                         ) : isUpgrade ? (
                           <ArrowUp className="w-4 h-4 text-green-500" />
                         ) : (

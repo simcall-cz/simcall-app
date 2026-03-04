@@ -372,7 +372,7 @@ function adaptAdminCall(row: any): AdminCallRecord {
     duration: formatDuration(row.duration_seconds),
     successRate: row.success_rate || fb?.overall_score || 0,
     audioUrl: row.audio_url || null,
-    userName: row.user_name || "Bez jména",
+    userName: row.user_email || row.user_name || "—",
     userEmail: row.user_email || "",
     transcript: [],
     feedback: fb
@@ -497,10 +497,7 @@ export default function AdminHovoryPage() {
                           {formatCallDate(call.date)}
                         </td>
                         <td className="py-3 px-4">
-                          <div>
-                            <span className="font-medium text-neutral-800">{call.userName}</span>
-                            <span className="block text-xs text-neutral-400">{call.userEmail}</span>
-                          </div>
+                          <span className="font-medium text-neutral-800">{call.userName}</span>
                         </td>
                         <td className="py-3 px-4">
                           <span className="font-medium text-neutral-800">{call.agentName}</span>

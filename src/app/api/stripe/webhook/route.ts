@@ -86,32 +86,86 @@ export async function POST(request: NextRequest) {
           }
         }
 
-        // Create subscription record
-        const { data: subscription, error: subError } = await db
-          .from("subscriptions")
-          .insert({
-            user_id: userId || null,
-            plan,
-            tier,
-            status: "active",
-            calls_limit: callsLimit,
-            calls_used: 0,
-            agents_limit: agentsLimit,
-            stripe_customer_id: session.customer as string,
-            stripe_subscription_id: session.subscription as string,
-            current_period_start: new Date().toISOString(),
-            current_period_end: null, // will be set by invoice.payment_succeeded
-          })
-          .select("id")
-          .single();
+        const isUpgrade = metadata.upgrade === "true";
 
-        if (subError) {
-          console.error("[stripe/webhook] Failed to create subscription:", subError);
-          break;
+        if (isUpgrade && userId) {
+          // Upgrade: update existing subscription
+          const { data: existingSub } = await db
+            .from("subscriptions")
+            .select("id")
+            .eq("user_id", userId)
+            .eq("status", "active")
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .single();
+
+          if (existingSub) {
+            const { error: updateError } = await db
+              .from("subscriptions")
+              .update({
+                plan,
+                tier,
+                calls_limit: callsLimit,
+                agents_limit: agentsLimit,
+                stripe_customer_id: session.customer as string,
+                stripe_subscription_id: session.subscription as string,
+                updated_at: new Date().toISOString(),
+              })
+              .eq("id", existingSub.id);
+
+            if (updateError) {
+              console.error("[stripe/webhook] Failed to update subscription for upgrade:", updateError);
+            } else {
+              console.log(`[stripe/webhook] Upgraded subscription ${existingSub.id} to ${plan}/${tier}`);
+            }
+          } else {
+            // No existing sub, create new
+            await db
+              .from("subscriptions")
+              .insert({
+                user_id: userId,
+                plan,
+                tier,
+                status: "active",
+                calls_limit: callsLimit,
+                calls_used: 0,
+                agents_limit: agentsLimit,
+                stripe_customer_id: session.customer as string,
+                stripe_subscription_id: session.subscription as string,
+                current_period_start: new Date().toISOString(),
+                current_period_end: null,
+              });
+          }
+        } else {
+          // New subscription
+          const { data: subscription, error: subError } = await db
+            .from("subscriptions")
+            .insert({
+              user_id: userId || null,
+              plan,
+              tier,
+              status: "active",
+              calls_limit: callsLimit,
+              calls_used: 0,
+              agents_limit: agentsLimit,
+              stripe_customer_id: session.customer as string,
+              stripe_subscription_id: session.subscription as string,
+              current_period_start: new Date().toISOString(),
+              current_period_end: null,
+            })
+            .select("id")
+            .single();
+
+          if (subError) {
+            console.error("[stripe/webhook] Failed to create subscription:", subError);
+            break;
+          }
+
+          if (!subscription) break;
         }
 
         // If user exists, update their profile role to match the plan
-        if (userId && subscription) {
+        if (userId) {
           // Team plan buyers become team_manager; solo buyers become solo
           const profileRole = plan === "team" ? "team_manager" : plan;
           await db
