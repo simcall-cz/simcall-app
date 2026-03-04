@@ -64,8 +64,14 @@ const comparisonFeatures: {
   { label: "AI analýza hovoru", solo: true, team: true, enterprise: true },
   { label: "Přepis hovoru", solo: true, team: true, enterprise: true },
   {
-    label: "Historie a nahrávky",
+    label: "Historie hovorů",
     solo: true,
+    team: true,
+    enterprise: true,
+  },
+  {
+    label: "Nahrávky hovorů (MP3)",
+    solo: false,
     team: true,
     enterprise: true,
   },
