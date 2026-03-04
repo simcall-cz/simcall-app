@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "@/styles/globals.css";
+import { AuthRecoveryRedirect } from "@/components/auth/AuthRecoveryRedirect";
 
 const inter = Inter({
   subsets: ["latin", "latin-ext"],
@@ -21,7 +22,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="cs" className={inter.variable}>
-      <body className="min-h-screen bg-white antialiased">{children}</body>
+      <body className="min-h-screen bg-white antialiased">
+        <AuthRecoveryRedirect />
+        {children}
+      </body>
     </html>
   );
 }
