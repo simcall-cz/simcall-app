@@ -2,9 +2,26 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Search, Filter, Loader2, AlertCircle } from "lucide-react";
+import {
+  Search,
+  Filter,
+  Loader2,
+  AlertCircle,
+  Eye,
+  X,
+  Phone,
+  CreditCard,
+  Calendar,
+  Users,
+  Mail,
+  User as UserIcon,
+  Shield,
+  Clock,
+  BarChart3,
+} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { getAuthHeaders } from "@/lib/auth";
 
 interface SubscriptionInfo {
@@ -24,6 +41,23 @@ interface AdminUser {
   role: string;
   created_at: string;
   subscriptions: SubscriptionInfo | null;
+  manager_email: string | null;
+}
+
+interface UserCallSummary {
+  total: number;
+  thisMonth: number;
+  avgScore: number;
+}
+
+interface UserPayment {
+  id: string;
+  plan: string;
+  tier: number;
+  amount: number;
+  method: string;
+  status: string;
+  created_at: string;
 }
 
 const roleBadge: Record<
@@ -33,7 +67,7 @@ const roleBadge: Record<
   free: { label: "Free", variant: "secondary" },
   demo: { label: "Demo", variant: "secondary" },
   solo: { label: "Solo", variant: "default" },
-  team: { label: "Team", variant: "success" },
+  team: { label: "Člen týmu", variant: "success" },
   team_manager: { label: "Team Manager", variant: "warning" },
   admin: { label: "Admin", variant: "warning" },
 };
@@ -79,6 +113,212 @@ function timeAgo(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("cs-CZ");
 }
 
+function formatDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString("cs-CZ", {
+    day: "numeric", month: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit",
+  });
+}
+
+function UserDetailModal({ user, onClose }: { user: AdminUser; onClose: () => void }) {
+  const [calls, setCalls] = useState<UserCallSummary | null>(null);
+  const [payments, setPayments] = useState<UserPayment[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchDetail() {
+      try {
+        const headers = await getAuthHeaders();
+
+        // Fetch user's calls
+        const callsRes = await fetch(`/api/admin/calls?user_id=${user.id}&limit=500`, { headers });
+        const callsData = await callsRes.json();
+        const allCalls = callsData.calls || [];
+
+        const now = new Date();
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const thisMonthCalls = allCalls.filter((c: { date: string }) => new Date(c.date) >= startOfMonth);
+        const scores = allCalls
+          .map((c: { success_rate?: number }) => c.success_rate || 0)
+          .filter((s: number) => s > 0);
+        const avgScore = scores.length > 0 ? Math.round(scores.reduce((a: number, b: number) => a + b, 0) / scores.length) : 0;
+
+        setCalls({ total: allCalls.length, thisMonth: thisMonthCalls.length, avgScore });
+
+        // Fetch user's payments
+        try {
+          const paymentsRes = await fetch("/api/admin/payments", { headers });
+          const paymentsData = await paymentsRes.json();
+          const userPayments = (paymentsData.payments || []).filter(
+            (p: { user_id: string | null; user_email: string }) => p.user_id === user.id || p.user_email === user.email
+          );
+          setPayments(userPayments);
+        } catch {
+          // payments table may not exist
+        }
+      } catch {
+        // silent
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchDetail();
+  }, [user]);
+
+  const sub = user.subscriptions;
+  const role = roleBadge[user.role] || { label: user.role, variant: "secondary" as const };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-start justify-center sm:overflow-y-auto">
+      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-2xl sm:my-8 sm:mx-4 max-h-[92vh] border border-neutral-100 flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="p-5 border-b border-neutral-100 flex items-start justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-primary-50 flex items-center justify-center text-sm font-bold text-primary-600">
+              {user.full_name
+                ? user.full_name.split(" ").map((n) => n[0]).join("")
+                : user.email?.[0]?.toUpperCase() || "?"}
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-neutral-900">{user.full_name || "Bez jména"}</h2>
+              <p className="text-sm text-neutral-500">{user.email}</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="p-2 hover:bg-neutral-50 rounded-lg text-neutral-400 hover:text-neutral-600">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-5 overflow-y-auto space-y-5">
+          {/* Info grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="bg-neutral-50 rounded-xl p-3">
+              <div className="flex items-center gap-1.5 mb-1">
+                <Shield className="w-3.5 h-3.5 text-neutral-400" />
+                <span className="text-[10px] text-neutral-500 uppercase">Role</span>
+              </div>
+              <Badge variant={role.variant}>{role.label}</Badge>
+            </div>
+            <div className="bg-neutral-50 rounded-xl p-3">
+              <div className="flex items-center gap-1.5 mb-1">
+                <Calendar className="w-3.5 h-3.5 text-neutral-400" />
+                <span className="text-[10px] text-neutral-500 uppercase">Registrace</span>
+              </div>
+              <p className="text-sm font-semibold text-neutral-800">{formatDate(user.created_at)}</p>
+            </div>
+            <div className="bg-neutral-50 rounded-xl p-3">
+              <div className="flex items-center gap-1.5 mb-1">
+                <Phone className="w-3.5 h-3.5 text-neutral-400" />
+                <span className="text-[10px] text-neutral-500 uppercase">Hovory</span>
+              </div>
+              {isLoading ? (
+                <Loader2 className="w-4 h-4 animate-spin text-neutral-400" />
+              ) : (
+                <p className="text-sm font-semibold text-neutral-800">
+                  {calls?.total || 0} celkem · {calls?.thisMonth || 0} tento měs.
+                </p>
+              )}
+            </div>
+            {!isLoading && calls && calls.avgScore > 0 && (
+              <div className="bg-neutral-50 rounded-xl p-3">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <BarChart3 className="w-3.5 h-3.5 text-neutral-400" />
+                  <span className="text-[10px] text-neutral-500 uppercase">Prům. skóre</span>
+                </div>
+                <p className={`text-sm font-semibold ${calls.avgScore >= 70 ? "text-green-600" : calls.avgScore >= 50 ? "text-yellow-600" : "text-red-600"}`}>
+                  {calls.avgScore}%
+                </p>
+              </div>
+            )}
+            {user.role === "team" && user.manager_email && (
+              <div className="bg-blue-50 rounded-xl p-3 col-span-2">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <Users className="w-3.5 h-3.5 text-blue-400" />
+                  <span className="text-[10px] text-blue-500 uppercase">Manažer</span>
+                </div>
+                <p className="text-sm font-semibold text-blue-700">{user.manager_email}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Subscription */}
+          {sub && (
+            <div className="border border-neutral-100 rounded-xl p-4">
+              <h3 className="text-sm font-semibold text-neutral-800 mb-3 flex items-center gap-2">
+                <CreditCard className="w-4 h-4 text-neutral-400" />
+                Předplatné
+              </h3>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <span className="text-neutral-500">Plán:</span>
+                  <span className="ml-2 font-medium text-neutral-800 capitalize">{sub.plan} · Tier {sub.tier}</span>
+                </div>
+                <div>
+                  <span className="text-neutral-500">Stav:</span>
+                  <Badge className="ml-2" variant={sub.status === "active" ? "success" : "secondary"}>
+                    {sub.status === "active" ? "Aktivní" : sub.status}
+                  </Badge>
+                </div>
+                <div>
+                  <span className="text-neutral-500">Hovory:</span>
+                  <span className="ml-2 font-medium text-neutral-800">{sub.calls_used}/{sub.calls_limit}</span>
+                </div>
+                {sub.current_period_end && (
+                  <div>
+                    <span className="text-neutral-500">Platí do:</span>
+                    <span className="ml-2 font-medium text-neutral-800">
+                      {new Date(sub.current_period_end).toLocaleDateString("cs-CZ")}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Payments */}
+          <div className="border border-neutral-100 rounded-xl p-4">
+            <h3 className="text-sm font-semibold text-neutral-800 mb-3 flex items-center gap-2">
+              <CreditCard className="w-4 h-4 text-neutral-400" />
+              Historie plateb
+            </h3>
+            {isLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin text-neutral-400" />
+            ) : payments.length === 0 ? (
+              <p className="text-sm text-neutral-400">Žádné platby</p>
+            ) : (
+              <div className="space-y-2">
+                {payments.map((p) => (
+                  <div key={p.id} className="flex items-center justify-between text-sm py-1.5 border-b border-neutral-50 last:border-0">
+                    <div className="flex items-center gap-2">
+                      <Badge variant={p.method === "stripe" ? "default" : "secondary"} className="text-[10px]">
+                        {p.method === "stripe" ? "Karta" : "Faktura"}
+                      </Badge>
+                      <span className="text-neutral-700 capitalize">{p.plan} T{p.tier}</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Badge variant={p.status === "completed" ? "success" : p.status === "pending" ? "warning" : "secondary"} className="text-[10px]">
+                        {p.status === "completed" ? "Zaplaceno" : p.status === "pending" ? "Čeká" : p.status}
+                      </Badge>
+                      <span className="font-medium text-neutral-800">{p.amount.toLocaleString("cs-CZ")} Kč</span>
+                      <span className="text-xs text-neutral-400">{new Date(p.created_at).toLocaleDateString("cs-CZ")}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex justify-end p-4 border-t border-neutral-100">
+          <Button variant="outline" size="sm" onClick={onClose}>Zavřít</Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminUzivatelePage() {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [total, setTotal] = useState(0);
@@ -87,6 +327,7 @@ export default function AdminUzivatelePage() {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [changingRoleId, setChangingRoleId] = useState<string | null>(null);
+  const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
 
   async function fetchUsers() {
     try {
@@ -180,13 +421,14 @@ export default function AdminUzivatelePage() {
         <Card>
           <CardContent className="p-0">
             {/* Header Row */}
-            <div className="hidden lg:grid lg:grid-cols-7 gap-3 px-5 py-3 border-b border-neutral-100 text-[10px] font-medium text-neutral-400 uppercase tracking-wider">
+            <div className="hidden lg:grid lg:grid-cols-8 gap-3 px-5 py-3 border-b border-neutral-100 text-[10px] font-medium text-neutral-400 uppercase tracking-wider">
               <span className="col-span-2">Uživatel</span>
               <span>Role</span>
               <span className="text-center">Hovory</span>
               <span className="text-center">Plán</span>
               <span className="text-center">Stav</span>
               <span className="text-right">Registrace</span>
+              <span className="text-right">Akce</span>
             </div>
 
             {isLoading ? (
@@ -206,7 +448,7 @@ export default function AdminUzivatelePage() {
                     return (
                       <div
                         key={user.id}
-                        className="grid grid-cols-1 lg:grid-cols-7 gap-1 lg:gap-3 px-5 py-3.5 hover:bg-neutral-50/50 transition-colors items-center"
+                        className="grid grid-cols-1 lg:grid-cols-8 gap-1 lg:gap-3 px-5 py-3.5 hover:bg-neutral-50/50 transition-colors items-center"
                       >
                         {/* User */}
                         <div className="col-span-2 flex items-center gap-3">
@@ -225,6 +467,11 @@ export default function AdminUzivatelePage() {
                             <p className="text-xs text-neutral-400 truncate">
                               {user.email}
                             </p>
+                            {user.role === "team" && user.manager_email && (
+                              <p className="text-[10px] text-blue-500 truncate">
+                                ← {user.manager_email}
+                              </p>
+                            )}
                           </div>
                         </div>
 
@@ -307,13 +554,32 @@ export default function AdminUzivatelePage() {
                           {timeAgo(user.created_at)}
                         </p>
 
+                        {/* Eye icon */}
+                        <div className="hidden lg:flex lg:justify-end">
+                          <button
+                            onClick={() => setSelectedUser(user)}
+                            className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-600 transition-colors"
+                            title="Detail uživatele"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                        </div>
+
                         {/* Mobile summary */}
-                        <p className="lg:hidden text-xs text-neutral-500">
-                          {role.label} ·{" "}
-                          {sub
-                            ? `${sub.plan} ${sub.tier} · ${sub.calls_used}/${sub.calls_limit} hovorů`
-                            : "Demo účet"}
-                        </p>
+                        <div className="lg:hidden flex items-center justify-between">
+                          <p className="text-xs text-neutral-500">
+                            {role.label} ·{" "}
+                            {sub
+                              ? `${sub.plan} ${sub.tier} · ${sub.calls_used}/${sub.calls_limit} hovorů`
+                              : "Demo účet"}
+                          </p>
+                          <button
+                            onClick={() => setSelectedUser(user)}
+                            className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-600 transition-colors"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
                     );
                   })}
@@ -330,6 +596,14 @@ export default function AdminUzivatelePage() {
           </CardContent>
         </Card>
       </motion.div>
+
+      {/* User Detail Modal */}
+      {selectedUser && (
+        <UserDetailModal
+          user={selectedUser}
+          onClose={() => setSelectedUser(null)}
+        />
+      )}
     </div>
   );
 }

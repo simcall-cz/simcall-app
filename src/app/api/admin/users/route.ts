@@ -66,7 +66,62 @@ export async function GET(request: NextRequest) {
     const users = (data || []).map((u) => ({
       ...u,
       subscriptions: subsMap[u.id] || null,
+      manager_email: null as string | null,
     }));
+
+    // Enrich team members with manager email
+    const teamUserIds = users.filter((u) => u.role === "team").map((u) => u.id);
+    if (teamUserIds.length > 0) {
+      try {
+        // Get company memberships for team users
+        const { data: memberships } = await db
+          .from("company_members")
+          .select("user_id, company_id")
+          .in("user_id", teamUserIds);
+
+        if (memberships && memberships.length > 0) {
+          const companyIds = [...new Set(memberships.map((m: { company_id: string }) => m.company_id))];
+
+          // Get managers of those companies
+          const { data: managers } = await db
+            .from("company_members")
+            .select("user_id, company_id")
+            .in("company_id", companyIds)
+            .eq("role", "manager");
+
+          if (managers && managers.length > 0) {
+            const managerUserIds = [...new Set(managers.map((m: { user_id: string }) => m.user_id))];
+            const { data: managerProfiles } = await db
+              .from("profiles")
+              .select("id, email")
+              .in("id", managerUserIds);
+
+            // Build lookup: company_id -> manager email
+            const companyManagerEmail: Record<string, string> = {};
+            if (managerProfiles) {
+              for (const mgr of managers) {
+                const profile = managerProfiles.find((p: { id: string }) => p.id === mgr.user_id);
+                if (profile) {
+                  companyManagerEmail[mgr.company_id] = profile.email;
+                }
+              }
+            }
+
+            // Assign manager email to team users
+            for (const user of users) {
+              if (user.role === "team") {
+                const membership = memberships.find((m: { user_id: string }) => m.user_id === user.id);
+                if (membership) {
+                  user.manager_email = companyManagerEmail[membership.company_id] || null;
+                }
+              }
+            }
+          }
+        }
+      } catch {
+        // company_members table may not exist
+      }
+    }
 
     return NextResponse.json({
       users,

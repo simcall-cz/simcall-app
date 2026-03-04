@@ -45,10 +45,14 @@ export async function GET(request: NextRequest) {
     let profileMap: Record<string, { full_name: string | null; email: string }> = {};
 
     if (userIds.length > 0) {
-      const { data: profiles } = await db
+      const { data: profiles, error: profilesError } = await db
         .from("profiles")
         .select("id, full_name, email")
         .in("id", userIds);
+
+      if (profilesError) {
+        console.warn("Failed to fetch profiles for calls enrichment:", profilesError.message);
+      }
 
       if (profiles) {
         profileMap = Object.fromEntries(
@@ -57,11 +61,15 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const enriched = (calls || []).map((call) => ({
-      ...call,
-      user_name: profileMap[call.user_id]?.full_name || null,
-      user_email: profileMap[call.user_id]?.email || null,
-    }));
+    const enriched = (calls || []).map((call) => {
+      const profile = profileMap[call.user_id];
+      const displayName = profile?.full_name || profile?.email?.split("@")[0] || null;
+      return {
+        ...call,
+        user_name: displayName,
+        user_email: profile?.email || null,
+      };
+    });
 
     return NextResponse.json({ calls: enriched });
   } catch (err) {
