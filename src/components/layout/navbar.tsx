@@ -11,7 +11,6 @@ import { buttonVariants } from "@/components/ui/button";
 const navItems = [
   { label: "Domů", href: "/" },
   { label: "Funkce", href: "/funkce" },
-  { label: "AI Simulátor", href: "/ai-simulator" },
   { label: "Ceník", href: "/cenik" },
   { label: "FAQ", href: "/faq" },
   { label: "O nás", href: "/o-nas" },

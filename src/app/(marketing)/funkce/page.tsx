@@ -16,6 +16,9 @@ import {
   Home,
   Heart,
   ShieldCheck,
+  UserX,
+  Briefcase,
+  Globe,
 } from "lucide-react";
 
 import { Container } from "@/components/shared/container";
@@ -269,8 +272,42 @@ export default function FunkcePage() {
         </Container>
       </section>
 
-      {/* FEATURE GRID */}
+      {/* CLIENT CATEGORIES */}
       <section className="py-16 sm:py-24 bg-neutral-50/80">
+        <Container>
+          <ScrollReveal>
+            <SectionHeader
+              badge="6 kategorií klientů"
+              title="Každý typ přináší jiné výzvy"
+              subtitle="Od skeptiků po investoře — trénujte na všech typech klientů, se kterými se v praxi setkáte."
+            />
+          </ScrollReveal>
+
+          <div className="mt-10 grid grid-cols-2 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+            {[
+              { icon: UserX, label: "Skeptici a Odmítači", desc: "Nedůvěřiví majitelé, kteří ze zásady nenávidí makléře." },
+              { icon: Briefcase, label: "Zkušení Investoři", desc: "Tvrdí vyjednavači analyzující každé vaše slovo." },
+              { icon: Users, label: "Rodiny a Rozvody", desc: "Hádky, křik a extrémní emoce přímo na telefonu." },
+              { icon: Building2, label: "Developeři", desc: "Arogantní profesionálové s nerealistickými nároky." },
+              { icon: Home, label: "Prvokupci", desc: "Vyděšení začátečníci nevydící co mají dělat." },
+              { icon: Globe, label: "Zahraniční klientela", desc: "Kulturní bariéra a obrovská nedůvěra na dálku." },
+            ].map((cat, i) => (
+              <ScrollReveal key={cat.label} delay={i * 0.07}>
+                <div className="p-6 rounded-2xl bg-white border border-neutral-100 hover:shadow-lg transition-shadow group flex flex-col h-full">
+                  <div className="w-12 h-12 rounded-xl bg-primary-50 text-primary-500 flex justify-center items-center mb-4 group-hover:scale-110 transition-transform">
+                    <cat.icon className="w-6 h-6" />
+                  </div>
+                  <h3 className="font-semibold text-neutral-800">{cat.label}</h3>
+                  <p className="mt-2 text-sm text-neutral-500 leading-relaxed">{cat.desc}</p>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </Container>
+      </section>
+
+      {/* FEATURE GRID */}
+      <section className="py-16 sm:py-24">
         <Container>
           <ScrollReveal>
             <SectionHeader badge="Co dostanete" title="Klíčové funkce" />

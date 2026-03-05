@@ -247,6 +247,62 @@ export default function HomePage() {
       </section>
 
       {/* ============================================ */}
+      {/* NOT JUST FOR BEGINNERS                       */}
+      {/* ============================================ */}
+      <section className="py-16 sm:py-24 bg-neutral-900 relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-primary-500/5 rounded-full blur-3xl pointer-events-none" />
+        <Container>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            <div>
+              <ScrollReveal>
+                <Badge className="mb-4">I pro pokročilé</Badge>
+                <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
+                  Není to jen pro nováčky.{" "}
+                  <span className="text-primary-400">Zdokonalte se i vy.</span>
+                </h2>
+                <p className="mt-5 text-neutral-400 leading-relaxed">
+                  Naši pokročilí AI agenti mají hlubokou znalost českého práva, smluvních procesů a neobvyklých situací. Můžete si ověřit, že znáte správné řešení, nebo se připravit na případy, které jste ještě nikdy neřešili.
+                </p>
+              </ScrollReveal>
+
+              <ScrollReveal delay={0.1}>
+                <ul className="mt-8 space-y-3">
+                  {[
+                    "Developerské projekty a prodej celých bytových domů",
+                    "Vyplacení exekuce klienta a komplikované zástavy",
+                    "Stavba bez stavebního povolení — jak to řešit s kupcem",
+                    "Nájemník odmítá odejít — prodej obsazené nemovitosti",
+                    "Dědické spory a prodej s více vlastníky",
+                    "Právní nuance: věcná břemena, předkupní práva, zápisy v katastru",
+                  ].map((item) => (
+                    <li key={item} className="flex items-center gap-2.5 text-neutral-300">
+                      <Shield className="w-4 h-4 text-primary-400 shrink-0" />
+                      <span className="text-sm">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </ScrollReveal>
+            </div>
+
+            <ScrollReveal delay={0.2}>
+              <div className="bg-neutral-800/60 border border-neutral-700/50 rounded-2xl p-8 sm:p-10">
+                <p className="text-lg sm:text-xl text-neutral-300 font-medium leading-relaxed italic">
+                  „I když prodávám 10 let, našel jsem v SimCallu případy, které jsem nikdy neřešil. Třeba prodej nemovitosti s nájemníkem, který odmítá odejít. Teď vím přesně, co říc klientovi.“
+                </p>
+                <div className="mt-6 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-primary-500/20 flex items-center justify-center text-sm font-bold text-primary-400">PM</div>
+                  <div>
+                    <p className="text-sm font-semibold text-white">Pokročilý makléř</p>
+                    <p className="text-xs text-neutral-500">10+ let v oboru</p>
+                  </div>
+                </div>
+              </div>
+            </ScrollReveal>
+          </div>
+        </Container>
+      </section>
+
+      {/* ============================================ */}
       {/* FEATURES GRID                                */}
       {/* ============================================ */}
       <section className="py-16 sm:py-24 bg-neutral-50/80">
@@ -284,10 +340,10 @@ export default function HomePage() {
 
           <ScrollReveal delay={0.3}>
             <div className="mt-10 text-center">
-              <Link href="/cenik">
-                <Button variant="outline" className="group">
-                  Porovnat všechny plány
-                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              <Link href="/registrace">
+                <Button size="lg" className="group">
+                  Vyzkoušet zdarma
+                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
                 </Button>
               </Link>
             </div>
@@ -486,62 +542,6 @@ export default function HomePage() {
       </section>
 
       {/* ============================================ */}
-      {/* NOT JUST FOR BEGINNERS                       */}
-      {/* ============================================ */}
-      <section className="py-16 sm:py-24 bg-neutral-900 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-primary-500/5 rounded-full blur-3xl pointer-events-none" />
-        <Container>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            <div>
-              <ScrollReveal>
-                <Badge className="mb-4">I pro pokročilé</Badge>
-                <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
-                  Není to jen pro nováčky.{" "}
-                  <span className="text-primary-400">Zdokonalte se i vy.</span>
-                </h2>
-                <p className="mt-5 text-neutral-400 leading-relaxed">
-                  Naši pokročilí AI agenti mají hlubokou znalost českého práva, smluvních procesů a neobvyklých situací. Můžete si ověřit, že znáte správné řešení, nebo se připravit na případy, které jste ještě nikdy neřešili.
-                </p>
-              </ScrollReveal>
-
-              <ScrollReveal delay={0.1}>
-                <ul className="mt-8 space-y-3">
-                  {[
-                    "Developerské projekty a prodej celých bytových domů",
-                    "Vyplacení exekuce klienta a komplikované zástavy",
-                    "Stavba bez stavebního povolení — jak to řešit s kupcem",
-                    "Nájemník odmítá odejít — prodej obsazené nemovitosti",
-                    "Dědické spory a prodej s více vlastníky",
-                    "Právní nuance: věcná břemena, předkupní práva, zápisy v katastru",
-                  ].map((item) => (
-                    <li key={item} className="flex items-center gap-2.5 text-neutral-300">
-                      <Shield className="w-4 h-4 text-primary-400 shrink-0" />
-                      <span className="text-sm">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </ScrollReveal>
-            </div>
-
-            <ScrollReveal delay={0.2}>
-              <div className="bg-neutral-800/60 border border-neutral-700/50 rounded-2xl p-8 sm:p-10">
-                <p className="text-lg sm:text-xl text-neutral-300 font-medium leading-relaxed italic">
-                  „I když prodávám 10 let, našel jsem v SimCallu případy, které jsem nikdy neřešil. Třeba prodej nemovitosti s nájemníkem, který odmítá odejít. Teď vím přesně, co říc klientovi.“
-                </p>
-                <div className="mt-6 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary-500/20 flex items-center justify-center text-sm font-bold text-primary-400">PM</div>
-                  <div>
-                    <p className="text-sm font-semibold text-white">Pokročilý makléř</p>
-                    <p className="text-xs text-neutral-500">10+ let v oboru</p>
-                  </div>
-                </div>
-              </div>
-            </ScrollReveal>
-          </div>
-        </Container>
-      </section>
-
-      {/* ============================================ */}
       {/* AI AGENTS                                    */}
       {/* ============================================ */}
       <section className="py-16 sm:py-24 bg-neutral-50/80">
@@ -597,9 +597,9 @@ export default function HomePage() {
           <ScrollReveal delay={0.35}>
             <div className="mt-10 text-center">
               <Link href="/registrace">
-                <Button variant="outline" className="group">
+                <Button size="lg" className="group">
                   Vyzkoušet zdarma — 3 hovory
-                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
                 </Button>
               </Link>
             </div>

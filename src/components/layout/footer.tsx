@@ -6,7 +6,7 @@ const footerLinks = {
     title: "Produkt",
     links: [
       { label: "Funkce", href: "/funkce" },
-      { label: "AI Simulátor", href: "/ai-simulator" },
+
       { label: "Ceník", href: "/cenik" },
     ],
   },
