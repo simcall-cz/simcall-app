@@ -43,7 +43,7 @@ const features = [
   {
     icon: FileText,
     title: "Detailní přepis hledající chyby",
-    desc: "AI najde vašim makléřům chybné formulace a výplňová slova, která zabíjejí obchody. PDF i CSV export do CRM.",
+    desc: "AI najde vašim makléřům chybné formulace a výplňová slova, která zabíjejí obchody.",
     tag: "Solo",
     tagColor: "bg-primary-50 text-primary-600",
   },
@@ -234,7 +234,7 @@ export default function FunkcePage() {
             <SectionHeader
               badge="Situace z praxe"
               title="Trénujte to, na čem to reálně padá"
-              subtitle="5 situací, které oddělují elitní makléře od průměrných telefonistů. Naši AI agenti je simulují do puntíku."
+              subtitle="6 situací, které oddělují elitní makléře od průměrných telefonistů. Naši AI agenti je simulují do puntíku."
             />
           </ScrollReveal>
 
@@ -320,7 +320,6 @@ export default function FunkcePage() {
                     "Kompletní přepis s časovými razítky",
                     "Identifikace výplňových slov",
                     "Personalizované tipy ke zlepšení",
-                    "Export do PDF nebo CSV",
                   ].map((item) => (
                     <li key={item} className="flex items-center gap-2.5 text-neutral-300">
                       <Sparkles className="w-4 h-4 text-primary-400 shrink-0" />
@@ -383,6 +382,124 @@ export default function FunkcePage() {
               <Link href="/cenik" className="text-sm font-medium text-primary-500 hover:text-primary-600 transition-colors inline-flex items-center gap-1">
                 Podrobné porovnání plánů
                 <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </ScrollReveal>
+        </Container>
+      </section>
+
+      {/* AGENT SHOWCASE */}
+      <section className="py-16 sm:py-24 bg-white">
+        <Container>
+          <ScrollReveal>
+            <SectionHeader
+              badge="Poznejte naše agenty"
+              title="S kým si zavoláte?"
+              subtitle="Ukázka 4 AI agentů z naší databáze. Každý má vlastní osobnost, příběh a styl komunikace."
+            />
+          </ScrollReveal>
+
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+            {/* Agent 1 */}
+            <ScrollReveal delay={0.05}>
+              <div className="rounded-2xl border border-rose-200 bg-rose-50/30 p-6 h-full flex flex-col">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 rounded-full bg-rose-500 text-white flex items-center justify-center text-base font-bold">RZ</div>
+                  <div>
+                    <h3 className="font-bold text-neutral-800">Urgentní prodej — Rozvod</h3>
+                    <span className="text-xs text-rose-600 font-medium">Obtížnost: Střední</span>
+                  </div>
+                </div>
+                <p className="text-sm text-neutral-700 italic border-l-2 border-rose-300 pl-3 mb-3">
+                  "Potřebuji to vyřešit co nejrychleji. Rozvádíme se."
+                </p>
+                <p className="text-sm text-neutral-600 leading-relaxed flex-1">
+                  Klientka volá, chce prodat společnou nemovitost kvůli rozvodu. Cílem je projevit empatii, ale hlavně zjistit, zda s prodejem souhlasí i partner — bez jeho souhlasu nelze prodat.
+                </p>
+                <div className="mt-4 pt-3 border-t border-rose-200/50">
+                  <p className="text-xs text-neutral-500"><span className="font-semibold">Tip:</span> Buď citlivý. Nastav realistická očekávání ohledně rychlosti. Ověř souhlas obou manželů.</p>
+                </div>
+              </div>
+            </ScrollReveal>
+
+            {/* Agent 2 */}
+            <ScrollReveal delay={0.1}>
+              <div className="rounded-2xl border border-red-200 bg-red-50/30 p-6 h-full flex flex-col">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 rounded-full bg-red-500 text-white flex items-center justify-center text-base font-bold">CC</div>
+                  <div>
+                    <h3 className="font-bold text-neutral-800">Cold call — Majitel z katastru</h3>
+                    <span className="text-xs text-red-600 font-medium">Obtížnost: Těžká</span>
+                  </div>
+                </div>
+                <p className="text-sm text-neutral-700 italic border-l-2 border-red-300 pl-3 mb-3">
+                  "Odkud máte mé číslo?!"
+                </p>
+                <p className="text-sm text-neutral-600 leading-relaxed flex-1">
+                  Voláte vlastníkovi domu z katastru. Okamžitě je agresivní a podezíravý. Musíte překonat první odpor a rychle přejít k hodnotě, kterou můžete nabídnout.
+                </p>
+                <div className="mt-4 pt-3 border-t border-red-200/50">
+                  <p className="text-xs text-neutral-500"><span className="font-semibold">Tip:</span> Buď upřímný, odkud máš číslo. Rychle přejdi k hodnotě: "Volám, protože mám pro tento typ nemovitosti kupce."</p>
+                </div>
+              </div>
+            </ScrollReveal>
+
+            {/* Agent 3 */}
+            <ScrollReveal delay={0.15}>
+              <div className="rounded-2xl border border-amber-200 bg-amber-50/30 p-6 h-full flex flex-col">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 rounded-full bg-amber-500 text-white flex items-center justify-center text-base font-bold">VB</div>
+                  <div>
+                    <h3 className="font-bold text-neutral-800">Věcné břemeno — Dožití babičky</h3>
+                    <span className="text-xs text-amber-600 font-medium">Obtížnost: Pokročilá</span>
+                  </div>
+                </div>
+                <p className="text-sm text-neutral-700 italic border-l-2 border-amber-300 pl-3 mb-3">
+                  "Chci prodat dům, ale babička tam má doživotní právo bydlet."
+                </p>
+                <p className="text-sm text-neutral-600 leading-relaxed flex-1">
+                  Klient chce prodat dům, na kterém vázne věcné břemeno dožití. Musíte vysvětlit vliv na cenu a okruh kupců, a navrhnout řešení.
+                </p>
+                <div className="mt-4 pt-3 border-t border-amber-200/50">
+                  <p className="text-xs text-neutral-500"><span className="font-semibold">Tip:</span> Věcné břemeno snižuje cenu — buď upřímný. Vysvětli prodej s břemenem vs. jeho zánik. Doporuč notáře.</p>
+                </div>
+              </div>
+            </ScrollReveal>
+
+            {/* Agent 4 */}
+            <ScrollReveal delay={0.2}>
+              <div className="rounded-2xl border border-purple-200 bg-purple-50/30 p-6 h-full flex flex-col">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 rounded-full bg-purple-500 text-white flex items-center justify-center text-base font-bold">PK</div>
+                  <div>
+                    <h3 className="font-bold text-neutral-800">První kupující — Netuší jak začít</h3>
+                    <span className="text-xs text-purple-600 font-medium">Obtížnost: Snadná</span>
+                  </div>
+                </div>
+                <p className="text-sm text-neutral-700 italic border-l-2 border-purple-300 pl-3 mb-3">
+                  "Chceme koupit první byt, ale vůbec nevíme kde začít."
+                </p>
+                <p className="text-sm text-neutral-600 leading-relaxed flex-1">
+                  Mladý pár volá poprvé. Jsou vyděšení z celého procesu, potřebují průvodce. Cílem je stát se jejich důvěryhodným partnerem na celou cestu.
+                </p>
+                <div className="mt-4 pt-3 border-t border-purple-200/50">
+                  <p className="text-xs text-neutral-500"><span className="font-semibold">Tip:</span> Zjisti budget a potřebu hypotéky. Doporuč hypotečního poradce, pak teprve hledání. Nabídni, že jim budeš posílat nabídky zdarma.</p>
+                </div>
+              </div>
+            </ScrollReveal>
+          </div>
+
+          {/* '496 dalších' */}
+          <ScrollReveal delay={0.25}>
+            <div className="mt-8 text-center">
+              <p className="text-neutral-500 text-sm mb-5">
+                ...a dalších <span className="font-bold text-neutral-800">496 scénářů</span> v naší databázi
+              </p>
+              <Link href="/registrace">
+                <Button size="lg" className="group">
+                  Chci začít trénovat
+                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </Button>
               </Link>
             </div>
           </ScrollReveal>

@@ -83,7 +83,7 @@ const features = [
   {
     icon: FileText,
     title: "Přepis a nahrávka",
-    desc: "Kompletní přepis hovoru, detekce výplňových slov a možnost exportu do PDF/CSV.",
+    desc: "Kompletní přepis hovoru a detekce výplňových slov, které zabíjejí vaše obchody.",
     tag: "Solo",
     tagColor: "bg-primary-50 text-primary-600",
   },
@@ -549,7 +549,7 @@ export default function HomePage() {
           <ScrollReveal>
             <SectionHeader
               badge="AI Agenti"
-              title={`${aiAgents.length}+ typů tvrdých vyjednávacích situací`}
+              title="500+ scénářů z reálného prostředí"
               subtitle="Arogantní investoři, skeptičtí slevovači i zmatení dědicové. Trénujte na realitě."
             />
           </ScrollReveal>
