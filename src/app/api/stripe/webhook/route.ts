@@ -294,7 +294,7 @@ export async function POST(request: NextRequest) {
 
           if (accountAutoCreated && temporaryPassword) {
             // Send account-created email with credentials
-            resend.emails.send({
+            await resend.emails.send({
               from: getFromEmail(),
               to: [orderEmail],
               subject: "Váš účet SimCall byl vytvořen — přihlašovací údaje 🔑",
@@ -306,10 +306,10 @@ export async function POST(request: NextRequest) {
                 tier,
                 callsLimit,
               }),
-            }).catch((err) => console.error("[email] Account created email failed:", err));
+            });
           } else {
             // Send regular order confirmation
-            resend.emails.send({
+            await resend.emails.send({
               from: getFromEmail(),
               to: [orderEmail],
               subject: "Potvrzení objednávky — SimCall ✅",
@@ -320,7 +320,7 @@ export async function POST(request: NextRequest) {
                 callsLimit,
                 customerEmail: orderEmail,
               }),
-            }).catch((err) => console.error("[email] Order confirmation failed:", err));
+            });
           }
         }
 
@@ -328,9 +328,9 @@ export async function POST(request: NextRequest) {
 
         // Business notification
         const amount = session.amount_total ? Math.round(session.amount_total / 100) : 0;
-        notifyPaymentCompleted(customerEmail, plan, tier, amount);
+        await notifyPaymentCompleted(customerEmail, plan, tier, amount);
         if (accountAutoCreated) {
-          notifyAutoAccountCreated(customerEmail, customerName, plan, tier);
+          await notifyAutoAccountCreated(customerEmail, customerName, plan, tier);
         }
         break;
       }
@@ -346,10 +346,10 @@ export async function POST(request: NextRequest) {
         // Map Stripe status to our status
         const dbStatus =
           status === "active" ? "active" :
-          status === "past_due" ? "past_due" :
-          status === "canceled" ? "cancelled" :
-          status === "trialing" ? "trialing" :
-          status;
+            status === "past_due" ? "past_due" :
+              status === "canceled" ? "cancelled" :
+                status === "trialing" ? "trialing" :
+                  status;
 
         await db
           .from("subscriptions")
@@ -394,7 +394,7 @@ export async function POST(request: NextRequest) {
         }
 
         console.log(`[stripe/webhook] customer.subscription.deleted — ${stripeSubId}`);
-        notifySubscriptionCancelled(sub?.user_id || "", stripeSubId);
+        await notifySubscriptionCancelled(sub?.user_id || "", stripeSubId);
         break;
       }
 
@@ -463,7 +463,7 @@ export async function POST(request: NextRequest) {
           }
 
           console.log(`[stripe/webhook] invoice.payment_succeeded — ${stripeSubId} calls reset`);
-          notifyRebill(stripeSubId);
+          await notifyRebill(stripeSubId);
         }
         break;
       }
@@ -486,7 +486,7 @@ export async function POST(request: NextRequest) {
             .eq("stripe_subscription_id", stripeSubId);
 
           console.log(`[stripe/webhook] invoice.payment_failed — ${stripeSubId} → past_due`);
-          notifyPaymentFailed("", stripeSubId);
+          await notifyPaymentFailed("", stripeSubId);
         }
         break;
       }

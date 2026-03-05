@@ -48,14 +48,11 @@ export default function PrihlaseniPage() {
     setIsLoading(true);
 
     try {
-      console.log("[LOGIN] Attempting signInWithPassword for:", formData.email);
       const { data, error: signInError } =
         await supabase.auth.signInWithPassword({
           email: formData.email,
           password: formData.password,
         });
-
-      console.log("[LOGIN] Result:", { data, signInError });
 
       if (signInError) {
         console.error("[LOGIN] Sign in error:", signInError);
@@ -72,13 +69,11 @@ export default function PrihlaseniPage() {
       }
 
       if (data.session) {
-        console.log("[LOGIN] Session obtained, setting cookie and redirecting...");
         // Set auth cookie so middleware can read it
-        document.cookie = `sb-access-token=${data.session.access_token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
+        document.cookie = `sb-access-token=${data.session.access_token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax; Secure`;
         // Use full page reload so middleware picks up the new auth cookies
         window.location.href = getRedirectUrl();
       } else {
-        console.warn("[LOGIN] No session in response");
         setError("Přihlášení se nezdařilo — žádná session");
       }
     } catch (err) {
@@ -96,7 +91,7 @@ export default function PrihlaseniPage() {
     setIsLoading(true);
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-        redirectTo: `${window.location.origin}/prihlaseni`,
+        redirectTo: `${window.location.origin}/nove-heslo`,
       });
 
       if (error) {

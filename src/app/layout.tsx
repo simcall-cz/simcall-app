@@ -10,9 +10,30 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "SimCall | Trénink hovorů s AI pro realitní makléře",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://simcall.cz"),
+  title: {
+    default: "SimCall | Trénink hovorů s AI pro realitní makléře",
+    template: "%s | SimCall",
+  },
   description:
     "Zlepšete své prodejní dovednosti s AI tréninkem hovorů. Realistické simulace, okamžitá zpětná vazba a personalizované lekce pro realitní makléře.",
+  openGraph: {
+    type: "website",
+    locale: "cs_CZ",
+    siteName: "SimCall",
+    title: "SimCall | Trénink hovorů s AI pro realitní makléře",
+    description:
+      "Zlepšete své prodejní dovednosti s AI tréninkem hovorů. Realistické simulace, okamžitá zpětná vazba a personalizované lekce pro realitní makléře.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SimCall | Trénink hovorů s AI",
+    description: "AI trénink hovorů pro realitní makléře — realistické simulace a okamžitá zpětná vazba.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({

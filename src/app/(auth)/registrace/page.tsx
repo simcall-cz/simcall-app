@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   Eye,
   EyeOff,
@@ -14,7 +13,6 @@ import {
 import { supabase } from "@/lib/supabase";
 
 export default function RegistracePage() {
-  const router = useRouter();
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -87,12 +85,12 @@ export default function RegistracePage() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: formData.email, name: formData.fullName }),
-        }).catch(() => {});
+        }).catch(() => { });
 
         // Check if session exists (email confirmation disabled)
         if (data.session) {
           // User is logged in immediately — set cookie and redirect
-          document.cookie = `sb-access-token=${data.session.access_token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
+          document.cookie = `sb-access-token=${data.session.access_token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax; Secure`;
           window.location.href = "/dashboard";
         } else {
           // Email confirmation required — show "check your email" message

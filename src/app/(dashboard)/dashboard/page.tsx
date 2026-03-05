@@ -152,11 +152,10 @@ function FreeDashboard({
           </div>
           <div className="w-full bg-neutral-100 rounded-full h-2.5">
             <div
-              className={`h-2.5 rounded-full transition-all ${
-                subscription.callsUsed >= subscription.callsLimit
-                  ? "bg-red-500"
-                  : "bg-primary-500"
-              }`}
+              className={`h-2.5 rounded-full transition-all ${subscription.callsUsed >= subscription.callsLimit
+                ? "bg-red-500"
+                : "bg-primary-500"
+                }`}
               style={{
                 width: `${Math.min(100, (subscription.callsUsed / subscription.callsLimit) * 100)}%`,
               }}
@@ -239,57 +238,61 @@ function FreeDashboard({
               )}
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-neutral-100">
-                    <th className="text-left py-3 px-2 font-medium text-neutral-500">
-                      Datum
-                    </th>
-                    <th className="text-left py-3 px-2 font-medium text-neutral-500">
-                      AI Agent
-                    </th>
-                    <th className="text-left py-3 px-2 font-medium text-neutral-500 hidden sm:table-cell">
-                      Scénář
-                    </th>
-                    <th className="text-right py-3 px-2 font-medium text-neutral-500">
-                      Úspěšnost
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentCalls.map((call) => {
-                    const callDate = new Date(call.date);
-                    const dateStr = `${callDate.getDate()}.${callDate.getMonth() + 1}. ${callDate.getHours()}:${String(callDate.getMinutes()).padStart(2, "0")}`;
-                    return (
-                      <tr
-                        key={call.id}
-                        className="border-b border-neutral-50 hover:bg-neutral-25 transition-colors"
-                      >
-                        <td className="py-3 px-2 text-neutral-600">
-                          {dateStr}
-                        </td>
-                        <td className="py-3 px-2 font-medium text-neutral-800">
-                          {call.agentName}
-                        </td>
-                        <td className="py-3 px-2 text-neutral-600 hidden sm:table-cell">
-                          {call.scenario}
-                        </td>
-                        <td className="py-3 px-2 text-right">
-                          <Badge
-                            className={getSuccessRateBg(call.successRate)}
-                          >
-                            {call.successRate > 0
-                              ? `${call.successRate}%`
-                              : "Čeká..."}
-                          </Badge>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+            <>
+              {/* Mobile: card layout */}
+              <div className="sm:hidden space-y-3">
+                {recentCalls.map((call) => {
+                  const callDate = new Date(call.date);
+                  const dateStr = `${callDate.getDate()}.${callDate.getMonth() + 1}. ${callDate.getHours()}:${String(callDate.getMinutes()).padStart(2, "0")}`;
+                  return (
+                    <div key={call.id} className="p-3 rounded-lg border border-neutral-100 bg-neutral-25">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-medium text-neutral-800">{call.agentName}</span>
+                        <Badge className={getSuccessRateBg(call.successRate)}>
+                          {call.successRate > 0 ? `${call.successRate}%` : "Čeká..."}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-neutral-500">
+                        <span>{dateStr}</span>
+                        <span className="w-1 h-1 rounded-full bg-neutral-300" />
+                        <span>{call.scenario}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              {/* Desktop: table layout */}
+              <div className="hidden sm:block overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-neutral-100">
+                      <th className="text-left py-3 px-2 font-medium text-neutral-500">Datum</th>
+                      <th className="text-left py-3 px-2 font-medium text-neutral-500">AI Agent</th>
+                      <th className="text-left py-3 px-2 font-medium text-neutral-500">Scénář</th>
+                      <th className="text-right py-3 px-2 font-medium text-neutral-500">Úspěšnost</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {recentCalls.map((call) => {
+                      const callDate = new Date(call.date);
+                      const dateStr = `${callDate.getDate()}.${callDate.getMonth() + 1}. ${callDate.getHours()}:${String(callDate.getMinutes()).padStart(2, "0")}`;
+                      return (
+                        <tr key={call.id} className="border-b border-neutral-50 hover:bg-neutral-25 transition-colors">
+                          <td className="py-3 px-2 text-neutral-600">{dateStr}</td>
+                          <td className="py-3 px-2 font-medium text-neutral-800">{call.agentName}</td>
+                          <td className="py-3 px-2 text-neutral-600">{call.scenario}</td>
+                          <td className="py-3 px-2 text-right">
+                            <Badge className={getSuccessRateBg(call.successRate)}>
+                              {call.successRate > 0 ? `${call.successRate}%` : "Čeká..."}
+                            </Badge>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
@@ -403,8 +406,8 @@ function PaidDashboard({
     subscription.plan === "solo"
       ? "Solo"
       : subscription.plan === "team"
-      ? "Team"
-      : subscription.plan;
+        ? "Team"
+        : subscription.plan;
 
   const stats = [
     {
@@ -461,8 +464,8 @@ function PaidDashboard({
           isLowOnCalls
             ? "border-amber-200"
             : isOutOfCalls
-            ? "border-red-200"
-            : ""
+              ? "border-red-200"
+              : ""
         }
       >
         <CardContent className="p-5">
@@ -479,13 +482,12 @@ function PaidDashboard({
           </div>
           <div className="w-full bg-neutral-100 rounded-full h-2.5">
             <div
-              className={`h-2.5 rounded-full transition-all ${
-                isOutOfCalls
-                  ? "bg-red-500"
-                  : isLowOnCalls
+              className={`h-2.5 rounded-full transition-all ${isOutOfCalls
+                ? "bg-red-500"
+                : isLowOnCalls
                   ? "bg-amber-500"
                   : "bg-primary-500"
-              }`}
+                }`}
               style={{ width: `${usagePercentage}%` }}
             />
           </div>
@@ -684,63 +686,69 @@ function PaidDashboard({
               )}
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-neutral-100">
-                    <th className="text-left py-3 px-2 font-medium text-neutral-500">
-                      Datum
-                    </th>
-                    <th className="text-left py-3 px-2 font-medium text-neutral-500">
-                      AI Agent
-                    </th>
-                    <th className="text-left py-3 px-2 font-medium text-neutral-500 hidden sm:table-cell">
-                      Scénář
-                    </th>
-                    <th className="text-left py-3 px-2 font-medium text-neutral-500 hidden md:table-cell">
-                      Doba trvání
-                    </th>
-                    <th className="text-right py-3 px-2 font-medium text-neutral-500">
-                      Úspěšnost
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {recentCalls.map((call) => {
-                    const callDate = new Date(call.date);
-                    const dateStr = `${callDate.getDate()}.${callDate.getMonth() + 1}. ${callDate.getHours()}:${String(callDate.getMinutes()).padStart(2, "0")}`;
-                    return (
-                      <tr
-                        key={call.id}
-                        className="border-b border-neutral-50 hover:bg-neutral-25 transition-colors"
-                      >
-                        <td className="py-3 px-2 text-neutral-600">
-                          {dateStr}
-                        </td>
-                        <td className="py-3 px-2 font-medium text-neutral-800">
-                          {call.agentName}
-                        </td>
-                        <td className="py-3 px-2 text-neutral-600 hidden sm:table-cell">
-                          {call.scenario}
-                        </td>
-                        <td className="py-3 px-2 text-neutral-600 hidden md:table-cell">
-                          {call.duration}
-                        </td>
-                        <td className="py-3 px-2 text-right">
-                          <Badge
-                            className={getSuccessRateBg(call.successRate)}
-                          >
-                            {call.successRate > 0
-                              ? `${call.successRate}%`
-                              : "Čeká..."}
-                          </Badge>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+            <>
+              {/* Mobile: card layout */}
+              <div className="sm:hidden space-y-3">
+                {recentCalls.map((call) => {
+                  const callDate = new Date(call.date);
+                  const dateStr = `${callDate.getDate()}.${callDate.getMonth() + 1}. ${callDate.getHours()}:${String(callDate.getMinutes()).padStart(2, "0")}`;
+                  return (
+                    <div key={call.id} className="p-3 rounded-lg border border-neutral-100 bg-neutral-25">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-medium text-neutral-800">{call.agentName}</span>
+                        <Badge className={getSuccessRateBg(call.successRate)}>
+                          {call.successRate > 0 ? `${call.successRate}%` : "Čeká..."}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-neutral-500">
+                        <span>{dateStr}</span>
+                        <span className="w-1 h-1 rounded-full bg-neutral-300" />
+                        <span>{call.scenario}</span>
+                        {call.duration && (
+                          <>
+                            <span className="w-1 h-1 rounded-full bg-neutral-300" />
+                            <span>{call.duration}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              {/* Desktop: table layout */}
+              <div className="hidden sm:block overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-neutral-100">
+                      <th className="text-left py-3 px-2 font-medium text-neutral-500">Datum</th>
+                      <th className="text-left py-3 px-2 font-medium text-neutral-500">AI Agent</th>
+                      <th className="text-left py-3 px-2 font-medium text-neutral-500">Scénář</th>
+                      <th className="text-left py-3 px-2 font-medium text-neutral-500 hidden md:table-cell">Doba trvání</th>
+                      <th className="text-right py-3 px-2 font-medium text-neutral-500">Úspěšnost</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {recentCalls.map((call) => {
+                      const callDate = new Date(call.date);
+                      const dateStr = `${callDate.getDate()}.${callDate.getMonth() + 1}. ${callDate.getHours()}:${String(callDate.getMinutes()).padStart(2, "0")}`;
+                      return (
+                        <tr key={call.id} className="border-b border-neutral-50 hover:bg-neutral-25 transition-colors">
+                          <td className="py-3 px-2 text-neutral-600">{dateStr}</td>
+                          <td className="py-3 px-2 font-medium text-neutral-800">{call.agentName}</td>
+                          <td className="py-3 px-2 text-neutral-600">{call.scenario}</td>
+                          <td className="py-3 px-2 text-neutral-600 hidden md:table-cell">{call.duration}</td>
+                          <td className="py-3 px-2 text-right">
+                            <Badge className={getSuccessRateBg(call.successRate)}>
+                              {call.successRate > 0 ? `${call.successRate}%` : "Čeká..."}
+                            </Badge>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
@@ -820,9 +828,9 @@ export default function DashboardPage() {
   const avgSuccessRate =
     completedCalls.length > 0
       ? Math.round(
-          completedCalls.reduce((sum, c) => sum + c.successRate, 0) /
-            completedCalls.length
-        )
+        completedCalls.reduce((sum, c) => sum + c.successRate, 0) /
+        completedCalls.length
+      )
       : 0;
 
   const chartData = useMemo(() => {

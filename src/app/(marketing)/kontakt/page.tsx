@@ -32,6 +32,7 @@ const subjectOptions = [
 
 export default function KontaktPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState(false);
 
   const {
     register,
@@ -57,7 +58,7 @@ export default function KontaktPage() {
       if (!res.ok) throw new Error("Chyba při odesílání");
       setIsSubmitted(true);
     } catch {
-      setIsSubmitted(true); // Show success anyway for UX, logged on server
+      setSubmitError(true);
     }
   };
 
@@ -154,6 +155,22 @@ export default function KontaktPage() {
                       Zpět na hlavní stránku
                       <ArrowRight className="w-4 h-4" />
                     </Link>
+                  </div>
+                ) : submitError ? (
+                  <div className="text-center py-10">
+                    <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
+                      <ArrowRight className="w-8 h-8 text-red-500 rotate-180" />
+                    </div>
+                    <h3 className="text-xl font-bold text-neutral-800">Něco se pokazilo</h3>
+                    <p className="mt-2 text-neutral-500 text-sm">
+                      Zprávu se nepodařilo odeslat. Zkuste to prosím znovu, nebo nás kontaktujte na simcallcz@gmail.com.
+                    </p>
+                    <button
+                      onClick={() => setSubmitError(false)}
+                      className="mt-6 inline-flex items-center gap-1 text-sm text-primary-500 hover:text-primary-600 font-medium transition-colors"
+                    >
+                      Zkusit znovu
+                    </button>
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">

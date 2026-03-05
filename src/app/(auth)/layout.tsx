@@ -42,38 +42,29 @@ export default function AuthLayout({
             lekce pro realitní makléře v České republice.
           </p>
 
-          {/* Stats */}
+          {/* Value propositions */}
           <div className="mt-10 grid grid-cols-3 gap-6">
             <div>
-              <p className="text-3xl font-bold text-primary-400">500+</p>
-              <p className="mt-1 text-sm text-neutral-500">Aktivních makléřů</p>
+              <p className="text-3xl font-bold text-primary-400">AI</p>
+              <p className="mt-1 text-sm text-neutral-500">Reálné scénáře</p>
             </div>
             <div>
-              <p className="text-3xl font-bold text-primary-400">10k+</p>
-              <p className="mt-1 text-sm text-neutral-500">Tréninkových hovorů</p>
+              <p className="text-3xl font-bold text-primary-400">24/7</p>
+              <p className="mt-1 text-sm text-neutral-500">Trénink kdykoliv</p>
             </div>
             <div>
-              <p className="text-3xl font-bold text-primary-400">+34%</p>
-              <p className="mt-1 text-sm text-neutral-500">Lepší výsledky</p>
+              <p className="text-3xl font-bold text-primary-400">3</p>
+              <p className="mt-1 text-sm text-neutral-500">Hovory zdarma</p>
             </div>
           </div>
         </div>
 
-        {/* Testimonial */}
+        {/* CTA */}
         <div className="relative z-10 rounded-xl bg-white/5 border border-white/10 p-6">
-          <p className="text-sm italic text-neutral-300 leading-relaxed">
-            &ldquo;Za první měsíc jsem zvýšil úspěšnost svých hovorů o 40 %. SimCall
-            mi pomáhá trénovat přesně ty situace, ve kterých jsem dříve selhal.&rdquo;
+          <p className="text-sm text-neutral-300 leading-relaxed">
+            Vyzkoušejte SimCall zdarma — 3 tréninkové hovory bez závazků.
+            Připravte se na reálné situace s AI klienty, kteří reagují přirozeně.
           </p>
-          <div className="mt-4 flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-500/20">
-              <span className="text-xs font-bold text-primary-400">JK</span>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-white">Jan Kovář</p>
-              <p className="text-xs text-neutral-500">Senior makléř, RE/MAX</p>
-            </div>
-          </div>
         </div>
       </div>
 

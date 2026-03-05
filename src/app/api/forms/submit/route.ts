@@ -5,9 +5,20 @@ import ContactFormEmail from "@/emails/ContactFormEmail";
 import ContactAutoReplyEmail from "@/emails/ContactAutoReplyEmail";
 import MeetingBookedEmail from "@/emails/MeetingBookedEmail";
 import { notifyContactForm, notifyMeetingBooked } from "@/lib/notifications";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 // POST /api/forms/submit - Submit a form (contact, meeting, enterprise)
 export async function POST(request: NextRequest) {
+  // Rate limit: max 5 form submissions per minute per IP
+  const ip = getClientIp(request);
+  const rl = rateLimit(ip, 5, 60_000);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: "Příliš mnoho požadavků. Zkuste to za chvíli." },
+      { status: 429, headers: { "Retry-After": String(Math.ceil(rl.retryAfterMs / 1000)) } },
+    );
+  }
+
   try {
     const body = await request.json();
     const { type, name, email, phone, company, subject, message, meeting_date, meeting_time, team_size } = body as {

@@ -49,89 +49,89 @@ const comparisonFeatures: {
   team: string | boolean;
   enterprise: string | boolean;
 }[] = [
-  {
-    label: "Počet hovorů",
-    solo: "50 – 1 000",
-    team: "250 – 5 000",
-    enterprise: "Dohodou",
-  },
-  {
-    label: "Počet AI agentů",
-    solo: "5 – 100",
-    team: "25 – 500",
-    enterprise: "Dohodou + vlastní",
-  },
-  { label: "AI analýza hovoru", solo: true, team: true, enterprise: true },
-  { label: "Přepis hovoru", solo: true, team: true, enterprise: true },
-  {
-    label: "Historie hovorů",
-    solo: true,
-    team: true,
-    enterprise: true,
-  },
-  {
-    label: "Nahrávky hovorů (MP3)",
-    solo: false,
-    team: true,
-    enterprise: true,
-  },
-  {
-    label: "Podrobné statistiky",
-    solo: true,
-    team: true,
-    enterprise: true,
-  },
-  {
-    label: "Pokročilá analýza (scoring)",
-    solo: true,
-    team: true,
-    enterprise: true,
-  },
-  {
-    label: "Export přepisů (PDF/CSV)",
-    solo: true,
-    team: true,
-    enterprise: true,
-  },
-  {
-    label: "Manager dashboard",
-    solo: false,
-    team: true,
-    enterprise: true,
-  },
-  { label: "Správa týmu", solo: false, team: true, enterprise: true },
-  {
-    label: "Analytika zaměstnanců",
-    solo: false,
-    team: true,
-    enterprise: true,
-  },
-  {
-    label: "Žebříčky v týmu",
-    solo: false,
-    team: true,
-    enterprise: true,
-  },
-  {
-    label: "Sdílená banka hovorů",
-    solo: false,
-    team: true,
-    enterprise: true,
-  },
-  { label: "White-label", solo: false, team: false, enterprise: true },
-  {
-    label: "Vlastní AI agenti na míru",
-    solo: false,
-    team: false,
-    enterprise: true,
-  },
-  {
-    label: "Dedikovaný account manažer",
-    solo: false,
-    team: false,
-    enterprise: true,
-  },
-];
+    {
+      label: "Počet hovorů",
+      solo: "50 – 1 000",
+      team: "250 – 5 000",
+      enterprise: "Dohodou",
+    },
+    {
+      label: "Počet AI agentů",
+      solo: "5 – 100",
+      team: "25 – 500",
+      enterprise: "Dohodou + vlastní",
+    },
+    { label: "AI analýza hovoru", solo: true, team: true, enterprise: true },
+    { label: "Přepis hovoru", solo: true, team: true, enterprise: true },
+    {
+      label: "Historie hovorů",
+      solo: true,
+      team: true,
+      enterprise: true,
+    },
+    {
+      label: "Nahrávky hovorů (MP3)",
+      solo: false,
+      team: true,
+      enterprise: true,
+    },
+    {
+      label: "Podrobné statistiky",
+      solo: true,
+      team: true,
+      enterprise: true,
+    },
+    {
+      label: "Pokročilá analýza (scoring)",
+      solo: true,
+      team: true,
+      enterprise: true,
+    },
+    {
+      label: "Export přepisů (PDF/CSV)",
+      solo: true,
+      team: true,
+      enterprise: true,
+    },
+    {
+      label: "Manager dashboard",
+      solo: false,
+      team: true,
+      enterprise: true,
+    },
+    { label: "Správa týmu", solo: false, team: true, enterprise: true },
+    {
+      label: "Analytika zaměstnanců",
+      solo: false,
+      team: true,
+      enterprise: true,
+    },
+    {
+      label: "Žebříčky v týmu",
+      solo: false,
+      team: true,
+      enterprise: true,
+    },
+    {
+      label: "Sdílená banka hovorů",
+      solo: false,
+      team: true,
+      enterprise: true,
+    },
+    { label: "White-label", solo: false, team: false, enterprise: true },
+    {
+      label: "Vlastní AI agenti na míru",
+      solo: false,
+      team: false,
+      enterprise: true,
+    },
+    {
+      label: "Dedikovaný account manažer",
+      solo: false,
+      team: false,
+      enterprise: true,
+    },
+  ];
 
 function FAQItem({ faq }: { faq: FAQ }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -146,15 +146,13 @@ function FAQItem({ faq }: { faq: FAQ }) {
           {faq.question}
         </span>
         <ChevronDown
-          className={`w-5 h-5 text-neutral-400 shrink-0 transition-transform ${
-            isOpen ? "rotate-180" : ""
-          }`}
+          className={`w-5 h-5 text-neutral-400 shrink-0 transition-transform ${isOpen ? "rotate-180" : ""
+            }`}
         />
       </button>
       <div
-        className={`grid transition-all duration-300 ${
-          isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
-        }`}
+        className={`grid transition-all duration-300 ${isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+          }`}
       >
         <div className="overflow-hidden">
           <div className="px-5 pb-5">
@@ -188,9 +186,8 @@ function PricingCard({ plan }: { plan: PricingPlan }) {
 
   return (
     <Card
-      className={`h-full flex flex-col relative ${
-        plan.highlighted ? "border-2 border-primary-500 shadow-lg" : ""
-      }`}
+      className={`h-full flex flex-col relative ${plan.highlighted ? "border-2 border-primary-500 shadow-lg" : ""
+        }`}
     >
       {plan.highlighted && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
@@ -201,11 +198,10 @@ function PricingCard({ plan }: { plan: PricingPlan }) {
       <CardHeader className={plan.highlighted ? "pt-8" : ""}>
         <div className="flex items-center gap-2.5 mb-3">
           <div
-            className={`flex h-9 w-9 items-center justify-center rounded-lg ${
-              plan.highlighted
+            className={`flex h-9 w-9 items-center justify-center rounded-lg ${plan.highlighted
                 ? "bg-primary-500 text-white"
                 : "bg-neutral-100 text-neutral-600"
-            }`}
+              }`}
           >
             <Icon className="h-4.5 w-4.5" />
           </div>
@@ -347,63 +343,65 @@ export default function CenikPage() {
           </ScrollReveal>
 
           <ScrollReveal delay={0.1}>
-            <div className="mt-12 max-w-4xl mx-auto overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-neutral-200">
-                    <th className="py-4 px-4 text-left text-sm font-semibold text-neutral-800">
-                      Funkce
-                    </th>
-                    <th className="py-4 px-4 text-center text-sm font-semibold text-neutral-800">
-                      Solo
-                    </th>
-                    <th className="py-4 px-4 text-center text-sm font-semibold text-primary-600">
-                      Team
-                    </th>
-                    <th className="py-4 px-4 text-center text-sm font-semibold text-neutral-800">
-                      Enterprise
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {comparisonFeatures.map((feature) => (
-                    <tr
-                      key={feature.label}
-                      className="border-b border-neutral-100"
-                    >
-                      <td className="py-3.5 px-4 text-sm text-neutral-700">
-                        {feature.label}
-                      </td>
-                      {(["solo", "team", "enterprise"] as const).map(
-                        (plan) => (
-                          <td
-                            key={plan}
-                            className="py-3.5 px-4 text-center text-sm"
-                          >
-                            {typeof feature[plan] === "boolean" ? (
-                              feature[plan] ? (
-                                <CheckCircle className="w-5 h-5 text-green-500 mx-auto" />
-                              ) : (
-                                <X className="w-5 h-5 text-neutral-300 mx-auto" />
-                              )
-                            ) : (
-                              <span
-                                className={`font-medium ${
-                                  plan === "team"
-                                    ? "text-primary-600"
-                                    : "text-neutral-700"
-                                }`}
-                              >
-                                {feature[plan]}
-                              </span>
-                            )}
-                          </td>
-                        )
-                      )}
+            <div className="mt-12 max-w-4xl mx-auto">
+              <p className="text-xs text-neutral-400 text-center mb-3 sm:hidden">← Posuňte tabulku pro zobrazení všech plánů →</p>
+              <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+                <table className="w-full min-w-[500px]">
+                  <thead>
+                    <tr className="border-b border-neutral-200">
+                      <th className="py-4 px-4 text-left text-sm font-semibold text-neutral-800 sticky left-0 bg-neutral-50/90 backdrop-blur-sm z-10">
+                        Funkce
+                      </th>
+                      <th className="py-4 px-4 text-center text-sm font-semibold text-neutral-800 min-w-[80px]">
+                        Solo
+                      </th>
+                      <th className="py-4 px-4 text-center text-sm font-semibold text-primary-600 min-w-[80px]">
+                        Team
+                      </th>
+                      <th className="py-4 px-4 text-center text-sm font-semibold text-neutral-800 min-w-[80px]">
+                        Enterprise
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {comparisonFeatures.map((feature) => (
+                      <tr
+                        key={feature.label}
+                        className="border-b border-neutral-100"
+                      >
+                        <td className="py-3.5 px-4 text-sm text-neutral-700 sticky left-0 bg-white/90 backdrop-blur-sm z-10">
+                          {feature.label}
+                        </td>
+                        {(["solo", "team", "enterprise"] as const).map(
+                          (plan) => (
+                            <td
+                              key={plan}
+                              className="py-3.5 px-4 text-center text-sm"
+                            >
+                              {typeof feature[plan] === "boolean" ? (
+                                feature[plan] ? (
+                                  <CheckCircle className="w-5 h-5 text-green-500 mx-auto" />
+                                ) : (
+                                  <X className="w-5 h-5 text-neutral-300 mx-auto" />
+                                )
+                              ) : (
+                                <span
+                                  className={`font-medium ${plan === "team"
+                                      ? "text-primary-600"
+                                      : "text-neutral-700"
+                                    }`}
+                                >
+                                  {feature[plan]}
+                                </span>
+                              )}
+                            </td>
+                          )
+                        )}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </ScrollReveal>
         </Container>

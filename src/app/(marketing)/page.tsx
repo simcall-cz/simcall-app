@@ -191,7 +191,7 @@ export default function HomePage() {
                   </Link>
                 </div>
                 <p className="mt-3 text-xs text-neutral-400">
-                  Zdarma: 5 hovorů a 2 AI agenti. Bez kreditní karty.
+                  Zdarma: 3 hovory a 1 AI agent. Bez kreditní karty.
                 </p>
               </ScrollReveal>
             </div>
@@ -513,13 +513,12 @@ export default function HomePage() {
                     {agent.name}
                   </p>
                   <span
-                    className={`mt-1 text-[11px] px-2 py-0.5 rounded-full font-medium ${
-                      agent.difficulty === "easy"
+                    className={`mt-1 text-[11px] px-2 py-0.5 rounded-full font-medium ${agent.difficulty === "easy"
                         ? "bg-green-100 text-green-700"
                         : agent.difficulty === "medium"
                           ? "bg-yellow-100 text-yellow-700"
                           : "bg-red-100 text-red-700"
-                    }`}
+                      }`}
                   >
                     {difficultyLabels[agent.difficulty]}
                   </span>
@@ -545,7 +544,7 @@ export default function HomePage() {
             <div className="mt-10 text-center">
               <Link href="/registrace">
                 <Button variant="outline" className="group">
-                  Vyzkoušet zdarma — 5 hovorů
+                  Vyzkoušet zdarma — 3 hovory
                   <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                 </Button>
               </Link>
@@ -596,7 +595,7 @@ export default function HomePage() {
                 Připraveni na lepší hovory?
               </h2>
               <p className="mt-3 sm:mt-4 text-base sm:text-lg text-neutral-400 leading-relaxed">
-                Začněte zdarma. 5 hovorů a 2 AI agenti bez kreditní karty.
+                Začněte zdarma. 3 hovory a 1 AI agent bez kreditní karty.
               </p>
               <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/registrace">
