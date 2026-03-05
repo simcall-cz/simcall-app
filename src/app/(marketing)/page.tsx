@@ -155,9 +155,9 @@ export default function HomePage() {
               <ScrollReveal delay={0.2}>
                 <ul className="mt-6 space-y-2.5">
                   {[
-                    "Konec 50stránkových PDF a zastaralých videokurzů",
-                    "Aplikace naprogramovaná z praxe: Nejlépe se učí na sluchátku",
-                    "Zbavte nováčky strachu nanečisto, než jim dáte reálné klienty",
+                    "Zbavte nováčky strachu z cold-callingu nanečisto",
+                    "Aplikace naprogramovaná z praxe: Zvyšte konverze ještě před přidělením placených leadů",
+                    "Manažeři nebudou ztrácet svůj čas neustálým tréninkem juniorů",
                   ].map((item) => (
                     <li
                       key={item}
@@ -199,6 +199,26 @@ export default function HomePage() {
               <HeroMockup />
             </div>
           </div>
+        </Container>
+      </section>
+
+      {/* ============================================ */}
+      {/* MASSIVE PHILOSOPHY BANNER                    */}
+      {/* ============================================ */}
+      <section className="py-20 sm:py-32 bg-neutral-900 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary-500/10 rounded-full blur-3xl pointer-events-none" />
+        <Container>
+          <ScrollReveal>
+            <div className="max-w-5xl mx-auto text-center">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.15] tracking-tight">
+                Nejsme zastánci čtení <span className="text-primary-400">50stránkových PDF</span> o tom, jak být lepší v cold callingu, nebo zastaralých videokurzů.
+              </h2>
+              <div className="w-24 h-1 bg-primary-500 mx-auto mt-12 mb-12 rounded-full" />
+              <p className="text-xl sm:text-2xl md:text-3xl text-neutral-300 font-medium leading-relaxed max-w-4xl mx-auto">
+                Naši aplikaci jsme naprogramovali z reálného prostředí ve spolupráci přímo s realitní kanceláří. Přesně víme, kde makléři dělají největší chyby, a jsme toho názoru, že <span className="text-white">nejlépe se každý učí prostě v praxi — na sluchátku!</span>
+              </p>
+            </div>
+          </ScrollReveal>
         </Container>
       </section>
 
