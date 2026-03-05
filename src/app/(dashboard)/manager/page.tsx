@@ -46,7 +46,7 @@ function getBarColor(score: number | null): string {
   return "#ef4444";
 }
 
-const medalLabels = ["🥇", "🥈", "🥉"];
+const medalColors = ["text-amber-500", "text-neutral-400", "text-amber-700"];
 
 export default function ManagerOverviewPage() {
   const [stats, setStats] = useState<ManagerStats | null>(null);
@@ -194,7 +194,7 @@ export default function ManagerOverviewPage() {
                     >
                       <div className="w-8 text-center">
                         {index < 3 ? (
-                          <span className="text-xl">{medalLabels[index]}</span>
+                          <span className={`text-sm font-bold ${medalColors[index]}`}>{index + 1}.</span>
                         ) : (
                           <span className="text-sm font-bold text-neutral-400">
                             {index + 1}.
@@ -204,9 +204,9 @@ export default function ManagerOverviewPage() {
                       <div className="w-10 h-10 rounded-full bg-primary-50 flex items-center justify-center text-primary-600 text-sm font-semibold shrink-0">
                         {entry.fullName
                           ? entry.fullName
-                              .split(" ")
-                              .map((n) => n[0])
-                              .join("")
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")
                           : "?"}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -222,8 +222,8 @@ export default function ManagerOverviewPage() {
                           entry.avgScore !== null && entry.avgScore >= 70
                             ? "success"
                             : entry.avgScore !== null && entry.avgScore >= 50
-                            ? "warning"
-                            : "secondary"
+                              ? "warning"
+                              : "secondary"
                         }
                       >
                         {entry.avgScore !== null

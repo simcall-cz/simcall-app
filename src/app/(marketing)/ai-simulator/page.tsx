@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Phone, BarChart3, Mic, Check } from "lucide-react";
+import { ArrowRight, Phone, BarChart3, Mic, Check, UserX, Briefcase, Users, Building, Home, Globe } from "lucide-react";
 
 import { Container } from "@/components/shared/container";
 import { SectionHeader } from "@/components/shared/section-header";
@@ -36,12 +36,12 @@ const difficultyBadge = {
 } as const;
 
 const categories = [
-  { emoji: "😤", label: "Skeptici", desc: "Nedůvěřiví majitelé, kteří nevěří makléřům" },
-  { emoji: "💼", label: "Investoři", desc: "Analytici hledající nejlepší výnos" },
-  { emoji: "👨‍👩‍👧", label: "Rodiny", desc: "Emocionální rozhodnutí spojená s bydlením" },
-  { emoji: "🏗️", label: "Developeři", desc: "Profesionálové s vysokými nároky" },
-  { emoji: "🏠", label: "Nájemníci", desc: "Hledají perfektní místo k bydlení" },
-  { emoji: "🌍", label: "Zahraniční", desc: "Jazyková a kulturní bariéra" },
+  { icon: UserX, label: "Skeptici a Odmítači", desc: "Nedůvěřiví majitelé, kteří ze zásady nenávidí makléře." },
+  { icon: Briefcase, label: "Zkušení Investoři", desc: "Tvrdí vyjednavači analyzující každé vaše slovo." },
+  { icon: Users, label: "Rodiny a Rozvody", desc: "Hádky, křik a extrémní emoce přímo na telefonu." },
+  { icon: Building, label: "Developeři", desc: "Arogantní profesionálové s nerealistickými nároky." },
+  { icon: Home, label: "Prvokupci", desc: "Vyděšení začátečníci pálící hromadu zbytečných dotazů." },
+  { icon: Globe, label: "Zahraniční klientela", desc: "Kulturní bariéra a obrovská nedůvěra na dálku." },
 ];
 
 const steps = [
@@ -83,15 +83,13 @@ export default function AiSimulatorPage() {
         <Container>
           <div className="text-center max-w-3xl mx-auto">
             <ScrollReveal>
-              <Badge className="mb-5">AI Simulátor hovorů</Badge>
+              <Badge className="mb-5">Tělocvična pro realitní makléře</Badge>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-neutral-800 leading-[1.1]">
-                500 AI scénářů.{" "}
-                <GradientText>Každý hovor jiný.</GradientText>
+                Natrénujte si hovor o{" "}
+                <GradientText>200 tisíc na provizi</GradientText> nanečisto.
               </h1>
               <p className="mt-5 text-lg text-neutral-500 leading-relaxed max-w-2xl mx-auto">
-                Připravili jsme 500 různých AI klientů — od přátelských majitelů po
-                extrémně náročné investory. Každý má vlastní osobnost, námitky a
-                komunikační styl.
+                Připravili jsme 500 agresivních, skeptických a náročných AI klientů. Otestujte si své prodejní instinkty a potopte se na cvičném hovoru dříve, než to uděláte před reálným zákazníkem o reálné peníze.
               </p>
             </ScrollReveal>
 
@@ -272,13 +270,15 @@ export default function AiSimulatorPage() {
             />
           </ScrollReveal>
 
-          <div className="mt-10 grid grid-cols-2 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
+          <div className="mt-10 grid grid-cols-2 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
             {categories.map((cat, i) => (
               <ScrollReveal key={cat.label} delay={i * 0.07}>
-                <div className="p-5 rounded-2xl bg-white border border-neutral-100 hover:shadow-md transition-shadow">
-                  <div className="text-3xl mb-3">{cat.emoji}</div>
+                <div className="p-6 rounded-2xl bg-white border border-neutral-100 hover:shadow-lg transition-shadow group flex flex-col h-full">
+                  <div className="w-12 h-12 rounded-xl bg-primary-50 text-primary-500 flex justify-center items-center mb-4 group-hover:scale-110 transition-transform">
+                    <cat.icon className="w-6 h-6" />
+                  </div>
                   <h3 className="font-semibold text-neutral-800">{cat.label}</h3>
-                  <p className="mt-1 text-sm text-neutral-500">{cat.desc}</p>
+                  <p className="mt-2 text-sm text-neutral-500 leading-relaxed">{cat.desc}</p>
                 </div>
               </ScrollReveal>
             ))}
@@ -295,10 +295,10 @@ export default function AiSimulatorPage() {
           <ScrollReveal>
             <div className="text-center max-w-2xl mx-auto">
               <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
-                Vyzkoušejte simulátor zdarma
+                Vstupte do ringu zdarma
               </h2>
               <p className="mt-4 text-neutral-400 leading-relaxed">
-                3 hovory a 1 AI agent zdarma. Bez kreditní karty.
+                Pošlete své makléře trénovat, ne pálit peníze. 3 tvrdé hovory zdarma na vyzkoušení.
               </p>
               <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
                 <Link href="/registrace">

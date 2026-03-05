@@ -11,6 +11,11 @@ import {
   Check,
   Building2,
   Users,
+  PhoneCall,
+  MessageSquare,
+  Home,
+  Heart,
+  ShieldCheck,
 } from "lucide-react";
 
 import { Container } from "@/components/shared/container";
@@ -30,45 +35,88 @@ export const metadata: Metadata = {
 const features = [
   {
     icon: Sparkles,
-    title: "AI analýza každého hovoru",
-    desc: "Automatické skóre, silné stránky a konkrétní tipy ke zlepšení ihned po hovoru.",
+    title: "Okamžitá AI analýza po zavěšení",
+    desc: "Získejte okamžité skóre, silné stránky a přesné prodejní tipy ke zlepšení konverze dříve, než sáhnete po dalším telefonu.",
     tag: "Solo",
     tagColor: "bg-primary-50 text-primary-600",
   },
   {
     icon: FileText,
-    title: "Přepis a nahrávka",
-    desc: "Kompletní přepis s detekcí výplňových slov. Export do PDF nebo CSV.",
+    title: "Detailní přepis hledající chyby",
+    desc: "AI najde vašim makléřům chybné formulace a výplňová slova, která zabíjejí obchody. PDF i CSV export do CRM.",
     tag: "Solo",
     tagColor: "bg-primary-50 text-primary-600",
   },
   {
     icon: TrendingUp,
-    title: "Sledování pokroku",
-    desc: "Podrobné statistiky a grafy vašeho zlepšení v čase. Vidíte přesně, kde rostete.",
+    title: "Křivka pokroku a výkonnosti",
+    desc: "Manažeři i makléři jasně vidí, jestli rostou. Grafy prokazatelně určující propálení peněz za reklamu.",
     tag: "Solo",
     tagColor: "bg-primary-50 text-primary-600",
   },
   {
     icon: BarChart3,
-    title: "Manager dashboard",
-    desc: "Přehled výkonu celého týmu na jednom místě. Analytika každého makléře zvlášť.",
+    title: "Manažerské řídící centrum",
+    desc: "Přehled o celém týmu bez nutnosti stát u každého makléře s tužkou. Komplexní analytika cold calls všech zaměstnanců.",
     tag: "Team",
     tagColor: "bg-blue-50 text-blue-600",
   },
   {
     icon: Trophy,
-    title: "Žebříčky v týmu",
-    desc: "Gamifikace motivující makléře k pravidelnému tréninku. Sdílená banka hovorů.",
+    title: "Surové kompetitivní žebříčky",
+    desc: "Nemilosrdná gamifikace, která probudí prodejní instinkt celého oddělení. Vědí, kdo prodává a kdo jen zvedá telefony.",
     tag: "Team",
     tagColor: "bg-blue-50 text-blue-600",
   },
   {
-    icon: Wand2,
-    title: "AI agenti na míru",
-    desc: "Vlastní scénáře ze situací vaší firmy. White-label pod vaší značkou.",
-    tag: "Enterprise",
-    tagColor: "bg-purple-50 text-purple-600",
+    icon: ShieldCheck,
+    title: "Zabudované české Realiťácké pravidla",
+    desc: "Naši AI agenti plně znají českou legislativu, správný rezervační proces i katastrální postupy. Makléř nemůže říct hloupost.",
+    tag: "Obsahuje",
+    tagColor: "bg-emerald-50 text-emerald-600",
+  },
+];
+
+const scenarios = [
+  {
+    icon: ShieldCheck,
+    title: "Složitý proces v ČR",
+    situation: '"Chci prodat byt, ale nevím, jak to u nás chodí."',
+    solution: "Naše AI zná přesný český postup (rezervace → escrow → katastr). Makléři se naučí prodávat proces bez váhání.",
+    color: "text-blue-500",
+    bg: "bg-blue-50",
+  },
+  {
+    icon: PhoneCall,
+    title: "Cold Call: Majitel z katastru",
+    situation: '"Odkud máte moje číslo? Nechci prodat přes makléře!"',
+    solution: "Nejběžnější křest ohněm. Agent simuluje vztek a podrážděnost – učí makléře, jak rychle prorazit bariéru k hodnotě.",
+    color: "text-red-500",
+    bg: "bg-red-50",
+  },
+  {
+    icon: MessageSquare,
+    title: "Bleskový Web Lead",
+    situation: '"Právě jsem vyplnil formulář, chci prodat rychle."',
+    solution: "Tlak na rychlé uzavření a profesionalitu. Simulace učí neusnout na vavřínech u teplého leadu a nepokazit 100% jistotu.",
+    color: "text-emerald-500",
+    bg: "bg-emerald-50",
+  },
+  {
+    icon: Heart,
+    title: "Krizový prodej – Rozvod",
+    situation: '"Musíme to rychle prodat, rozvádíme se. Rychle!"',
+    solution: "Extrémní trénink empatie. Klienti na sebe křičí a makléř musí ustát mediaci a nenechat se stáhnout do hádky.",
+    color: "text-rose-500",
+    bg: "bg-rose-50",
+  },
+  {
+    icon: Home,
+    title: "Mladý pár kupuje první byt",
+    situation: '"Chceme koupit první bydlení, ale vůbec nevíme jak na to."',
+    solution: "Budování celoživotního důvěrného vztahu. Makléři trénují, jak edukovat vyděšeného kupce a neztratit ho kvůli byrokracii.",
+    color: "text-purple-500",
+    bg: "bg-purple-50",
   },
 ];
 
@@ -147,11 +195,11 @@ export default function FunkcePage() {
             <ScrollReveal>
               <Badge className="mb-5">Funkce</Badge>
               <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-neutral-800 leading-[1.1]">
-                Vše co potřebujete.{" "}
-                <GradientText>Nic navíc.</GradientText>
+                Tvrdý trénink.{" "}
+                <GradientText>Reálné provize.</GradientText>
               </h1>
               <p className="mt-5 text-lg text-neutral-500 leading-relaxed">
-                Od individuálního tréninku po správu celého týmu. SimCall roste s vámi.
+                Neztrácejte ostré leady na trénink juniorů. S našimi AI agenty projdou makléři tím nejhorším ještě před zvednutím prvního reálného telefonu.
               </p>
             </ScrollReveal>
             <ScrollReveal delay={0.1}>
@@ -167,6 +215,48 @@ export default function FunkcePage() {
                 </Link>
               </div>
             </ScrollReveal>
+          </div>
+        </Container>
+      </section>
+
+      {/* REAL WORLD SCENARIOS */}
+      <section className="py-16 sm:py-24 bg-white">
+        <Container>
+          <ScrollReveal>
+            <SectionHeader
+              badge="Situace z praxe"
+              title="Trénujte to, na čem to reálně padá"
+              subtitle="5 situací, které oddělují elitní makléře od průměrných telefonistů. Naši AI agenti je simulují do puntíku."
+            />
+          </ScrollReveal>
+
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {scenarios.map((scen, idx) => (
+              <ScrollReveal key={scen.title} delay={idx * 0.1}>
+                <div className="border border-neutral-100 rounded-2xl p-6 hover:shadow-lg transition-shadow bg-neutral-50/50 h-full flex flex-col">
+                  <div className="flex gap-4 items-center mb-5">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${scen.bg}`}>
+                      <scen.icon className={`w-6 h-6 ${scen.color}`} />
+                    </div>
+                    <h3 className="font-bold text-neutral-800 leading-tight">{scen.title}</h3>
+                  </div>
+                  <div className="flex-1 space-y-4">
+                    <div>
+                      <span className="text-xs font-semibold text-neutral-400 uppercase tracking-wider block mb-1">Klient v telefonu:</span>
+                      <p className="text-sm font-medium text-neutral-700 italic border-l-2 border-neutral-200 pl-3 py-1">
+                        {scen.situation}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-xs font-semibold text-neutral-400 uppercase tracking-wider block mb-1">Předmět tréninku:</span>
+                      <p className="text-sm text-neutral-600 leading-relaxed">
+                        {scen.solution}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </ScrollReveal>
+            ))}
           </div>
         </Container>
       </section>
@@ -206,14 +296,13 @@ export default function FunkcePage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             <div>
               <ScrollReveal>
-                <Badge className="mb-4">Zpětná vazba</Badge>
+                <Badge className="mb-4">Zpětná vazba pro dospělé</Badge>
                 <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
-                  Okamžitá analýza{" "}
-                  <span className="text-primary-400">každého hovoru</span>
+                  Surová analytika{" "}
+                  <span className="text-primary-400">každého slova</span>
                 </h2>
                 <p className="mt-4 text-neutral-400 leading-relaxed">
-                  Po každém hovoru dostanete podrobný report — skóre, přepis,
-                  výplňová slova a tipy co zlepšit.
+                  Podívejte se pravdě do očí. Po každém hovoru přesně ukážeme, ve které vteřině jste ztratili klienta kvůli váhání nebo aroganci.
                 </p>
               </ScrollReveal>
               <ScrollReveal delay={0.1}>

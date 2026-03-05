@@ -145,21 +145,19 @@ export default function HomePage() {
 
               <ScrollReveal delay={0.1}>
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-neutral-800 leading-[1.1]">
-                  První{" "}
-                  <GradientText>AI simulátor</GradientText>
+                  Přestaňte pálit <br />
+                  <GradientText>drahé leady</GradientText>
                   <br />
-                  pro realitní makléře
-                  <br />
-                  v&nbsp;Česku
+                  kvůli chybám u telefonu
                 </h1>
               </ScrollReveal>
 
               <ScrollReveal delay={0.2}>
                 <ul className="mt-6 space-y-2.5">
                   {[
-                    "Trénujte na reálných scénářích z praxe",
-                    "Okamžitá AI analýza s přepisem a skóre",
-                    "Přehled výkonu pro makléře i manažery",
+                    "Zbavte nováčky strachu z cold-callingu nanečisto",
+                    "Zvyšte konverze dříve, než jim dáte placené leady",
+                    "Manažeři neztrácí čas s neustálým osobním tréninkem juniorů",
                   ].map((item) => (
                     <li
                       key={item}
@@ -212,7 +210,7 @@ export default function HomePage() {
           <ScrollReveal>
             <SectionHeader
               badge="Jak to funguje"
-              title="Tři kroky k lepším hovorům"
+              title="Od paralyzovaného nováčka k profesionálovi ve 3 krocích"
             />
           </ScrollReveal>
 
@@ -255,8 +253,8 @@ export default function HomePage() {
           <ScrollReveal>
             <SectionHeader
               badge="Funkce"
-              title="Vše, co potřebujete ke zvýšení úspěšnosti"
-              subtitle="Od individuálního tréninku po správu celého týmu."
+              title="Vše, co potřebujete k masivnímu růstu prodejů"
+              subtitle="Neztrácejte čas neefektivním trénováním. Nechte umělou inteligenci odhalit chyby, které vás a váš tým stojí tisíce na provizích."
             />
           </ScrollReveal>
 
@@ -309,12 +307,11 @@ export default function HomePage() {
               <ScrollReveal>
                 <Badge className="mb-4">Zpětná vazba</Badge>
                 <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
-                  Okamžitá analýza{" "}
-                  <span className="text-primary-400">každého hovoru</span>
+                  Odhalte chyby, které vás stojí{" "}
+                  <span className="text-primary-400">statisíce na provizích</span>
                 </h2>
                 <p className="mt-4 text-neutral-400 leading-relaxed">
-                  Přepis, skóre, silné stránky i konkrétní doporučení ke
-                  zlepšení. Vše automaticky po každém hovoru.
+                  Každé zaváhání u telefonu vás může stát klienta. Naše AI zanalyzuje každý detail hovoru a ukáže vám, jak dotáhnout obchod do úspěšného konce. Vycvičte si nekompromisní tah na branku.
                 </p>
               </ScrollReveal>
 
@@ -387,14 +384,14 @@ export default function HomePage() {
                   <User className="w-6 h-6 text-primary-500" />
                 </div>
                 <h3 className="text-xl font-bold text-neutral-800">
-                  Pro makléře
+                  Pro makléře & nováčky
                 </h3>
                 <ul className="mt-4 space-y-2.5">
                   {[
-                    "AI analýza hovoru s přepisem a skóre",
-                    "Personalizovaná doporučení ke zlepšení",
-                    "Export přepisů do PDF a CSV",
-                    "Sledování pokroku v čase",
+                    "Zbavte se paralyzujícího strachu z volání a získejte sebevědomí",
+                    "Natrénujte si ty nejtěžší námitky nanečisto – neztrácíte leady",
+                    "Získejte okamžitou zpětnou vazbu a konkrétní tipy co říct jinak",
+                    "Maximalizujte svou úspěšnost a vydělávejte mnohonásobně vyšší provize",
                   ].map((item) => (
                     <li
                       key={item}
@@ -423,14 +420,14 @@ export default function HomePage() {
                   <Users className="w-6 h-6 text-blue-500" />
                 </div>
                 <h3 className="text-xl font-bold text-neutral-800">
-                  Pro manažery
+                  Pro majitele kanceláří & manažery
                 </h3>
                 <ul className="mt-4 space-y-2.5">
                   {[
-                    "Manager dashboard s přehledem týmu",
-                    "Analytika výkonu každého makléře",
-                    "Žebříčky motivující celý tým",
-                    "Sdílená banka hovorů pro tým",
+                    "Neztrácejte navždy svůj drahocenný čas tréninkem juniorů",
+                    "Předávejte platící leady makléřům až když jsou 100% připraveni",
+                    "Získejte absolutní kontrolu nad prodejními dovednostmi a aktivitou týmu",
+                    "Vybudujte z kanceláře tvrdé prodejce díky žebříčkům a gamifikaci",
                   ].map((item) => (
                     <li
                       key={item}
@@ -462,10 +459,10 @@ export default function HomePage() {
                 </div>
                 <div className="flex-1">
                   <h3 className="text-xl font-bold text-neutral-800">
-                    Pro velké realitní kanceláře
+                    Pro velké developerské a realitní korporace
                   </h3>
                   <p className="mt-1 text-sm text-neutral-500">
-                    White-label řešení, vlastní AI agenti ze situací vaší firmy a dedikovaný vývojář. Cena dohodou.
+                    Nasazení pod vaší značkou. Do AI agentů nahrajeme vaše skutečné firemní procesy, nejčastější chyby na pobočkách a zaručené prodejní skripty. Dostaňte obrat celé sítě na novou úroveň.
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {["White-label", "Vlastní AI agenti na míru", "Dedikovaný vývojář"].map((item) => (
@@ -495,8 +492,8 @@ export default function HomePage() {
           <ScrollReveal>
             <SectionHeader
               badge="AI Agenti"
-              title={`${aiAgents.length}+ unikátních osobností`}
-              subtitle="Od skeptických klientů po investory. Připravte se na cokoli."
+              title={`${aiAgents.length}+ typů tvrdých vyjednávacích situací`}
+              subtitle="Arogantní investoři, skeptičtí slevovači i zmatení dědicové. Trénujte na realitě."
             />
           </ScrollReveal>
 
@@ -514,10 +511,10 @@ export default function HomePage() {
                   </p>
                   <span
                     className={`mt-1 text-[11px] px-2 py-0.5 rounded-full font-medium ${agent.difficulty === "easy"
-                        ? "bg-green-100 text-green-700"
-                        : agent.difficulty === "medium"
-                          ? "bg-yellow-100 text-yellow-700"
-                          : "bg-red-100 text-red-700"
+                      ? "bg-green-100 text-green-700"
+                      : agent.difficulty === "medium"
+                        ? "bg-yellow-100 text-yellow-700"
+                        : "bg-red-100 text-red-700"
                       }`}
                   >
                     {difficultyLabels[agent.difficulty]}
@@ -592,10 +589,10 @@ export default function HomePage() {
           <ScrollReveal>
             <div className="text-center max-w-2xl mx-auto relative">
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight">
-                Připraveni na lepší hovory?
+                Nemusíte ztrácet další klienty.
               </h2>
               <p className="mt-3 sm:mt-4 text-base sm:text-lg text-neutral-400 leading-relaxed">
-                Začněte zdarma. 3 hovory a 1 AI agent bez kreditní karty.
+                Pošlete své makléře do Simulátoru a zvyšte celkové tržby vaší kanceláře. Začněte ještě dnes.
               </p>
               <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/registrace">

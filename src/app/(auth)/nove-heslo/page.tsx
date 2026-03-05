@@ -131,7 +131,7 @@ export default function NoveHesloPage() {
                 <CheckCircle className="w-7 h-7 text-green-500" />
               </div>
               <h1 className="text-xl font-bold text-neutral-900 mb-2">
-                Heslo změněno ✅
+                Heslo změněno
               </h1>
               <p className="text-neutral-500 text-sm mb-4">
                 Vaše heslo bylo úspěšně aktualizováno. Za chvíli budete přesměrováni do dashboardu.

@@ -9,31 +9,24 @@ import { Button } from "@/components/ui/button";
 const teamMembers = [
   {
     name: "Filip Mojik",
-    role: "Zakladatel & CEO",
+    role: "Spoluzakladatel & CEO",
     initials: "FM",
-    desc: "Zakladatel a vizionář SimCall. Zodpovědný za celkový směr a strategii.",
+    desc: "Bývalý realitní makléř, který si prošel peklem cold-callingu. Zodpovídá za produktovou vizi.",
     gradient: "from-primary-400 to-primary-600",
   },
   {
     name: "Trung Le",
     role: "Spoluzakladatel & CTO",
     initials: "TL",
-    desc: "Technologický základ platformy. Stará se o AI integraci a vývoj.",
+    desc: "Mozek za AI technologií. Stará se o to, aby agenti byli rychlí, agresivní a realističtí.",
     gradient: "from-blue-400 to-blue-600",
   },
   {
-    name: "Marek Černý",
-    role: "Marketing",
-    initials: "MČ",
-    desc: "Marketingová strategie, kampaně a budování značky SimCall na trhu.",
+    name: "Tým expertů",
+    role: "Realitní matadoři",
+    initials: "RE",
+    desc: "Naši AI agenty skriptujeme a trénujeme ve spolupráci s elitními českými makléři a developery.",
     gradient: "from-purple-400 to-purple-600",
-  },
-  {
-    name: "Mario Stránský",
-    role: "Obchod",
-    initials: "MS",
-    desc: "Obchodní vztahy, péče o klienty a rozvoj partnerství.",
-    gradient: "from-green-400 to-green-600",
   },
 ];
 
@@ -73,13 +66,11 @@ export default function ONasPage() {
                 O nás
               </div>
               <h1 className="text-4xl sm:text-5xl font-bold text-white tracking-tight leading-[1.1]">
-                Česká firma, která mění{" "}
-                <span className="text-primary-400">trénink hovorů</span>
+                Nástroj, který jsme{" "}
+                <span className="text-primary-400">sami zoufale potřebovali</span>
               </h1>
               <p className="mt-5 text-lg text-neutral-400 leading-relaxed max-w-2xl mx-auto">
-                SimCall vznikl z frustrace s průměrným tréninkem makléřů. Chceme
-                dát každému realitnímu makléři nástroj, který mu pomůže trénovat
-                kdykoli — bez trenéra, bez stresu, s okamžitou zpětnou vazbou.
+                Začínali jsme v 18 letech s telefonem v ruce, obrovským stresem v břiše a nulovými zkušenostmi. Dnes stavíme nástroj, díky kterému už žádný nováček nemusí zažít paralyzující strach ze sluchátka.
               </p>
             </ScrollReveal>
           </div>
@@ -93,9 +84,9 @@ export default function ONasPage() {
             <ScrollReveal>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-16">
                 {[
-                  { value: "500+", label: "AI agentů" },
-                  { value: "34%", label: "průměrné zlepšení" },
-                  { value: "🇨🇿", label: "Česká firma" },
+                  { value: "500+", label: "Realitních scénářů" },
+                  { value: "0", label: "Spálených leadů" },
+                  { value: "100%", label: "Jistota manažera" },
                 ].map((stat) => (
                   <div key={stat.label} className="text-center p-6 rounded-2xl bg-neutral-50 border border-neutral-100">
                     <p className="text-3xl font-bold text-neutral-900">{stat.value}</p>
@@ -106,22 +97,22 @@ export default function ONasPage() {
             </ScrollReveal>
 
             <ScrollReveal delay={0.1}>
-              <div className="space-y-5 text-neutral-600 leading-relaxed">
+              <div className="space-y-5 text-neutral-600 leading-relaxed text-lg">
                 <p>
-                  <strong className="text-neutral-800">Realitní trh v Česku je náročný.</strong>{" "}
-                  Makléři tráví roky zdokonalováním svého přístupu k zákazníkům —
-                  ale tradičních způsobů tréninku je málo, jsou drahé a závislé na
-                  kouči nebo kolegovi.
+                  <strong className="text-neutral-800">Když nám bylo 18 let, začali jsme dělat cold-calling.</strong>{" "}
+                  Byl to extrémní stres. Zíráte na to číslo, potí se vám ruce a jste paralyzovaní, protože nevíte, co člověk na druhé straně odpoví. A každá chyba vás sráží níž.
                 </p>
                 <p>
-                  My jsme to chtěli změnit. Vytvořili jsme platformu, která makléřům
-                  umožní trénovat telefonní hovory s{" "}
-                  <GradientText>realistickými AI agenty</GradientText> — kdykoli,
-                  odkudkoli, na vlastním tempem.
+                  Velmi rychle jsme pochopili krutou realitu realitního trhu: <strong className="text-neutral-800">Zkušení manažeři nechtějí ztrácet čas s juniory.</strong> Nechtějí hodiny poslouchat hrozné hovory a dělat "hraní rolí". Juniorské oddělení je v mnoha firmách začarovaný kruh, kde se jen čeká, kdo z nováčků to náhodou přežije.
                 </p>
                 <p>
-                  Dnes máme 500+ AI agentů s různými osobnostmi, 6 kategorií klientů
-                  a okamžitou AI analýzu každého hovoru. A teprve začínáme.
+                  A největší noční můra manažera? Svěřit draze zaplacený, horký lead z reklamy nevypsanému nováčkovi, který ho do minuty spálí.
+                </p>
+                <p>
+                  <strong className="text-neutral-800 text-primary-500">Proto jsme vytvořili SimCall.</strong>
+                </p>
+                <p>
+                  Dnes mohou nováčci i zaběhnutí makléři udělat 50 chyb denně – ale udělají je na umělé inteligenci. Když manažer vidí v našem grafu, že je makléř připravený, může mu předat skutečný lead s ledovým klidem. Žádné pálení peněz. Žádný strach ze sluchátka.
                 </p>
               </div>
             </ScrollReveal>
@@ -139,7 +130,7 @@ export default function ONasPage() {
             </div>
           </ScrollReveal>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-4xl mx-auto">
             {teamMembers.map((member, i) => (
               <ScrollReveal key={member.name} delay={i * 0.08}>
                 <div className="h-full bg-white rounded-2xl border border-neutral-100 p-6 text-center hover:shadow-lg transition-shadow">
