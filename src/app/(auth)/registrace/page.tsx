@@ -80,7 +80,18 @@ export default function RegistracePage() {
       }
 
       if (data.user) {
-        // Notify about new registration (server-side)
+        // Send welcome email via Resend
+        fetch("/api/email/welcome", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: formData.email,
+            fullName: formData.fullName,
+            planName: "Demo",
+          }),
+        }).catch(() => { });
+
+        // Notify about new registration (Discord)
         fetch("/api/notify/registration", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
