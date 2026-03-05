@@ -118,6 +118,14 @@ const scenarios = [
     color: "text-purple-500",
     bg: "bg-purple-50",
   },
+  {
+    icon: Wand2,
+    title: "Obhajoba exkluzivní smlouvy a provize",
+    situation: '"Proč bych vám měl dávat exkluzivitu a 5% provizi, když mi jinde nabízí prodej bez závazků?"',
+    solution: "Klíčový moment byznysu. Agent trénuje pádné argumenty pro exkluzivitu a učí se obhájit svou odměnu bez ustupování.",
+    color: "text-amber-500",
+    bg: "bg-amber-50",
+  },
 ];
 
 const plans = [

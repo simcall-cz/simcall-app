@@ -85,11 +85,11 @@ export default function AiSimulatorPage() {
             <ScrollReveal>
               <Badge className="mb-5">Tělocvična pro realitní makléře</Badge>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-neutral-800 leading-[1.1]">
-                Natrénujte si hovor o{" "}
-                <GradientText>200 tisíc na provizi</GradientText> nanečisto.
+                Nervozita stranou.{" "}
+                <GradientText>Naučte se vše v praxi.</GradientText>
               </h1>
               <p className="mt-5 text-lg text-neutral-500 leading-relaxed max-w-2xl mx-auto">
-                Připravili jsme 500 agresivních, skeptických a náročných AI klientů. Otestujte si své prodejní instinkty a potopte se na cvičném hovoru dříve, než to uděláte před reálným zákazníkem o reálné peníze.
+                Více než 500 různých situací pro zvládnutí realitního řemesla. Od procesních otázek, práva, až po studené volání. Trénujte vyjednávání nanečisto, než půjdete do ostré akce o skutečné peníze.
               </p>
             </ScrollReveal>
 

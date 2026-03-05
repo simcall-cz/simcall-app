@@ -155,16 +155,16 @@ export default function HomePage() {
               <ScrollReveal delay={0.2}>
                 <ul className="mt-6 space-y-2.5">
                   {[
-                    "Zbavte nováčky strachu z cold-callingu nanečisto",
-                    "Zvyšte konverze dříve, než jim dáte placené leady",
-                    "Manažeři neztrácí čas s neustálým osobním tréninkem juniorů",
+                    "Konec 50stránkových PDF a zastaralých videokurzů",
+                    "Aplikace naprogramovaná z praxe: Nejlépe se učí na sluchátku",
+                    "Zbavte nováčky strachu nanečisto, než jim dáte reálné klienty",
                   ].map((item) => (
                     <li
                       key={item}
                       className="flex items-center gap-2.5 text-neutral-500"
                     >
-                      <Check className="w-4 h-4 text-primary-500 shrink-0" />
-                      <span className="text-base sm:text-lg">{item}</span>
+                      <Check className="w-5 h-5 text-primary-500 shrink-0" />
+                      <span className="text-base sm:text-lg font-medium">{item}</span>
                     </li>
                   ))}
                 </ul>
