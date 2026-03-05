@@ -47,7 +47,19 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ payments: [] });
       }
 
-      return NextResponse.json({ payments: payments || [] });
+      // Format payments to normalize Stripe vs Invoice metadata
+      const formattedPayments = (payments || []).map((p) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const metadata = p.metadata || ({} as any);
+        return {
+          ...p,
+          plan: p.plan || metadata.plan || "Neznámý",
+          tier: p.tier || metadata.tier || 0,
+          method: p.method || metadata.billing_method || "stripe",
+        };
+      });
+
+      return NextResponse.json({ payments: formattedPayments });
     } catch {
       return NextResponse.json({ payments: [] });
     }
@@ -195,10 +207,8 @@ export async function PATCH(request: NextRequest) {
         .eq("id", userId);
 
       if (tierConfig) {
-        const endOfMonth = new Date();
-        endOfMonth.setMonth(endOfMonth.getMonth() + 1);
-        endOfMonth.setDate(1);
-        endOfMonth.setHours(0, 0, 0, 0);
+        const periodEnd = new Date();
+        periodEnd.setDate(periodEnd.getDate() + 30); // 30 days from now
 
         // Check for existing subscription
         const { data: existingSub } = await db
@@ -218,6 +228,7 @@ export async function PATCH(request: NextRequest) {
               calls_limit: callsLimit,
               agents_limit: agentsLimit,
               calls_used: 0,
+              billing_method: "invoice",
               updated_at: now,
             })
             .eq("id", existingSub.id);
@@ -232,10 +243,11 @@ export async function PATCH(request: NextRequest) {
               calls_used: 0,
               calls_limit: callsLimit,
               agents_limit: agentsLimit,
+              billing_method: "invoice",
               customer_name: payment.user_name,
               customer_email: payment.user_email,
               current_period_start: now,
-              current_period_end: endOfMonth.toISOString(),
+              current_period_end: periodEnd.toISOString(),
               created_at: now,
               updated_at: now,
             });

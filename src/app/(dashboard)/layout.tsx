@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { Sidebar } from "@/components/layout/sidebar";
 import { DashboardTopbar } from "@/components/layout/dashboard-topbar";
+import { GracePeriodBanner } from "@/components/dashboard/grace-period-banner";
 import { getAuthHeaders } from "@/lib/auth";
 
 export default function DashboardLayout({
@@ -59,6 +60,7 @@ export default function DashboardLayout({
         </div>
       )}
       <div className="flex flex-col flex-1 min-w-0">
+        <GracePeriodBanner />
         <DashboardTopbar onMenuClick={() => setSidebarOpen(true)} />
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
           {children}

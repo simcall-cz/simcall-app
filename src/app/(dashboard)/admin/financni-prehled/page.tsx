@@ -33,6 +33,7 @@ interface Subscription {
   current_period_end: string | null;
   created_at: string;
   updated_at: string;
+  billing_method?: string;
 }
 
 interface AdminStats {
@@ -301,10 +302,15 @@ export default function FinancniPrehledPage() {
                             {sub.customer_email}
                           </p>
                         </div>
-                        <div className="hidden sm:block">
+                        <div className="hidden sm:flex sm:items-center sm:gap-2">
                           <span className="text-sm text-neutral-700 capitalize">
                             {planLabel[sub.plan] || sub.plan} {sub.tier}
                           </span>
+                          {sub.billing_method === "invoice" && (
+                            <Badge variant="secondary" className="text-[10px] bg-neutral-100 text-neutral-600 hover:bg-neutral-200">
+                              Faktura
+                            </Badge>
+                          )}
                         </div>
                         <p className="hidden sm:block text-sm text-neutral-600 text-center">
                           {sub.calls_used} / {sub.calls_limit}
@@ -323,11 +329,18 @@ export default function FinancniPrehledPage() {
                           </Badge>
                         </div>
                         {/* Mobile */}
-                        <p className="sm:hidden text-xs text-neutral-500">
-                          {planLabel[sub.plan] || sub.plan} {sub.tier} ·{" "}
-                          {sub.calls_used}/{sub.calls_limit} hovorů ·{" "}
-                          {config.label}
-                        </p>
+                        <div className="sm:hidden flex flex-col gap-1 mt-1">
+                          <p className="text-xs text-neutral-500">
+                            {planLabel[sub.plan] || sub.plan} {sub.tier} ·{" "}
+                            {sub.calls_used}/{sub.calls_limit} hovorů ·{" "}
+                            {config.label}
+                          </p>
+                          {sub.billing_method === "invoice" && (
+                            <Badge variant="secondary" className="w-fit text-[10px] bg-neutral-100 text-neutral-600">
+                              Faktura
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     );
                   })}

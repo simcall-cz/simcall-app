@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
       const { data: subscriptions, error } = await db
         .from("subscriptions")
         .select(
-          "id, user_id, plan, tier, status, calls_used, calls_limit, agents_limit, stripe_customer_id, stripe_subscription_id, customer_name, customer_email, current_period_start, current_period_end, created_at, updated_at"
+          "id, user_id, plan, tier, status, calls_used, calls_limit, agents_limit, stripe_customer_id, stripe_subscription_id, customer_name, customer_email, current_period_start, current_period_end, created_at, updated_at, billing_method"
         )
         .order("created_at", { ascending: false });
 

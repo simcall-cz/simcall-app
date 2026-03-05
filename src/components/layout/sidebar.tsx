@@ -21,6 +21,7 @@ import {
   LifeBuoy,
   Receipt,
   CreditCard,
+  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
@@ -108,6 +109,11 @@ const adminNavItems: SidebarNavItem[] = [
     label: "Platby",
     href: "/admin/platby",
     icon: <Receipt className="w-5 h-5" />,
+  },
+  {
+    label: "Faktury",
+    href: "/admin/faktury",
+    icon: <FileText className="w-5 h-5" />,
   },
   {
     label: "Agenti",

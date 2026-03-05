@@ -32,6 +32,7 @@ interface SubscriptionData {
   managerEmail?: string;
   scheduledPlan?: string | null;
   scheduledTier?: number | null;
+  billingMethod?: string;
 }
 
 const planLabels: Record<string, string> = {
@@ -69,6 +70,10 @@ export default function BalicekPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isPortalLoading, setIsPortalLoading] = useState(false);
   const [upgradingTier, setUpgradingTier] = useState<number | null>(null);
+  
+  // Invoice Request Modal
+  const [invoiceRequestModal, setInvoiceRequestModal] = useState<{ plan: string; tier: number; price: number } | null>(null);
+  const [isRequesting, setIsRequesting] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -170,7 +175,7 @@ export default function BalicekPage() {
                   )}
                 </div>
               </div>
-              {isPaid && sub.stripeCustomerId && !isTeamMember && (
+              {isPaid && sub.stripeCustomerId && !isTeamMember && sub.billingMethod !== "invoice" && (
                 <Button
                   onClick={handlePortal}
                   disabled={isPortalLoading}
@@ -359,6 +364,48 @@ export default function BalicekPage() {
                       disabled={isCurrentTier || isScheduledTier || upgradingTier !== null}
                       onClick={async () => {
                         if (isCurrentTier || isScheduledTier) return;
+
+                        // IF INVOICE CUSTOMER
+                        if (sub.billingMethod === "invoice") {
+                          if (isUpgrade) {
+                            // Upgrades -> Custom Modal (requires admin approval & payment)
+                            setInvoiceRequestModal({ plan: sub.plan, tier: t.calls, price: t.price });
+                            return;
+                          } else {
+                            // Downgrades -> Automatic for next month
+                            const confirmed = window.confirm(
+                              `Opravdu chcete downgrade na ${t.calls} hovorů? Změna se projeví na konci aktuálního období.`
+                            );
+                            if (!confirmed) return;
+
+                            setUpgradingTier(t.calls);
+                            try {
+                              const headers = await getAuthHeaders();
+                              const res = await fetch("/api/invoice-request", {
+                                method: "POST",
+                                headers: { ...headers, "Content-Type": "application/json" },
+                                body: JSON.stringify({
+                                  requestedPlan: sub.plan,
+                                  requestedTier: t.calls,
+                                  isDowngrade: true,
+                                }),
+                              });
+                              if (res.ok) {
+                                alert("Downgrade úspěšně naplánován od dalšího měsíce.");
+                                window.location.reload();
+                              } else {
+                                alert("Chyba při plánování downgradu.");
+                              }
+                            } catch (e) {
+                              alert("Chyba spojení");
+                            } finally {
+                              setUpgradingTier(null);
+                            }
+                            return;
+                          }
+                        }
+
+                        // IF STRIPE CUSTOMER
                         // Confirm downgrade
                         if (!isUpgrade) {
                           const confirmed = window.confirm(
@@ -465,6 +512,69 @@ export default function BalicekPage() {
             </CardContent>
           </Card>
         </motion.div>
+      )}
+
+      {/* Invoice Request Modal Overlay */}
+      {invoiceRequestModal && (
+        <div className="fixed inset-0 bg-neutral-900/40 z-50 flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl"
+          >
+            <h3 className="text-xl font-bold text-neutral-900 mb-2">
+              Žádost o změnu tarifu
+            </h3>
+            <p className="text-neutral-500 text-sm mb-6">
+              Jste placeni na fakturu. Přejete si zažádat o změnu na tarif <strong className="text-neutral-900 capitalize">{invoiceRequestModal.plan} ({invoiceRequestModal.tier} hovorů)</strong> za <strong>{invoiceRequestModal.price.toLocaleString("cs-CZ")} Kč/měs</strong>? 
+              <br/><br/>
+              Administrátor vaši žádost zpracuje a zašle vám na e-mail fakturu na poměrnou částku doplatku, případně novou fakturu na další období.
+            </p>
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setInvoiceRequestModal(null)}
+                disabled={isRequesting}
+              >
+                Zrušit
+              </Button>
+              <Button
+                disabled={isRequesting}
+                onClick={async () => {
+                  setIsRequesting(true);
+                  try {
+                    const headers = await getAuthHeaders();
+                    const res = await fetch("/api/invoice-request", {
+                      method: "POST",
+                      headers: { ...headers, "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        requestedPlan: invoiceRequestModal.plan,
+                        requestedTier: invoiceRequestModal.tier,
+                      }),
+                    });
+                    
+                    if (!res.ok) throw new Error("Chyba API");
+                    const data = await res.json();
+                    
+                    if (data.success) {
+                      alert("Žádost úspěšně odeslána! Budeme vás kontaktovat na e-mail.");
+                      setInvoiceRequestModal(null);
+                    } else {
+                      alert(data.error || "Nepodařilo se odeslat žádost.");
+                    }
+                  } catch (err) {
+                    alert("Došlo k chybě při odesílání žádosti.");
+                  } finally {
+                    setIsRequesting(false);
+                  }
+                }}
+              >
+                {isRequesting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                Odeslat žádost
+              </Button>
+            </div>
+          </motion.div>
+        </div>
       )}
     </div>
   );

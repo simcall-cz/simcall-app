@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
     try {
       const { data: subs } = await db
         .from("subscriptions")
-        .select("user_id, id, plan, tier, status, calls_used, calls_limit, current_period_end")
+        .select("user_id, id, plan, tier, status, calls_used, calls_limit, current_period_end, billing_method")
         .eq("status", "active");
       if (subs) {
         for (const s of subs) {
@@ -230,10 +230,8 @@ export async function PATCH(request: NextRequest) {
         .single();
 
       const now = new Date().toISOString();
-      const endOfMonth = new Date();
-      endOfMonth.setMonth(endOfMonth.getMonth() + 1);
-      endOfMonth.setDate(1);
-      endOfMonth.setHours(0, 0, 0, 0);
+      const periodEnd = new Date();
+      periodEnd.setDate(periodEnd.getDate() + 30); // 30 days from now
 
       if (existingSub) {
         // Update existing subscription
@@ -259,8 +257,9 @@ export async function PATCH(request: NextRequest) {
             calls_used: 0,
             calls_limit: config.calls,
             agents_limit: config.agents,
+            billing_method: "invoice",
             current_period_start: now,
-            current_period_end: endOfMonth.toISOString(),
+            current_period_end: periodEnd.toISOString(),
             created_at: now,
             updated_at: now,
           });

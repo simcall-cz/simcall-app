@@ -32,6 +32,7 @@ interface SubscriptionInfo {
   calls_used: number;
   calls_limit: number;
   current_period_end: string | null;
+  billing_method?: string;
 }
 
 interface AdminUser {
@@ -258,6 +259,12 @@ function UserDetailModal({ user, onClose }: { user: AdminUser; onClose: () => vo
                   <span className="text-neutral-500">Stav:</span>
                   <Badge className="ml-2" variant={sub.status === "active" ? "success" : "secondary"}>
                     {sub.status === "active" ? "Aktivní" : sub.status}
+                  </Badge>
+                </div>
+                <div>
+                  <span className="text-neutral-500">Platba:</span>
+                  <Badge className="ml-2" variant={sub.billing_method === "invoice" ? "secondary" : "default"}>
+                    {sub.billing_method === "invoice" ? "Faktura" : "Karta"}
                   </Badge>
                 </div>
                 <div>
@@ -518,11 +525,16 @@ export default function AdminUzivatelePage() {
                         </p>
 
                         {/* Plan */}
-                        <p className="hidden lg:block text-sm text-neutral-600 text-center capitalize">
-                          {sub
-                            ? `${sub.plan} ${sub.tier}`
-                            : "Demo"}
-                        </p>
+                        <div className="hidden lg:flex lg:flex-col lg:items-center lg:justify-center gap-1">
+                          <p className="text-sm text-neutral-600 capitalize">
+                            {sub ? `${sub.plan} ${sub.tier}` : "Demo"}
+                          </p>
+                          {sub?.billing_method === "invoice" && (
+                            <Badge variant="secondary" className="text-[10px] bg-neutral-100 text-neutral-500 hover:bg-neutral-200">
+                              Faktura
+                            </Badge>
+                          )}
+                        </div>
 
                         {/* Status */}
                         <div className="hidden lg:flex lg:justify-center">
@@ -567,12 +579,19 @@ export default function AdminUzivatelePage() {
 
                         {/* Mobile summary */}
                         <div className="lg:hidden flex items-center justify-between">
-                          <p className="text-xs text-neutral-500">
-                            {role.label} ·{" "}
-                            {sub
-                              ? `${sub.plan} ${sub.tier} · ${sub.calls_used}/${sub.calls_limit} hovorů`
-                              : "Demo účet"}
-                          </p>
+                          <div className="flex flex-col gap-1">
+                            <p className="text-xs text-neutral-500">
+                              {role.label} ·{" "}
+                              {sub
+                                ? `${sub.plan} ${sub.tier} · ${sub.calls_used}/${sub.calls_limit} hovorů`
+                                : "Demo účet"}
+                            </p>
+                            {sub?.billing_method === "invoice" && (
+                              <Badge variant="secondary" className="w-fit text-[10px] bg-neutral-100 text-neutral-500">
+                                Faktura
+                              </Badge>
+                            )}
+                          </div>
                           <button
                             onClick={() => setSelectedUser(user)}
                             className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-600 transition-colors"
