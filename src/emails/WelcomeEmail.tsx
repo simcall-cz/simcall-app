@@ -91,6 +91,26 @@ export default function WelcomeEmail({
                 Přejít do dashboardu →
               </Button>
             </Section>
+
+            {/* Upsell for Demo users */}
+            {planName === "Demo" && (
+              <Section style={upsellSectionStyle}>
+                <Text style={upsellHeadingStyle}>
+                  Posuňte svůj trénink na další úroveň 🚀
+                </Text>
+                <Text style={upsellParagraphStyle}>
+                  V rámci verze <strong>Demo</strong> máte k dispozici první <strong>3 tréninkové hovory s 1 AI agentem</strong> zcela zdarma.
+                </Text>
+                <Text style={upsellParagraphStyle}>
+                  Chcete trénovat bez omezení? Získejte přístup ke všem AI agentům, neomezeným scénářům na míru a detailní pokročilé analytice.
+                </Text>
+                <Section style={upsellCtaContainerStyle}>
+                  <Button style={upsellCtaButtonStyle} href="https://simcall.cz/cenik">
+                    Zobrazit prémiové tarify
+                  </Button>
+                </Section>
+              </Section>
+            )}
           </Section>
 
           <Hr style={hrStyle} />
@@ -214,4 +234,42 @@ const footerSmallStyle: React.CSSProperties = {
 const linkStyle: React.CSSProperties = {
   color: "#ef4444",
   textDecoration: "underline",
+};
+
+const upsellSectionStyle: React.CSSProperties = {
+  marginTop: "32px",
+  padding: "24px",
+  backgroundColor: "#fef2f2", // light red background
+  borderRadius: "8px",
+  border: "1px solid #fee2e2",
+};
+
+const upsellHeadingStyle: React.CSSProperties = {
+  fontSize: "16px",
+  fontWeight: 700,
+  color: "#991b1b", // dark red text
+  margin: "0 0 12px",
+};
+
+const upsellParagraphStyle: React.CSSProperties = {
+  fontSize: "14px",
+  color: "#7f1d1d",
+  lineHeight: "1.6",
+  margin: "0 0 12px",
+};
+
+const upsellCtaContainerStyle: React.CSSProperties = {
+  marginTop: "16px",
+};
+
+const upsellCtaButtonStyle: React.CSSProperties = {
+  backgroundColor: "#ffffff",
+  color: "#ef4444",
+  padding: "10px 20px",
+  borderRadius: "6px",
+  border: "1px solid #ef4444",
+  fontSize: "14px",
+  fontWeight: 600,
+  textDecoration: "none",
+  display: "inline-block",
 };
