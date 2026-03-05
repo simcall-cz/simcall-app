@@ -529,11 +529,6 @@ export default function AdminUzivatelePage() {
                           <p className="text-sm text-neutral-600 capitalize">
                             {sub ? `${sub.plan} ${sub.tier}` : "Demo"}
                           </p>
-                          {sub?.billing_method === "invoice" && (
-                            <Badge variant="secondary" className="text-[10px] bg-neutral-100 text-neutral-500 hover:bg-neutral-200">
-                              Faktura
-                            </Badge>
-                          )}
                         </div>
 
                         {/* Status */}
@@ -586,11 +581,6 @@ export default function AdminUzivatelePage() {
                                 ? `${sub.plan} ${sub.tier} · ${sub.calls_used}/${sub.calls_limit} hovorů`
                                 : "Demo účet"}
                             </p>
-                            {sub?.billing_method === "invoice" && (
-                              <Badge variant="secondary" className="w-fit text-[10px] bg-neutral-100 text-neutral-500">
-                                Faktura
-                              </Badge>
-                            )}
                           </div>
                           <button
                             onClick={() => setSelectedUser(user)}

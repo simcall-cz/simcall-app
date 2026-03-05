@@ -111,11 +111,6 @@ const adminNavItems: SidebarNavItem[] = [
     icon: <Receipt className="w-5 h-5" />,
   },
   {
-    label: "Faktury",
-    href: "/admin/faktury",
-    icon: <FileText className="w-5 h-5" />,
-  },
-  {
     label: "Agenti",
     href: "/admin/agenti",
     icon: <Bot className="w-5 h-5" />,

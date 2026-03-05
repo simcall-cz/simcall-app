@@ -106,7 +106,7 @@ function formatSub(sub: any) {
     status: sub.status,
     currentPeriodEnd: sub.current_period_end,
     stripeCustomerId: sub.stripe_customer_id,
-    billingMethod: sub.billing_method || (sub.stripe_customer_id && sub.stripe_customer_id !== "invoice" ? "stripe" : "invoice"),
+    billingMethod: sub.billing_method,
     scheduledPlan: sub.scheduled_plan || null,
     scheduledTier: sub.scheduled_tier || null,
   };

@@ -4,7 +4,6 @@ import {
   NotifyColors,
   notifyNewRegistration,
   notifyPaymentCompleted,
-  notifyInvoiceOrder,
   notifyMeetingBooked,
   notifyContactForm,
   notifySupportTicket,
@@ -30,10 +29,6 @@ export async function GET() {
     {
       event: "Platba přijata",
       fn: () => notifyPaymentCompleted("test@simcall.cz", "solo", 50, 990),
-    },
-    {
-      event: "Objednávka na fakturu",
-      fn: () => notifyInvoiceOrder("test@simcall.cz", "Test Firma", "team", 100, 1990),
     },
     {
       event: "Nová schůzka",

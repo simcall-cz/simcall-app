@@ -24,20 +24,11 @@ import { pricingPlans } from "@/data/pricing";
 import { getAuthHeaders } from "@/lib/auth";
 import type { PricingPlan } from "@/types";
 
-type PaymentMethod = "card" | "invoice";
-
 interface BillingForm {
   fullName: string;
   email: string;
   phone: string;
   companyName: string;
-  ico: string;
-  dic: string;
-  street: string;
-  city: string;
-  zip: string;
-  country: string;
-  note: string;
 }
 
 const emptyForm: BillingForm = {
@@ -45,13 +36,6 @@ const emptyForm: BillingForm = {
   email: "",
   phone: "+420 ",
   companyName: "",
-  ico: "",
-  dic: "",
-  street: "",
-  city: "",
-  zip: "",
-  country: "CZ",
-  note: "",
 };
 
 const planIcons = {
@@ -87,7 +71,6 @@ function CheckoutPage() {
     planParam === "team" ? "team" : "solo"
   );
   const [tierIndex, setTierIndex] = useState(tierParam);
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("card");
   const [form, setForm] = useState<BillingForm>(emptyForm);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof BillingForm, string>>>({});
@@ -121,12 +104,6 @@ function CheckoutPage() {
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
       newErrors.email = "Neplatný formát e-mailu";
 
-    if (paymentMethod === "invoice") {
-      if (!form.street.trim()) newErrors.street = "Zadejte ulici a číslo popisné";
-      if (!form.city.trim()) newErrors.city = "Zadejte město";
-      if (!form.zip.trim()) newErrors.zip = "Zadejte PSČ";
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -139,7 +116,6 @@ function CheckoutPage() {
     setSubmitError(null);
 
     try {
-      if (paymentMethod === "card") {
         // Stripe checkout — send auth headers if logged in
         const headers = await getAuthHeaders();
 
@@ -166,48 +142,6 @@ function CheckoutPage() {
         if (data.error) {
           setSubmitError(data.error);
         }
-      } else {
-        // Invoice — submit form to forms API and create pending payment
-        const headers = await getAuthHeaders();
-
-        await fetch("/api/forms/submit", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            type: "enterprise",
-            name: form.fullName,
-            email: form.email,
-            phone: form.phone,
-            company: form.companyName,
-            message: `Objednávka fakturou: ${plan.name} ${tier.calls} hovorů (${tier.price} Kč/měs). IČO: ${form.ico || "—"}, DIČ: ${form.dic || "—"}. Adresa: ${form.street}, ${form.city} ${form.zip}. Poznámka: ${form.note || "—"}`,
-          }),
-        });
-
-        // Create pending payment record for admin approval
-        await fetch("/api/payments/create", {
-          method: "POST",
-          headers,
-          body: JSON.stringify({
-            plan: selectedPlanId,
-            tier: safeTierIndex + 1,
-            amount: tier.price,
-            email: form.email,
-            name: form.fullName,
-            companyName: form.companyName,
-            ico: form.ico,
-            dic: form.dic,
-            address: `${form.street}, ${form.city} ${form.zip}`.trim(),
-          }),
-        });
-
-        const params = new URLSearchParams({
-          method: "invoice",
-          plan: selectedPlanId,
-          tier: tier.calls.toString(),
-        });
-        window.location.href = `/dekujeme?${params.toString()}`;
-        return;
-      }
     } catch {
       setSubmitError("Došlo k chybě. Zkuste to prosím znovu.");
     } finally {
@@ -392,126 +326,6 @@ function CheckoutPage() {
                 </div>
               </ScrollReveal>
 
-              {/* Payment method */}
-              <ScrollReveal delay={0.15}>
-                <div>
-                  <h2 className="text-sm font-semibold text-neutral-800 uppercase tracking-wider mb-4">
-                    Způsob platby
-                  </h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setPaymentMethod("card")}
-                      className={`flex items-start gap-3 rounded-xl border-2 p-4 text-left transition-all ${
-                        paymentMethod === "card"
-                          ? "border-primary-500 bg-primary-50/50 shadow-sm"
-                          : "border-neutral-200 hover:border-neutral-300"
-                      }`}
-                    >
-                      <div className={`flex h-10 w-10 items-center justify-center rounded-lg shrink-0 ${
-                        paymentMethod === "card" ? "bg-primary-500 text-white" : "bg-neutral-100 text-neutral-500"
-                      }`}>
-                        <CreditCard className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-neutral-800">Kartou online</p>
-                        <p className="text-xs text-neutral-500 mt-0.5">Visa, Mastercard, Apple Pay</p>
-                      </div>
-                      <div className={`ml-auto mt-0.5 flex h-5 w-5 items-center justify-center rounded-full border-2 shrink-0 ${
-                        paymentMethod === "card" ? "border-primary-500 bg-primary-500" : "border-neutral-300"
-                      }`}>
-                        {paymentMethod === "card" && <Check className="h-3 w-3 text-white" />}
-                      </div>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setPaymentMethod("invoice")}
-                      className={`flex items-start gap-3 rounded-xl border-2 p-4 text-left transition-all ${
-                        paymentMethod === "invoice"
-                          ? "border-primary-500 bg-primary-50/50 shadow-sm"
-                          : "border-neutral-200 hover:border-neutral-300"
-                      }`}
-                    >
-                      <div className={`flex h-10 w-10 items-center justify-center rounded-lg shrink-0 ${
-                        paymentMethod === "invoice" ? "bg-primary-500 text-white" : "bg-neutral-100 text-neutral-500"
-                      }`}>
-                        <Receipt className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-neutral-800">Fakturou</p>
-                        <p className="text-xs text-neutral-500 mt-0.5">Bankovní převod, splatnost 14 dní</p>
-                      </div>
-                      <div className={`ml-auto mt-0.5 flex h-5 w-5 items-center justify-center rounded-full border-2 shrink-0 ${
-                        paymentMethod === "invoice" ? "border-primary-500 bg-primary-500" : "border-neutral-300"
-                      }`}>
-                        {paymentMethod === "invoice" && <Check className="h-3 w-3 text-white" />}
-                      </div>
-                    </button>
-                  </div>
-                </div>
-              </ScrollReveal>
-
-              {/* Invoice form — only for invoice payment */}
-              {paymentMethod === "invoice" && (
-                <ScrollReveal delay={0.05}>
-                  <div className="space-y-6">
-                    <div>
-                      <h2 className="text-sm font-semibold text-neutral-800 uppercase tracking-wider mb-4">
-                        Fakturační údaje
-                      </h2>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="sm:col-span-2">
-                          <label htmlFor="companyName" className="mb-1.5 block text-sm font-medium text-neutral-700">
-                            Název firmy / Jméno
-                          </label>
-                          <input id="companyName" name="companyName" type="text" value={form.companyName} onChange={handleChange} placeholder="Reality s.r.o. nebo Jan Novák" className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20" />
-                        </div>
-                        <div>
-                          <label htmlFor="ico" className="mb-1.5 block text-sm font-medium text-neutral-700">IČO <span className="text-neutral-400 font-normal">(nepovinné)</span></label>
-                          <input id="ico" name="ico" type="text" value={form.ico} onChange={handleChange} placeholder="12345678" maxLength={8} className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20" />
-                        </div>
-                        <div>
-                          <label htmlFor="dic" className="mb-1.5 block text-sm font-medium text-neutral-700">DIČ <span className="text-neutral-400 font-normal">(nepovinné)</span></label>
-                          <input id="dic" name="dic" type="text" value={form.dic} onChange={handleChange} placeholder="CZ12345678" className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20" />
-                        </div>
-                      </div>
-                    </div>
-                    <div>
-                      <h2 className="text-sm font-semibold text-neutral-800 uppercase tracking-wider mb-4">Fakturační adresa</h2>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="sm:col-span-2">
-                          <label htmlFor="street" className="mb-1.5 block text-sm font-medium text-neutral-700">Ulice a číslo popisné *</label>
-                          <input id="street" name="street" type="text" autoComplete="street-address" value={form.street} onChange={handleChange} placeholder="Vinohradská 123" className={`w-full rounded-lg border px-4 py-2.5 text-sm text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 ${errors.street ? "border-red-400" : "border-neutral-300"}`} />
-                          {errors.street && <p className="mt-1 text-xs text-red-500">{errors.street}</p>}
-                        </div>
-                        <div>
-                          <label htmlFor="city" className="mb-1.5 block text-sm font-medium text-neutral-700">Město *</label>
-                          <input id="city" name="city" type="text" autoComplete="address-level2" value={form.city} onChange={handleChange} placeholder="Praha" className={`w-full rounded-lg border px-4 py-2.5 text-sm text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 ${errors.city ? "border-red-400" : "border-neutral-300"}`} />
-                          {errors.city && <p className="mt-1 text-xs text-red-500">{errors.city}</p>}
-                        </div>
-                        <div>
-                          <label htmlFor="zip" className="mb-1.5 block text-sm font-medium text-neutral-700">PSČ *</label>
-                          <input id="zip" name="zip" type="text" autoComplete="postal-code" value={form.zip} onChange={handleChange} placeholder="110 00" maxLength={6} className={`w-full rounded-lg border px-4 py-2.5 text-sm text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 ${errors.zip ? "border-red-400" : "border-neutral-300"}`} />
-                          {errors.zip && <p className="mt-1 text-xs text-red-500">{errors.zip}</p>}
-                        </div>
-                        <div className="sm:col-span-2">
-                          <label htmlFor="country" className="mb-1.5 block text-sm font-medium text-neutral-700">Stát</label>
-                          <select id="country" name="country" value={form.country} onChange={handleChange} className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 bg-white transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20">
-                            <option value="CZ">Česká republika</option>
-                            <option value="SK">Slovensko</option>
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-                    <div>
-                      <label htmlFor="note" className="mb-1.5 block text-sm font-medium text-neutral-700">Poznámka k objednávce <span className="text-neutral-400 font-normal">(nepovinné)</span></label>
-                      <textarea id="note" name="note" rows={3} value={form.note} onChange={handleChange} placeholder="Další informace k fakturaci..." className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 resize-none" />
-                    </div>
-                  </div>
-                </ScrollReveal>
-              )}
-
               {/* Error */}
               {submitError && (
                 <div className="rounded-lg bg-red-50 border border-red-200 p-4 text-sm text-red-600">
@@ -531,24 +345,17 @@ function CheckoutPage() {
                       <Loader2 className="h-4 w-4 animate-spin" />
                       Zpracovávám...
                     </>
-                  ) : paymentMethod === "card" ? (
+                  ) : (
                     <>
                       <Lock className="h-4 w-4" />
                       Zaplatit kartou — {tier.price.toLocaleString("cs-CZ")} Kč/měs
                     </>
-                  ) : (
-                    <>
-                      <Receipt className="h-4 w-4" />
-                      Objednat a vystavit fakturu
-                    </>
                   )}
                 </button>
 
-                {paymentMethod === "card" && (
-                  <p className="mt-3 text-center text-xs text-neutral-400">
-                    Budete přesměrováni na zabezpečenou platební bránu Stripe
-                  </p>
-                )}
+                <p className="mt-3 text-center text-xs text-neutral-400">
+                  Budete přesměrováni na zabezpečenou platební bránu Stripe
+                </p>
               </ScrollReveal>
 
               {/* Trust badges */}

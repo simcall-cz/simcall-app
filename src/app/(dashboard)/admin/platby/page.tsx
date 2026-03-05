@@ -62,7 +62,6 @@ export default function AdminPlatbyPage() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [approvingId, setApprovingId] = useState<string | null>(null);
 
   async function fetchPayments() {
     try {
@@ -80,26 +79,6 @@ export default function AdminPlatbyPage() {
 
   useEffect(() => { fetchPayments(); }, []);
 
-  async function handleApprove(paymentId: string) {
-    if (!confirm("Opravdu chcete schválit tuto platbu? Uživateli bude automaticky přiřazen zakoupený balíček.")) return;
-
-    setApprovingId(paymentId);
-    try {
-      const headers = await getAuthHeaders();
-      const res = await fetch("/api/admin/payments", {
-        method: "PATCH",
-        headers,
-        body: JSON.stringify({ paymentId }),
-      });
-      if (!res.ok) throw new Error("Schválení selhalo");
-      // Refresh list
-      await fetchPayments();
-    } catch (err) {
-      alert(err instanceof Error ? err.message : "Chyba při schvalování");
-    } finally {
-      setApprovingId(null);
-    }
-  }
 
   const completedPayments = useMemo(() => payments.filter((p) => p.status === "completed"), [payments]);
 
@@ -262,24 +241,7 @@ export default function AdminPlatbyPage() {
                           <Badge variant={cfg.variant}>{cfg.label}</Badge>
                         </td>
                         <td className="py-3 px-4 text-right">
-                          {payment.status === "pending" && payment.method === "invoice" && (
-                            <Button
-                              size="sm"
-                              onClick={() => handleApprove(payment.id)}
-                              disabled={approvingId === payment.id}
-                              className="gap-1"
-                            >
-                              {approvingId === payment.id ? (
-                                <Loader2 className="w-3 h-3 animate-spin" />
-                              ) : (
-                                <CheckCircle className="w-3 h-3" />
-                              )}
-                              Schválit
-                            </Button>
-                          )}
-                          {payment.status === "completed" && (
-                            <span className="text-xs text-green-600 font-medium">✓ Hotovo</span>
-                          )}
+                          <span className="text-neutral-400">—</span>
                         </td>
                       </tr>
                     );

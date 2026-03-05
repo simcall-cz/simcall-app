@@ -151,19 +151,6 @@ export function notifySubscriptionCancelled(email: string, stripeSubId: string) 
   });
 }
 
-/** Invoice order (manual payment) */
-export function notifyInvoiceOrder(email: string, name: string, plan: string, tier: number, amount: number) {
-  return notifyBusiness({
-    title: "📄 Objednávka na fakturu",
-    color: NotifyColors.WARNING,
-    fields: [
-      { name: "Zákazník", value: `${name} (${email})`, inline: false },
-      { name: "Plán", value: `${plan.toUpperCase()} ${tier}`, inline: true },
-      { name: "Částka", value: `${amount.toLocaleString("cs-CZ")} Kč`, inline: true },
-    ],
-    description: "⏳ Čeká na schválení v admin dashboardu.",
-  });
-}
 
 /** Meeting booked */
 export function notifyMeetingBooked(name: string, email: string, date: string, time: string) {
@@ -229,14 +216,3 @@ export function notifyRebill(stripeSubId: string, email?: string) {
   });
 }
 
-/** Invoice payment approved by admin */
-export function notifyInvoiceApproved(email: string, plan: string, tier: number) {
-  return notifyBusiness({
-    title: "✅ Faktura schválena",
-    color: NotifyColors.SUCCESS,
-    fields: [
-      { name: "Zákazník", value: email, inline: true },
-      { name: "Plán", value: `${plan.toUpperCase()} ${tier}`, inline: true },
-    ],
-  });
-}

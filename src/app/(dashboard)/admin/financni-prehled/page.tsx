@@ -306,11 +306,6 @@ export default function FinancniPrehledPage() {
                           <span className="text-sm text-neutral-700 capitalize">
                             {planLabel[sub.plan] || sub.plan} {sub.tier}
                           </span>
-                          {sub.billing_method === "invoice" && (
-                            <Badge variant="secondary" className="text-[10px] bg-neutral-100 text-neutral-600 hover:bg-neutral-200">
-                              Faktura
-                            </Badge>
-                          )}
                         </div>
                         <p className="hidden sm:block text-sm text-neutral-600 text-center">
                           {sub.calls_used} / {sub.calls_limit}
@@ -335,11 +330,6 @@ export default function FinancniPrehledPage() {
                             {sub.calls_used}/{sub.calls_limit} hovorů ·{" "}
                             {config.label}
                           </p>
-                          {sub.billing_method === "invoice" && (
-                            <Badge variant="secondary" className="w-fit text-[10px] bg-neutral-100 text-neutral-600">
-                              Faktura
-                            </Badge>
-                          )}
                         </div>
                       </div>
                     );

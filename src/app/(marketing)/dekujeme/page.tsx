@@ -10,12 +10,10 @@ import { Button } from "@/components/ui/button";
 function ThankYouContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("session_id");
-  const method = searchParams.get("method"); // "invoice" or null (stripe)
   const plan = searchParams.get("plan") || "solo";
   const tier = searchParams.get("tier") || "50";
 
   const isStripe = !!sessionId;
-  const isInvoice = method === "invoice";
 
   const planName = plan === "team" ? "Team" : "Solo";
   const displayName = `${planName} ${tier}`;
@@ -40,20 +38,14 @@ function ThankYouContent() {
           {/* Payment method info */}
           <div className="bg-neutral-50 rounded-xl p-6 mb-8 text-left">
             <div className="flex items-start gap-3 mb-4">
-              {isStripe ? (
-                <CreditCard className="w-5 h-5 text-primary-500 mt-0.5 shrink-0" />
-              ) : (
-                <FileText className="w-5 h-5 text-primary-500 mt-0.5 shrink-0" />
-              )}
+              <CreditCard className="w-5 h-5 text-primary-500 mt-0.5 shrink-0" />
               <div>
                 <h3 className="font-semibold text-neutral-900">
-                  {isStripe ? "Platba kartou" : isInvoice ? "Platba fakturou" : "Objednávka přijata"}
+                  {isStripe ? "Platba úspěšná" : "Objednávka přijata"}
                 </h3>
                 <p className="text-sm text-neutral-500 mt-1">
                   {isStripe
                     ? "Platba byla úspěšně zpracována. Váš plán je aktivní ihned."
-                    : isInvoice
-                    ? "Fakturu obdržíte e-mailem. Plán bude aktivován po připsání platby."
                     : "Vaše objednávka byla přijata."
                   }
                 </p>
