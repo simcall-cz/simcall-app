@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createCheckoutSession, PLAN_PRICES } from "@/lib/stripe";
 import { getUserFromRequest } from "@/lib/auth";
+import { notifyCheckoutStarted } from "@/lib/notifications";
 
 export async function POST(request: NextRequest) {
   // ------------------------------------------------------------------
@@ -77,6 +78,11 @@ export async function POST(request: NextRequest) {
       successUrl,
       cancelUrl,
     });
+
+    // ----------------------------------------------------------------
+    // Discord webhook: Lead captured (before Stripe payment)
+    // ----------------------------------------------------------------
+    notifyCheckoutStarted({ name, email, phone, plan, tier, companyName });
 
     return NextResponse.json({ url: session.url });
   } catch (error: unknown) {

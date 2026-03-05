@@ -28,7 +28,7 @@ export const NotifyColors = {
 export async function notifyBusiness(options: NotifyOptions): Promise<void> {
   // Read env var at CALL TIME, not module load time (important for Vercel serverless)
   const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
-  
+
   if (!webhookUrl) {
     console.warn("[notify] DISCORD_WEBHOOK_URL not set, skipping notification:", options.title);
     return;
@@ -216,3 +216,25 @@ export function notifyRebill(stripeSubId: string, email?: string) {
   });
 }
 
+/** Checkout started — lead capture (before Stripe payment) */
+export function notifyCheckoutStarted(opts: {
+  name: string;
+  email: string;
+  phone?: string;
+  plan: string;
+  tier: number;
+  companyName?: string;
+}) {
+  return notifyBusiness({
+    title: "🛒 Nový lead — checkout zahájen",
+    color: NotifyColors.WARNING,
+    description: "Zákazník klikl na platbu a byl přesměrován na Stripe. Pokud nezaplatí, lze ho kontaktovat.",
+    fields: [
+      { name: "Jméno", value: opts.name || "—", inline: true },
+      { name: "E-mail", value: opts.email, inline: true },
+      { name: "Telefon", value: opts.phone || "—", inline: true },
+      { name: "Plán", value: `${opts.plan.toUpperCase()} ${opts.tier}`, inline: true },
+      ...(opts.companyName ? [{ name: "Firma", value: opts.companyName, inline: true }] : []),
+    ],
+  });
+}
