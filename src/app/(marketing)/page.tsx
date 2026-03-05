@@ -53,7 +53,7 @@ const steps = [
     num: "01",
     icon: Mic,
     title: "Vyberte scénář",
-    desc: "Zvolte AI agenta a typ hovoru — od studeného kontaktu po náročné námitky.",
+    desc: "Zvolte AI agenta a typ hovoru od studeného kontaktu po náročné námitky.",
   },
   {
     num: "02",
@@ -111,7 +111,7 @@ const features = [
   {
     icon: Wand2,
     title: "AI agenti na míru",
-    desc: "Scénáře z reálných situací vaší firmy. White-label řešení pod vaší značkou.",
+    desc: "Scénáře z reálných situací vaší firmy. Whitelabel řešení pod vaší značkou.",
     tag: "Enterprise",
     tagColor: "bg-purple-50 text-purple-600",
   },
@@ -270,8 +270,8 @@ export default function HomePage() {
                   {[
                     "Developerské projekty a prodej celých bytových domů",
                     "Vyplacení exekuce klienta a komplikované zástavy",
-                    "Stavba bez stavebního povolení — jak to řešit s kupcem",
-                    "Nájemník odmítá odejít — prodej obsazené nemovitosti",
+                    "Stavba bez stavebního povolení a jak to řešit s kupcem",
+                    "Nájemník odmítá odejít a prodej obsazené nemovitosti",
                     "Dědické spory a prodej s více vlastníky",
                     "Právní nuance: věcná břemena, předkupní práva, zápisy v katastru",
                   ].map((item) => (
@@ -446,7 +446,7 @@ export default function HomePage() {
                 <ul className="mt-4 space-y-2.5">
                   {[
                     "Zbavte se paralyzujícího strachu z volání a získejte sebevědomí",
-                    "Natrénujte si ty nejtěžší námitky nanečisto – neztrácíte leady",
+                    "Natrénujte si ty nejtěžší námitky nanečisto a neztraťte už ani jeden lead",
                     "Získejte okamžitou zpětnou vazbu a konkrétní tipy co říct jinak",
                     "Maximalizujte svou úspěšnost a vydělávejte mnohonásobně vyšší provize",
                   ].map((item) => (
@@ -522,7 +522,7 @@ export default function HomePage() {
                     Nasazení pod vaší značkou. Do AI agentů nahrajeme vaše skutečné firemní procesy, nejčastější chyby na pobočkách a zaručené prodejní skripty. Dostaňte obrat celé sítě na novou úroveň.
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2">
-                    {["White-label", "Vlastní AI agenti na míru", "Dedikovaný vývojář"].map((item) => (
+                    {["Whitelabel", "Vlastní AI agenti na míru", "Dedikovaný vývojář"].map((item) => (
                       <span key={item} className="text-[11px] font-medium bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full">
                         {item}
                       </span>
@@ -598,7 +598,7 @@ export default function HomePage() {
             <div className="mt-10 text-center">
               <Link href="/registrace">
                 <Button size="lg" className="group">
-                  Vyzkoušet zdarma — 3 hovory
+                  Vyzkoušet 3 hovory zdarma
                   <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
                 </Button>
               </Link>

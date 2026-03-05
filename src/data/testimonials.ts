@@ -7,7 +7,7 @@ export const testimonials: Testimonial[] = [
     role: "Senior realitní makléř",
     company: "RE/MAX Alfa",
     quote:
-      "SimCall kompletně změnilo můj přístup k cold callingu. Za 3 měsíce používání se moje úspěšnost domlouvání schůzek zvedla o 40 %. AI agenti jsou neuvěřitelně realistickí a zpětná vazba po každém hovoru mi ukázala chyby, kterých jsem si nebyl vědom.",
+      "SimCall kompletně změnilo můj přístup k cold callingu. Za 3 měsíce používání se moje úspěšnost domlouvání schůzek zvedla o 40 %. AI agenti jsou neuvěřitelně realističtí a zpětná vazba po každém hovoru mi ukázala chyby, kterých jsem si nebyl vědom.",
     rating: 5,
     avatarInitials: "PN",
   },
@@ -27,7 +27,7 @@ export const testimonials: Testimonial[] = [
     role: "Realitní makléř",
     company: "M&M Reality",
     quote:
-      "Jako začínající makléř jsem se bál telefonovat cizím lidem. S SimCall jsem si mohl nacvičit desítky hovorů bez stresu. Po měsíci tréninku jsem měl takové sebevědomí, že jsem hned první týden domluvil 5 schůzek. Jednoznačně doporučuji.",
+      "Jako začínající makléř jsem se bál telefonovat cizím lidem. Se SimCall jsem si mohl nacvičit desítky hovorů bez stresu. Po měsíci tréninku jsem měl takové sebevědomí, že jsem hned první týden domluvil 5 schůzek. Jednoznačně doporučuji.",
     rating: 5,
     avatarInitials: "TV",
   },

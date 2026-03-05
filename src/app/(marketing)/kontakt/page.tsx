@@ -114,7 +114,7 @@ export default function KontaktPage() {
                   </div>
                   <div>
                     <p className="text-xs font-medium text-neutral-400 mb-0.5">Provozní doba</p>
-                    <p className="text-sm font-semibold text-neutral-800">Po–Pá: 9:00–18:00</p>
+                    <p className="text-sm font-semibold text-neutral-800">Po až Pá: 9:00 až 18:00</p>
                   </div>
                 </div>
               </ScrollReveal>
@@ -126,7 +126,7 @@ export default function KontaktPage() {
                     <p className="text-sm font-semibold text-neutral-800">Enterprise zákazníci</p>
                   </div>
                   <p className="text-xs text-neutral-600 mb-4 leading-relaxed">
-                    Pro velké realitní kanceláře nabízíme white-label a vlastní AI agenty.
+                    Pro velké realitní kanceláře nabízíme Whitelabel a vlastní AI agenty.
                     Domluvte si schůzku.
                   </p>
                   <Link href="/domluvit-schuzku">

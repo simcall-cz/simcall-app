@@ -5,13 +5,13 @@ export const faqItems: FAQ[] = [
   {
     question: "Co je SimCall a jak funguje?",
     answer:
-      "SimCall je tréninková platforma pro realitní makléře. Zavoláte AI agentovi, který simuluje reálného klienta — reaguje přirozeně, má vlastní osobnost a námitky. Po každém hovoru dostanete detailní AI analýzu s konkrétními doporučeními ke zlepšení.",
+      "SimCall je tréninková platforma pro realitní makléře. Zavoláte AI agentovi, který simuluje reálného klienta, reaguje přirozeně, má vlastní osobnost a námitky. Po každém hovoru dostanete detailní AI analýzu s konkrétními doporučeními ke zlepšení.",
     category: "general",
   },
   {
     question: "Pro koho je SimCall určen?",
     answer:
-      "Primárně pro realitní makléře — jak začínající, kteří si chtějí vybudovat sebevědomí při cold callingu, tak zkušené profesionály, kteří chtějí zlepšit svůj přístup. Plán Team je určen pro realitní kanceláře, které chtějí systematicky trénovat celý tým a sledovat pokrok zaměstnanců.",
+      "Primárně pro realitní makléře, ať už začínající, kteří si chtějí vybudovat sebevědomí při cold callingu, tak zkušené profesionály, kteří chtějí zlepšit svůj přístup. Plán Team je určen pro realitní kanceláře, které chtějí systematicky trénovat celý tým a sledovat pokrok zaměstnanců.",
     category: "general",
   },
   {
@@ -37,19 +37,19 @@ export const faqItems: FAQ[] = [
   {
     question: "Jaké technické požadavky jsou potřeba?",
     answer:
-      "Stačí moderní webový prohlížeč (Chrome, Firefox, Safari nebo Edge), stabilní internet a mikrofon. Funguje na počítači, tabletu i mobilu — není potřeba nic instalovat. Doporučujeme sluchátka s mikrofonem pro nejlepší kvalitu.",
+      "Stačí moderní webový prohlížeč (Chrome, Firefox, Safari nebo Edge), stabilní internet a mikrofon. Funguje na počítači, tabletu i mobilu bez nutnosti cokoliv instalovat. Doporučujeme sluchátka s mikrofonem pro nejlepší kvalitu.",
     category: "technology",
   },
   {
     question: "Jak funguje AI analýza hovoru?",
     answer:
-      "Po každém hovoru AI analyzuje váš výkon — hodnotí práci s námitkami, strukturu hovoru, tempo řeči a použité techniky. Dostanete konkrétní skóre, silné stránky i oblasti ke zlepšení s personalizovanými doporučeními.",
+      "Po každém hovoru AI analyzuje váš výkon, hodnotí práci s námitkami, strukturu hovoru, tempo řeči a použité techniky. Dostanete konkrétní skóre, silné stránky i oblasti ke zlepšení s personalizovanými doporučeními.",
     category: "technology",
   },
   {
     question: "Kolik AI agentů je k dispozici?",
     answer:
-      "Počet agentů závisí na vašem balíčku — od 5 agentů v nejmenším Solo balíčku až po stovky v největších. Každý agent má jinou osobnost, obtížnost a scénář. Ve free verzi máte k dispozici 2 agenty pro vyzkoušení.",
+      "Počet agentů závisí na vašem balíčku od 5 agentů v nejmenším Solo balíčku až po stovky v největších. Každý agent má jinou osobnost, obtížnost a scénář. Ve free verzi máte k dispozici 2 agenty pro vyzkoušení.",
     category: "technology",
   },
 
@@ -75,7 +75,7 @@ export const faqItems: FAQ[] = [
   {
     question: "Nabízíte Enterprise řešení pro velké týmy?",
     answer:
-      "Ano. Enterprise plán zahrnuje white-label branding, vlastní AI agenty a scénáře na míru, dedikovaného account manažera a individuální počet hovorů a agentů. Cena je dohodou — domluvte si nezávaznou schůzku a připravíme nabídku přímo pro vás.",
+      "Ano. Enterprise plán zahrnuje Whitelabel branding, vlastní AI agenty a scénáře na míru, dedikovaného account manažera a individuální počet hovorů a agentů. Cena je dohodou, proto si domluvte nezávaznou schůzku a připravíme nabídku přímo pro vás.",
     category: "pricing",
   },
 
@@ -95,7 +95,7 @@ export const faqItems: FAQ[] = [
   {
     question: "Kdo má přístup k mým tréninkovým hovorům?",
     answer:
-      "K nahrávkám máte přístup pouze vy. Pokud používáte Team plán, váš manažer vidí pouze souhrnné statistiky a analýzy — ne samotné nahrávky, pokud k tomu nedáte souhlas. Žádná třetí strana k vašim hovorům přístup nemá.",
+      "K nahrávkám máte přístup pouze vy. Pokud používáte Team plán, váš manažer vidí pouze souhrnné statistiky a analýzy a nemá přístup k samotným nahrávkám, pokud k tomu nedáte souhlas. Žádná třetí strana k vašim hovorům přístup nemá.",
     category: "security",
   },
   {

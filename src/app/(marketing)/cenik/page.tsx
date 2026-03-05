@@ -51,15 +51,15 @@ const comparisonFeatures: {
 }[] = [
     {
       label: "Počet hovorů",
-      solo: "50 – 1 000",
-      team: "250 – 5 000",
+      solo: "50 až 1 000",
+      team: "250 až 5 000",
       enterprise: "Dohodou",
     },
     {
       label: "Počet AI agentů",
-      solo: "5 – 100",
-      team: "25 – 500",
-      enterprise: "Dohodou + vlastní",
+      solo: "5 až 100",
+      team: "25 až 500",
+      enterprise: "Dohodou a vlastní",
     },
     { label: "AI analýza hovoru", solo: true, team: true, enterprise: true },
     { label: "Přepis hovoru", solo: true, team: true, enterprise: true },
@@ -88,7 +88,7 @@ const comparisonFeatures: {
       enterprise: true,
     },
     {
-      label: "Export přepisů (PDF/CSV)",
+      label: "Export přepisů do CRM",
       solo: true,
       team: true,
       enterprise: true,
@@ -118,7 +118,7 @@ const comparisonFeatures: {
       team: true,
       enterprise: true,
     },
-    { label: "White-label", solo: false, team: false, enterprise: true },
+    { label: "Whitelabel", solo: false, team: false, enterprise: true },
     {
       label: "Vlastní AI agenti na míru",
       solo: false,
@@ -199,8 +199,8 @@ function PricingCard({ plan }: { plan: PricingPlan }) {
         <div className="flex items-center gap-2.5 mb-3">
           <div
             className={`flex h-9 w-9 items-center justify-center rounded-lg ${plan.highlighted
-                ? "bg-primary-500 text-white"
-                : "bg-neutral-100 text-neutral-600"
+              ? "bg-primary-500 text-white"
+              : "bg-neutral-100 text-neutral-600"
               }`}
           >
             <Icon className="h-4.5 w-4.5" />
@@ -252,7 +252,7 @@ function PricingCard({ plan }: { plan: PricingPlan }) {
               >
                 {plan.tiers.map((t, i) => (
                   <option key={i} value={i}>
-                    {t.calls} hovorů — {t.price.toLocaleString("cs-CZ")} Kč/měs
+                    {t.calls} hovorů za {t.price.toLocaleString("cs-CZ")} Kč/měsíc
                   </option>
                 ))}
               </select>
@@ -387,8 +387,8 @@ export default function CenikPage() {
                               ) : (
                                 <span
                                   className={`font-medium ${plan === "team"
-                                      ? "text-primary-600"
-                                      : "text-neutral-700"
+                                    ? "text-primary-600"
+                                    : "text-neutral-700"
                                     }`}
                                 >
                                   {feature[plan]}

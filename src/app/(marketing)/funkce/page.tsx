@@ -73,7 +73,7 @@ const features = [
   },
   {
     icon: ShieldCheck,
-    title: "Zabudované české Realiťácké pravidla",
+    title: "Zabudovaná česká realiťácká pravidla",
     desc: "Naši AI agenti plně znají českou legislativu, správný rezervační proces i katastrální postupy. Makléř nemůže říct hloupost.",
     tag: "Obsahuje",
     tagColor: "bg-emerald-50 text-emerald-600",
@@ -85,7 +85,7 @@ const scenarios = [
     icon: ShieldCheck,
     title: "Složitý proces v ČR",
     situation: '"Chci prodat byt, ale nevím, jak to u nás chodí."',
-    solution: "Naše AI zná přesný český postup (rezervace → escrow → katastr). Makléři se naučí prodávat proces bez váhání.",
+    solution: "Naše AI zná přesný český postup od rezervace k úschově a následně do katastru. Makléři se naučí prodávat proces bez váhání.",
     color: "text-blue-500",
     bg: "bg-blue-50",
   },
@@ -93,7 +93,7 @@ const scenarios = [
     icon: PhoneCall,
     title: "Cold Call: Majitel z katastru",
     situation: '"Odkud máte moje číslo? Nechci prodat přes makléře!"',
-    solution: "Nejběžnější křest ohněm. Agent simuluje vztek a podrážděnost – učí makléře, jak rychle prorazit bariéru k hodnotě.",
+    solution: "Nejběžnější křest ohněm. Agent simuluje vztek a podrážděnost a učí makléře, jak rychle prorazit bariéru k hodnotě.",
     color: "text-red-500",
     bg: "bg-red-50",
   },
@@ -107,7 +107,7 @@ const scenarios = [
   },
   {
     icon: Heart,
-    title: "Krizový prodej – Rozvod",
+    title: "Krizový prodej a rozvod",
     situation: '"Musíme to rychle prodat, rozvádíme se. Rychle!"',
     solution: "Extrémní trénink empatie. Klienti na sebe křičí a makléř musí ustát mediaci a nenechat se stáhnout do hádky.",
     color: "text-rose-500",
@@ -147,7 +147,7 @@ const plans = [
       "Sledování pokroku a statistiky",
       "Personalizovaná doporučení",
       "Pokročilá analýza (detailní scoring)",
-      "Export přepisů (PDF/CSV)",
+      "Export přepisů do CRM",
     ],
     price: "od 490 Kč/měs",
     href: "/checkout?plan=solo&tier=0",
@@ -182,7 +182,7 @@ const plans = [
     highlighted: false,
     items: [
       "Vše z Team",
-      "White-label řešení",
+      "Whitelabel řešení",
       "Vlastní AI agenti a scénáře",
       "Dedikovaný account manažer",
       "Počet hovorů a agentů dohodou",
@@ -279,7 +279,7 @@ export default function FunkcePage() {
             <SectionHeader
               badge="6 kategorií klientů"
               title="Každý typ přináší jiné výzvy"
-              subtitle="Od skeptiků po investoře — trénujte na všech typech klientů, se kterými se v praxi setkáte."
+              subtitle="Od skeptiků po investory. Trénujte na všech typech klientů, se kterými se v praxi setkáte."
             />
           </ScrollReveal>
 
@@ -289,7 +289,7 @@ export default function FunkcePage() {
               { icon: Briefcase, label: "Zkušení Investoři", desc: "Tvrdí vyjednavači analyzující každé vaše slovo." },
               { icon: Users, label: "Rodiny a Rozvody", desc: "Hádky, křik a extrémní emoce přímo na telefonu." },
               { icon: Building2, label: "Developeři", desc: "Arogantní profesionálové s nerealistickými nároky." },
-              { icon: Home, label: "Prvokupci", desc: "Vyděšení začátečníci nevydící co mají dělat." },
+              { icon: Home, label: "Prvokupci", desc: "Vyděšení začátečníci nevědící co mají dělat." },
               { icon: Globe, label: "Zahraniční klientela", desc: "Kulturní bariéra a obrovská nedůvěra na dálku." },
             ].map((cat, i) => (
               <ScrollReveal key={cat.label} delay={i * 0.07}>
@@ -443,7 +443,7 @@ export default function FunkcePage() {
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 rounded-full bg-rose-500 text-white flex items-center justify-center text-base font-bold">RZ</div>
                   <div>
-                    <h3 className="font-bold text-neutral-800">Urgentní prodej — Rozvod</h3>
+                    <h3 className="font-bold text-neutral-800">Urgentní prodej a rozvod</h3>
                     <span className="text-xs text-rose-600 font-medium">Obtížnost: Střední</span>
                   </div>
                 </div>
@@ -451,7 +451,7 @@ export default function FunkcePage() {
                   "Potřebuji to vyřešit co nejrychleji. Rozvádíme se."
                 </p>
                 <p className="text-sm text-neutral-600 leading-relaxed flex-1">
-                  Klientka volá, chce prodat společnou nemovitost kvůli rozvodu. Cílem je projevit empatii, ale hlavně zjistit, zda s prodejem souhlasí i partner — bez jeho souhlasu nelze prodat.
+                  Klientka volá, chce prodat společnou nemovitost kvůli rozvodu. Cílem je projevit empatii, ale hlavně zjistit, zda s prodejem souhlasí i partner. Bez jeho souhlasu nelze nemovitost prodat.
                 </p>
                 <div className="mt-4 pt-3 border-t border-rose-200/50">
                   <p className="text-xs text-neutral-500"><span className="font-semibold">Tip:</span> Buď citlivý. Nastav realistická očekávání ohledně rychlosti. Ověř souhlas obou manželů.</p>
@@ -465,7 +465,7 @@ export default function FunkcePage() {
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 rounded-full bg-red-500 text-white flex items-center justify-center text-base font-bold">CC</div>
                   <div>
-                    <h3 className="font-bold text-neutral-800">Cold call — Majitel z katastru</h3>
+                    <h3 className="font-bold text-neutral-800">Cold call z katastru</h3>
                     <span className="text-xs text-red-600 font-medium">Obtížnost: Těžká</span>
                   </div>
                 </div>
@@ -476,7 +476,7 @@ export default function FunkcePage() {
                   Voláte vlastníkovi domu z katastru. Okamžitě je agresivní a podezíravý. Musíte překonat první odpor a rychle přejít k hodnotě, kterou můžete nabídnout.
                 </p>
                 <div className="mt-4 pt-3 border-t border-red-200/50">
-                  <p className="text-xs text-neutral-500"><span className="font-semibold">Tip:</span> Buď upřímný, odkud máš číslo. Rychle přejdi k hodnotě: "Volám, protože mám pro tento typ nemovitosti kupce."</p>
+                  <p className="text-xs text-neutral-500"><span className="font-semibold">Tip:</span> Buď upřímný ohledně toho odkud máš číslo. Rychle přejdi k hodnotě a řekni, že voláš protože máš pro tento typ nemovitosti kupce.</p>
                 </div>
               </div>
             </ScrollReveal>
@@ -487,7 +487,7 @@ export default function FunkcePage() {
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 rounded-full bg-amber-500 text-white flex items-center justify-center text-base font-bold">VB</div>
                   <div>
-                    <h3 className="font-bold text-neutral-800">Věcné břemeno — Dožití babičky</h3>
+                    <h3 className="font-bold text-neutral-800">Věcné břemeno na dožití babičky</h3>
                     <span className="text-xs text-amber-600 font-medium">Obtížnost: Pokročilá</span>
                   </div>
                 </div>
@@ -498,7 +498,7 @@ export default function FunkcePage() {
                   Klient chce prodat dům, na kterém vázne věcné břemeno dožití. Musíte vysvětlit vliv na cenu a okruh kupců, a navrhnout řešení.
                 </p>
                 <div className="mt-4 pt-3 border-t border-amber-200/50">
-                  <p className="text-xs text-neutral-500"><span className="font-semibold">Tip:</span> Věcné břemeno snižuje cenu — buď upřímný. Vysvětli prodej s břemenem vs. jeho zánik. Doporuč notáře.</p>
+                  <p className="text-xs text-neutral-500"><span className="font-semibold">Tip:</span> Věcné břemeno snižuje cenu, proto buď upřímný. Vysvětli prodej s břemenem oproti jeho zániku. Doporuč notáře.</p>
                 </div>
               </div>
             </ScrollReveal>
@@ -509,7 +509,7 @@ export default function FunkcePage() {
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 rounded-full bg-purple-500 text-white flex items-center justify-center text-base font-bold">PK</div>
                   <div>
-                    <h3 className="font-bold text-neutral-800">První kupující — Netuší jak začít</h3>
+                    <h3 className="font-bold text-neutral-800">První kupující neví jak začít</h3>
                     <span className="text-xs text-purple-600 font-medium">Obtížnost: Snadná</span>
                   </div>
                 </div>

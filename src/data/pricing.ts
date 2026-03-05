@@ -58,7 +58,7 @@ export const pricingPlans: PricingPlan[] = [
       {
         label: "Žebříčky v týmu",
         tooltip:
-          "Gamifikace — srovnání výkonu mezi členy motivuje ke zlepšení",
+          "Gamifikace a srovnání výkonu mezi členy motivuje ke zlepšení",
       },
       {
         label: "Sdílená banka hovorů",
@@ -79,19 +79,19 @@ export const pricingPlans: PricingPlan[] = [
     features: [
       { label: "Vše z Team" },
       {
-        label: "White-label",
+        label: "Whitelabel",
         tooltip:
-          "Vlastní logo a branding — SimCall vystupuje pod značkou vaší firmy",
+          "Vlastní logo a branding, SimCall odteď vystupuje pod značkou vaší firmy",
       },
       {
         label: "Vlastní AI agenti a scénáře na míru",
         tooltip:
-          "Vytvořte scénáře z reálných situací vaší firmy — zaškolte tým na problémy, které jste už v praxi řešili, a předejděte opakovaným chybám",
+          "Vytvořte scénáře z reálných situací vaší firmy a zaškolte tým na problémy, které jste už v praxi řešili, čímž předejdete opakovaným chybám",
       },
       {
         label: "Dedikovaný account manažer",
         tooltip:
-          "Přímý kontakt na vašeho osobního vývojáře ze SimCall, který vám pomůže s čímkoli — od nastavení po nové analytiky a funkce na míru",
+          "Přímý kontakt na vašeho osobního vývojáře ze SimCall, který vám pomůže se vším od nastavení po nové analytiky a funkce na míru",
       },
       { label: "Počet hovorů a agentů dohodou" },
       { label: "Vlastní agenti na míru" },

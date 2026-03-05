@@ -128,7 +128,7 @@ export default function FAQPage() {
                 Nenašli jste odpověď?
               </h3>
               <p className="mt-2 text-neutral-500 text-sm">
-                Napište nám nebo domluvte schůzku — odpovíme do 24 hodin.
+                Napište nám nebo domluvte schůzku a my vám odpovíme do 24 hodin.
               </p>
               <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
                 <Link href="/kontakt">

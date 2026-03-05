@@ -11,7 +11,7 @@ const teamMembers = [
     name: "Filip Mojik",
     role: "Spoluzakladatel & CEO",
     initials: "FM",
-    desc: "Bývalý realitní makléř, který si prošel peklem cold-callingu. Zodpovídá za produktovou vizi.",
+    desc: "Bývalý realitní makléř, který si prošel peklem cold callingu. Zodpovídá za produktovou vizi.",
     gradient: "from-primary-400 to-primary-600",
   },
   {
@@ -99,7 +99,7 @@ export default function ONasPage() {
             <ScrollReveal delay={0.1}>
               <div className="space-y-5 text-neutral-600 leading-relaxed text-lg">
                 <p>
-                  <strong className="text-neutral-800">Když nám bylo 18 let, začali jsme dělat cold-calling.</strong>{" "}
+                  <strong className="text-neutral-800">Když nám bylo 18 let, začali jsme dělat cold calling.</strong>{" "}
                   Byl to extrémní stres. Zíráte na to číslo, potí se vám ruce a jste paralyzovaní, protože nevíte, co člověk na druhé straně odpoví. A každá chyba vás sráží níž.
                 </p>
                 <p>
@@ -112,7 +112,7 @@ export default function ONasPage() {
                   <strong className="text-neutral-800 text-primary-500">Proto jsme vytvořili SimCall.</strong>
                 </p>
                 <p>
-                  Dnes mohou nováčci i zaběhnutí makléři udělat 50 chyb denně – ale udělají je na umělé inteligenci. Když manažer vidí v našem grafu, že je makléř připravený, může mu předat skutečný lead s ledovým klidem. Žádné pálení peněz. Žádný strach ze sluchátka.
+                  Dnes mohou nováčci i zaběhnutí makléři udělat 50 chyb denně, ale udělají je na umělé inteligenci. Když manažer vidí v našem grafu, že je makléř připravený, může mu předat skutečný lead s ledovým klidem. Žádné pálení peněz. Žádný strach ze sluchátka.
                 </p>
               </div>
             </ScrollReveal>
@@ -180,7 +180,7 @@ export default function ONasPage() {
           <ScrollReveal>
             <div className="text-center max-w-xl mx-auto">
               <h2 className="text-3xl font-bold text-white">Chcete se přidat?</h2>
-              <p className="mt-3 text-neutral-400">Vyzkoušejte SimCall zdarma — 3 hovory, bez kreditní karty.</p>
+              <p className="mt-3 text-neutral-400">Vyzkoušejte SimCall na 3 hovory zdarma a bez kreditní karty.</p>
               <div className="mt-7 flex gap-3 justify-center flex-wrap">
                 <Link href="/registrace">
                   <Button size="lg" className="group">

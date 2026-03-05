@@ -6,7 +6,7 @@ export const aiAgents: AIAgent[] = [
     name: "Petr Horák",
     personality: "Skeptický prodejce",
     description:
-      "Petr vlastní rodinný dům 5+kk na okraji Prahy a prodává ho sám přes Bezrealitky. Měl špatné zkušenosti se dvěma makléři — jeden byl líný, druhý tlačil na slevu. Je úsečný, podezřívavý a cynický. Trpělivost má velmi nízkou a postoj k makléřům je jasný: 'Všichni jste stejní, chcete jen provizi za nic.'",
+      "Petr vlastní rodinný dům 5+kk na okraji Prahy a prodává ho sám přes Bezrealitky. Měl špatné zkušenosti se dvěma makléři, jeden byl líný a druhý tlačil na slevu. Je úsečný, podezřívavý a cynický. Trpělivost má velmi nízkou a postoj k makléřům je jasný: 'Všichni jste stejní, chcete jen provizi za nic.'",
     difficulty: "hard",
     avatarInitials: "PH",
     traits: [
@@ -24,7 +24,7 @@ export const aiAgents: AIAgent[] = [
     name: "Jana Nováková",
     personality: "Přátelský prodejce",
     description:
-      "Jana vlastní rodinný dům v Brně a stěhuje se za prací. Je přátelská, otevřená a ochotná spolupracovat. Nemá velké zkušenosti s makléři, ale je vstřícná. Ideální pro začátečníky — obtížnost 3/10.",
+      "Jana vlastní rodinný dům v Brně a stěhuje se za prací. Je přátelská, otevřená a ochotná spolupracovat. Nemá velké zkušenosti s makléři, ale je vstřícná. Ideální pro začátečníky s obtížností 3 z 10.",
     difficulty: "easy",
     avatarInitials: "JN",
     traits: [
@@ -42,7 +42,7 @@ export const aiAgents: AIAgent[] = [
     name: "Martin Dvořák",
     personality: "Nedůvěřivý vlastník",
     description:
-      "Martin vlastní starší rodinný dům na okraji Prahy vyžadující rekonstrukci. Mění se mu rodinná situace. Měl negativní zkušenost s makléři. Je skeptický, úsečný a má nerealisticky vysoké cenové očekávání. Nejtěžší agent — obtížnost 9/10.",
+      "Martin vlastní starší rodinný dům na okraji Prahy vyžadující rekonstrukci. Mění se mu rodinná situace. Měl negativní zkušenost s makléři. Je skeptický, úsečný a má nerealisticky vysoké cenové očekávání. Nejtěžší agent s obtížností 9 z 10.",
     difficulty: "hard",
     avatarInitials: "MD",
     traits: [
