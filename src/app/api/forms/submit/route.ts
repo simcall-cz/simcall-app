@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
 
     if (type === "kontakt") {
       // 1. Notify admin about new contact form submission
-      resend.emails.send({
+      await resend.emails.send({
         from: getFromEmail(),
         to: [ADMIN_EMAIL],
         subject: `Nová zpráva z kontaktu: ${trimmedName}`,
@@ -103,18 +103,18 @@ export async function POST(request: NextRequest) {
           message: message?.trim() || "",
         }),
         replyTo: trimmedEmail,
-      }).catch((err) => console.error("[email] Contact admin notification failed:", err));
+      });
 
       // 2. Auto-reply to sender
-      resend.emails.send({
+      await resend.emails.send({
         from: getFromEmail(),
         to: [trimmedEmail],
         subject: "Děkujeme za zprávu — SimCall",
         react: ContactAutoReplyEmail({ name: trimmedName }),
-      }).catch((err) => console.error("[email] Contact auto-reply failed:", err));
+      });
 
       // 3. Discord notification
-      notifyContactForm(trimmedName, trimmedEmail, message?.trim() || "");
+      await notifyContactForm(trimmedName, trimmedEmail, message?.trim() || "");
     }
 
     if (type === "schuzka" || type === "enterprise") {
@@ -129,24 +129,24 @@ export async function POST(request: NextRequest) {
       };
 
       // 1. Confirmation to customer
-      resend.emails.send({
+      await resend.emails.send({
         from: getFromEmail(),
         to: [trimmedEmail],
         subject: `Schůzka potvrzena — ${meeting_date} v ${meeting_time}`,
         react: MeetingBookedEmail({ ...meetingProps, isAdminNotification: false }),
-      }).catch((err) => console.error("[email] Meeting customer confirmation failed:", err));
+      });
 
       // 2. Notify admin
-      resend.emails.send({
+      await resend.emails.send({
         from: getFromEmail(),
         to: [ADMIN_EMAIL],
         subject: `Nová schůzka: ${trimmedName} (${company?.trim() || "N/A"})`,
         react: MeetingBookedEmail({ ...meetingProps, isAdminNotification: true }),
         replyTo: trimmedEmail,
-      }).catch((err) => console.error("[email] Meeting admin notification failed:", err));
+      });
 
       // 3. Discord notification
-      notifyMeetingBooked(trimmedName, trimmedEmail, meeting_date || "", meeting_time || "");
+      await notifyMeetingBooked(trimmedName, trimmedEmail, meeting_date || "", meeting_time || "");
     }
 
     if (error) {
