@@ -17,6 +17,7 @@ export interface Scenario {
   difficulty: "easy" | "medium" | "hard";
   objectives: string[];
   agentId: string;
+  imageUrl?: string;
 }
 
 export interface Testimonial {

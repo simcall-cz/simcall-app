@@ -212,6 +212,18 @@ export default function NovyHovorPage() {
             </ul>
           </div>
 
+          {/* Graphic (if exists) */}
+          {scenario.imageUrl && (
+            <div className="border-b border-neutral-100 p-6 bg-neutral-50/50">
+              <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-400">
+                Kontext leadu ze systému
+              </h3>
+              <div className="rounded-xl overflow-hidden shadow-sm border border-neutral-200/60 bg-white">
+                <img src={scenario.imageUrl} alt="Kontext" className="w-full h-auto object-cover" />
+              </div>
+            </div>
+          )}
+
           {/* Start Button */}
           <div className="p-6">
             <Button

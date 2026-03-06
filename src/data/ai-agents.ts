@@ -109,4 +109,21 @@ export const aiAgents: AIAgent[] = [
     exampleScenario:
       "Viktor prodává sklepní kóji 8 m² v Pardubicích-Dukle za 100-300 tis. Kč. Nespěchá, ale chce se zbavit nemovitosti po špatné zkušenosti s nájemníky.",
   },
+  {
+    id: "agent-zbynek",
+    name: "Zbyněk Zajíc",
+    personality: "Finanční tíseň a skeptický realista",
+    description:
+      "Zbyněk má finanční potíže, spotřebitelské úvěry a hrozí mu exekuce. Potřebuje urgentní prodej bytu. I přes svou tíseň je skeptický realista — nevěří planým slibům a žádá konkrétní důkazy a reference.",
+    difficulty: "easy",
+    avatarInitials: "ZZ",
+    traits: [
+      "V tísni",
+      "Skeptický",
+      "Realista",
+      "Spěchá",
+    ],
+    exampleScenario:
+      "Zbyněk odeslal poptávku z webu kvůli exekuci. Potřebuje rychlé řešení a důkazy vaší kompetence. Přesvědčte ho a domluvte schůzku na tento týden.",
+  },
 ];
