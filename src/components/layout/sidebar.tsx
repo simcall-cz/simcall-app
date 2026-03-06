@@ -45,6 +45,11 @@ const agentNavItems: SidebarNavItem[] = [
     icon: <LayoutDashboard className="w-5 h-5" />,
   },
   {
+    label: "Nový hovor",
+    href: "/dashboard/hovory/novy-hovor",
+    icon: <PhoneCall className="w-5 h-5" />,
+  },
+  {
     label: "Hovory",
     href: "/dashboard/hovory",
     icon: <Phone className="w-5 h-5" />,
@@ -141,8 +146,8 @@ export function Sidebar({ variant, isOpen, onClose }: SidebarProps) {
     isAdmin
       ? adminNavItems
       : variant === "manager"
-      ? managerNavItems
-      : agentNavItems;
+        ? managerNavItems
+        : agentNavItems;
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -178,11 +183,11 @@ export function Sidebar({ variant, isOpen, onClose }: SidebarProps) {
 
   const initials = userName
     ? userName
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2)
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2)
     : userEmail?.[0]?.toUpperCase() || "?";
 
   const renderNavLink = (item: SidebarNavItem) => (
