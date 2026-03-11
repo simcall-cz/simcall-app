@@ -13,7 +13,7 @@ export interface Scenario {
   id: string;
   title: string;
   description: string;
-  category: "hot-lead" | "cold-lead" | "competitive" | "negotiation" | "listing";
+  category: "hot-lead" | "warm-lead" | "cold-lead" | "competitive" | "negotiation" | "listing";
   difficulty: "easy" | "medium" | "hard";
   objectives: string[];
   agentId: string;

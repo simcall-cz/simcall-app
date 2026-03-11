@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
 import { getUserFromRequest } from "@/lib/auth";
+import { promises as fs } from "fs";
+import path from "path";
 
 // Allow up to 60s on Vercel Hobby (default is 10s which causes audio upload to fail)
 export const maxDuration = 60;
@@ -48,7 +50,32 @@ export async function POST(
   }
 
   try {
-    // 2. Fetch conversation from ElevenLabs API (with retries)
+    // 2a. Look up scenario difficulty for dynamic evaluation prompt
+    let evaluationPrompt = "";
+    if (call.scenario_id) {
+      const { data: scenario } = await supabase
+        .from("scenarios")
+        .select("difficulty")
+        .eq("id", call.scenario_id)
+        .single();
+
+      const difficultyMap: Record<string, string> = {
+        easy: "hot_lead_1_3.txt",
+        medium: "warm_lead_4_6.txt",
+        hard: "cold_lead_7_10.txt",
+      };
+      const promptFile = difficultyMap[scenario?.difficulty || "medium"] || "warm_lead_4_6.txt";
+
+      try {
+        const promptPath = path.join(process.cwd(), "src", "lib", "prompts", "evaluation", promptFile);
+        evaluationPrompt = await fs.readFile(promptPath, "utf-8");
+        console.log(`Using evaluation prompt: ${promptFile}`);
+      } catch {
+        console.warn(`Could not load prompt file ${promptFile}, using default criteria`);
+      }
+    }
+
+    // 2b. Fetch conversation from ElevenLabs API (with retries)
     // After a call ends there can be a short delay before data is available
     let conversationData: ElevenLabsConversation | null = null;
 
@@ -162,7 +189,7 @@ export async function POST(
                 },
                 {
                   role: "user",
-                  content: `Analyzuj nasledujici treninkovy hovor realitniho maklere.\n\nPREPIS HOVORU:\n${transcriptText}\n\nVrat POUZE validni JSON (bez \`\`\`json bloku) v tomto formatu:\n{\n  "overall_score": <cislo 0-100>,\n  "strengths": ["silna stranka 1", "silna stranka 2"],\n  "improvements": ["oblast ke zlepseni 1", "oblast ke zlepseni 2"],\n  "filler_words": [{"word": "ehm", "count": 2}],\n  "recommendations": ["doporuceni 1", "doporuceni 2"],\n  "transcript_highlights": [\n    {"index": 0, "highlight": null},\n    {"index": 1, "highlight": "good"},\n    {"index": 2, "highlight": "mistake"}\n  ]\n}\n\nHodnotici kriteria:\n1. Profesionalni predstaveni a navazani kontaktu (0-10 bodu)\n2. Zjistovani potreb klienta (0-15 bodu)\n3. Prezentace hodnoty sluzeb a obhajoba provize (0-15 bodu)\n4. ODBORNA SPRAVNOST — zna makler spravny pravni postup, smluvni proces, dane? (0-25 bodu)\n5. Prace s namitkami a obtizne situace (0-15 bodu)\n6. Uzavreni / domluveni dalsiho kroku (0-10 bodu)\n7. Komunikacni dovednosti (0-10 bodu) - plynulost, vyplnova slova, ton\n\nDULEZITE: Pokud makler sdeli klientovi SPATNOU pravni nebo procesni informaci (napr. nespravny postup u katastru, spatne vysvetleni uschovy, rezervacni smlouvy ci dani), VZDY sniz skore a jasne to popís v improvements a recommendations.`,
+                  content: `Analyzuj nasledujici treninkovy hovor realitniho maklere.\n\nPREPIS HOVORU:\n${transcriptText}\n\nVrat POUZE validni JSON (bez \`\`\`json bloku) v tomto formatu:\n{\n  "overall_score": <cislo 0-100>,\n  "strengths": ["silna stranka 1", "silna stranka 2"],\n  "improvements": ["oblast ke zlepseni 1", "oblast ke zlepseni 2"],\n  "filler_words": [{"word": "ehm", "count": 2}],\n  "recommendations": ["doporuceni 1", "doporuceni 2"],\n  "transcript_highlights": [\n    {"index": 0, "highlight": null},\n    {"index": 1, "highlight": "good"},\n    {"index": 2, "highlight": "mistake"}\n  ]\n}\n\n${evaluationPrompt ? `SPECIFICKA HODNOTICI KRITERIA PRO TENTO TYP HOVORU:\n${evaluationPrompt}` : `Hodnotici kriteria:\n1. Profesionalni predstaveni a navazani kontaktu (0-10 bodu)\n2. Zjistovani potreb klienta (0-15 bodu)\n3. Prezentace hodnoty sluzeb a obhajoba provize (0-15 bodu)\n4. ODBORNA SPRAVNOST — zna makler spravny pravni postup, smluvni proces, dane? (0-25 bodu)\n5. Prace s namitkami a obtizne situace (0-15 bodu)\n6. Uzavreni / domluveni dalsiho kroku (0-10 bodu)\n7. Komunikacni dovednosti (0-10 bodu) - plynulost, vyplnova slova, ton`}\n\nDULEZITE: Pokud makler sdeli klientovi SPATNOU pravni nebo procesni informaci (napr. nespravny postup u katastru, spatne vysvetleni uschovy, rezervacni smlouvy ci dani), VZDY sniz skore a jasne to popis v improvements a recommendations.`,
                 },
               ],
             }),
