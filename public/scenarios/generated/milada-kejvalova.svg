@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 300" width="100%" height="100%">
+        <rect width="600" height="300" fill="#eef2f6" />
+        <rect x="30" y="30" width="540" height="240" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1" />
+        
+        <!-- Header -->
+        <rect x="30" y="30" width="540" height="46" rx="4" fill="#1e293b" />
+        <rect x="30" y="60" width="540" height="16" fill="#1e293b" />
+        <text x="50" y="58" font-family="'Courier New', Courier, monospace" font-weight="bold" font-size="18" fill="#ffffff">🏢 KN - Nahlížení do katastru</text>
+        
+        <!-- Content List -->
+        <text x="50" y="105" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#64748b">INFORMACE O POZEMKU / STAVBĚ</text>
+        <rect x="50" y="115" width="500" height="1" fill="#e2e8f0" />
+        
+        <text x="50" y="140" font-family="Arial, sans-serif" font-size="13" fill="#475569">Vlastnické právo:</text>
+        <text x="200" y="140" font-family="Arial, sans-serif" font-weight="bold" font-size="14" fill="#0f172a">Milada Kejvalová</text>
+        
+        <text x="50" y="170" font-family="Arial, sans-serif" font-size="13" fill="#475569">Způsob využití:</text>
+        <text x="200" y="170" font-family="Arial, sans-serif" font-size="13" fill="#0f172a">byt 2+1 v panelovém domě (68 m²)</text>
+        
+        <text x="50" y="200" font-family="Arial, sans-serif" font-size="13" fill="#475569">Katastrální území:</text>
+        <text x="200" y="200" font-family="Arial, sans-serif" font-size="13" fill="#0f172a">Praha 10 - Vršovice</text>
+        
+        <text x="50" y="230" font-family="Arial, sans-serif" font-size="13" fill="#475569">Omezení pr. vztahu:</text>
+        <text x="200" y="230" font-family="Arial, sans-serif" font-weight="bold" font-size="13" fill="#ef4444">Zástavní právo smluvní / Ostatní</text>
+        
+        <rect x="440" y="210" width="80" height="30" rx="4" fill="#3b82f6" />
+        <text x="480" y="230" font-family="Arial, sans-serif" font-size="12" fill="#ffffff" text-anchor="middle">Detail LV</text>
+    </svg>
