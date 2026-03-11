@@ -18,6 +18,7 @@ export const scenarios: Scenario[] = [
       "Domluvit konkrétní termín video hovoru",
     ],
     agentId: "agent-eva-tomanova",
+    imageUrl: "/scenarios/eva-email.png",
   },
   {
     id: "scenario-karin-horackova",
@@ -33,6 +34,7 @@ export const scenarios: Scenario[] = [
       "Domluvit osobní schůzku na konkrétní den a čas",
     ],
     agentId: "agent-karin-horackova",
+    imageUrl: "/scenarios/karin-h-doporuceni.png",
   },
   {
     id: "scenario-karin-pitrova",
@@ -48,6 +50,7 @@ export const scenarios: Scenario[] = [
       "Domluvit osobní schůzku ještě tento týden",
     ],
     agentId: "agent-karin-pitrova",
+    imageUrl: "/scenarios/karin-p-crm.png",
   },
   {
     id: "scenario-samuel-orel",
@@ -63,6 +66,7 @@ export const scenarios: Scenario[] = [
       "Domluvit osobní schůzku s konkrétním plánem",
     ],
     agentId: "agent-samuel-orel",
+    imageUrl: "/scenarios/samuel-hovor.png",
   },
   {
     id: "scenario-milada-kejvalova",
@@ -78,6 +82,7 @@ export const scenarios: Scenario[] = [
       "Domluvit schůzku s konkrétním plánem postupu",
     ],
     agentId: "agent-milada-kejvalova",
+    imageUrl: "/scenarios/milada-crm.png",
   },
   // ═══════════════════════════════════════════
   // WARM LEADS (Obtížnost 3–4)
@@ -96,6 +101,7 @@ export const scenarios: Scenario[] = [
       "Domluvit bezplatný odhad nebo follow-up",
     ],
     agentId: "agent-adam-kohout",
+    imageUrl: "/scenarios/adam-email.png",
   },
   {
     id: "scenario-hildegarda-kovarova",
@@ -111,6 +117,7 @@ export const scenarios: Scenario[] = [
       "Udržet klienta v CRM pro budoucí kontakt",
     ],
     agentId: "agent-hildegarda-kovarova",
+    imageUrl: "/scenarios/hildegarda-portal.png",
   },
   {
     id: "scenario-ruzena-ruzickova",
@@ -161,6 +168,7 @@ export const scenarios: Scenario[] = [
       "Posunout věci kupředu nebo si jasně zjistit zájem",
     ],
     agentId: "agent-eduard-langer",
+    imageUrl: "/scenarios/eduard-cold-email.png",
   },
   {
     id: "scenario-ilona-tykalova",
@@ -176,6 +184,7 @@ export const scenarios: Scenario[] = [
       "Překonat první odpor a domluvit další krok",
     ],
     agentId: "agent-ilona-tykalova",
+    imageUrl: "/scenarios/ilona-katastr.png",
   },
   {
     id: "scenario-leona-neumannova",
@@ -207,6 +216,7 @@ export const scenarios: Scenario[] = [
       "Dostat se k decision makerovi",
     ],
     agentId: "agent-miroslava-balounova",
+    imageUrl: "/scenarios/miroslava-b2b.png",
   },
   {
     id: "scenario-ales-navratil",
@@ -238,6 +248,7 @@ export const scenarios: Scenario[] = [
       "Nabídnout pilotní spolupráci nebo audit zdarma",
     ],
     agentId: "agent-andrea-kohoutova",
+    imageUrl: "/scenarios/andrea-k-developer.png",
   },
   {
     id: "scenario-agata-kralova",
@@ -269,6 +280,7 @@ export const scenarios: Scenario[] = [
       "Domluvit jakýkoli další krok",
     ],
     agentId: "agent-andrea-spackova",
+    imageUrl: "/scenarios/eduard-cold-email.png",
   },
   {
     id: "scenario-marie-mrazkova",
@@ -284,6 +296,7 @@ export const scenarios: Scenario[] = [
       "Posunout věci kupředu pokud je zájem skutečný",
     ],
     agentId: "agent-marie-mrazkova",
+    imageUrl: "/scenarios/eduard-cold-email.png",
   },
   {
     id: "scenario-frantiska-jelinkova",
