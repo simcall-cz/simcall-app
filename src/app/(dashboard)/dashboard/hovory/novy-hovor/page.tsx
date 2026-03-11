@@ -223,9 +223,9 @@ export default function NovyHovorPage() {
                   {agent.avatarInitials}
                 </span>
               </div>
-              <div>
-                <p className="font-semibold text-neutral-900">{agent.name}</p>
-                <p className="text-sm text-neutral-500">
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold text-neutral-900 break-words">{agent.name}</p>
+                <p className="text-sm text-neutral-500 break-words">
                   {agent.personality}
                 </p>
               </div>
@@ -402,10 +402,10 @@ export default function NovyHovorPage() {
                         </span>
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-neutral-900 whitespace-normal leading-tight">
+                        <p className="text-sm font-medium text-neutral-900 break-words leading-tight line-clamp-2">
                           {a.name}
                         </p>
-                        <p className="text-xs text-neutral-500 whitespace-normal mt-0.5 leading-tight">
+                        <p className="text-xs text-neutral-500 break-words mt-1 leading-tight line-clamp-2">
                           {a.personality}
                         </p>
                       </div>

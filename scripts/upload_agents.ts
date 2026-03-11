@@ -176,7 +176,8 @@ async function main() {
             category: source.cat,
             difficulty: difficulty,
             objectives: ["Zjistit situaci klienta", "Navázat vztah", "Nabídnout řešení a schůzku"],
-            agent_id: agentIdDb
+            agent_id: agentIdDb,
+            image_url: `/scenarios/generated/${slugify(jmeno)}.svg`
         });
     }
 
