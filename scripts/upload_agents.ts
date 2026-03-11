@@ -1,11 +1,15 @@
 import fs from 'fs';
 import path from 'path';
 import { createClient } from '@supabase/supabase-js';
+import * as dotenv from 'dotenv';
+
+// Load environment variables from .env.local or .env
+dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
 
 // Parsed from .env.local
-const ELEVENLABS_API_KEY = "sk_a46f8053b79da5c27e649645f6badd78b31e108eeaeebd1f";
-const SUPABASE_URL = "https://ujvmzylsbblqpqbpbapq.supabase.co";
-const SUPABASE_SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqdm16eWxzYmJscXBxYnBiYXBxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjM3OTk2MywiZXhwIjoyMDg3OTU1OTYzfQ.k3sMRmre4IZV1IwuMhj_0KYh6rhi32u7jWLzXseGgRE";
+const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY || "";
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
