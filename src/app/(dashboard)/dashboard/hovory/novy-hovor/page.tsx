@@ -1,27 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   Phone,
   ArrowLeft,
   Target,
-  Clock,
-  Star,
-  ChevronRight,
-  Zap,
   Shield,
+  Zap,
   Flame,
+  ChevronRight,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { ActiveCall } from "@/components/call/ActiveCall";
 import { useTrainingCall } from "@/hooks/useTrainingCall";
-import { scenarios } from "@/data/scenarios";
-import { aiAgents } from "@/data/ai-agents";
+import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
+import type { AIAgent, Scenario } from "@/types";
 
 const difficultyConfig = {
   easy: {
@@ -43,14 +42,20 @@ const difficultyConfig = {
 
 const categoryLabels: Record<string, string> = {
   "hot-lead": "Horký lead",
+  "warm-lead": "Teplý lead",
   "cold-lead": "Studený lead",
-  competitive: "Konkurence",
-  negotiation: "Vyjednávání",
-  listing: "Získání zakázky",
+  "competitive": "Konkurence",
+  "negotiation": "Vyjednávání",
+  "listing": "Získání zakázky",
 };
 
 export default function NovyHovorPage() {
   const router = useRouter();
+
+  const [agents, setAgents] = useState<AIAgent[]>([]);
+  const [scenarios, setScenarios] = useState<Scenario[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const [selectedScenario, setSelectedScenario] = useState<string | null>(null);
   const [step, setStep] = useState<"select" | "confirm" | "call">("select");
   const [selectedDifficulty, setSelectedDifficulty] = useState<"all" | "easy" | "medium" | "hard">("all");
@@ -60,7 +65,7 @@ export default function NovyHovorPage() {
     duration,
     isSpeaking,
     isMuted,
-    error,
+    error: callError,
     callId,
     startCall,
     endCall,
@@ -72,10 +77,63 @@ export default function NovyHovorPage() {
     },
   });
 
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [agentsRes, scenariosRes] = await Promise.all([
+          supabase.from("agents").select("*").not("elevenlabs_agent_id", "is", null),
+          supabase.from("scenarios").select("*")
+        ]);
+
+        if (agentsRes.data) {
+          const formattedAgents: AIAgent[] = agentsRes.data.map((a: any) => ({
+            id: a.id,
+            name: a.name,
+            personality: a.personality,
+            description: a.description || "",
+            difficulty: a.difficulty as any,
+            avatarInitials: a.avatar_initials,
+            traits: a.traits || [],
+            exampleScenario: a.example_scenario || ""
+          }));
+          setAgents(formattedAgents);
+        }
+
+        if (scenariosRes.data) {
+          const formattedScenarios: Scenario[] = scenariosRes.data.map((s: any) => {
+            // Check if description implies a specific source to map the image properly
+            let img = "";
+            const descLower = (s.description || "").toLowerCase();
+            if (descLower.includes("formulář")) img = "/scenarios/form.png";
+            else if (descLower.includes("sreality") || descLower.includes("inzerát")) img = "/scenarios/sreality.png";
+            else if (descLower.includes("doporučení")) img = "/scenarios/recommendation.png";
+            else if (descLower.includes("slepé") || descLower.includes("katastr")) img = "/scenarios/cold.png";
+
+            return {
+              id: s.id,
+              title: s.title,
+              description: s.description || "",
+              category: s.category as any,
+              difficulty: s.difficulty as any,
+              objectives: s.objectives || [],
+              agentId: s.agent_id,
+              imageUrl: img
+            };
+          });
+          setScenarios(formattedScenarios);
+        }
+      } catch (err) {
+        console.error("Error fetching data:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, [supabase]);
+
   const scenario = scenarios.find((s) => s.id === selectedScenario);
-  const agent = scenario
-    ? aiAgents.find((a) => a.id === scenario.agentId)
-    : null;
+  const agent = scenario ? agents.find((a) => a.id === scenario.agentId) : null;
 
   const filteredScenarios = selectedDifficulty === "all"
     ? scenarios
@@ -100,9 +158,17 @@ export default function NovyHovorPage() {
 
   const handleViewResults = () => {
     if (callId) {
-      router.push(`/dashboard/hovory`);
+      router.push("/dashboard/hovory");
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex h-[50vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary-500" />
+      </div>
+    );
+  }
 
   // CALL VIEW
   if (step === "call" && agent) {
@@ -116,7 +182,7 @@ export default function NovyHovorPage() {
           agentInitials={agent.avatarInitials}
           isSpeaking={isSpeaking}
           isMuted={isMuted}
-          error={error}
+          error={callError}
           onEndCall={endCall}
           onToggleMute={toggleMute}
           onReset={handleReset}
@@ -145,13 +211,13 @@ export default function NovyHovorPage() {
         >
           {/* Header */}
           <div className="border-b border-neutral-100 bg-neutral-50 p-6">
-            <Badge variant={difficultyConfig[scenario.difficulty].color}>
-              {difficultyConfig[scenario.difficulty].label}
+            <Badge variant={difficultyConfig[scenario.difficulty]?.color || "default"}>
+              {difficultyConfig[scenario.difficulty]?.label || "Neznámá"}
             </Badge>
             <h1 className="mt-3 text-2xl font-bold text-neutral-900">
               {scenario.title}
             </h1>
-            <p className="mt-2 text-neutral-600">{scenario.description}</p>
+            <p className="mt-2 text-neutral-600 whitespace-pre-wrap">{scenario.description}</p>
           </div>
 
           {/* Agent Info */}
@@ -173,7 +239,7 @@ export default function NovyHovorPage() {
               </div>
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
-              {agent.traits.map((trait) => (
+              {agent.traits?.map((trait) => (
                 <span
                   key={trait}
                   className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs text-neutral-600"
@@ -184,13 +250,25 @@ export default function NovyHovorPage() {
             </div>
           </div>
 
+          {/* Graphic (if exists) */}
+          {scenario.imageUrl && (
+            <div className="border-b border-neutral-100 p-6 bg-neutral-50/50">
+              <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-400">
+                Kontext leadu ze systému
+              </h3>
+              <div className="rounded-xl overflow-hidden shadow-sm border border-neutral-200/60 bg-white">
+                <img src={scenario.imageUrl} alt="Kontext" className="w-full h-auto object-cover" />
+              </div>
+            </div>
+          )}
+
           {/* Objectives */}
           <div className="border-b border-neutral-100 p-6">
             <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-400">
               Cíle hovoru
             </h3>
             <ul className="space-y-2">
-              {scenario.objectives.map((obj, i) => (
+              {scenario.objectives?.map((obj, i) => (
                 <li key={i} className="flex items-start gap-2">
                   <Target className="mt-0.5 h-4 w-4 shrink-0 text-primary-500" />
                   <span className="text-sm text-neutral-700">{obj}</span>
@@ -208,21 +286,9 @@ export default function NovyHovorPage() {
               <li>• Představte se profesionálně v prvních 10 sekundách</li>
               <li>• Poslouchejte pozorně a reagujte na potřeby klienta</li>
               <li>• Snažte se domluvit konkrétní schůzku</li>
-              <li>• Vyhněte se výplňovým slovům (ehm, jako, vlastně)</li>
+              <li>• Ujistěte se, že chápete kontext z popisu výše</li>
             </ul>
           </div>
-
-          {/* Graphic (if exists) */}
-          {scenario.imageUrl && (
-            <div className="border-b border-neutral-100 p-6 bg-neutral-50/50">
-              <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-400">
-                Kontext leadu ze systému
-              </h3>
-              <div className="rounded-xl overflow-hidden shadow-sm border border-neutral-200/60 bg-white">
-                <img src={scenario.imageUrl} alt="Kontext" className="w-full h-auto object-cover" />
-              </div>
-            </div>
-          )}
 
           {/* Start Button */}
           <div className="p-6">
@@ -256,7 +322,7 @@ export default function NovyHovorPage() {
         </button>
         <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900">Nový hovor</h1>
         <p className="mt-2 text-neutral-500">
-          Vyberte scénář pro tréninkový hovor s AI agentem
+          Vyberte scénář pro tréninkový hovor. K dispozici je {filteredScenarios.length} agentů pro různé situace z praxe.
         </p>
       </div>
 
@@ -281,10 +347,12 @@ export default function NovyHovorPage() {
       </div>
 
       {/* Scenarios Grid */}
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {filteredScenarios.map((s, i) => {
-          const a = aiAgents.find((ag) => ag.id === s.agentId);
-          const diffConf = difficultyConfig[s.difficulty];
+          const a = agents.find((ag) => ag.id === s.agentId);
+          if (!a) return null; // Only show if we found the linked agent
+
+          const diffConf = difficultyConfig[s.difficulty] || difficultyConfig.medium;
           const DiffIcon = diffConf.icon;
 
           return (
@@ -292,21 +360,21 @@ export default function NovyHovorPage() {
               key={s.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}
+              transition={{ delay: (i % 10) * 0.05 }}
             >
               <Card
-                className="cursor-pointer transition-all hover:border-primary-200 hover:shadow-md"
+                className="cursor-pointer h-full flex flex-col transition-all hover:border-primary-200 hover:shadow-md"
                 onClick={() => handleSelectScenario(s.id)}
               >
-                <div className="p-5">
+                <div className="p-5 flex flex-col flex-1">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <div className="mb-2 flex items-center gap-2">
+                      <div className="mb-2 flex flex-wrap items-center gap-2">
                         <Badge variant={diffConf.color} className="gap-1">
                           <DiffIcon className="h-3 w-3" />
                           {diffConf.label}
                         </Badge>
-                        <span className="text-xs text-neutral-400">
+                        <span className="text-xs font-medium px-2 py-0.5 rounded bg-neutral-100 text-neutral-600">
                           {categoryLabels[s.category] || s.category}
                         </span>
                       </div>
@@ -314,36 +382,44 @@ export default function NovyHovorPage() {
                         {s.title}
                       </h3>
                       <p className="mt-1 line-clamp-2 text-sm text-neutral-500">
-                        {s.description}
+                        {s.description.split('\n')[0]} {/* Show just the source on the card */}
                       </p>
                     </div>
-                    <ChevronRight className="ml-3 h-5 w-5 shrink-0 text-neutral-300" />
                   </div>
 
+                  <div className="flex-1"></div>
+
                   {/* Agent preview */}
-                  {a && (
-                    <div className="mt-4 flex items-center gap-3 border-t border-neutral-100 pt-4">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100">
+                  <div className="mt-4 flex items-center justify-between border-t border-neutral-100 pt-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-100">
                         <span className="text-xs font-bold text-neutral-600">
                           {a.avatarInitials}
                         </span>
                       </div>
-                      <div>
-                        <p className="text-sm font-medium text-neutral-700">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-neutral-700 truncate">
                           {a.name}
                         </p>
-                        <p className="text-xs text-neutral-400">
+                        <p className="text-xs text-neutral-400 truncate">
                           {a.personality}
                         </p>
                       </div>
                     </div>
-                  )}
+                    <ChevronRight className="h-5 w-5 shrink-0 text-neutral-300" />
+                  </div>
                 </div>
               </Card>
             </motion.div>
           );
         })}
       </div>
+
+      {filteredScenarios.length === 0 && (
+        <div className="text-center py-12 rounded-xl border border-dashed border-neutral-200">
+          <p className="text-neutral-500">Nenalezeny žádné scénáře s touto obtížností.</p>
+        </div>
+      )}
     </div>
   );
 }

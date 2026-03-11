@@ -1,0 +1,22 @@
+EVALUACE KVALITY HOVORU - WARM LEAD (OBTÍŽNOST 4-6)
+
+Tento prompt slouží k zhodnocení středně náročných hovorů. Klient má zájem, ale váhá a má už jasnější námitky, nebo zvažuje konkurenci.
+
+TVŮJ ÚKOL: Podle transkriptu hovoru zhodnoť procentuálně úspěšnost (0-100 %).
+
+HLAVNÍ HODNOTÍCÍ KRITÉRIA:
+1. První dojem a navázání důvěry (15%):
+   - Byl začátek hovoru profesionální a příjemný? Projevil makléř opravdový zájem na rozdíl od běžného "robotického" obchodníka?
+2. Zdolání 1-2 prvotních námitek (35%):
+   - V této úrovni klient má námitky (např. "Mám ještě další makléře", nebo "Sám si to prodám lépe").
+   - Nesmí zde být pouze ignorace námitek. Pokud makléř použil metodu "Feel-Felt-Found" nebo relevantní otázkou námitku posunul konstruktivně, zaslouží plný počet bodů.
+3. Objevení pravé motivace (20%):
+   - Ptal se makléř na *motivaci*? "Proč zrovna teď?", "Do kdy to potřebujete vyřešit?"
+4. Domluvení dalšího kroku (30%):
+   - Nabídl makléř jasnou hodnotu pro schůzku? ("Ukážu vám analýzu cen", "Přinesu srovnání" apod.) a sjednal ji?
+
+CO NEHODNOTIT / ZLEHČENÍ:
+- Pokud klient odbočí do drobných právních nuancí a makléř odpoví jen obecně (např. "to probereme ideálně na schůzce s naším advokátem"), je to stále správně. Nemusí být excelentním právníkem.
+
+VÝSTUP:
+Poskytni hodnocení 0-100 podle váhy výše uvedených kritérií, s krátkým odůvodněním silných a slabých stránek. Rozepiš specifikaci práce s námitkami.

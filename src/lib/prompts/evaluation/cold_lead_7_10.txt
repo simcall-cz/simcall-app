@@ -1,0 +1,24 @@
+EVALUACE KVALITY HOVORU - COLD LEAD / EXTRÉM (OBTÍŽNOST 7-10)
+
+Tento prompt slouží k zhodnocení nejsložitějších hovorů, kde klient je cynický, naštvaný, nespolupracující nebo má zásadní překážky či vady (exekuce, dědické řízení, narušená statika, spory ap.). Od makléře se zde vyžaduje perfektní vyjednávání, zvládnutí mnoha námitek a orientace v právu. Pokud hovor není v ničem složitý, makléř zde skóre nezíská, pokud neprokáže odbornost.
+
+TVŮJ ÚKOL: Podle transkriptu hovoru zhodnoť procentuálně úspěšnost (0-100 %).
+
+HLAVNÍ HODNOTÍCÍ KRITÉRIA:
+1. Prolomení ledu a kontrola hovoru (15%):
+   - Udržel makléř klid a kontrolu nad hovorem, i přes cynismus klienta? Nenechal se vyvést z míry a v klidu reagoval na "odkud máte číslo?" a "nechci s vámi mluvit"?
+2. Zvládnutí série těžkých námitek (30%):
+   - Kolik složitějších námitek se podařilo odrazit? Měl makléř kvalitní protiargumenty postavené na reálné situaci na trhu, referencích nebo případových studiích? 
+   - Použil vyjednávací a de-eskalační techniky (mirroring, zrcadlení emoce)?
+3. Odhalení skryté složitosti a odbornost v právu/legislativě (25%):
+   - Odhalil makléř právní vady (exekuce / dědictví) či technické vady (statika / povodeň)? 
+   - Znal správný postup (např. že při exekuci musí probíhat vyjednávání se správcem, nevyřešené dědictví brání převodu), nebo odpověděl nesprávně/zavádějícím způsobem, který by klienta ohrozil v reálném životě?
+4. Návrh konkrétních akčních kroků a uzavření schůzky (30%):
+   - Prokázal svou kompetenci plánem řešení? ("Setkám se s vaším odhadcem", "Doložím vám tržní analýzu speciálně k vašemu břemenu").
+   - Dokázal vyjednat osobní schůzku nebo reálný follow-up závazek klienta (např. "dobře, zavolejte ve čtvrtek odpoledne") u člověka, který na začátku vyhrožoval položením? Zde i domluvený follow-up ("zavolám vám v úterý") tvoří velký úspěch z nuly!
+
+CO NEHODNOTIT / ZLEHČENÍ:
+- Žádné zlehčení se neakceptuje. Tady chceme vidět makléře zkušností, ne pouhé sjednavače schůzek. Makléř, který nabídne jen povrchní domluvu: "Nebojte se, naše realitka vše vyřeší" ztrácí body v kritériu odbornosti. Musí alespoň naznačit mechanismus!
+
+VÝSTUP:
+Poskytni velmi detailní hodnocení 0-100 (zisk vysokého hodnocení by zde měl být velmi náročný - nad 80 % jde pouze excelentním výkonem). Rozebírej zjevné i skryté prohřešky. Upozorni zvláště na případné špatné legislativní povědomí!

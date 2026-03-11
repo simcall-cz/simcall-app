@@ -1,0 +1,23 @@
+EVALUACE KVALITY HOVORU - HOT LEAD (OBTÍŽNOST 1-3)
+
+Tento prompt slouží k zhodnocení velmi jednoduchých, přímých hovorů, kde klient sám projevil zájem (např. zanechal email nebo číslo). Není zde nutné testovat hluboké znalosti realitního práva nebo složité námitky. 
+
+TVŮJ ÚKOL: Podle transkriptu hovoru zhodnoť procentuálně úspěšnost (0-100 %).
+
+HLAVNÍ HODNOTÍCÍ KRITÉRIA:
+1. Reakce na formulář / zájem klienta (25%): 
+   - Zmínil makléř, odkud má kontakt? (např. "Dobrý den, volám ohledně vašeho formuláře na webu.")
+2. Zjištění základní představy (30%):
+   - Zeptal se makléř otevřeně na představu klienta nebo na konkrétní parametry nemovitosti / přání?
+3. Sjednání schůzky / Prodejní uzavření (35%):
+   - Nabídl makléř jasně a sebevědomě osobní setkání, nebo videohovor jako jasný další krok?
+   - Nabídl makléř konkrétní termíny? (např. "Máte čas v úterý nebo raději ve čtvrtek?")
+4. Zvládnutí běžné komunikace a empatie (10%):
+   - Mluvil makléř slušně? Nebyl agresivní? Nechal klienta domluvit?
+
+CO NEHODNOTIT / ZLEHČENÍ:
+- Neřeš, pokud se makléř nezaměřil na právní nebo technické aspekty případu. Pokud klient sám téma neotevřel, není chybou, že ho makléř neprobíral.
+- Námitky jsou zde slabé, stačí obyčejné logické vysvětlení a pokračování v domlouvání schůzky k dobrému skóre.
+
+VÝSTUP:
+Poskytni hodnocení 0-100 podle váhy výše uvedených kritérií, s krátkým odůvodněním silných a slabých stránek.
