@@ -101,14 +101,6 @@ export default function NovyHovorPage() {
 
         if (scenariosRes.data) {
           const formattedScenarios: Scenario[] = scenariosRes.data.map((s: any) => {
-            // Check if description implies a specific source to map the image properly
-            let img = "";
-            const descLower = (s.description || "").toLowerCase();
-            if (descLower.includes("formulář")) img = "/scenarios/form.png";
-            else if (descLower.includes("sreality") || descLower.includes("inzerát")) img = "/scenarios/sreality.png";
-            else if (descLower.includes("doporučení")) img = "/scenarios/recommendation.png";
-            else if (descLower.includes("slepé") || descLower.includes("katastr")) img = "/scenarios/cold.png";
-
             return {
               id: s.id,
               title: s.title,
@@ -117,7 +109,7 @@ export default function NovyHovorPage() {
               difficulty: s.difficulty as any,
               objectives: s.objectives || [],
               agentId: s.agent_id,
-              imageUrl: img
+              imageUrl: s.image_url || ""
             };
           });
           setScenarios(formattedScenarios);
