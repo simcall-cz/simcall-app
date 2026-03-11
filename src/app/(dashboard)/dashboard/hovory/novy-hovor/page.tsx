@@ -339,10 +339,10 @@ export default function NovyHovorPage() {
       </div>
 
       {/* Scenarios Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {filteredScenarios.map((s, i) => {
           const a = agents.find((ag) => ag.id === s.agentId);
-          if (!a) return null; // Only show if we found the linked agent
+          if (!a) return null;
 
           const diffConf = difficultyConfig[s.difficulty] || difficultyConfig.medium;
           const DiffIcon = diffConf.icon;
@@ -353,11 +353,23 @@ export default function NovyHovorPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: (i % 10) * 0.05 }}
+              className="h-full"
             >
               <Card
-                className="cursor-pointer h-full flex flex-col transition-all hover:border-primary-200 hover:shadow-md"
+                className="cursor-pointer h-full flex flex-col transition-all hover:border-primary-200 hover:shadow-md overflow-hidden"
                 onClick={() => handleSelectScenario(s.id)}
               >
+                {/* SVG Visual Header */}
+                {s.imageUrl && (
+                  <div className="w-full h-36 bg-neutral-100 border-b border-neutral-100 overflow-hidden relative">
+                    <img
+                      src={s.imageUrl}
+                      alt="Náhled leadu"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+
                 <div className="p-5 flex flex-col flex-1">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -370,30 +382,30 @@ export default function NovyHovorPage() {
                           {categoryLabels[s.category] || s.category}
                         </span>
                       </div>
-                      <h3 className="text-lg font-semibold text-neutral-900">
+                      <h3 className="text-lg font-semibold text-neutral-900 leading-tight">
                         {s.title}
                       </h3>
-                      <p className="mt-1 line-clamp-2 text-sm text-neutral-500">
-                        {s.description.split('\n')[0]} {/* Show just the source on the card */}
+                      <p className="mt-2 line-clamp-2 text-sm text-neutral-500">
+                        {s.description.split('\\n')[0]}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex-1"></div>
 
-                  {/* Agent preview */}
-                  <div className="mt-4 flex items-center justify-between border-t border-neutral-100 pt-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-100">
+                  {/* Agent preview - Fixed truncation */}
+                  <div className="mt-5 flex items-center justify-between border-t border-neutral-100 pt-4">
+                    <div className="flex items-center gap-3 w-full pr-2">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-neutral-100">
                         <span className="text-xs font-bold text-neutral-600">
                           {a.avatarInitials}
                         </span>
                       </div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium text-neutral-700 truncate">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-neutral-900 whitespace-normal leading-tight">
                           {a.name}
                         </p>
-                        <p className="text-xs text-neutral-400 truncate">
+                        <p className="text-xs text-neutral-500 whitespace-normal mt-0.5 leading-tight">
                           {a.personality}
                         </p>
                       </div>
