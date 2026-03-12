@@ -12,6 +12,8 @@ import {
   Flame,
   ChevronRight,
   Loader2,
+  ZoomIn,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -59,6 +61,7 @@ export default function NovyHovorPage() {
   const [selectedScenario, setSelectedScenario] = useState<string | null>(null);
   const [step, setStep] = useState<"select" | "confirm" | "call">("select");
   const [selectedDifficulty, setSelectedDifficulty] = useState<"all" | "easy" | "medium" | "hard">("all");
+  const [imageZoom, setImageZoom] = useState(false);
 
   const {
     phase,
@@ -196,23 +199,35 @@ export default function NovyHovorPage() {
           Zpět na výběr scénáře
         </button>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm"
-        >
-          {/* Hero Image */}
-          <div className="w-full bg-neutral-100 overflow-hidden" style={{ height: "260px" }}>
+        {/* Lightbox */}
+        {imageZoom && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+            onClick={() => setImageZoom(false)}
+          >
+            <button
+              onClick={() => setImageZoom(false)}
+              className="absolute right-4 top-4 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20"
+            >
+              <X className="h-6 w-6" />
+            </button>
             <img
               src={
                 scenario.imageUrl ||
                 `/scenarios/generated/${agent.id.replace("agent-", "")}.svg`
               }
               alt={`Kontext: ${scenario.title}`}
-              className="w-full h-full object-cover"
+              className="max-h-[90vh] max-w-[90vw] rounded-lg object-contain shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
             />
           </div>
+        )}
 
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm"
+        >
           {/* Header */}
           <div className="border-b border-neutral-100 bg-neutral-50 p-6">
             <Badge variant={difficultyConfig[scenario.difficulty]?.color || "default"}>
@@ -253,6 +268,33 @@ export default function NovyHovorPage() {
               ))}
             </div>
           </div>
+
+          {/* Scenario Image */}
+          {(scenario.imageUrl || agent.id) && (
+            <div className="border-b border-neutral-100 p-6">
+              <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-400">
+                Kontext leadu
+              </h3>
+              <div
+                className="group relative cursor-pointer rounded-xl overflow-hidden border border-neutral-200/60 bg-white shadow-sm"
+                onClick={() => setImageZoom(true)}
+              >
+                <img
+                  src={
+                    scenario.imageUrl ||
+                    `/scenarios/generated/${agent.id.replace("agent-", "")}.svg`
+                  }
+                  alt={`Kontext: ${scenario.title}`}
+                  className="w-full h-auto object-contain"
+                />
+                <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/10">
+                  <div className="rounded-full bg-white/80 p-2 opacity-0 shadow transition-opacity group-hover:opacity-100">
+                    <ZoomIn className="h-5 w-5 text-neutral-700" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Objectives */}
           <div className="border-b border-neutral-100 p-6">
