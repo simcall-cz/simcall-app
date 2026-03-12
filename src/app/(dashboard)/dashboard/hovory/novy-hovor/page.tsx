@@ -201,6 +201,18 @@ export default function NovyHovorPage() {
           animate={{ opacity: 1, y: 0 }}
           className="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm"
         >
+          {/* Hero Image */}
+          <div className="w-full bg-neutral-100 overflow-hidden" style={{ height: "260px" }}>
+            <img
+              src={
+                scenario.imageUrl ||
+                `/scenarios/generated/${agent.id.replace("agent-", "")}.svg`
+              }
+              alt={`Kontext: ${scenario.title}`}
+              className="w-full h-full object-cover"
+            />
+          </div>
+
           {/* Header */}
           <div className="border-b border-neutral-100 bg-neutral-50 p-6">
             <Badge variant={difficultyConfig[scenario.difficulty]?.color || "default"}>
@@ -241,18 +253,6 @@ export default function NovyHovorPage() {
               ))}
             </div>
           </div>
-
-          {/* Graphic (if exists) */}
-          {scenario.imageUrl && (
-            <div className="border-b border-neutral-100 p-6 bg-neutral-50/50">
-              <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-400">
-                Kontext leadu ze systému
-              </h3>
-              <div className="rounded-xl overflow-hidden shadow-sm border border-neutral-200/60 bg-white">
-                <img src={scenario.imageUrl} alt="Kontext" className="w-full h-auto object-cover" />
-              </div>
-            </div>
-          )}
 
           {/* Objectives */}
           <div className="border-b border-neutral-100 p-6">
