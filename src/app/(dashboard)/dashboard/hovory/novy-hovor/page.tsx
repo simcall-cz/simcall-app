@@ -212,10 +212,7 @@ export default function NovyHovorPage() {
               <X className="h-6 w-6" />
             </button>
             <img
-              src={
-                scenario.imageUrl ||
-                `/scenarios/generated/${agent.id.replace("agent-", "")}.svg`
-              }
+              src={scenario.imageUrl}
               alt={`Kontext: ${scenario.title}`}
               className="max-h-[90vh] max-w-[90vw] rounded-lg object-contain shadow-2xl"
               onClick={(e) => e.stopPropagation()}
@@ -270,7 +267,7 @@ export default function NovyHovorPage() {
           </div>
 
           {/* Scenario Image */}
-          {(scenario.imageUrl || agent.id) && (
+          {scenario.imageUrl && (
             <div className="border-b border-neutral-100 p-6">
               <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-400">
                 Kontext leadu
@@ -280,10 +277,7 @@ export default function NovyHovorPage() {
                 onClick={() => setImageZoom(true)}
               >
                 <img
-                  src={
-                    scenario.imageUrl ||
-                    `/scenarios/generated/${agent.id.replace("agent-", "")}.svg`
-                  }
+                  src={scenario.imageUrl}
                   alt={`Kontext: ${scenario.title}`}
                   className="w-full h-auto object-contain"
                 />
@@ -401,17 +395,6 @@ export default function NovyHovorPage() {
                 className="cursor-pointer h-full flex flex-col transition-all hover:border-primary-200 hover:shadow-md overflow-hidden"
                 onClick={() => handleSelectScenario(s.id)}
               >
-                {/* SVG Visual Header */}
-                {s.imageUrl && (
-                  <div className="w-full h-36 bg-neutral-100 border-b border-neutral-100 overflow-hidden relative">
-                    <img
-                      src={s.imageUrl}
-                      alt="Náhled leadu"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                )}
-
                 <div className="p-5 flex flex-col flex-1">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
