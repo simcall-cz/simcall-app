@@ -9,7 +9,7 @@
         
         <!-- Content -->
         <!-- Image -->
-        <image href="https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=400&q=80" x="40" y="90" height="150" width="220" preserveAspectRatio="xMidYMid slice" clip-path="inset(0% round 4px)" />
+        <image href="https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&amp;fit=crop&amp;w=400&amp;q=80" x="40" y="90" height="150" width="220" preserveAspectRatio="xMidYMid slice" clip-path="inset(0% round 4px)" />
         
         <!-- Details -->
         <text x="280" y="110" font-family="Arial, sans-serif" font-weight="bold" font-size="18" fill="#333333">Prodej - sad (0,6 ha)</text>
