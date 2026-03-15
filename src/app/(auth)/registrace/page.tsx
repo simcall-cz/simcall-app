@@ -43,6 +43,10 @@ export default function RegistracePage() {
       setError("Zadejte e-mail");
       return;
     }
+    if (!formData.phone.trim() || formData.phone.trim() === "+420") {
+      setError("Zadejte telefonní číslo");
+      return;
+    }
     if (formData.password.length < 6) {
       setError("Heslo musí mít alespoň 6 znaků");
       return;
@@ -216,8 +220,7 @@ export default function RegistracePage() {
             htmlFor="phone"
             className="mb-1.5 block text-sm font-medium text-neutral-700"
           >
-            Telefonní číslo{" "}
-            <span className="text-neutral-400 font-normal">(nepovinné)</span>
+            Telefonní číslo
           </label>
           <div className="relative">
             <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
@@ -226,6 +229,7 @@ export default function RegistracePage() {
               name="phone"
               type="tel"
               autoComplete="tel"
+              required
               value={formData.phone}
               onChange={handleChange}
               placeholder="+420 123 456 789"
