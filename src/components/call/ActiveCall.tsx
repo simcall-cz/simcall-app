@@ -13,7 +13,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { CallPhase } from "@/hooks/useTrainingCall";
+import type { CallPhase, ProcessingResult } from "@/hooks/useTrainingCall";
 
 interface ActiveCallProps {
   phase: CallPhase;
@@ -24,6 +24,7 @@ interface ActiveCallProps {
   isSpeaking: boolean;
   isMuted: boolean;
   error: string | null;
+  processingResult?: ProcessingResult | null;
   onEndCall: () => void;
   onToggleMute: () => void;
   onReset: () => void;
@@ -45,6 +46,7 @@ export function ActiveCall({
   isSpeaking,
   isMuted,
   error,
+  processingResult,
   onEndCall,
   onToggleMute,
   onReset,
@@ -247,18 +249,40 @@ export function ActiveCall({
           </motion.div>
         )}
 
-        {/* Completed State */}
+        {/* Completed State — inline results */}
         {phase === "completed" && (
           <motion.div
             key="completed"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            className="flex flex-col items-center gap-4 sm:gap-6 text-center"
+            className="flex flex-col items-center gap-4 sm:gap-6 text-center w-full max-w-md"
           >
-            <div className="flex h-24 w-24 sm:h-28 sm:w-28 items-center justify-center rounded-full bg-green-50">
-              <CheckCircle2 className="h-12 w-12 sm:h-14 sm:w-14 text-green-500" />
+            {/* Score circle or checkmark */}
+            <div className={`flex h-24 w-24 sm:h-28 sm:w-28 items-center justify-center rounded-full ${
+              processingResult
+                ? processingResult.overall_score >= 70
+                  ? "bg-green-50"
+                  : processingResult.overall_score >= 50
+                    ? "bg-yellow-50"
+                    : "bg-red-50"
+                : "bg-green-50"
+            }`}>
+              {processingResult ? (
+                <span className={`text-3xl sm:text-4xl font-bold ${
+                  processingResult.overall_score >= 70
+                    ? "text-green-600"
+                    : processingResult.overall_score >= 50
+                      ? "text-yellow-600"
+                      : "text-red-600"
+                }`}>
+                  {processingResult.overall_score}%
+                </span>
+              ) : (
+                <CheckCircle2 className="h-12 w-12 sm:h-14 sm:w-14 text-green-500" />
+              )}
             </div>
+
             <div>
               <h2 className="text-2xl font-bold text-neutral-900">
                 Hovor dokončen!
@@ -267,11 +291,32 @@ export function ActiveCall({
                 Délka hovoru: {formatDuration(duration)}
               </p>
             </div>
-            <div className="flex gap-3">
+
+            {/* Inline summary — what was good */}
+            {processingResult?.summary_good && (
+              <div className="w-full rounded-xl bg-green-50 border border-green-100 p-4 text-left">
+                <div className="flex items-start gap-3">
+                  <CheckCircle2 className="h-5 w-5 mt-0.5 text-green-500 shrink-0" />
+                  <p className="text-sm text-green-800">{processingResult.summary_good}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Inline summary — what to improve */}
+            {processingResult?.summary_improve && (
+              <div className="w-full rounded-xl bg-amber-50 border border-amber-100 p-4 text-left">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="h-5 w-5 mt-0.5 text-amber-500 shrink-0" />
+                  <p className="text-sm text-amber-800">{processingResult.summary_improve}</p>
+                </div>
+              </div>
+            )}
+
+            <div className="flex gap-3 pt-2">
               <Button variant="outline" onClick={onReset}>
                 Nový hovor
               </Button>
-              <Button onClick={onViewResults}>Zobrazit výsledky</Button>
+              <Button onClick={onViewResults}>Kompletní detail</Button>
             </div>
           </motion.div>
         )}

@@ -18,6 +18,7 @@ export interface Scenario {
   objectives: string[];
   agentId: string;
   imageUrl?: string;
+  tips?: string[];
 }
 
 export interface Testimonial {

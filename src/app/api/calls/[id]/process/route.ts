@@ -50,28 +50,35 @@ export async function POST(
   }
 
   try {
-    // 2a. Look up scenario difficulty for dynamic evaluation prompt
+    // 2a. Look up scenario-specific control prompt for evaluation
     let evaluationPrompt = "";
     if (call.scenario_id) {
       const { data: scenario } = await supabase
         .from("scenarios")
-        .select("difficulty")
+        .select("difficulty, control_prompt, title")
         .eq("id", call.scenario_id)
         .single();
 
-      const difficultyMap: Record<string, string> = {
-        easy: "hot_lead_1_3.txt",
-        medium: "warm_lead_4_6.txt",
-        hard: "cold_lead_7_10.txt",
-      };
-      const promptFile = difficultyMap[scenario?.difficulty || "medium"] || "warm_lead_4_6.txt";
+      if (scenario?.control_prompt) {
+        // Per-scenario evaluation prompt (preferred)
+        evaluationPrompt = scenario.control_prompt;
+        console.log(`Using per-scenario prompt for: ${scenario.title}`);
+      } else {
+        // Fallback to difficulty-based .txt files (legacy)
+        const difficultyMap: Record<string, string> = {
+          easy: "hot_lead_1_3.txt",
+          medium: "warm_lead_4_6.txt",
+          hard: "cold_lead_7_10.txt",
+        };
+        const promptFile = difficultyMap[scenario?.difficulty || "medium"] || "warm_lead_4_6.txt";
 
-      try {
-        const promptPath = path.join(process.cwd(), "src", "lib", "prompts", "evaluation", promptFile);
-        evaluationPrompt = await fs.readFile(promptPath, "utf-8");
-        console.log(`Using evaluation prompt: ${promptFile}`);
-      } catch {
-        console.warn(`Could not load prompt file ${promptFile}, using default criteria`);
+        try {
+          const promptPath = path.join(process.cwd(), "src", "lib", "prompts", "evaluation", promptFile);
+          evaluationPrompt = await fs.readFile(promptPath, "utf-8");
+          console.log(`Using fallback evaluation prompt: ${promptFile}`);
+        } catch {
+          console.warn(`Could not load prompt file ${promptFile}, using default criteria`);
+        }
       }
     }
 
@@ -189,7 +196,7 @@ export async function POST(
                 },
                 {
                   role: "user",
-                  content: `Analyzuj nasledujici treninkovy hovor realitniho maklere.\n\nPREPIS HOVORU:\n${transcriptText}\n\nVrat POUZE validni JSON (bez \`\`\`json bloku) v tomto formatu:\n{\n  "overall_score": <cislo 0-100>,\n  "strengths": ["silna stranka 1", "silna stranka 2"],\n  "improvements": ["oblast ke zlepseni 1", "oblast ke zlepseni 2"],\n  "filler_words": [{"word": "ehm", "count": 2}],\n  "recommendations": ["doporuceni 1", "doporuceni 2"],\n  "transcript_highlights": [\n    {"index": 0, "highlight": null},\n    {"index": 1, "highlight": "good"},\n    {"index": 2, "highlight": "mistake"}\n  ]\n}\n\n${evaluationPrompt ? `SPECIFICKA HODNOTICI KRITERIA PRO TENTO TYP HOVORU:\n${evaluationPrompt}` : `Hodnotici kriteria:\n1. Profesionalni predstaveni a navazani kontaktu (0-10 bodu)\n2. Zjistovani potreb klienta (0-15 bodu)\n3. Prezentace hodnoty sluzeb a obhajoba provize (0-15 bodu)\n4. ODBORNA SPRAVNOST — zna makler spravny pravni postup, smluvni proces, dane? (0-25 bodu)\n5. Prace s namitkami a obtizne situace (0-15 bodu)\n6. Uzavreni / domluveni dalsiho kroku (0-10 bodu)\n7. Komunikacni dovednosti (0-10 bodu) - plynulost, vyplnova slova, ton`}\n\nDULEZITE: Pokud makler sdeli klientovi SPATNOU pravni nebo procesni informaci (napr. nespravny postup u katastru, spatne vysvetleni uschovy, rezervacni smlouvy ci dani), VZDY sniz skore a jasne to popis v improvements a recommendations.`,
+                  content: `Analyzuj nasledujici treninkovy hovor realitniho maklere.\n\nPREPIS HOVORU:\n${transcriptText}\n\nVrat POUZE validni JSON (bez \`\`\`json bloku) v tomto formatu:\n{\n  "overall_score": <cislo 0-100>,\n  "strengths": ["silna stranka 1", "silna stranka 2"],\n  "improvements": ["oblast ke zlepseni 1", "oblast ke zlepseni 2"],\n  "filler_words": [{"word": "ehm", "count": 2}],\n  "recommendations": ["doporuceni 1", "doporuceni 2"],\n  "summary_good": "<jedna veta co makler udelal dobre, nebo prazdny retezec>",\n  "summary_improve": "<jedna veta co zlepsit, nebo prazdny retezec>",\n  "transcript_highlights": [\n    {"index": 0, "highlight": null},\n    {"index": 1, "highlight": "good"},\n    {"index": 2, "highlight": "mistake"}\n  ]\n}\n\nDULEZITE POLE:\n- "summary_good": Stručná jedna věta shrnující největší pozitivum hovoru. Pokud nebylo nic výrazně dobrého, vrať prázdný řetězec "".\n- "summary_improve": Stručná jedna věta shrnující nejdůležitější oblast ke zlepšení. Pokud nebylo co zlepšit, vrať prázdný řetězec "".\n\n${evaluationPrompt ? `SPECIFICKA HODNOTICI KRITERIA PRO TENTO SCENAR:\n${evaluationPrompt}` : `Hodnotici kriteria:\n1. Profesionalni predstaveni a navazani kontaktu (0-10 bodu)\n2. Zjistovani potreb klienta (0-15 bodu)\n3. Prezentace hodnoty sluzeb a obhajoba provize (0-15 bodu)\n4. ODBORNA SPRAVNOST — zna makler spravny pravni postup, smluvni proces, dane? (0-25 bodu)\n5. Prace s namitkami a obtizne situace (0-15 bodu)\n6. Uzavreni / domluveni dalsiho kroku (0-10 bodu)\n7. Komunikacni dovednosti (0-10 bodu) - plynulost, vyplnova slova, ton`}\n\nDULEZITE: Pokud makler sdeli klientovi SPATNOU pravni nebo procesni informaci (napr. nespravny postup u katastru, spatne vysvetleni uschovy, rezervacni smlouvy ci dani), VZDY sniz skore a jasne to popis v improvements a recommendations.`,
                 },
               ],
             }),
@@ -276,6 +283,8 @@ export async function POST(
       improvements: analysis.improvements,
       filler_words: analysis.filler_words,
       recommendations: analysis.recommendations,
+      summary_good: analysis.summary_good || null,
+      summary_improve: analysis.summary_improve || null,
     });
     if (feedbackError) {
       console.error("Failed to store feedback:", feedbackError);
@@ -370,6 +379,8 @@ export async function POST(
     return NextResponse.json({
       success: true,
       overall_score: analysis.overall_score,
+      summary_good: analysis.summary_good || null,
+      summary_improve: analysis.summary_improve || null,
       transcript_count: transcript.length,
       duration_seconds: Math.round(durationSeconds),
       audio_url: audioUrl,
@@ -419,5 +430,7 @@ interface CallAnalysis {
   improvements: string[];
   filler_words: { word: string; count: number }[];
   recommendations: string[];
+  summary_good?: string;
+  summary_improve?: string;
   transcript_highlights?: TranscriptHighlight[];
 }

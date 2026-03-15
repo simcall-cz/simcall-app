@@ -70,6 +70,7 @@ export default function NovyHovorPage() {
     isMuted,
     error: callError,
     callId,
+    processingResult,
     startCall,
     endCall,
     toggleMute,
@@ -112,7 +113,8 @@ export default function NovyHovorPage() {
               difficulty: s.difficulty as any,
               objectives: s.objectives || [],
               agentId: s.agent_id,
-              imageUrl: s.image_url || ""
+              imageUrl: s.image_url || "",
+              tips: s.tips || []
             };
           });
           setScenarios(formattedScenarios);
@@ -178,6 +180,7 @@ export default function NovyHovorPage() {
           isSpeaking={isSpeaking}
           isMuted={isMuted}
           error={callError}
+          processingResult={processingResult}
           onEndCall={endCall}
           onToggleMute={toggleMute}
           onReset={handleReset}
@@ -187,10 +190,20 @@ export default function NovyHovorPage() {
     );
   }
 
-  // CONFIRM VIEW
+  // CONFIRM VIEW — 2-column layout on desktop
   if (step === "confirm" && scenario && agent) {
+    const diffConf = difficultyConfig[scenario.difficulty] || difficultyConfig.medium;
+    const hasTips = scenario.tips && scenario.tips.length > 0;
+    const defaultTips = [
+      "Představte se profesionálně v prvních 10 sekundách",
+      "Poslouchejte pozorně a reagujte na potřeby klienta",
+      "Snažte se domluvit konkrétní schůzku",
+      "Ujistěte se, že chápete kontext z popisu výše",
+    ];
+    const tipsToShow = hasTips ? scenario.tips! : defaultTips;
+
     return (
-      <div className="mx-auto max-w-2xl px-2 sm:p-6">
+      <div className="mx-auto max-w-6xl px-2 sm:px-6">
         <button
           onClick={() => setStep("select")}
           className="mb-4 sm:mb-6 flex items-center gap-2 text-sm text-neutral-500 transition-colors hover:text-neutral-900"
@@ -223,114 +236,218 @@ export default function NovyHovorPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm"
         >
-          {/* Header */}
-          <div className="border-b border-neutral-100 bg-neutral-50 p-6">
-            <Badge variant={difficultyConfig[scenario.difficulty]?.color || "default"}>
-              {difficultyConfig[scenario.difficulty]?.label || "Neznámá"}
-            </Badge>
-            <h1 className="mt-3 text-2xl font-bold text-neutral-900">
+          {/* Mobile-only header */}
+          <div className="lg:hidden mb-6">
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              <Badge variant={diffConf.color}>
+                {diffConf.label}
+              </Badge>
+              <span className="text-xs font-medium px-2 py-0.5 rounded bg-neutral-100 text-neutral-600">
+                {categoryLabels[scenario.category] || scenario.category}
+              </span>
+            </div>
+            <h1 className="text-2xl font-bold text-neutral-900">
               {scenario.title}
             </h1>
             <p className="mt-2 text-neutral-600 whitespace-pre-wrap">{scenario.description}</p>
           </div>
 
-          {/* Agent Info */}
-          <div className="border-b border-neutral-100 p-6">
-            <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-400">
-              Váš protějšek
-            </h3>
-            <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary-50">
-                <span className="text-lg font-bold text-primary-600">
-                  {agent.avatarInitials}
-                </span>
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="font-semibold text-neutral-900 break-words">{agent.name}</p>
-                <p className="text-sm text-neutral-500 break-words">
-                  {agent.personality}
-                </p>
-              </div>
-            </div>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {agent.traits?.map((trait) => (
-                <span
-                  key={trait}
-                  className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs text-neutral-600"
-                >
-                  {trait}
-                </span>
-              ))}
-            </div>
-          </div>
+          {/* Two-column grid */}
+          <div className="lg:grid lg:grid-cols-[380px_1fr] lg:gap-8">
 
-          {/* Scenario Image */}
-          {scenario.imageUrl && (
-            <div className="border-b border-neutral-100 p-6">
-              <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-400">
-                Kontext leadu
-              </h3>
-              <div
-                className="group relative cursor-pointer rounded-xl overflow-hidden border border-neutral-200/60 bg-white shadow-sm"
-                onClick={() => setImageZoom(true)}
-              >
-                <img
-                  src={scenario.imageUrl}
-                  alt={`Kontext: ${scenario.title}`}
-                  className="w-full h-auto object-contain"
-                />
-                <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/10">
-                  <div className="rounded-full bg-white/80 p-2 opacity-0 shadow transition-opacity group-hover:opacity-100">
-                    <ZoomIn className="h-5 w-5 text-neutral-700" />
+            {/* LEFT COLUMN — sticky on desktop */}
+            <div className="lg:sticky lg:top-6 lg:self-start space-y-5">
+              {/* Agent card with image */}
+              <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm">
+                {/* Scenario Image */}
+                {scenario.imageUrl && (
+                  <div
+                    className="group relative cursor-pointer"
+                    onClick={() => setImageZoom(true)}
+                  >
+                    <img
+                      src={scenario.imageUrl}
+                      alt={`Kontext: ${scenario.title}`}
+                      className="w-full h-auto object-contain"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/10">
+                      <div className="rounded-full bg-white/80 p-2 opacity-0 shadow transition-opacity group-hover:opacity-100">
+                        <ZoomIn className="h-5 w-5 text-neutral-700" />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Agent Info */}
+                <div className="p-5">
+                  <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-neutral-400">
+                    Váš protějšek
+                  </h3>
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary-50">
+                      <span className="text-base font-bold text-primary-600">
+                        {agent.avatarInitials}
+                      </span>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-neutral-900 break-words leading-tight">{agent.name}</p>
+                      <p className="text-sm text-neutral-500 break-words">
+                        {agent.personality}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {agent.traits?.map((trait) => (
+                      <span
+                        key={trait}
+                        className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs text-neutral-600"
+                      >
+                        {trait}
+                      </span>
+                    ))}
                   </div>
                 </div>
               </div>
+
+              {/* Start Button — desktop (always visible due to sticky) */}
+              <div className="hidden lg:block">
+                <Button
+                  size="lg"
+                  className="w-full gap-2"
+                  onClick={handleStartCall}
+                >
+                  <Phone className="h-5 w-5" />
+                  Zahájit hovor
+                </Button>
+                <p className="mt-3 text-center text-xs text-neutral-400">
+                  Hovor bude nahráván a analyzován pro zpětnou vazbu
+                </p>
+              </div>
             </div>
-          )}
 
-          {/* Objectives */}
-          <div className="border-b border-neutral-100 p-6">
-            <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-400">
-              Cíle hovoru
-            </h3>
-            <ul className="space-y-2">
-              {scenario.objectives?.map((obj, i) => (
-                <li key={i} className="flex items-start gap-2">
-                  <Target className="mt-0.5 h-4 w-4 shrink-0 text-primary-500" />
-                  <span className="text-sm text-neutral-700">{obj}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+            {/* RIGHT COLUMN */}
+            <div className="mt-6 lg:mt-0">
+              <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm">
+                {/* Header — desktop only */}
+                <div className="hidden lg:block border-b border-neutral-100 bg-neutral-50 p-6">
+                  <div className="flex flex-wrap items-center gap-2 mb-3">
+                    <Badge variant={diffConf.color}>
+                      {diffConf.label}
+                    </Badge>
+                    <span className="text-xs font-medium px-2 py-0.5 rounded bg-neutral-100 text-neutral-600">
+                      {categoryLabels[scenario.category] || scenario.category}
+                    </span>
+                  </div>
+                  <h1 className="text-2xl font-bold text-neutral-900">
+                    {scenario.title}
+                  </h1>
+                  <p className="mt-2 text-neutral-600 whitespace-pre-wrap">{scenario.description}</p>
+                </div>
 
-          {/* Tips */}
-          <div className="border-b border-neutral-100 bg-amber-50/50 p-6">
-            <h3 className="mb-2 text-sm font-semibold text-amber-800">
-              💡 Tipy před hovorem
-            </h3>
-            <ul className="space-y-1 text-sm text-amber-700">
-              <li>• Představte se profesionálně v prvních 10 sekundách</li>
-              <li>• Poslouchejte pozorně a reagujte na potřeby klienta</li>
-              <li>• Snažte se domluvit konkrétní schůzku</li>
-              <li>• Ujistěte se, že chápete kontext z popisu výše</li>
-            </ul>
-          </div>
+                {/* Mobile-only: agent info + image (already shown in left column on desktop) */}
+                <div className="lg:hidden">
+                  {/* Agent Info */}
+                  <div className="border-b border-neutral-100 p-5">
+                    <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-neutral-400">
+                      Váš protějšek
+                    </h3>
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary-50">
+                        <span className="text-base font-bold text-primary-600">
+                          {agent.avatarInitials}
+                        </span>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold text-neutral-900 break-words leading-tight">{agent.name}</p>
+                        <p className="text-sm text-neutral-500 break-words">
+                          {agent.personality}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {agent.traits?.map((trait) => (
+                        <span
+                          key={trait}
+                          className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs text-neutral-600"
+                        >
+                          {trait}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
 
-          {/* Start Button */}
-          <div className="p-6">
-            <Button
-              size="lg"
-              className="w-full gap-2"
-              onClick={handleStartCall}
-            >
-              <Phone className="h-5 w-5" />
-              Zahájit hovor
-            </Button>
-            <p className="mt-3 text-center text-xs text-neutral-400">
-              Hovor bude nahráván a analyzován pro zpětnou vazbu
-            </p>
+                  {/* Image */}
+                  {scenario.imageUrl && (
+                    <div className="border-b border-neutral-100 p-5">
+                      <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-neutral-400">
+                        Kontext leadu
+                      </h3>
+                      <div
+                        className="group relative cursor-pointer rounded-xl overflow-hidden border border-neutral-200/60 bg-white shadow-sm"
+                        onClick={() => setImageZoom(true)}
+                      >
+                        <img
+                          src={scenario.imageUrl}
+                          alt={`Kontext: ${scenario.title}`}
+                          className="w-full h-auto object-contain"
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/10">
+                          <div className="rounded-full bg-white/80 p-2 opacity-0 shadow transition-opacity group-hover:opacity-100">
+                            <ZoomIn className="h-5 w-5 text-neutral-700" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Objectives */}
+                <div className="border-b border-neutral-100 p-6">
+                  <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-400">
+                    Cíle hovoru
+                  </h3>
+                  <ul className="space-y-2.5">
+                    {scenario.objectives?.map((obj, i) => (
+                      <li key={i} className="flex items-start gap-2.5">
+                        <Target className="mt-0.5 h-4 w-4 shrink-0 text-primary-500" />
+                        <span className="text-sm text-neutral-700">{obj}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Dynamic Tips */}
+                <div className="bg-amber-50/50 p-6">
+                  <h3 className="mb-3 text-sm font-semibold text-amber-800">
+                    💡 Tipy před hovorem
+                  </h3>
+                  <ul className="space-y-2 text-sm text-amber-700">
+                    {tipsToShow.map((tip, i) => (
+                      <li key={i} className="flex items-start gap-2">
+                        <span className="mt-0.5 shrink-0">•</span>
+                        <span>{tip}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              {/* Start Button — mobile only */}
+              <div className="lg:hidden mt-6">
+                <Button
+                  size="lg"
+                  className="w-full gap-2"
+                  onClick={handleStartCall}
+                >
+                  <Phone className="h-5 w-5" />
+                  Zahájit hovor
+                </Button>
+                <p className="mt-3 text-center text-xs text-neutral-400">
+                  Hovor bude nahráván a analyzován pro zpětnou vazbu
+                </p>
+              </div>
+            </div>
           </div>
         </motion.div>
       </div>

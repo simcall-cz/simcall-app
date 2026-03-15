@@ -146,19 +146,18 @@ export default function HomePage() {
 
               <ScrollReveal delay={0.1}>
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-neutral-800 leading-[1.1]">
-                  Přestaňte pálit <br />
-                  <GradientText>drahé leady</GradientText>
-                  <br />
-                  kvůli chybám u telefonu
+                  Každá chyba u telefonu <br />
+                  vás stojí klienta. <br />
+                  <GradientText>Trénujte nanečisto.</GradientText>
                 </h1>
               </ScrollReveal>
 
               <ScrollReveal delay={0.2}>
                 <ul className="mt-6 space-y-2.5">
                   {[
-                    "Konec 50stránkových PDF a zastaralých videokurzů",
-                    "Aplikace naprogramovaná z praxe: Nejlépe se učí na sluchátku",
-                    "Zbavte nováčky strachu nanečisto, než jim dáte reálné klienty",
+                    "Zapomeňte na PDF manuály a nudné školení",
+                    "Postaveno makléři, kteří si tím sami prošli",
+                    "Bezpečný prostor pro chyby, než přijdou skuteční klienti",
                   ].map((item) => (
                     <li
                       key={item}
@@ -175,7 +174,7 @@ export default function HomePage() {
                 <div className="mt-8 flex flex-col sm:flex-row gap-3">
                   <Link href="/registrace">
                     <Button size="lg" className="group w-full sm:w-auto">
-                      Začít zdarma
+                      Vyzkoušet 3 hovory zdarma
                       <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </Link>
@@ -190,7 +189,7 @@ export default function HomePage() {
                   </Link>
                 </div>
                 <p className="mt-3 text-xs text-neutral-400">
-                  Zdarma: 3 hovory a 1 AI agent. Bez kreditní karty.
+                  3 hovory na vyzkoušení, bez platby.
                 </p>
               </ScrollReveal>
             </div>
@@ -257,8 +256,8 @@ export default function HomePage() {
               <ScrollReveal>
                 <Badge className="mb-4">I pro pokročilé</Badge>
                 <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
-                  Není to jen pro nováčky.{" "}
-                  <span className="text-primary-400">Zdokonalte se i vy.</span>
+                  I zkušený makléř najde situaci,{" "}
+                  <span className="text-primary-400">kterou nikdy neřešil.</span>
                 </h2>
                 <p className="mt-5 text-neutral-400 leading-relaxed">
                   Naši pokročilí AI agenti mají hlubokou znalost českého práva, smluvních procesů a neobvyklých situací. Můžete si ověřit, že znáte správné řešení, nebo se připravit na případy, které jste ještě nikdy neřešili.
@@ -441,7 +440,7 @@ export default function HomePage() {
                   <User className="w-6 h-6 text-primary-500" />
                 </div>
                 <h3 className="text-xl font-bold text-neutral-800">
-                  Pro makléře & nováčky
+                  Pro jednotlivé makléře
                 </h3>
                 <ul className="mt-4 space-y-2.5">
                   {[
@@ -549,7 +548,7 @@ export default function HomePage() {
           <ScrollReveal>
             <SectionHeader
               badge="AI Agenti"
-              title="500+ scénářů z reálného prostředí"
+              title="Databáze 500+ ostrých scénářů z praxe"
               subtitle="Arogantní investoři, skeptičtí slevovači i zmatení dědicové. Trénujte na realitě."
             />
           </ScrollReveal>

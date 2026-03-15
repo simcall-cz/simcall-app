@@ -44,7 +44,7 @@ export default function FAQPage() {
                 FAQ
               </div>
               <h1 className="text-4xl sm:text-5xl font-bold text-white tracking-tight leading-[1.1]">
-                Časté dotazy
+                Vše, co potřebujete vědět o SimCall
               </h1>
               <p className="mt-4 text-lg text-neutral-400">
                 Odpovědi na nejčastější otázky o SimCall.

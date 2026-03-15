@@ -19,6 +19,12 @@ interface UseTrainingCallOptions {
   onError?: (error: string) => void;
 }
 
+export interface ProcessingResult {
+  overall_score: number;
+  summary_good: string | null;
+  summary_improve: string | null;
+}
+
 interface CallState {
   phase: CallPhase;
   callId: string | null;
@@ -28,6 +34,7 @@ interface CallState {
   scenarioId: string | null;
   error: string | null;
   isMuted: boolean;
+  processingResult: ProcessingResult | null;
 }
 
 export function useTrainingCall(options: UseTrainingCallOptions = {}) {
@@ -40,6 +47,7 @@ export function useTrainingCall(options: UseTrainingCallOptions = {}) {
     scenarioId: null,
     error: null,
     isMuted: false,
+    processingResult: null,
   });
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -108,7 +116,17 @@ export function useTrainingCall(options: UseTrainingCallOptions = {}) {
             .then((res) => res.json())
             .then((result) => {
               console.log("Call processing result:", result);
-              setState((prev) => ({ ...prev, phase: "completed" }));
+              setState((prev) => ({
+                ...prev,
+                phase: "completed",
+                processingResult: result?.overall_score != null
+                  ? {
+                      overall_score: result.overall_score,
+                      summary_good: result.summary_good || null,
+                      summary_improve: result.summary_improve || null,
+                    }
+                  : null,
+              }));
               optionsRef.current.onCallEnded?.(currentCallId);
             })
             .catch((err) => {
@@ -249,6 +267,7 @@ export function useTrainingCall(options: UseTrainingCallOptions = {}) {
       scenarioId: null,
       error: null,
       isMuted: false,
+      processingResult: null,
     });
   }, []);
 

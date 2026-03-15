@@ -163,7 +163,7 @@ export default function RegistracePage() {
           Vytvořte si účet
         </h2>
         <p className="mt-2 text-sm text-neutral-500">
-          Začněte zdarma — 3 tréninkové hovory bez závazků
+          Zaregistrujte se a vyzkoušejte 3 hovory s AI na vlastní kůži
         </p>
       </div>
 
