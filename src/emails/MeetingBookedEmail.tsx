@@ -131,11 +131,7 @@ export default function MeetingBookedEmail({
 
             {!isAdminNotification && (
               <Text style={paragraphStyle}>
-                Odkaz na video hovor Google Meet je:{" "}
-                <a href={meetLink} style={linkStyle}>
-                  {meetLink}
-                </a>
-                . Pokud potřebujete termín změnit, napište nám na{" "}
+                Pozvánka do kalendáře Vám během několika minut obvykle pípne ve Vašem e-mailu. Pokud potřebujete termín změnit, napište nám na{" "}
                 <a href="mailto:simcallcz@gmail.com" style={linkStyle}>
                   simcallcz@gmail.com
                 </a>

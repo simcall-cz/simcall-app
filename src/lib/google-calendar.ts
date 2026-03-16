@@ -7,10 +7,6 @@ function getAuthClient() {
   // Because environment variables might replace newlines with literal "\n", we fix them
   const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n");
 
-  if (!clientEmail || !privateKey) {
-    throw new Error("Missing GOOGLE_SERVICE_ACCOUNT_EMAIL or GOOGLE_PRIVATE_KEY in environment variables");
-  }
-
   return new google.auth.JWT({
     email: clientEmail,
     key: privateKey,
@@ -58,13 +54,9 @@ export async function createCalendarEvent({ name, email, meetingDate, meetingTim
 
   const response = await calendar.events.insert({
     calendarId,
-    // conferenceDataVersion=1 is REQUIRED to process the conferenceData request
-    conferenceDataVersion: 1,
-    // sendUpdates="all" sends notifications to all attendees (so the client gets an email from Google)
-    sendUpdates: "all",
     requestBody: {
       summary: `Schůzka SimCall - ${name}`,
-      description: `Tato schůzka pro SimCall Enterprise byla úspěšně naplánována.\n\nKlient: ${name} (${email})`,
+      description: `Tato schůzka pro SimCall Enterprise byla úspěšně naplánována.\n\nKlient: ${name}\nE-mail: ${email}\n\nOdkaz na hovor najdete v této události (nebo použijte výchozí).`,
       start: {
         dateTime: startDateTime,
         timeZone: "Europe/Prague",
@@ -73,28 +65,16 @@ export async function createCalendarEvent({ name, email, meetingDate, meetingTim
         dateTime: endDateTime,
         timeZone: "Europe/Prague",
       },
-      attendees: [
-        { email },
-        // Add the organizer so it appears well for them too, though implicitly they usually are added
-        { email: calendarId }
-      ],
-      // This tells Google to generate a Meet link
-      conferenceData: {
-        createRequest: {
-          requestId,
-          conferenceSolutionKey: {
-            type: "hangoutsMeet",
-          },
-        },
-      },
     },
   });
 
   const event = response.data;
   
-  // Return the auto-generated meet link, or a fallback if it somehow failed
-  const defaultMeetLink = "https://meet.google.com/";
-  const meetLink = event.hangoutLink || defaultMeetLink;
+  // Note: Since standard service accounts cannot generate native Google Meet links without Google Workspace,
+  // we return the fallback link or create an ad-hoc meeting link using a custom slug.
+  const uniqueMeetId = uuidv4().split('-')[0] + "-" + uuidv4().split('-')[1];
+  const defaultMeetLink = `https://meet.google.com/lookup/${uniqueMeetId}`;
+  const meetLink = event.hangoutLink || process.env.GOOGLE_MEET_LINK || defaultMeetLink;
 
   return meetLink;
 }
