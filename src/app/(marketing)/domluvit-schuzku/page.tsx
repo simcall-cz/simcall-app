@@ -70,7 +70,7 @@ function formatDateShort(date: Date): string {
 
 export default function DomluvitSchuzku() {
   // Zde vložíte přesný odkaz na váš Calendly profil/událost
-  const calendlyUrl = "https://calendly.com/simcallcz";
+  const calendlyUrl = "https://calendly.com/simcallcz/new-meeting";
 
   return (
     <>
