@@ -48,7 +48,7 @@ export default function ContactFormEmail({
           </Section>
 
           <Section style={contentStyle}>
-            <Text style={headingStyle}>📩 Nová zpráva z kontaktu</Text>
+            <Text style={headingStyle}>Nová zpráva z kontaktního formuláře</Text>
 
             <Section style={detailsBoxStyle}>
               <table cellPadding={0} cellSpacing={0} style={{ width: "100%" }}>
@@ -117,7 +117,7 @@ const containerStyle: React.CSSProperties = {
   maxWidth: "560px",
   margin: "0 auto",
   backgroundColor: "#ffffff",
-  borderRadius: "12px",
+  borderRadius: "4px",
   overflow: "hidden",
   border: "1px solid #e5e5e5",
 };
@@ -129,7 +129,7 @@ const logoSectionStyle: React.CSSProperties = {
 
 const logoBadgeStyle: React.CSSProperties = {
   backgroundColor: "#ef4444",
-  borderRadius: "8px",
+  borderRadius: "4px",
   width: "36px",
   height: "36px",
   textAlign: "center",
@@ -158,7 +158,7 @@ const paragraphStyle: React.CSSProperties = {
 const detailsBoxStyle: React.CSSProperties = {
   backgroundColor: "#fafafa",
   border: "1px solid #e5e5e5",
-  borderRadius: "8px",
+  borderRadius: "4px",
   padding: "20px",
   margin: "16px 0",
 };
@@ -181,7 +181,7 @@ const valueStyle: React.CSSProperties = {
 const messageBoxStyle: React.CSSProperties = {
   backgroundColor: "#fafafa",
   border: "1px solid #e5e5e5",
-  borderRadius: "8px",
+  borderRadius: "4px",
   padding: "16px",
   margin: "8px 0 16px",
 };

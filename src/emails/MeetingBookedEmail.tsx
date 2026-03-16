@@ -69,19 +69,22 @@ export default function MeetingBookedEmail({
           <Section style={contentStyle}>
             {isAdminNotification ? (
               <>
-                <Text style={headingStyle}>📅 Nová rezervace schůzky</Text>
+                <Text style={headingStyle}>Nová rezervace schůzky</Text>
                 <Text style={paragraphStyle}>
-                  Nový zájemce si právě zarezervoval schůzku:
+                  Systém zaznamenal novou rezervaci od zájemce:
                 </Text>
               </>
             ) : (
               <>
                 <Text style={headingStyle}>
-                  Schůzka potvrzena, {firstName}! 📅
+                  Potvrzení Vaší schůzky
                 </Text>
                 <Text style={paragraphStyle}>
-                  Děkujeme za zájem o SimCall Enterprise. Vaše schůzka je
-                  naplánována.
+                  Dobrý den,
+                </Text>
+                <Text style={paragraphStyle}>
+                  děkujeme za Váš zájem o řešení SimCall Enterprise. Tímto potvrzujeme, že Vaše 
+                  schůzka byla úspěšně naplánována.
                 </Text>
               </>
             )}
@@ -91,29 +94,29 @@ export default function MeetingBookedEmail({
               <table cellPadding={0} cellSpacing={0} style={{ width: "100%" }}>
                 <tbody>
                   <tr>
-                    <td style={detailLabelStyle}>📆 Datum</td>
+                    <td style={detailLabelStyle}>Datum</td>
                     <td style={detailValueStyle}>{meetingDate}</td>
                   </tr>
                   <tr>
-                    <td style={detailLabelStyle}>🕐 Čas</td>
+                    <td style={detailLabelStyle}>Čas</td>
                     <td style={detailValueStyle}>{meetingTime}</td>
                   </tr>
                   <tr>
-                    <td style={detailLabelStyle}>👤 Jméno</td>
+                    <td style={detailLabelStyle}>Jméno</td>
                     <td style={detailValueStyle}>{name}</td>
                   </tr>
                   <tr>
-                    <td style={detailLabelStyle}>📧 E-mail</td>
+                    <td style={detailLabelStyle}>E-mail</td>
                     <td style={detailValueStyle}>{email}</td>
                   </tr>
                   <tr>
-                    <td style={detailLabelStyle}>🏢 Firma</td>
+                    <td style={detailLabelStyle}>Firma</td>
                     <td style={detailValueStyle}>{company}</td>
                   </tr>
                   {teamSize && (
                     <tr>
-                      <td style={detailLabelStyle}>👥 Tým</td>
-                      <td style={detailValueStyle}>{teamSize} makléřů</td>
+                      <td style={detailLabelStyle}>Tým</td>
+                      <td style={detailValueStyle}>{teamSize}</td>
                     </tr>
                   )}
                 </tbody>
@@ -130,13 +133,23 @@ export default function MeetingBookedEmail({
             )}
 
             {!isAdminNotification && (
-              <Text style={paragraphStyle}>
-                Pozvánka do kalendáře Vám během několika minut obvykle pípne ve Vašem e-mailu. Pokud potřebujete termín změnit, napište nám na{" "}
-                <a href="mailto:simcallcz@gmail.com" style={linkStyle}>
-                  simcallcz@gmail.com
-                </a>
-                .
-              </Text>
+              <Section style={{ marginTop: "20px" }}>
+                <Text style={{ ...paragraphStyle, fontWeight: 600 }}>
+                  Odkaz pro videokonferenci (Google Meet):
+                </Text>
+                <Text style={paragraphStyle}>
+                  <a href={meetLink} style={linkStyle}>
+                    {meetLink}
+                  </a>
+                </Text>
+                <Text style={{ ...paragraphStyle, marginTop: "16px", color: "#737373" }}>
+                  Pokud potřebujete termín z jakéhokoliv důvodu změnit, prosím kontaktujte nás 
+                  přímo na e-mailové adrese{" "}
+                  <a href="mailto:simcallcz@gmail.com" style={linkStyle}>
+                    simcallcz@gmail.com
+                  </a>.
+                </Text>
+              </Section>
             )}
           </Section>
 
@@ -169,7 +182,7 @@ const containerStyle: React.CSSProperties = {
   maxWidth: "560px",
   margin: "0 auto",
   backgroundColor: "#ffffff",
-  borderRadius: "12px",
+  borderRadius: "4px",
   overflow: "hidden",
   border: "1px solid #e5e5e5",
 };
@@ -181,7 +194,7 @@ const logoSectionStyle: React.CSSProperties = {
 
 const logoBadgeStyle: React.CSSProperties = {
   backgroundColor: "#ef4444",
-  borderRadius: "8px",
+  borderRadius: "4px",
   width: "36px",
   height: "36px",
   textAlign: "center",
@@ -210,7 +223,7 @@ const paragraphStyle: React.CSSProperties = {
 const detailsBoxStyle: React.CSSProperties = {
   backgroundColor: "#fafafa",
   border: "1px solid #e5e5e5",
-  borderRadius: "8px",
+  borderRadius: "4px",
   padding: "20px",
   margin: "20px 0",
 };

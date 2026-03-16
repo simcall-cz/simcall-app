@@ -48,20 +48,22 @@ export default function ContactAutoReplyEmail({
           {/* Content */}
           <Section style={contentStyle}>
             <Text style={headingStyle}>
-              Děkujeme za zprávu, {firstName}! ✉️
+              Potvrzení o přijetí zprávy
             </Text>
             <Text style={paragraphStyle}>
-              Vaši zprávu jsme úspěšně přijali. Náš tým ji zpracuje a
-              odpovíme vám nejpozději <strong>do 24 hodin</strong>.
+              Dobrý den,
             </Text>
             <Text style={paragraphStyle}>
-              Mezitím se můžete podívat na naše často kladené dotazy, kde
-              najdete odpovědi na nejčastější otázky.
+              Vaši zprávu jsme v pořádku přijali. Náš tým se jí bude podrobně věnovat a 
+              obdržíte odpověď zpravidla <strong>do 24 hodin</strong>.
+            </Text>
+            <Text style={paragraphStyle}>
+              Pro rychlé odpovědi doporučujeme navštívit sekci Častých dotazů na našich stránkách.
             </Text>
 
             <Section style={ctaContainerStyle}>
               <Button style={ctaButtonStyle} href="https://simcall.cz/faq">
-                Přejít na FAQ →
+                Přejít na sekci FAQ →
               </Button>
             </Section>
           </Section>
@@ -99,7 +101,7 @@ const containerStyle: React.CSSProperties = {
   maxWidth: "560px",
   margin: "0 auto",
   backgroundColor: "#ffffff",
-  borderRadius: "12px",
+  borderRadius: "4px",
   overflow: "hidden",
   border: "1px solid #e5e5e5",
 };
@@ -111,7 +113,7 @@ const logoSectionStyle: React.CSSProperties = {
 
 const logoBadgeStyle: React.CSSProperties = {
   backgroundColor: "#ef4444",
-  borderRadius: "8px",
+  borderRadius: "4px",
   width: "36px",
   height: "36px",
   textAlign: "center",
@@ -146,7 +148,7 @@ const ctaButtonStyle: React.CSSProperties = {
   backgroundColor: "#ef4444",
   color: "#ffffff",
   padding: "14px 32px",
-  borderRadius: "8px",
+  borderRadius: "4px",
   fontSize: "14px",
   fontWeight: 600,
   textDecoration: "none",
