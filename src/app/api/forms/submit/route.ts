@@ -7,6 +7,7 @@ import MeetingBookedEmail from "@/emails/MeetingBookedEmail";
 import { notifyContactForm, notifyMeetingBooked } from "@/lib/notifications";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { createCalendarEvent } from "@/lib/google-calendar";
+import { generateIcs } from "@/lib/ical";
 
 // POST /api/forms/submit - Submit a form (contact, meeting, enterprise)
 export async function POST(request: NextRequest) {
@@ -146,11 +147,31 @@ export async function POST(request: NextRequest) {
       };
 
       // 1. Confirmation to customer
+      const icsString = generateIcs({
+        summary: `Schůzka: SimCall Enterprise - ${trimmedName}`,
+        description: `Dobrý den,\n\npotvrzujeme Vám termín schůzky ohledně rešení SimCall Enterprise.\n\nOdkaz pro videokonferenci (Google Meet):\n${meetLink}`,
+        location: meetLink,
+        date: meeting_date || "",
+        time: meeting_time || "",
+        durationMinutes: 30,
+        organizerEmail: "simcallcz@gmail.com",
+        organizerName: "SimCall",
+        attendeeEmail: trimmedEmail,
+        attendeeName: trimmedName,
+      });
+
       await resend.emails.send({
         from: getFromEmail(),
         to: [trimmedEmail],
         subject: `Schůzka potvrzena — ${meeting_date} v ${meeting_time}`,
         react: MeetingBookedEmail({ ...meetingProps, isAdminNotification: false }),
+        attachments: [
+          {
+            filename: "pozvanka.ics",
+            content: Buffer.from(icsString).toString("base64"),
+            contentType: "text/calendar",
+          },
+        ],
       });
 
       // 2. Notify admin
