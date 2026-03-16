@@ -6,6 +6,7 @@ import ContactAutoReplyEmail from "@/emails/ContactAutoReplyEmail";
 import MeetingBookedEmail from "@/emails/MeetingBookedEmail";
 import { notifyContactForm, notifyMeetingBooked } from "@/lib/notifications";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { createCalendarEvent } from "@/lib/google-calendar";
 
 // POST /api/forms/submit - Submit a form (contact, meeting, enterprise)
 export async function POST(request: NextRequest) {
@@ -118,6 +119,21 @@ export async function POST(request: NextRequest) {
     }
 
     if (type === "schuzka" || type === "enterprise") {
+      let meetLink = "https://meet.google.com/";
+      
+      try {
+        // Attempt to create the Google Calendar event dynamically
+        meetLink = await createCalendarEvent({
+          name: trimmedName,
+          email: trimmedEmail,
+          meetingDate: meeting_date || "",
+          meetingTime: meeting_time || "",
+        });
+      } catch (err) {
+        console.error("Failed to create Google Calendar event. Falling back to default link.", err);
+        meetLink = process.env.GOOGLE_MEET_LINK || meetLink;
+      }
+
       const meetingProps = {
         name: trimmedName,
         email: trimmedEmail,
@@ -126,6 +142,7 @@ export async function POST(request: NextRequest) {
         meetingTime: meeting_time || "",
         teamSize: team_size || undefined,
         note: message?.trim() || undefined,
+        meetLink,
       };
 
       // 1. Confirmation to customer

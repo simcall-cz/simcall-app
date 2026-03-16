@@ -17,6 +17,7 @@ interface MeetingBookedEmailProps {
   meetingTime: string;
   teamSize?: string;
   note?: string;
+  meetLink?: string;
   /** If true, renders admin notification version instead of customer confirmation */
   isAdminNotification?: boolean;
 }
@@ -29,6 +30,7 @@ export default function MeetingBookedEmail({
   meetingTime = "",
   teamSize = "",
   note = "",
+  meetLink = "https://meet.google.com/",
   isAdminNotification = false,
 }: MeetingBookedEmailProps) {
   const firstName = name.split(" ")[0];
@@ -129,8 +131,11 @@ export default function MeetingBookedEmail({
 
             {!isAdminNotification && (
               <Text style={paragraphStyle}>
-                Odkaz na video hovor vám pošleme den předem e-mailem. Pokud
-                potřebujete termín změnit, napište nám na{" "}
+                Odkaz na video hovor Google Meet je:{" "}
+                <a href={meetLink} style={linkStyle}>
+                  {meetLink}
+                </a>
+                . Pokud potřebujete termín změnit, napište nám na{" "}
                 <a href="mailto:simcallcz@gmail.com" style={linkStyle}>
                   simcallcz@gmail.com
                 </a>
