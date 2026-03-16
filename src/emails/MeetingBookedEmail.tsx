@@ -134,13 +134,9 @@ export default function MeetingBookedEmail({
 
             {!isAdminNotification && (
               <Section style={{ marginTop: "20px" }}>
-                <Text style={{ ...paragraphStyle, fontWeight: 600 }}>
-                  Odkaz pro videokonferenci (Google Meet):
-                </Text>
                 <Text style={paragraphStyle}>
-                  <a href={meetLink} style={linkStyle}>
-                    {meetLink}
-                  </a>
+                  Do několika minut obdržíte samostatný e-mail s oficiální pozvánkou do kalendáře 
+                  a odkazem na videohovor (Google Meet).
                 </Text>
                 <Text style={{ ...paragraphStyle, marginTop: "16px", color: "#737373" }}>
                   Pokud potřebujete termín z jakéhokoliv důvodu změnit, prosím kontaktujte nás 

@@ -74,7 +74,7 @@ export async function createCalendarEvent({ name, email, meetingDate, meetingTim
   // we return the fallback link or create an ad-hoc meeting link using a custom slug.
   const uniqueMeetId = uuidv4().split('-')[0] + "-" + uuidv4().split('-')[1];
   const defaultMeetLink = `https://meet.google.com/lookup/${uniqueMeetId}`;
-  const meetLink = event.hangoutLink || process.env.GOOGLE_MEET_LINK || defaultMeetLink;
+  const meetLink = event.hangoutLink || defaultMeetLink;
 
   return meetLink;
 }

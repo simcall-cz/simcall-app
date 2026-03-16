@@ -4,6 +4,7 @@ import { getResend, getFromEmail, ADMIN_EMAIL } from "@/lib/resend";
 import ContactFormEmail from "@/emails/ContactFormEmail";
 import ContactAutoReplyEmail from "@/emails/ContactAutoReplyEmail";
 import MeetingBookedEmail from "@/emails/MeetingBookedEmail";
+import MeetingInviteEmail from "@/emails/MeetingInviteEmail";
 import { notifyContactForm, notifyMeetingBooked } from "@/lib/notifications";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { createCalendarEvent } from "@/lib/google-calendar";
@@ -146,7 +147,15 @@ export async function POST(request: NextRequest) {
         meetLink,
       };
 
-      // 1. Confirmation to customer
+      // 1. Confirmation to customer (Email 1)
+      await resend.emails.send({
+        from: getFromEmail(),
+        to: [trimmedEmail],
+        subject: `Schůzka potvrzena — ${meeting_date} v ${meeting_time}`,
+        react: MeetingBookedEmail({ ...meetingProps, isAdminNotification: false }),
+      });
+
+      // 2. Calendar Invite (Email 2)
       const icsString = generateIcs({
         summary: `Schůzka: SimCall Enterprise - ${trimmedName}`,
         description: `Dobrý den,\n\npotvrzujeme Vám termín schůzky ohledně rešení SimCall Enterprise.\n\nOdkaz pro videokonferenci (Google Meet):\n${meetLink}`,
@@ -163,8 +172,13 @@ export async function POST(request: NextRequest) {
       await resend.emails.send({
         from: getFromEmail(),
         to: [trimmedEmail],
-        subject: `Schůzka potvrzena — ${meeting_date} v ${meeting_time}`,
-        react: MeetingBookedEmail({ ...meetingProps, isAdminNotification: false }),
+        subject: `Pozvánka do kalendáře: SimCall Enterprise - ${meeting_date} ${meeting_time}`,
+        react: MeetingInviteEmail({
+          name: trimmedName,
+          meetingDate: meeting_date || "",
+          meetingTime: meeting_time || "",
+          meetLink,
+        }),
         attachments: [
           {
             filename: "pozvanka.ics",
@@ -174,7 +188,7 @@ export async function POST(request: NextRequest) {
         ],
       });
 
-      // 2. Notify admin
+      // 3. Notify admin
       await resend.emails.send({
         from: getFromEmail(),
         to: [ADMIN_EMAIL],
@@ -183,7 +197,7 @@ export async function POST(request: NextRequest) {
         replyTo: trimmedEmail,
       });
 
-      // 3. Discord notification
+      // 4. Discord notification
       await notifyMeetingBooked(trimmedName, trimmedEmail, meeting_date || "", meeting_time || "");
     }
 
