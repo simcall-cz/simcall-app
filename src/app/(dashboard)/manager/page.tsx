@@ -107,7 +107,7 @@ export default function ManagerOverviewPage() {
       color: "bg-green-50 text-green-600",
     },
     {
-      label: "Hovorů tento měsíc",
+      label: "Minut tento měsíc",
       value: stats.totalCallsThisMonth,
       icon: Phone,
       color: "bg-purple-50 text-purple-600",
@@ -214,7 +214,7 @@ export default function ManagerOverviewPage() {
                           {entry.fullName || entry.email}
                         </p>
                         <p className="text-xs text-neutral-500">
-                          {entry.callsCount} hovorů tento měsíc
+                          {entry.callsCount} minut tento měsíc
                         </p>
                       </div>
                       <Badge
@@ -246,12 +246,12 @@ export default function ManagerOverviewPage() {
         >
           <Card className="h-full">
             <CardHeader>
-              <CardTitle>Rozložení hovorů</CardTitle>
+              <CardTitle>Rozložení minut</CardTitle>
             </CardHeader>
             <CardContent>
               {stats.callsDistribution.length === 0 ? (
                 <p className="text-sm text-neutral-400 text-center py-8">
-                  Žádné hovory tento měsíc
+                  Žádné minuty tento měsíc
                 </p>
               ) : (
                 <div className="space-y-4">

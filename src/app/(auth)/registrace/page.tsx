@@ -167,7 +167,7 @@ export default function RegistracePage() {
           Vytvořte si účet
         </h2>
         <p className="mt-2 text-sm text-neutral-500">
-          Zaregistrujte se a vyzkoušejte 3 hovory s AI na vlastní kůži
+          Zaregistrujte se a vyzkoušejte 30 minut s AI na vlastní kůži
         </p>
       </div>
 
@@ -320,8 +320,8 @@ export default function RegistracePage() {
         <div className="rounded-lg bg-neutral-50 border border-neutral-100 p-3">
           <p className="text-xs text-neutral-500 text-center">
             <span className="font-medium text-neutral-700">Demo zdarma</span>
-            {" — "}3 tréninkové hovory, 1 AI agent, základní zpětná vazba.
-            Plné plány od 490 Kč/měsíc.
+            {" — "}30 tréninkových minut, 1 AI agent, základní zpětná vazba.
+            Plné plány od 990 Kč/měsíc.
           </p>
         </div>
 

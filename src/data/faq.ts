@@ -17,7 +17,7 @@ export const faqItems: FAQ[] = [
   {
     question: "Mohu si SimCall vyzkoušet zdarma?",
     answer:
-      "Ano. Po registraci získáte zdarma 5 tréninkových hovorů a přístup ke 2 AI agentům. Díky tomu si můžete vyzkoušet, jak platforma funguje, ještě než se rozhodnete pro placený balíček.",
+      "Ano. Po registraci získáte zdarma 30 tréninkových minut a přístup ke 2 AI agentům. Díky tomu si můžete vyzkoušet, jak platforma funguje, ještě než se rozhodnete pro placený balíček.",
     category: "general",
   },
   {
@@ -57,13 +57,13 @@ export const faqItems: FAQ[] = [
   {
     question: "Jak funguje ceník a platby?",
     answer:
-      "Nabízíme balíčky Solo (pro jednotlivce, od 490 Kč/měs) a Team (pro firmy, od 2 490 Kč/měs). Platíte měsíčně za zvolený počet hovorů. Můžete platit kartou online nebo bankovním převodem na fakturu. Balíček lze kdykoliv změnit nebo zrušit.",
+      "Nabízíme balíčky Solo (pro jednotlivce, od 990 Kč/měs) a Team (pro firmy, od 7 490 Kč/měs). Platíte měsíčně za zvolený počet minut. Můžete platit kartou online nebo bankovním převodem na fakturu. Balíček lze kdykoliv změnit nebo zrušit.",
     category: "pricing",
   },
   {
     question: "Co je ve free verzi zdarma?",
     answer:
-      "Po registraci dostanete 5 hovorů a přístup ke 2 AI agentům úplně zdarma. Můžete si vyzkoušet celý průběh — hovor, přepis, AI analýzu a doporučení. Žádná platební karta není potřeba.",
+      "Po registraci dostanete 30 minut a přístup ke 2 AI agentům úplně zdarma. Můžete si vyzkoušet celý průběh — hovor, přepis, AI analýzu a doporučení. Žádná platební karta není potřeba.",
     category: "pricing",
   },
   {
@@ -75,7 +75,7 @@ export const faqItems: FAQ[] = [
   {
     question: "Nabízíte Enterprise řešení pro velké týmy?",
     answer:
-      "Ano. Enterprise plán zahrnuje Whitelabel branding, vlastní AI agenty a scénáře na míru, dedikovaného account manažera a individuální počet hovorů a agentů. Cena je dohodou, proto si domluvte nezávaznou schůzku a připravíme nabídku přímo pro vás.",
+      "Ano. Enterprise plán zahrnuje Whitelabel branding, vlastní AI agenty a scénáře na míru, dedikovaného account manažera a individuální počet minut a agentů. Cena je dohodou, proto si domluvte nezávaznou schůzku a připravíme nabídku přímo pro vás.",
     category: "pricing",
   },
 

@@ -134,7 +134,7 @@ export default function BalicekPage() {
       >
         <h1 className="text-2xl font-bold text-neutral-900">Můj balíček</h1>
         <p className="text-neutral-500 mt-1">
-          Správa vašeho předplatného a hovorů
+          Správa vašeho předplatného a minut
         </p>
       </motion.div>
 
@@ -157,7 +157,7 @@ export default function BalicekPage() {
                     {planLabels[sub.plan] || sub.plan}
                     {isPaid && (
                       <span className="text-neutral-400 font-normal ml-2 text-sm">
-                        · {sub.callsLimit} hovorů/měs
+                        · {sub.callsLimit} minut/měs
                       </span>
                     )}
                   </h2>
@@ -193,7 +193,7 @@ export default function BalicekPage() {
               <div className="bg-neutral-50 rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <Phone className="w-4 h-4 text-neutral-400" />
-                  <span className="text-xs text-neutral-500">Hovory</span>
+                  <span className="text-xs text-neutral-500">Minuty</span>
                 </div>
                 <p className="text-2xl font-bold text-neutral-900">
                   {sub.callsUsed}
@@ -209,7 +209,7 @@ export default function BalicekPage() {
                 </div>
                 <p className="text-2xl font-bold text-neutral-900">
                   {remaining}
-                  <span className="text-sm font-normal text-neutral-400"> hovorů</span>
+                  <span className="text-sm font-normal text-neutral-400"> minut</span>
                 </p>
               </div>
               <div className="bg-neutral-50 rounded-xl p-4">
@@ -243,7 +243,7 @@ export default function BalicekPage() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-neutral-600">
-                  Využití hovorů tento měsíc
+                  Využití minut tento měsíc
                 </span>
                 <span className="text-sm font-medium text-neutral-900">
                   {usagePercent}%
@@ -364,7 +364,7 @@ export default function BalicekPage() {
                         // Confirm downgrade
                         if (!isUpgrade) {
                           const confirmed = window.confirm(
-                            `Opravdu chcete downgrade na ${t.calls} hovorů? Změna se projeví na konci aktuálního období.`
+                            `Opravdu chcete downgrade na ${t.calls} minut? Změna se projeví na konci aktuálního období.`
                           );
                           if (!confirmed) return;
                         }
@@ -409,7 +409,7 @@ export default function BalicekPage() {
                     >
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm font-semibold text-neutral-900">
-                          {t.calls} hovorů
+                          {t.calls} minut
                         </span>
                         {isCurrentTier ? (
                           <Badge variant="default">Aktuální</Badge>
@@ -454,7 +454,7 @@ export default function BalicekPage() {
                     Upgradujte na placený plán
                   </h3>
                   <p className="text-sm text-neutral-500 mt-0.5">
-                    Získejte více hovorů, agentů a pokročilé funkce. Vyberte si z plánu Solo (od 490 Kč) nebo Team (od 2 490 Kč).
+                    Získejte více minut, agentů a pokročilé funkce. Vyberte si z plánu Solo (od 990 Kč) nebo Team (od 7 490 Kč).
                   </p>
                 </div>
                 <Button

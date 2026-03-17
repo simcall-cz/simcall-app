@@ -99,7 +99,7 @@ export default function WelcomeEmail({
                   Posuňte svůj trénink na další úroveň 🚀
                 </Text>
                 <Text style={upsellParagraphStyle}>
-                  V rámci verze <strong>Demo</strong> máte k dispozici první <strong>3 tréninkové hovory s 1 AI agentem</strong> zcela zdarma.
+                  V rámci verze <strong>Demo</strong> máte k dispozici prvních <strong>30 tréninkových minut s 1 AI agentem</strong> zcela zdarma.
                 </Text>
                 <Text style={upsellParagraphStyle}>
                   Chcete trénovat bez omezení? Získejte přístup ke všem AI agentům, neomezeným scénářům na míru a detailní pokročilé analytice.

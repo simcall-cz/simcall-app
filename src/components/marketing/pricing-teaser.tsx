@@ -7,19 +7,19 @@ import { ScrollReveal } from "@/components/shared/scroll-reveal";
 const plans = [
   {
     name: "Solo",
-    price: "od 490 Kč",
+    price: "od 990 Kč",
     period: "/měsíc",
     description: "Pro jednotlivé makléře",
-    features: ["Až 100 agentů", "50–1 000 hovorů/měsíc", "AI analýza a scoring"],
+    features: ["Až 50 agentů", "100–1 000 minut/měsíc", "AI analýza a scoring"],
     highlighted: false,
     href: "/checkout?plan=solo&tier=0",
   },
   {
     name: "Team",
-    price: "od 2 490 Kč",
+    price: "od 7 490 Kč",
     period: "/měsíc",
     description: "Pro firmy a týmy",
-    features: ["Manager dashboard", "Správa celého týmu", "Sdílená banka hovorů"],
+    features: ["Manager dashboard", "Správa celého týmu", "Sdílený pool minut"],
     highlighted: true,
     href: "/checkout?plan=team&tier=0",
   },

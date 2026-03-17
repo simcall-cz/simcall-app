@@ -255,7 +255,7 @@ export default function TeamPage() {
               <div className="flex-1 min-w-[200px]">
                 <div className="flex items-center justify-between mb-1">
                   <p className="text-xs text-neutral-500">
-                    Využití týmových hovorů
+                    Využití týmových minut
                   </p>
                   <p className="text-sm font-bold text-neutral-900">
                     {teamCallsUsed} / {teamCallsLimit || "∞"}
@@ -367,7 +367,7 @@ export default function TeamPage() {
                     {/* Total Calls */}
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-neutral-500">
-                        Celkem hovorů
+                        Celkem minut
                       </span>
                       <span className="text-sm text-neutral-500">
                         {member.totalCalls}

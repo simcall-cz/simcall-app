@@ -212,7 +212,7 @@ export function notifyRebill(stripeSubId: string, email?: string) {
       { name: "Subscription", value: stripeSubId, inline: true },
       ...(email ? [{ name: "Zákazník", value: email, inline: true }] : []),
     ],
-    description: "Hovory resetovány, nové období započato.",
+    description: "Minuty resetovány, nové období započato.",
   });
 }
 

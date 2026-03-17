@@ -112,7 +112,7 @@ export default function StatistikyPage() {
 
   const statCards = [
     {
-      label: "Celkem hovorů",
+      label: "Celkem minut",
       value: totalCalls.toString(),
       icon: Phone,
       bg: "bg-neutral-50",
@@ -275,7 +275,7 @@ export default function StatistikyPage() {
           {callsPerDay.length > 1 && (
             <Card>
               <CardHeader>
-                <CardTitle>Počet hovorů za den</CardTitle>
+                <CardTitle>Počet minut za den</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="h-56">
@@ -353,7 +353,7 @@ export default function StatistikyPage() {
             </div>
             <h3 className="text-lg font-bold text-neutral-900">Statistiky jsou zamčeny</h3>
             <p className="mt-2 text-sm text-neutral-500 leading-relaxed">
-              Podrobné statistiky jsou dostupné od plánu Solo (od 490 Kč/měs).
+              Podrobné statistiky jsou dostupné od plánu Solo (od 990 Kč/měs).
             </p>
             <Link href="/cenik" className="mt-5 block">
               <Button className="w-full">

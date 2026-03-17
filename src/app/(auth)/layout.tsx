@@ -53,8 +53,8 @@ export default function AuthLayout({
               <p className="mt-1 text-sm text-neutral-500">Trénink kdykoliv</p>
             </div>
             <div>
-              <p className="text-3xl font-bold text-primary-400">3</p>
-              <p className="mt-1 text-sm text-neutral-500">Hovory zdarma</p>
+              <p className="text-3xl font-bold text-primary-400">30</p>
+              <p className="mt-1 text-sm text-neutral-500">Minut zdarma</p>
             </div>
           </div>
         </div>
@@ -62,7 +62,7 @@ export default function AuthLayout({
         {/* CTA */}
         <div className="relative z-10 rounded-xl bg-white/5 border border-white/10 p-6">
           <p className="text-sm text-neutral-300 leading-relaxed">
-            Vyzkoušejte SimCall zdarma — 3 tréninkové hovory bez závazků.
+            Vyzkoušejte SimCall zdarma — 30 tréninkových minut bez závazků.
             Připravte se na reálné situace s AI klienty, kteří reagují přirozeně.
           </p>
         </div>

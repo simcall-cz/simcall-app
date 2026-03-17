@@ -77,7 +77,7 @@ export default function OrderConfirmationEmail({
                     <td style={summaryValueStyle}>{planLabel} (Tier {tier})</td>
                   </tr>
                   <tr>
-                    <td style={summaryLabelStyle}>Hovorů měsíčně</td>
+                    <td style={summaryLabelStyle}>Minut měsíčně</td>
                     <td style={summaryValueStyle}>{callsLimit.toLocaleString("cs-CZ")}</td>
                   </tr>
                   <tr>

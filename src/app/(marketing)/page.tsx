@@ -104,7 +104,7 @@ const features = [
   {
     icon: Trophy,
     title: "Žebříčky v týmu",
-    desc: "Gamifikace motivující makléře k pravidelnému tréninku. Sdílená banka hovorů.",
+    desc: "Gamifikace motivující makléře k pravidelnému tréninku. Sdílený pool minut.",
     tag: "Team",
     tagColor: "bg-blue-50 text-blue-600",
   },
@@ -122,7 +122,7 @@ const features = [
 /* ------------------------------------------------------------------ */
 export default function HomePage() {
   const showcaseAgents = aiAgents.slice(0, 5);
-  const extraAgentsCount = aiAgents.length - 5;
+  const extraAgentsCount = 495;
 
   return (
     <>
@@ -174,7 +174,7 @@ export default function HomePage() {
                 <div className="mt-8 flex flex-col sm:flex-row gap-3">
                   <Link href="/registrace">
                     <Button size="lg" className="group w-full sm:w-auto">
-                      Vyzkoušet 3 hovory zdarma
+                      Vyzkoušet 30 minut zdarma
                       <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </Link>
@@ -189,7 +189,7 @@ export default function HomePage() {
                   </Link>
                 </div>
                 <p className="mt-3 text-xs text-neutral-400">
-                  3 hovory na vyzkoušení, bez platby.
+                  30 minut na vyzkoušení, bez platby.
                 </p>
               </ScrollReveal>
             </div>
@@ -462,7 +462,7 @@ export default function HomePage() {
                   href="/cenik"
                   className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-primary-500 hover:text-primary-600 transition-colors group"
                 >
-                  Solo plán od 490 Kč/měs.
+                  Solo plán od 990 Kč/měs.
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                 </Link>
               </div>
@@ -498,7 +498,7 @@ export default function HomePage() {
                   href="/cenik"
                   className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-blue-500 hover:text-blue-600 transition-colors group"
                 >
-                  Team plán od 2 490 Kč/měs.
+                  Team plán od 7 490 Kč/měs.
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                 </Link>
               </div>
@@ -597,7 +597,7 @@ export default function HomePage() {
             <div className="mt-10 text-center">
               <Link href="/registrace">
                 <Button size="lg" className="group">
-                  Vyzkoušet 3 hovory zdarma
+                  Vyzkoušet 30 minut zdarma
                   <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
                 </Button>
               </Link>

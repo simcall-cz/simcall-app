@@ -77,22 +77,19 @@ const allRoles = ["free", "solo", "team", "team_manager"] as const;
 
 // Combined role+tier options for the admin dropdown
 const PLAN_OPTIONS = [
-  { value: "free", label: "Free (3 hovory)" },
-  { value: "solo:1", label: "Solo · 50 hovorů" },
-  { value: "solo:2", label: "Solo · 100 hovorů" },
-  { value: "solo:3", label: "Solo · 250 hovorů" },
-  { value: "solo:4", label: "Solo · 500 hovorů" },
-  { value: "solo:5", label: "Solo · 1 000 hovorů" },
-  { value: "team:1", label: "Team · 250 hovorů" },
-  { value: "team:2", label: "Team · 500 hovorů" },
-  { value: "team:3", label: "Team · 1 000 hovorů" },
-  { value: "team:4", label: "Team · 2 500 hovorů" },
-  { value: "team:5", label: "Team · 5 000 hovorů" },
-  { value: "team_manager:1", label: "Team Manager · 250 hovorů" },
-  { value: "team_manager:2", label: "Team Manager · 500 hovorů" },
-  { value: "team_manager:3", label: "Team Manager · 1 000 hovorů" },
-  { value: "team_manager:4", label: "Team Manager · 2 500 hovorů" },
-  { value: "team_manager:5", label: "Team Manager · 5 000 hovorů" },
+  { value: "free", label: "Free (30 minut)" },
+  { value: "solo:2", label: "Solo · 100 minut" },
+  { value: "solo:3", label: "Solo · 250 minut" },
+  { value: "solo:4", label: "Solo · 500 minut" },
+  { value: "solo:5", label: "Solo · 1 000 minut" },
+  { value: "team:2", label: "Team · 500 minut" },
+  { value: "team:3", label: "Team · 1 000 minut" },
+  { value: "team:4", label: "Team · 2 500 minut" },
+  { value: "team:5", label: "Team · 5 000 minut" },
+  { value: "team_manager:2", label: "Team Manager · 500 minut" },
+  { value: "team_manager:3", label: "Team Manager · 1 000 minut" },
+  { value: "team_manager:4", label: "Team Manager · 2 500 minut" },
+  { value: "team_manager:5", label: "Team Manager · 5 000 minut" },
 ];
 
 function getUserPlanValue(user: AdminUser): string {
@@ -211,7 +208,7 @@ function UserDetailModal({ user, onClose }: { user: AdminUser; onClose: () => vo
             <div className="bg-neutral-50 rounded-xl p-3">
               <div className="flex items-center gap-1.5 mb-1">
                 <Phone className="w-3.5 h-3.5 text-neutral-400" />
-                <span className="text-[10px] text-neutral-500 uppercase">Hovory</span>
+                <span className="text-[10px] text-neutral-500 uppercase">Minuty</span>
               </div>
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin text-neutral-400" />
@@ -268,7 +265,7 @@ function UserDetailModal({ user, onClose }: { user: AdminUser; onClose: () => vo
                   </Badge>
                 </div>
                 <div>
-                  <span className="text-neutral-500">Hovory:</span>
+                  <span className="text-neutral-500">Minuty:</span>
                   <span className="ml-2 font-medium text-neutral-800">{sub.calls_used}/{sub.calls_limit}</span>
                 </div>
                 {sub.current_period_end && (
@@ -431,7 +428,7 @@ export default function AdminUzivatelePage() {
             <div className="hidden lg:grid lg:grid-cols-8 gap-3 px-5 py-3 border-b border-neutral-100 text-[10px] font-medium text-neutral-400 uppercase tracking-wider">
               <span className="col-span-2">Uživatel</span>
               <span>Role</span>
-              <span className="text-center">Hovory</span>
+              <span className="text-center">Minuty</span>
               <span className="text-center">Plán</span>
               <span className="text-center">Stav</span>
               <span className="text-right">Registrace</span>
@@ -578,7 +575,7 @@ export default function AdminUzivatelePage() {
                             <p className="text-xs text-neutral-500">
                               {role.label} ·{" "}
                               {sub
-                                ? `${sub.plan} ${sub.tier} · ${sub.calls_used}/${sub.calls_limit} hovorů`
+                                ? `${sub.plan} ${sub.tier} · ${sub.calls_used}/${sub.calls_limit} minut`
                                 : "Demo účet"}
                             </p>
                           </div>

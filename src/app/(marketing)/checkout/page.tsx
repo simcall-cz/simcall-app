@@ -244,7 +244,7 @@ function CheckoutPage() {
                   {/* Tier selector */}
                   <div className="mt-4">
                     <label className="text-xs font-medium text-neutral-500 uppercase tracking-wider mb-2 block">
-                      Počet hovorů / měsíc
+                      Počet minut / měsíc
                     </label>
                     <div className="relative">
                       <select
@@ -254,7 +254,7 @@ function CheckoutPage() {
                       >
                         {plan.tiers.map((t, i) => (
                           <option key={i} value={i}>
-                            {t.calls} hovorů / {t.agents} agentů — {t.price.toLocaleString("cs-CZ")} Kč/měs
+                            {t.calls} minut / {t.agents} agentů — {t.price.toLocaleString("cs-CZ")} Kč/měs
                           </option>
                         ))}
                       </select>
@@ -387,7 +387,7 @@ function CheckoutPage() {
                       <p className="font-semibold text-neutral-800">{plan.name}</p>
                       <p className="font-bold text-neutral-800">{tier.price.toLocaleString("cs-CZ")} Kč</p>
                     </div>
-                    <p className="text-xs text-neutral-400 mt-1">{tier.calls} hovorů / {tier.agents} agentů / měsíc</p>
+                    <p className="text-xs text-neutral-400 mt-1">{tier.calls} minut / {tier.agents} agentů / měsíc</p>
                   </div>
                   <div className="border-t border-neutral-100" />
                   <div className="space-y-2">
@@ -404,7 +404,7 @@ function CheckoutPage() {
                   <div className="border-t border-neutral-100" />
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-neutral-500">{plan.name} ({tier.calls} hovorů)</span>
+                      <span className="text-neutral-500">{plan.name} ({tier.calls} minut)</span>
                       <span className="text-neutral-800">{tier.price.toLocaleString("cs-CZ")} Kč</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">

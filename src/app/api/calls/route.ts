@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     if (!limitCheck.canCall) {
       return NextResponse.json(
         {
-          error: "Limit hovorů vyčerpán",
+          error: "Limit minut vyčerpán",
           callsUsed: limitCheck.used,
           callsLimit: limitCheck.limit,
           planRole: limitCheck.planRole,

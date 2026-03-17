@@ -143,7 +143,7 @@ function FreeDashboard({
             <div className="flex items-center gap-2">
               <Phone className="w-4 h-4 text-neutral-500" />
               <span className="text-sm font-medium text-neutral-700">
-                Využití demo hovorů celkem
+                Využití demo minut celkem
               </span>
             </div>
             <span className="text-sm font-bold text-neutral-900">
@@ -163,8 +163,8 @@ function FreeDashboard({
           </div>
           {subscription.callsUsed >= subscription.callsLimit && (
             <p className="text-xs text-red-500 mt-2">
-              Dosáhli jste limitu {subscription.callsLimit} hovorů v demo verzi.
-              Vyberte plán pro více hovorů.
+              Dosáhli jste limitu {subscription.callsLimit} minut v demo verzi.
+              Vyberte plán pro více minut.
             </p>
           )}
         </CardContent>
@@ -180,7 +180,7 @@ function FreeDashboard({
               </div>
               <div className="min-w-0">
                 <p className="text-sm text-neutral-500 truncate">
-                  Celkem hovorů
+                  Celkem minut
                 </p>
                 <p className="text-lg font-semibold text-neutral-900 truncate">
                   {isLoading ? "..." : subscription.callsUsed.toString()}
@@ -334,7 +334,7 @@ function FreeDashboard({
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                 {[
-                  "Až 1 000 hovorů/měsíc (Solo plán)",
+                  "Až 1 000 minut/měsíc (Solo plán)",
                   "500 AI agentů k výběru",
                   "Detailní AI analýza hovoru",
                   "Přepis hovoru s exportem PDF",
@@ -352,7 +352,7 @@ function FreeDashboard({
               </div>
             </div>
             <div className="text-center sm:text-right shrink-0">
-              <p className="text-2xl font-bold text-neutral-900">od 490 Kč</p>
+              <p className="text-2xl font-bold text-neutral-900">od 990 Kč</p>
               <p className="text-xs text-neutral-400 mb-3">/ měsíc</p>
               <Link href="/cenik">
                 <Button size="lg" className="whitespace-nowrap">
@@ -411,7 +411,7 @@ function PaidDashboard({
 
   const stats = [
     {
-      label: "Celkem hovorů",
+      label: "Celkem minut",
       value: totalCalls.toString(),
       icon: Phone,
       bg: "bg-neutral-50",
@@ -473,7 +473,7 @@ function PaidDashboard({
             <div className="flex items-center gap-2">
               <Phone className="w-4 h-4 text-neutral-500" />
               <span className="text-sm font-medium text-neutral-700">
-                Využití hovorů ({planLabel} {subscription.tier})
+                Využití minut ({planLabel} {subscription.tier})
               </span>
             </div>
             <span className="text-sm font-bold text-neutral-900">
@@ -493,7 +493,7 @@ function PaidDashboard({
           </div>
           <div className="flex items-center justify-between mt-2">
             <p className="text-xs text-neutral-400">
-              Zbývá {callsRemaining} hovorů
+              Zbývá {callsRemaining} minut
             </p>
             {subscription.currentPeriodEnd && (
               <p className="text-xs text-neutral-400">
@@ -514,10 +514,10 @@ function PaidDashboard({
             <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
             <div className="flex-1">
               <p className="text-sm font-medium text-amber-800">
-                Blížíte se limitu hovorů
+                Blížíte se limitu minut
               </p>
               <p className="text-xs text-amber-600 mt-0.5">
-                Zbývá vám {callsRemaining} hovorů. Zvyšte limit pro
+                Zbývá vám {callsRemaining} minut. Zvyšte limit pro
                 nepřerušený trénink.
               </p>
             </div>
@@ -537,7 +537,7 @@ function PaidDashboard({
             <Lock className="w-5 h-5 text-red-500 shrink-0" />
             <div className="flex-1">
               <p className="text-sm font-medium text-red-800">
-                Vyčerpali jste limit hovorů
+                Vyčerpali jste limit minut
               </p>
               <p className="text-xs text-red-600 mt-0.5">
                 Pro pokračování v tréninku přejděte na vyšší balíček.

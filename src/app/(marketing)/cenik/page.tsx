@@ -50,15 +50,15 @@ const comparisonFeatures: {
   enterprise: string | boolean;
 }[] = [
     {
-      label: "Počet hovorů",
-      solo: "50 až 1 000",
-      team: "250 až 5 000",
+      label: "Počet minut",
+      solo: "100 až 1 000",
+      team: "500 až 5 000",
       enterprise: "Dohodou",
     },
     {
       label: "Počet AI agentů",
-      solo: "5 až 100",
-      team: "25 až 500",
+      solo: "5 až 50",
+      team: "25 až 250",
       enterprise: "Dohodou a vlastní",
     },
     { label: "AI analýza hovoru", solo: true, team: true, enterprise: true },
@@ -113,7 +113,7 @@ const comparisonFeatures: {
       enterprise: true,
     },
     {
-      label: "Sdílená banka hovorů",
+      label: "Sdílený pool minut",
       solo: false,
       team: true,
       enterprise: true,
@@ -224,7 +224,7 @@ function PricingCard({ plan }: { plan: PricingPlan }) {
               </span>
               <span className="text-neutral-400 text-sm">/měsíc</span>
               <div className="flex items-center gap-3 mt-2 text-sm text-neutral-500">
-                <span>{tier.calls} hovorů</span>
+                <span>{tier.calls} minut</span>
                 <span className="w-1 h-1 rounded-full bg-neutral-300" />
                 <span>{tier.agents} agentů</span>
               </div>
@@ -242,7 +242,7 @@ function PricingCard({ plan }: { plan: PricingPlan }) {
         {!isEnterprise && plan.tiers.length > 1 && (
           <div>
             <label className="text-xs font-medium text-neutral-500 uppercase tracking-wider mb-2 block">
-              Počet hovorů / měsíc
+              Počet minut / měsíc
             </label>
             <div className="relative">
               <select
@@ -252,7 +252,7 @@ function PricingCard({ plan }: { plan: PricingPlan }) {
               >
                 {plan.tiers.map((t, i) => (
                   <option key={i} value={i}>
-                    {t.calls} hovorů za {t.price.toLocaleString("cs-CZ")} Kč/měsíc
+                    {t.calls} minut za {t.price.toLocaleString("cs-CZ")} Kč/měsíc
                   </option>
                 ))}
               </select>

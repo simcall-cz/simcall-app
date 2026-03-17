@@ -108,7 +108,7 @@ export default function ProfilPage() {
 
   const stats = [
     {
-      label: "Celkem hovorů",
+      label: "Celkem minut",
       value: totalCalls.toString(),
       icon: Phone,
       bg: "bg-neutral-50",
@@ -202,7 +202,7 @@ export default function ProfilPage() {
               <div className="flex items-center justify-between mb-1.5">
                 <span className="text-xs text-neutral-500 flex items-center gap-1.5">
                   <CreditCard className="w-3.5 h-3.5" />
-                  Využití hovorů
+                  Využití minut
                 </span>
                 <span className="text-sm font-medium text-neutral-700">
                   {subscription.callsUsed} / {subscription.callsLimit}

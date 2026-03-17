@@ -188,7 +188,7 @@ export const scenarios: Scenario[] = [
   },
   {
     id: "scenario-leona-neumannova",
-    title: "Exspirace inzerátu: ležák",
+    title: "Expirace inzerátu: ležák",
     description:
       "Leoně Neumannové právě vypršel inzerát přes jinou RK po 3 měsících. Nemovitost se neprodala. Voláte s nabídkou jiného přístupu. Je vyjednavačka a tlačí na podmínky.",
     category: "cold-lead",
@@ -300,7 +300,7 @@ export const scenarios: Scenario[] = [
   },
   {
     id: "scenario-frantiska-jelinkova",
-    title: "Exspirace inzerátu: nejnáročnější",
+    title: "Expirace inzerátu: nejnáročnější",
     description:
       "Františce Jelínkové právě vypršel inzerát přes jinou RK po 3 měsících bez prodeje. Obtížnost 10/10. Podezírá ze skrytých motivů a každý makléř je pro ni podvodník.",
     category: "cold-lead",

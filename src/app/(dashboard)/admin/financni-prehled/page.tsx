@@ -278,7 +278,7 @@ export default function FinancniPrehledPage() {
                 <div className="hidden sm:grid sm:grid-cols-7 gap-3 px-3 py-2 text-[10px] font-medium text-neutral-400 uppercase tracking-wider">
                   <span className="col-span-2">Zákazník</span>
                   <span>Plán</span>
-                  <span className="text-center">Hovory</span>
+                  <span className="text-center">Minuty</span>
                   <span>Období</span>
                   <span className="text-right">Cena</span>
                   <span className="text-right">Stav</span>
@@ -327,7 +327,7 @@ export default function FinancniPrehledPage() {
                         <div className="sm:hidden flex flex-col gap-1 mt-1">
                           <p className="text-xs text-neutral-500">
                             {planLabel[sub.plan] || sub.plan} {sub.tier} ·{" "}
-                            {sub.calls_used}/{sub.calls_limit} hovorů ·{" "}
+                            {sub.calls_used}/{sub.calls_limit} minut ·{" "}
                             {config.label}
                           </p>
                         </div>

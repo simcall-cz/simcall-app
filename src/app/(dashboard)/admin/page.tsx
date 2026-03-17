@@ -106,7 +106,7 @@ export default function AdminOverviewPage() {
       color: "bg-blue-50 text-blue-600",
     },
     {
-      label: "Celkem hovorů",
+      label: "Celkem minut",
       value: stats.totalCalls.toLocaleString("cs-CZ"),
       icon: Phone,
       color: "bg-purple-50 text-purple-600",
@@ -273,7 +273,7 @@ export default function AdminOverviewPage() {
                   <div className="flex items-center gap-3">
                     <Phone className="w-5 h-5 text-purple-600" />
                     <span className="text-sm font-medium text-purple-700">
-                      Hovorů dnes
+                      Minut dnes
                     </span>
                   </div>
                   <span className="text-2xl font-bold text-purple-600">

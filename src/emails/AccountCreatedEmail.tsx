@@ -104,7 +104,7 @@ export default function AccountCreatedEmail({
                     <td style={summaryValueStyle}>{planLabel} {tier}</td>
                   </tr>
                   <tr>
-                    <td style={summaryLabelStyle}>Hovorů měsíčně</td>
+                    <td style={summaryLabelStyle}>Minut měsíčně</td>
                     <td style={summaryValueStyle}>{callsLimit.toLocaleString("cs-CZ")}</td>
                   </tr>
                   <tr>

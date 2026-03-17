@@ -7,11 +7,10 @@ export const pricingPlans: PricingPlan[] = [
     description:
       "Pro jednotlivé makléře, kteří chtějí zlepšit své telefonní dovednosti a zvýšit úspěšnost hovorů.",
     tiers: [
-      { calls: 50, agents: 5, price: 490 },
-      { calls: 100, agents: 10, price: 990 },
-      { calls: 250, agents: 25, price: 1990 },
-      { calls: 500, agents: 50, price: 3490 },
-      { calls: 1000, agents: 100, price: 4990 },
+      { calls: 100, agents: 5, price: 990 },
+      { calls: 250, agents: 10, price: 2490 },
+      { calls: 500, agents: 25, price: 4990 },
+      { calls: 1000, agents: 50, price: 9990 },
     ],
     features: [
       { label: "AI analýza hovoru" },
@@ -32,11 +31,10 @@ export const pricingPlans: PricingPlan[] = [
     description:
       "Pro firmy a týmy. Správa celého týmu z jednoho místa s neomezeným počtem členů.",
     tiers: [
-      { calls: 250, agents: 25, price: 2490 },
-      { calls: 500, agents: 50, price: 4490 },
-      { calls: 1000, agents: 100, price: 7990 },
-      { calls: 2500, agents: 250, price: 14990 },
-      { calls: 5000, agents: 500, price: 24990 },
+      { calls: 500, agents: 25, price: 7490 },
+      { calls: 1000, agents: 50, price: 14990 },
+      { calls: 2500, agents: 100, price: 37490 },
+      { calls: 5000, agents: 250, price: 74990 },
     ],
     features: [
       { label: "Vše ze Solo" },
@@ -61,9 +59,9 @@ export const pricingPlans: PricingPlan[] = [
           "Gamifikace a srovnání výkonu mezi členy motivuje ke zlepšení",
       },
       {
-        label: "Sdílená banka hovorů",
+        label: "Sdílený pool minut",
         tooltip:
-          "Hovory se čerpají ze společného poolu, rozdělíte jak potřebujete",
+          "Minuty se čerpají ze společného poolu, rozdělíte jak potřebujete",
       },
     ],
     highlighted: true,
@@ -93,8 +91,7 @@ export const pricingPlans: PricingPlan[] = [
         tooltip:
           "Přímý kontakt na vašeho osobního vývojáře ze SimCall, který vám pomůže se vším od nastavení po nové analytiky a funkce na míru",
       },
-      { label: "Počet hovorů a agentů dohodou" },
-      { label: "Vlastní agenti na míru" },
+      { label: "Počet minut a agentů dohodou" },
     ],
     highlighted: false,
     cta: "Domluvit schůzku",

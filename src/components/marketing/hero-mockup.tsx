@@ -115,7 +115,7 @@ export function HeroMockup() {
           {/* Stats row */}
           <div className="grid grid-cols-3 gap-2">
             {[
-              { label: "Hovory dnes", value: "8" },
+              { label: "Minuty dnes", value: "8" },
               { label: "Prům. skóre", value: "82%" },
               { label: "Série dnů", value: "5 🔥" },
             ].map((stat) => (
