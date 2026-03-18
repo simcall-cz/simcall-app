@@ -84,13 +84,15 @@ export default function NovyHovorPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [agentsRes, scenariosRes] = await Promise.all([
-          supabase.from("agents").select("*").not("elevenlabs_agent_id", "is", null),
+        // Fetch agents via API (respects subscription/demo limits)
+        const [agentsApiRes, scenariosRes] = await Promise.all([
+          fetch("/api/agents"),
           supabase.from("scenarios").select("*")
         ]);
 
-        if (agentsRes.data) {
-          const formattedAgents: AIAgent[] = agentsRes.data.map((a: any) => ({
+        if (agentsApiRes.ok) {
+          const agentsData = await agentsApiRes.json();
+          const formattedAgents: AIAgent[] = (agentsData.agents || []).map((a: any) => ({
             id: a.id,
             name: a.name,
             personality: a.personality,
@@ -127,7 +129,7 @@ export default function NovyHovorPage() {
     }
 
     fetchData();
-  }, [supabase]);
+  }, []);
 
   const scenario = scenarios.find((s) => s.id === selectedScenario);
   const agent = scenario ? agents.find((a) => a.id === scenario.agentId) : null;
