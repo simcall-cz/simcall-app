@@ -21,6 +21,7 @@ import { Card } from "@/components/ui/card";
 import { ActiveCall } from "@/components/call/ActiveCall";
 import { useTrainingCall } from "@/hooks/useTrainingCall";
 import { supabase } from "@/lib/supabase";
+import { getAuthHeaders } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import type { AIAgent, Scenario } from "@/types";
 
@@ -85,8 +86,9 @@ export default function NovyHovorPage() {
     async function fetchData() {
       try {
         // Fetch agents via API (respects subscription/demo limits)
+        const headers = await getAuthHeaders();
         const [agentsApiRes, scenariosRes] = await Promise.all([
-          fetch("/api/agents"),
+          fetch("/api/agents", { headers }),
           supabase.from("scenarios").select("*")
         ]);
 
