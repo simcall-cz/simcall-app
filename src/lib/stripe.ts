@@ -128,7 +128,7 @@ export async function createCheckoutSession(params: CreateCheckoutParams) {
     metadata: {
       plan: params.plan,
       tier: params.tier.toString(),
-      calls_limit: params.tier.toString(),
+      minutes_limit: params.tier.toString(),
       agents_limit: planPrice.agents.toString(),
       user_id: params.userId || "",
       customer_name: params.customerName,

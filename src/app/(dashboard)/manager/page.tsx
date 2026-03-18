@@ -19,12 +19,12 @@ interface LeaderboardEntry {
   fullName: string;
   email: string;
   role: string;
-  callsCount: number;
+  minutesCount: number;
   avgScore: number | null;
 }
 
 interface ManagerStats {
-  totalCallsThisMonth: number;
+  totalMinutesThisMonth: number;
   avgTeamScore: number | null;
   topPerformer: {
     userId: string;
@@ -35,7 +35,7 @@ interface ManagerStats {
   callsDistribution: {
     userId: string;
     fullName: string;
-    callsCount: number;
+    minutesCount: number;
   }[];
 }
 
@@ -108,7 +108,7 @@ export default function ManagerOverviewPage() {
     },
     {
       label: "Minut tento měsíc",
-      value: stats.totalCallsThisMonth,
+      value: stats.totalMinutesThisMonth,
       icon: Phone,
       color: "bg-purple-50 text-purple-600",
     },
@@ -121,7 +121,7 @@ export default function ManagerOverviewPage() {
   ];
 
   const maxCalls = Math.max(
-    ...stats.callsDistribution.map((m) => m.callsCount),
+    ...stats.callsDistribution.map((m) => m.minutesCount),
     1
   );
 
@@ -214,7 +214,7 @@ export default function ManagerOverviewPage() {
                           {entry.fullName || entry.email}
                         </p>
                         <p className="text-xs text-neutral-500">
-                          {entry.callsCount} minut tento měsíc
+                          {entry.minutesCount} minut tento měsíc
                         </p>
                       </div>
                       <Badge
@@ -262,14 +262,14 @@ export default function ManagerOverviewPage() {
                           {member.fullName?.split(" ")[0] || "—"}
                         </span>
                         <span className="text-sm font-bold text-neutral-900">
-                          {member.callsCount}
+                          {member.minutesCount}
                         </span>
                       </div>
                       <div className="w-full bg-neutral-100 rounded-full h-2">
                         <div
                           className="h-2 rounded-full bg-primary-500 transition-all"
                           style={{
-                            width: `${(member.callsCount / maxCalls) * 100}%`,
+                            width: `${(member.minutesCount / maxCalls) * 100}%`,
                           }}
                         />
                       </div>

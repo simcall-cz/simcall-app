@@ -50,10 +50,15 @@ export async function GET(request: NextRequest) {
         const profile = member.profiles;
         const userId = member.user_id;
 
-        const { count: totalCalls } = await supabase
+        const { data: totalDurationData } = await supabase
           .from("calls")
-          .select("*", { count: "exact", head: true })
-          .eq("user_id", userId);
+          .select("duration_seconds")
+          .eq("user_id", userId)
+          .eq("status", "completed");
+
+        const totalMinutes = Math.round(
+          (totalDurationData || []).reduce((sum: number, c: { duration_seconds: number }) => sum + (c.duration_seconds || 0), 0) / 60
+        );
 
         const { data: scoreData } = await supabase
           .from("calls")
@@ -69,28 +74,33 @@ export async function GET(request: NextRequest) {
               ) / 10
             : null;
 
-        const { count: callsThisMonth } = await supabase
+        const { data: monthDurationData } = await supabase
           .from("calls")
-          .select("*", { count: "exact", head: true })
+          .select("duration_seconds")
           .eq("user_id", userId)
+          .eq("status", "completed")
           .gte("date", monthStart)
           .lte("date", monthEnd);
+
+        const minutesThisMonth = Math.round(
+          (monthDurationData || []).reduce((sum: number, c: { duration_seconds: number }) => sum + (c.duration_seconds || 0), 0) / 60
+        );
 
         return {
           userId,
           fullName: profile?.full_name || "",
           email: profile?.email || "",
           role: member.role,
-          totalCalls: totalCalls || 0,
+          totalMinutes,
           avgScore,
-          callsThisMonth: callsThisMonth || 0,
+          minutesThisMonth,
         };
       })
     );
 
     // Team-level totals
-    const teamCallsUsed = enrichedMembers.reduce(
-      (sum, m) => sum + m.callsThisMonth,
+    const teamMinutesUsed = enrichedMembers.reduce(
+      (sum, m) => sum + m.minutesThisMonth,
       0
     );
 
@@ -101,7 +111,7 @@ export async function GET(request: NextRequest) {
 
     const { data: teamSub } = await supabase
       .from("subscriptions")
-      .select("calls_limit")
+      .select("minutes_limit")
       .eq("user_id", managerId || user.id)
       .eq("status", "active")
       .order("created_at", { ascending: false })
@@ -110,8 +120,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       members: enrichedMembers,
-      teamCallsUsed,
-      teamCallsLimit: teamSub?.calls_limit || 0,
+      teamMinutesUsed,
+      teamMinutesLimit: teamSub?.minutes_limit || 0,
     });
   } catch (err) {
     console.error("GET /api/manager/team error:", err);

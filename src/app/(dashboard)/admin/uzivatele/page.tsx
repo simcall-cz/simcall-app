@@ -29,8 +29,8 @@ interface SubscriptionInfo {
   plan: string;
   tier: number;
   status: string;
-  calls_used: number;
-  calls_limit: number;
+  seconds_used: number;
+  minutes_limit: number;
   current_period_end: string | null;
   billing_method?: string;
 }
@@ -77,19 +77,19 @@ const allRoles = ["free", "solo", "team", "team_manager"] as const;
 
 // Combined role+tier options for the admin dropdown
 const PLAN_OPTIONS = [
-  { value: "free", label: "Free (30 minut)" },
-  { value: "solo:2", label: "Solo · 100 minut" },
-  { value: "solo:3", label: "Solo · 250 minut" },
-  { value: "solo:4", label: "Solo · 500 minut" },
-  { value: "solo:5", label: "Solo · 1 000 minut" },
-  { value: "team:2", label: "Team · 500 minut" },
-  { value: "team:3", label: "Team · 1 000 minut" },
-  { value: "team:4", label: "Team · 2 500 minut" },
-  { value: "team:5", label: "Team · 5 000 minut" },
-  { value: "team_manager:2", label: "Team Manager · 500 minut" },
-  { value: "team_manager:3", label: "Team Manager · 1 000 minut" },
-  { value: "team_manager:4", label: "Team Manager · 2 500 minut" },
-  { value: "team_manager:5", label: "Team Manager · 5 000 minut" },
+  { value: "free", label: "Free (10 minut)" },
+  { value: "solo:1", label: "Solo · 100 minut" },
+  { value: "solo:2", label: "Solo · 250 minut" },
+  { value: "solo:3", label: "Solo · 500 minut" },
+  { value: "solo:4", label: "Solo · 1 000 minut" },
+  { value: "team:1", label: "Team · 500 minut" },
+  { value: "team:2", label: "Team · 1 000 minut" },
+  { value: "team:3", label: "Team · 2 500 minut" },
+  { value: "team:4", label: "Team · 5 000 minut" },
+  { value: "team_manager:1", label: "Team Manager · 500 minut" },
+  { value: "team_manager:2", label: "Team Manager · 1 000 minut" },
+  { value: "team_manager:3", label: "Team Manager · 2 500 minut" },
+  { value: "team_manager:4", label: "Team Manager · 5 000 minut" },
 ];
 
 function getUserPlanValue(user: AdminUser): string {
@@ -266,7 +266,7 @@ function UserDetailModal({ user, onClose }: { user: AdminUser; onClose: () => vo
                 </div>
                 <div>
                   <span className="text-neutral-500">Minuty:</span>
-                  <span className="ml-2 font-medium text-neutral-800">{sub.calls_used}/{sub.calls_limit}</span>
+                  <span className="ml-2 font-medium text-neutral-800">{Math.floor((sub.seconds_used || 0) / 60)}/{sub.minutes_limit} minut</span>
                 </div>
                 {sub.current_period_end && (
                   <div>
@@ -517,7 +517,7 @@ export default function AdminUzivatelePage() {
                         {/* Calls */}
                         <p className="hidden lg:block text-sm font-medium text-neutral-900 text-center">
                           {sub
-                            ? `${sub.calls_used}/${sub.calls_limit}`
+                            ? `${Math.floor((sub.seconds_used || 0) / 60)}/${sub.minutes_limit}`
                             : "—"}
                         </p>
 
@@ -575,7 +575,7 @@ export default function AdminUzivatelePage() {
                             <p className="text-xs text-neutral-500">
                               {role.label} ·{" "}
                               {sub
-                                ? `${sub.plan} ${sub.tier} · ${sub.calls_used}/${sub.calls_limit} minut`
+                                ? `${sub.plan} ${sub.tier} · ${Math.floor((sub.seconds_used || 0) / 60)}/${sub.minutes_limit} minut`
                                 : "Demo účet"}
                             </p>
                           </div>

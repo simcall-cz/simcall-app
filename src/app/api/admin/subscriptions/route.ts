@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
       const { data: subscriptions, error } = await db
         .from("subscriptions")
         .select(
-          "id, user_id, plan, tier, status, calls_used, calls_limit, agents_limit, stripe_customer_id, stripe_subscription_id, customer_name, customer_email, current_period_start, current_period_end, created_at, updated_at, billing_method"
+          "id, user_id, plan, tier, status, seconds_used, minutes_limit, agents_limit, stripe_customer_id, stripe_subscription_id, customer_name, customer_email, current_period_start, current_period_end, created_at, updated_at, billing_method"
         )
         .order("created_at", { ascending: false });
 
@@ -70,10 +70,10 @@ export async function PATCH(request: NextRequest) {
 
     const db = createServerClient();
     const body = await request.json();
-    const { subscriptionId, status, calls_used } = body as {
+    const { subscriptionId, status, seconds_used } = body as {
       subscriptionId: string;
       status?: string;
-      calls_used?: number;
+      seconds_used?: number;
     };
 
     if (!subscriptionId) {
@@ -90,8 +90,8 @@ export async function PATCH(request: NextRequest) {
     if (status) {
       updateData.status = status;
     }
-    if (typeof calls_used === "number") {
-      updateData.calls_used = calls_used;
+    if (typeof seconds_used === "number") {
+      updateData.seconds_used = seconds_used;
     }
 
     const { error } = await db

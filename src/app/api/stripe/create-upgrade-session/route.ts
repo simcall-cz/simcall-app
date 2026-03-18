@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
                 metadata: {
                   plan,
                   tier: tier.toString(),
-                  calls_limit: tier.toString(),
+                  minutes_limit: tier.toString(),
                   agents_limit: priceInfo.agents.toString(),
                   user_id: user.id,
                   upgrade: "true",
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
               .update({
                 plan,
                 tier,
-                calls_limit: tier,
+                minutes_limit: tier,
                 agents_limit: priceInfo.agents,
                 updated_at: new Date().toISOString(),
               })
@@ -164,7 +164,7 @@ export async function POST(request: NextRequest) {
                 metadata: {
                   plan,
                   tier: tier.toString(),
-                  calls_limit: tier.toString(),
+                  minutes_limit: tier.toString(),
                   agents_limit: priceInfo.agents.toString(),
                   user_id: user.id,
                   downgrade: "true",
@@ -180,7 +180,7 @@ export async function POST(request: NextRequest) {
               .update({
                 scheduled_plan: plan,
                 scheduled_tier: tier,
-                scheduled_calls_limit: tier,
+                scheduled_minutes_limit: tier,
                 scheduled_agents_limit: priceInfo.agents,
                 updated_at: new Date().toISOString(),
               })
@@ -222,7 +222,7 @@ export async function POST(request: NextRequest) {
       metadata: {
         plan,
         tier: tier.toString(),
-        calls_limit: tier.toString(),
+        minutes_limit: tier.toString(),
         agents_limit: priceInfo.agents.toString(),
         user_id: user.id,
         customer_name: customerName,

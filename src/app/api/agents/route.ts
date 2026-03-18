@@ -24,6 +24,24 @@ export async function GET(request: NextRequest) {
 
     const agentsLimit = subscription?.agents_limit ?? 1; // demo = 1
 
+    if (!subscription) {
+      // Demo user: only show the specific demo agent
+      const { data: demoAgents, error: demoError } = await supabase
+        .from("agents")
+        .select("*")
+        .eq("name", "Formulář na webu — Finanční tíseň")
+        .not("elevenlabs_agent_id", "is", null)
+        .limit(1);
+      if (demoError) {
+        return NextResponse.json({ error: demoError.message }, { status: 500 });
+      }
+      return NextResponse.json({
+        agents: demoAgents || [],
+        total: demoAgents?.length || 0,
+        limit: 1,
+      });
+    }
+
     // Fetch agents that have an ElevenLabs agent configured
     const { data: agents, error } = await supabase
       .from("agents")

@@ -21,15 +21,15 @@ interface TeamMember {
   fullName: string;
   email: string;
   role: string;
-  totalCalls: number;
+  totalMinutes: number;
   avgScore: number | null;
-  callsThisMonth: number;
+  minutesThisMonth: number;
 }
 
 export default function TeamPage() {
   const [members, setMembers] = useState<TeamMember[]>([]);
-  const [teamCallsUsed, setTeamCallsUsed] = useState(0);
-  const [teamCallsLimit, setTeamCallsLimit] = useState(0);
+  const [teamMinutesUsed, setTeamMinutesUsed] = useState(0);
+  const [teamMinutesLimit, setTeamMinutesLimit] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -52,8 +52,8 @@ export default function TeamPage() {
       if (!res.ok) throw new Error("Nepodařilo se načíst tým");
       const data = await res.json();
       setMembers(data.members || []);
-      setTeamCallsUsed(data.teamCallsUsed || 0);
-      setTeamCallsLimit(data.teamCallsLimit || 0);
+      setTeamMinutesUsed(data.teamMinutesUsed || 0);
+      setTeamMinutesLimit(data.teamMinutesLimit || 0);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Chyba při načítání");
     } finally {
@@ -156,8 +156,8 @@ export default function TeamPage() {
   }
 
   const usagePercentage =
-    teamCallsLimit > 0
-      ? Math.min(100, Math.round((teamCallsUsed / teamCallsLimit) * 100))
+    teamMinutesLimit > 0
+      ? Math.min(100, Math.round((teamMinutesUsed / teamMinutesLimit) * 100))
       : 0;
 
   return (
@@ -258,7 +258,7 @@ export default function TeamPage() {
                     Využití týmových minut
                   </p>
                   <p className="text-sm font-bold text-neutral-900">
-                    {teamCallsUsed} / {teamCallsLimit || "∞"}
+                    {teamMinutesUsed} / {teamMinutesLimit || "∞"}
                   </p>
                 </div>
                 <div className="w-full bg-neutral-100 rounded-full h-2">
@@ -360,7 +360,7 @@ export default function TeamPage() {
                         Tento měsíc
                       </span>
                       <span className="font-medium text-neutral-700">
-                        {member.callsThisMonth}
+                        {member.minutesThisMonth}
                       </span>
                     </div>
 
@@ -370,7 +370,7 @@ export default function TeamPage() {
                         Celkem minut
                       </span>
                       <span className="text-sm text-neutral-500">
-                        {member.totalCalls}
+                        {member.totalMinutes}
                       </span>
                     </div>
                   </div>

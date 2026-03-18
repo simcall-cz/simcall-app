@@ -18,8 +18,8 @@ interface UserInfo {
 interface SubscriptionInfo {
   plan: string;
   tier: number;
-  callsUsed: number;
-  callsLimit: number;
+  minutesUsed: number;
+  minutesLimit: number;
   status: string;
   currentPeriodEnd?: string;
 }
@@ -205,20 +205,20 @@ export default function ProfilPage() {
                   Využití minut
                 </span>
                 <span className="text-sm font-medium text-neutral-700">
-                  {subscription.callsUsed} / {subscription.callsLimit}
+                  {subscription.minutesUsed} / {subscription.minutesLimit}
                 </span>
               </div>
               <div className="w-full bg-neutral-100 rounded-full h-2">
                 <div
                   className={`h-2 rounded-full transition-all ${
-                    subscription.callsUsed / subscription.callsLimit >= 0.9
+                    subscription.minutesUsed / subscription.minutesLimit >= 0.9
                       ? "bg-red-500"
-                      : subscription.callsUsed / subscription.callsLimit >= 0.7
+                      : subscription.minutesUsed / subscription.minutesLimit >= 0.7
                       ? "bg-amber-500"
                       : "bg-primary-500"
                   }`}
                   style={{
-                    width: `${Math.min(100, Math.round((subscription.callsUsed / subscription.callsLimit) * 100))}%`,
+                    width: `${Math.min(100, Math.round((subscription.minutesUsed / subscription.minutesLimit) * 100))}%`,
                   }}
                 />
               </div>

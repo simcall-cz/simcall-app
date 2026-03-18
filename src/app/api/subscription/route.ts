@@ -39,11 +39,11 @@ export async function GET(request: NextRequest) {
     if (role === "team") {
       const managerResult = await getManagerSubscription(supabase, user.id);
       if (managerResult) {
-        // Count the team member's own calls this month as their usage
-        const callsUsed = await countCallsThisMonth(supabase, user.id);
+        // Sum the team member's own seconds this month as their usage
+        const totalSeconds = await sumSecondsThisMonth(supabase, user.id);
         return NextResponse.json({
           ...formatSub(managerResult.subscription),
-          callsUsed,
+          minutesUsed: Math.floor(totalSeconds / 60),
           isTeamMember: true,
           managerPlan: true,
           managerEmail: managerResult.managerEmail || null,
@@ -52,20 +52,20 @@ export async function GET(request: NextRequest) {
     }
 
     // 4. Role-based defaults (admin-assigned, no Stripe subscription)
-    const ROLE_DEFAULTS: Record<string, { plan: string; callsLimit: number; agentsLimit: number }> = {
-      solo: { plan: "solo", callsLimit: 50, agentsLimit: 5 },
-      team: { plan: "team", callsLimit: 250, agentsLimit: 25 },
-      team_manager: { plan: "team", callsLimit: 250, agentsLimit: 25 },
+    const ROLE_DEFAULTS: Record<string, { plan: string; minutesLimit: number; agentsLimit: number }> = {
+      solo: { plan: "solo", minutesLimit: 100, agentsLimit: 5 },
+      team: { plan: "team", minutesLimit: 500, agentsLimit: 25 },
+      team_manager: { plan: "team", minutesLimit: 500, agentsLimit: 25 },
     };
 
     const defaults = ROLE_DEFAULTS[role];
     if (defaults) {
-      const callsUsed = await countCallsThisMonth(supabase, user.id);
+      const totalSeconds = await sumSecondsThisMonth(supabase, user.id);
       return NextResponse.json({
         plan: defaults.plan,
         tier: 1,
-        callsUsed,
-        callsLimit: defaults.callsLimit,
+        minutesUsed: Math.floor(totalSeconds / 60),
+        minutesLimit: defaults.minutesLimit,
         agentsLimit: defaults.agentsLimit,
         status: "active",
         isTeamMember: role === "team",
@@ -73,16 +73,22 @@ export async function GET(request: NextRequest) {
     }
 
     // 5. Free user
-    const { count } = await supabase
+    const { data: freeCallsData } = await supabase
       .from("calls")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", user.id);
+      .select("duration_seconds")
+      .eq("user_id", user.id)
+      .eq("status", "completed");
+
+    const totalSeconds = (freeCallsData || []).reduce(
+      (sum: number, c: { duration_seconds: number }) => sum + (c.duration_seconds || 0),
+      0
+    );
 
     return NextResponse.json({
       plan: "demo",
       tier: 0,
-      callsUsed: count || 0,
-      callsLimit: 3,
+      minutesUsed: Math.floor(totalSeconds / 60),
+      minutesLimit: 10,
       agentsLimit: 1,
       status: "active",
     });
@@ -100,8 +106,8 @@ function formatSub(sub: any) {
   return {
     plan: sub.plan,
     tier: sub.tier,
-    callsUsed: sub.calls_used,
-    callsLimit: sub.calls_limit,
+    minutesUsed: Math.floor((sub.seconds_used || 0) / 60),
+    minutesLimit: sub.minutes_limit,
     agentsLimit: sub.agents_limit,
     status: sub.status,
     currentPeriodEnd: sub.current_period_end,
@@ -112,22 +118,17 @@ function formatSub(sub: any) {
   };
 }
 
-async function countCallsThisMonth(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  supabase: any,
-  userId: string
-): Promise<number> {
+async function sumSecondsThisMonth(supabase: any, userId: string): Promise<number> {
   const startOfMonth = new Date();
   startOfMonth.setDate(1);
   startOfMonth.setHours(0, 0, 0, 0);
-
-  const { count } = await supabase
+  const { data } = await supabase
     .from("calls")
-    .select("*", { count: "exact", head: true })
+    .select("duration_seconds")
     .eq("user_id", userId)
+    .eq("status", "completed")
     .gte("date", startOfMonth.toISOString());
-
-  return count || 0;
+  return (data || []).reduce((sum: number, c: { duration_seconds: number }) => sum + (c.duration_seconds || 0), 0);
 }
 
 async function getManagerSubscription(

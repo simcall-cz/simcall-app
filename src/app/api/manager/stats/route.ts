@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
 
     if (memberIds.length === 0) {
       return NextResponse.json({
-        totalCallsThisMonth: 0,
+        totalMinutesThisMonth: 0,
         avgTeamScore: null,
         topPerformer: null,
         leaderboard: [],
@@ -61,15 +61,17 @@ export async function GET(request: NextRequest) {
     // Fetch all calls this month for team members
     const { data: monthCalls } = await supabase
       .from("calls")
-      .select("user_id, score, date")
+      .select("user_id, score, date, duration_seconds")
       .in("user_id", memberIds)
       .gte("date", monthStart)
       .lte("date", monthEnd);
 
     const allMonthCalls = monthCalls || [];
 
-    // Total team calls this month
-    const totalCallsThisMonth = allMonthCalls.length;
+    // Total team minutes this month
+    const totalMinutesThisMonth = Math.round(
+      allMonthCalls.reduce((sum, c) => sum + ((c as any).duration_seconds || 0), 0) / 60
+    );
 
     // Average team score (only scored calls)
     const scoredCalls = allMonthCalls.filter((c) => c.score != null);
@@ -108,7 +110,7 @@ export async function GET(request: NextRequest) {
         fullName: profile?.full_name || "",
         email: profile?.email || "",
         role: member.role,
-        callsCount: memberCalls.length,
+        minutesCount: Math.round(memberCalls.reduce((sum, c) => sum + ((c as any).duration_seconds || 0), 0) / 60),
         avgScore: memberAvgScore,
       };
     });
@@ -125,15 +127,15 @@ export async function GET(request: NextRequest) {
     const topPerformer =
       leaderboard.find((m) => m.avgScore != null) || null;
 
-    // Calls distribution per member
+    // Minutes distribution per member
     const callsDistribution = leaderboard.map((m) => ({
       userId: m.userId,
       fullName: m.fullName,
-      callsCount: m.callsCount,
+      minutesCount: m.minutesCount,
     }));
 
     return NextResponse.json({
-      totalCallsThisMonth,
+      totalMinutesThisMonth,
       avgTeamScore,
       topPerformer: topPerformer
         ? {

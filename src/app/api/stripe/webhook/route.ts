@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
 
         const plan = metadata.plan || "solo";
         const tier = parseInt(metadata.tier || "0", 10);
-        const callsLimit = parseInt(metadata.calls_limit || "0", 10);
+        const minutesLimit = parseInt(metadata.minutes_limit || "0", 10);
         const agentsLimit = parseInt(metadata.agents_limit || "0", 10);
         let userId = metadata.user_id || null;
         const customerName = metadata.customer_name || "";
@@ -162,7 +162,7 @@ export async function POST(request: NextRequest) {
               .update({
                 plan,
                 tier,
-                calls_limit: callsLimit,
+                minutes_limit: minutesLimit,
                 agents_limit: agentsLimit,
                 stripe_customer_id: session.customer as string,
                 stripe_subscription_id: session.subscription as string,
@@ -184,8 +184,8 @@ export async function POST(request: NextRequest) {
                 plan,
                 tier,
                 status: "active",
-                calls_limit: callsLimit,
-                calls_used: 0,
+                minutes_limit: minutesLimit,
+                seconds_used: 0,
                 agents_limit: agentsLimit,
                 stripe_customer_id: session.customer as string,
                 stripe_subscription_id: session.subscription as string,
@@ -202,8 +202,8 @@ export async function POST(request: NextRequest) {
               plan,
               tier,
               status: "active",
-              calls_limit: callsLimit,
-              calls_used: 0,
+              minutes_limit: minutesLimit,
+              seconds_used: 0,
               agents_limit: agentsLimit,
               stripe_customer_id: session.customer as string,
               stripe_subscription_id: session.subscription as string,
@@ -304,7 +304,7 @@ export async function POST(request: NextRequest) {
                 temporaryPassword,
                 plan,
                 tier,
-                callsLimit,
+                minutesLimit,
               }),
             });
           } else {
@@ -317,7 +317,7 @@ export async function POST(request: NextRequest) {
                 customerName: customerName || "zákazníku",
                 plan,
                 tier,
-                callsLimit,
+                minutesLimit,
                 customerEmail: orderEmail,
               }),
             });
@@ -414,11 +414,11 @@ export async function POST(request: NextRequest) {
             ? new Date((invoice.period_end as number) * 1000).toISOString()
             : null;
 
-          // Reset calls and update period
+          // Reset usage and update period
           await db
             .from("subscriptions")
             .update({
-              calls_used: 0,
+              seconds_used: 0,
               current_period_start: periodStart,
               current_period_end: periodEnd,
               status: "active",
@@ -429,7 +429,7 @@ export async function POST(request: NextRequest) {
           // Check and apply scheduled plan changes (downgrades)
           const { data: subRecord } = await db
             .from("subscriptions")
-            .select("id, user_id, scheduled_plan, scheduled_tier, scheduled_calls_limit, scheduled_agents_limit")
+            .select("id, user_id, scheduled_plan, scheduled_tier, scheduled_minutes_limit, scheduled_agents_limit")
             .eq("stripe_subscription_id", stripeSubId)
             .single();
 
@@ -440,11 +440,11 @@ export async function POST(request: NextRequest) {
               .update({
                 plan: subRecord.scheduled_plan,
                 tier: subRecord.scheduled_tier,
-                calls_limit: subRecord.scheduled_calls_limit || subRecord.scheduled_tier,
+                minutes_limit: subRecord.scheduled_minutes_limit || subRecord.scheduled_tier,
                 agents_limit: subRecord.scheduled_agents_limit || 5,
                 scheduled_plan: null,
                 scheduled_tier: null,
-                scheduled_calls_limit: null,
+                scheduled_minutes_limit: null,
                 scheduled_agents_limit: null,
                 updated_at: new Date().toISOString(),
               })

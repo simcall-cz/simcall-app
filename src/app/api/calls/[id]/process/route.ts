@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
-import { getUserFromRequest } from "@/lib/auth";
+import { getUserFromRequest, addSecondsUsed } from "@/lib/auth";
 import { promises as fs } from "fs";
 import path from "path";
 
@@ -374,6 +374,11 @@ export async function POST(
 
     if (updateError) {
       console.error("Failed to update call status:", updateError);
+    }
+
+    // ---- Track minutes usage (add seconds to subscription) ----
+    if (durationSeconds > 0) {
+      await addSecondsUsed(user.id, Math.round(durationSeconds));
     }
 
     return NextResponse.json({

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
-import { getUserFromRequest, checkCallLimit, incrementCallUsage } from "@/lib/auth";
+import { getUserFromRequest, checkMinuteLimit } from "@/lib/auth";
 
 // GET /api/calls - List all calls for the current user
 export async function GET(request: NextRequest) {
@@ -69,14 +69,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // ---- Call limit check ----
-    const limitCheck = await checkCallLimit(user.id);
+    // ---- Minute limit check ----
+    const limitCheck = await checkMinuteLimit(user.id);
     if (!limitCheck.canCall) {
       return NextResponse.json(
         {
           error: "Limit minut vyčerpán",
-          callsUsed: limitCheck.used,
-          callsLimit: limitCheck.limit,
+          secondsUsed: limitCheck.secondsUsed,
+          minutesLimit: limitCheck.minutesLimit,
           planRole: limitCheck.planRole,
         },
         { status: 403 }
@@ -139,8 +139,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // ---- Increment usage counter ----
-    await incrementCallUsage(user.id);
+    // Usage is now tracked at call COMPLETION (in /api/calls/[id]/process)
 
     return NextResponse.json({
       call_id: call.id,

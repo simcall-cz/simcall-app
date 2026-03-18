@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
     try {
       const { data: subs } = await db
         .from("subscriptions")
-        .select("user_id, id, plan, tier, status, calls_used, calls_limit, current_period_end, billing_method")
+        .select("user_id, id, plan, tier, status, seconds_used, minutes_limit, current_period_end, billing_method")
         .eq("status", "active");
       if (subs) {
         for (const s of subs) {
@@ -138,27 +138,24 @@ export async function GET(request: NextRequest) {
   }
 }
 // Tier configs (mirrors pricing page)
-const TIER_CONFIG: Record<string, { calls: number; agents: number }[]> = {
+const TIER_CONFIG: Record<string, { minutes: number; agents: number }[]> = {
   solo: [
-    { calls: 50, agents: 5 },
-    { calls: 100, agents: 10 },
-    { calls: 250, agents: 25 },
-    { calls: 500, agents: 50 },
-    { calls: 1000, agents: 100 },
+    { minutes: 100, agents: 10 },
+    { minutes: 250, agents: 25 },
+    { minutes: 500, agents: 50 },
+    { minutes: 1000, agents: 100 },
   ],
   team: [
-    { calls: 250, agents: 25 },
-    { calls: 500, agents: 50 },
-    { calls: 1000, agents: 100 },
-    { calls: 2500, agents: 250 },
-    { calls: 5000, agents: 500 },
+    { minutes: 500, agents: 50 },
+    { minutes: 1000, agents: 100 },
+    { minutes: 2500, agents: 250 },
+    { minutes: 5000, agents: 500 },
   ],
   team_manager: [
-    { calls: 250, agents: 25 },
-    { calls: 500, agents: 50 },
-    { calls: 1000, agents: 100 },
-    { calls: 2500, agents: 250 },
-    { calls: 5000, agents: 500 },
+    { minutes: 500, agents: 50 },
+    { minutes: 1000, agents: 100 },
+    { minutes: 2500, agents: 250 },
+    { minutes: 5000, agents: 500 },
   ],
 };
 
@@ -240,7 +237,7 @@ export async function PATCH(request: NextRequest) {
           .update({
             plan,
             tier,
-            calls_limit: config.calls,
+            minutes_limit: config.minutes,
             agents_limit: config.agents,
             updated_at: now,
           })
@@ -254,8 +251,8 @@ export async function PATCH(request: NextRequest) {
             plan,
             tier,
             status: "active",
-            calls_used: 0,
-            calls_limit: config.calls,
+            seconds_used: 0,
+            minutes_limit: config.minutes,
             agents_limit: config.agents,
             billing_method: "invoice",
             current_period_start: now,

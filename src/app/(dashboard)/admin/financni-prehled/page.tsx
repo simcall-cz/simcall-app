@@ -22,8 +22,8 @@ interface Subscription {
   plan: string;
   tier: number;
   status: string;
-  calls_used: number;
-  calls_limit: number;
+  seconds_used: number;
+  minutes_limit: number;
   agents_limit: number;
   stripe_customer_id: string | null;
   stripe_subscription_id: string | null;
@@ -308,7 +308,7 @@ export default function FinancniPrehledPage() {
                           </span>
                         </div>
                         <p className="hidden sm:block text-sm text-neutral-600 text-center">
-                          {sub.calls_used} / {sub.calls_limit}
+                          {Math.floor((sub.seconds_used || 0) / 60)} / {sub.minutes_limit}
                         </p>
                         <p className="hidden sm:block text-xs text-neutral-500">
                           {formatDate(sub.current_period_start)} –{" "}
@@ -327,7 +327,7 @@ export default function FinancniPrehledPage() {
                         <div className="sm:hidden flex flex-col gap-1 mt-1">
                           <p className="text-xs text-neutral-500">
                             {planLabel[sub.plan] || sub.plan} {sub.tier} ·{" "}
-                            {sub.calls_used}/{sub.calls_limit} minut ·{" "}
+                            {Math.floor((sub.seconds_used || 0) / 60)}/{sub.minutes_limit} minut ·{" "}
                             {config.label}
                           </p>
                         </div>

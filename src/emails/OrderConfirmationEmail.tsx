@@ -14,7 +14,7 @@ interface OrderConfirmationEmailProps {
   customerName: string;
   plan: string;
   tier: number;
-  callsLimit: number;
+  minutesLimit: number;
   customerEmail: string;
 }
 
@@ -27,7 +27,7 @@ export default function OrderConfirmationEmail({
   customerName = "zákazníku",
   plan = "solo",
   tier = 1,
-  callsLimit = 100,
+  minutesLimit = 100,
   customerEmail = "",
 }: OrderConfirmationEmailProps) {
   const firstName = customerName.split(" ")[0];
@@ -78,7 +78,7 @@ export default function OrderConfirmationEmail({
                   </tr>
                   <tr>
                     <td style={summaryLabelStyle}>Minut měsíčně</td>
-                    <td style={summaryValueStyle}>{callsLimit.toLocaleString("cs-CZ")}</td>
+                    <td style={summaryValueStyle}>{minutesLimit.toLocaleString("cs-CZ")}</td>
                   </tr>
                   <tr>
                     <td style={summaryLabelStyle}>E-mail účtu</td>

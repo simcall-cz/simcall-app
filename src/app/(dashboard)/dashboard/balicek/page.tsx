@@ -22,8 +22,8 @@ import { getAuthHeaders } from "@/lib/auth";
 interface SubscriptionData {
   plan: string;
   tier: number;
-  callsUsed: number;
-  callsLimit: number;
+  minutesUsed: number;
+  minutesLimit: number;
   agentsLimit: number;
   status: string;
   currentPeriodEnd?: string;
@@ -41,20 +41,18 @@ const planLabels: Record<string, string> = {
   team: "Team",
 };
 
-const tierDetails: Record<string, { calls: number; price: number }[]> = {
+const tierDetails: Record<string, { minutes: number; price: number }[]> = {
   solo: [
-    { calls: 50, price: 490 },
-    { calls: 100, price: 990 },
-    { calls: 250, price: 1990 },
-    { calls: 500, price: 3490 },
-    { calls: 1000, price: 4990 },
+    { minutes: 100, price: 990 },
+    { minutes: 250, price: 2490 },
+    { minutes: 500, price: 4990 },
+    { minutes: 1000, price: 9990 },
   ],
   team: [
-    { calls: 250, price: 2490 },
-    { calls: 500, price: 4490 },
-    { calls: 1000, price: 7990 },
-    { calls: 2500, price: 14990 },
-    { calls: 5000, price: 24990 },
+    { minutes: 500, price: 7490 },
+    { minutes: 1000, price: 14990 },
+    { minutes: 2500, price: 37490 },
+    { minutes: 5000, price: 74990 },
   ],
 };
 
@@ -116,10 +114,10 @@ export default function BalicekPage() {
 
   if (!sub) return null;
 
-  const usagePercent = sub.callsLimit > 0
-    ? Math.min(100, Math.round((sub.callsUsed / sub.callsLimit) * 100))
+  const usagePercent = sub.minutesLimit > 0
+    ? Math.min(100, Math.round((sub.minutesUsed / sub.minutesLimit) * 100))
     : 0;
-  const remaining = Math.max(0, sub.callsLimit - sub.callsUsed);
+  const remaining = Math.max(0, sub.minutesLimit - sub.minutesUsed);
   const isPaid = sub.plan !== "demo";
   const isTeamMember = !!sub.isTeamMember;
   const daysLeft = sub.currentPeriodEnd ? getDaysRemaining(sub.currentPeriodEnd) : null;
@@ -157,7 +155,7 @@ export default function BalicekPage() {
                     {planLabels[sub.plan] || sub.plan}
                     {isPaid && (
                       <span className="text-neutral-400 font-normal ml-2 text-sm">
-                        · {sub.callsLimit} minut/měs
+                        · {sub.minutesLimit} minut/měs
                       </span>
                     )}
                   </h2>
@@ -196,9 +194,9 @@ export default function BalicekPage() {
                   <span className="text-xs text-neutral-500">Minuty</span>
                 </div>
                 <p className="text-2xl font-bold text-neutral-900">
-                  {sub.callsUsed}
+                  {sub.minutesUsed}
                   <span className="text-sm font-normal text-neutral-400">
-                    /{sub.callsLimit}
+                    /{sub.minutesLimit}
                   </span>
                 </p>
               </div>
@@ -352,8 +350,8 @@ export default function BalicekPage() {
                 {currentTiers.map((t, idx) => {
                   const isCurrentTier = idx === currentTierIndex;
                   const isUpgrade = idx > currentTierIndex;
-                  const isUpgradingThis = upgradingTier === t.calls;
-                  const isScheduledTier = sub.scheduledTier === t.calls && sub.scheduledPlan === sub.plan;
+                  const isUpgradingThis = upgradingTier === t.minutes;
+                  const isScheduledTier = sub.scheduledTier === t.minutes && sub.scheduledPlan === sub.plan;
                   return (
                     <button
                       key={idx}
@@ -364,11 +362,11 @@ export default function BalicekPage() {
                         // Confirm downgrade
                         if (!isUpgrade) {
                           const confirmed = window.confirm(
-                            `Opravdu chcete downgrade na ${t.calls} minut? Změna se projeví na konci aktuálního období.`
+                            `Opravdu chcete downgrade na ${t.minutes} minut? Změna se projeví na konci aktuálního období.`
                           );
                           if (!confirmed) return;
                         }
-                        setUpgradingTier(t.calls);
+                        setUpgradingTier(t.minutes);
                         try {
                           const headers = await getAuthHeaders();
                           const res = await fetch("/api/stripe/create-upgrade-session", {
@@ -376,7 +374,7 @@ export default function BalicekPage() {
                             headers: { ...headers, "Content-Type": "application/json" },
                             body: JSON.stringify({
                               plan: sub.plan,
-                              tier: t.calls,
+                              tier: t.minutes,
                             }),
                           });
                           const data = await res.json();
@@ -409,7 +407,7 @@ export default function BalicekPage() {
                     >
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm font-semibold text-neutral-900">
-                          {t.calls} minut
+                          {t.minutes} minut
                         </span>
                         {isCurrentTier ? (
                           <Badge variant="default">Aktuální</Badge>

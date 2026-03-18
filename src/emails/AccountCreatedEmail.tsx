@@ -16,7 +16,7 @@ interface AccountCreatedEmailProps {
   temporaryPassword: string;
   plan: string;
   tier: number;
-  callsLimit: number;
+  minutesLimit: number;
 }
 
 const planLabels: Record<string, string> = {
@@ -30,7 +30,7 @@ export default function AccountCreatedEmail({
   temporaryPassword = "",
   plan = "solo",
   tier = 50,
-  callsLimit = 50,
+  minutesLimit = 100,
 }: AccountCreatedEmailProps) {
   const firstName = customerName.split(" ")[0];
   const planLabel = planLabels[plan] || plan;
@@ -105,7 +105,7 @@ export default function AccountCreatedEmail({
                   </tr>
                   <tr>
                     <td style={summaryLabelStyle}>Minut měsíčně</td>
-                    <td style={summaryValueStyle}>{callsLimit.toLocaleString("cs-CZ")}</td>
+                    <td style={summaryValueStyle}>{minutesLimit.toLocaleString("cs-CZ")}</td>
                   </tr>
                   <tr>
                     <td style={summaryLabelStyle}>Stav</td>

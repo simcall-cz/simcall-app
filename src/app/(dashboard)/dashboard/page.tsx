@@ -74,8 +74,8 @@ function getSuccessRateBg(rate: number) {
 interface SubscriptionInfo {
   plan: string;
   tier: number;
-  callsUsed: number;
-  callsLimit: number;
+  minutesUsed: number;
+  minutesLimit: number;
   agentsLimit: number;
   status: string;
   currentPeriodEnd?: string;
@@ -99,7 +99,7 @@ function FreeDashboard({
 }) {
   const callsRemaining = Math.max(
     0,
-    subscription.callsLimit - subscription.callsUsed
+    subscription.minutesLimit - subscription.minutesUsed
   );
   const recentCalls = calls.slice(0, 3);
 
@@ -123,7 +123,7 @@ function FreeDashboard({
           <Link href="/dashboard/hovory/novy-hovor">
             <Button>
               <PhoneCall className="w-4 h-4 mr-2" />
-              Nový hovor ({callsRemaining}/{subscription.callsLimit})
+              Nový hovor ({callsRemaining}/{subscription.minutesLimit})
             </Button>
           </Link>
         ) : (
@@ -147,23 +147,23 @@ function FreeDashboard({
               </span>
             </div>
             <span className="text-sm font-bold text-neutral-900">
-              {subscription.callsUsed} / {subscription.callsLimit}
+              {subscription.minutesUsed} / {subscription.minutesLimit}
             </span>
           </div>
           <div className="w-full bg-neutral-100 rounded-full h-2.5">
             <div
-              className={`h-2.5 rounded-full transition-all ${subscription.callsUsed >= subscription.callsLimit
+              className={`h-2.5 rounded-full transition-all ${subscription.minutesUsed >= subscription.minutesLimit
                 ? "bg-red-500"
                 : "bg-primary-500"
                 }`}
               style={{
-                width: `${Math.min(100, (subscription.callsUsed / subscription.callsLimit) * 100)}%`,
+                width: `${Math.min(100, (subscription.minutesUsed / subscription.minutesLimit) * 100)}%`,
               }}
             />
           </div>
-          {subscription.callsUsed >= subscription.callsLimit && (
+          {subscription.minutesUsed >= subscription.minutesLimit && (
             <p className="text-xs text-red-500 mt-2">
-              Dosáhli jste limitu {subscription.callsLimit} minut v demo verzi.
+              Dosáhli jste limitu {subscription.minutesLimit} minut v demo verzi.
               Vyberte plán pro více minut.
             </p>
           )}
@@ -183,7 +183,7 @@ function FreeDashboard({
                   Celkem minut
                 </p>
                 <p className="text-lg font-semibold text-neutral-900 truncate">
-                  {isLoading ? "..." : subscription.callsUsed.toString()}
+                  {isLoading ? "..." : subscription.minutesUsed.toString()}
                 </p>
               </div>
             </div>
@@ -393,14 +393,14 @@ function PaidDashboard({
   const recentCalls = calls.slice(0, 5);
   const callsRemaining = Math.max(
     0,
-    subscription.callsLimit - subscription.callsUsed
+    subscription.minutesLimit - subscription.minutesUsed
   );
   const usagePercentage = Math.min(
     100,
-    Math.round((subscription.callsUsed / subscription.callsLimit) * 100)
+    Math.round((subscription.minutesUsed / subscription.minutesLimit) * 100)
   );
   const isLowOnCalls = usagePercentage >= 80;
-  const isOutOfCalls = subscription.callsUsed >= subscription.callsLimit;
+  const isOutOfCalls = subscription.minutesUsed >= subscription.minutesLimit;
 
   const planLabel =
     subscription.plan === "solo"
@@ -477,7 +477,7 @@ function PaidDashboard({
               </span>
             </div>
             <span className="text-sm font-bold text-neutral-900">
-              {subscription.callsUsed} / {subscription.callsLimit}
+              {subscription.minutesUsed} / {subscription.minutesLimit}
             </span>
           </div>
           <div className="w-full bg-neutral-100 rounded-full h-2.5">
@@ -790,8 +790,8 @@ export default function DashboardPage() {
   const [subscription, setSubscription] = useState<SubscriptionInfo>({
     plan: "demo",
     tier: 0,
-    callsUsed: 0,
-    callsLimit: 3,
+    minutesUsed: 0,
+    minutesLimit: 10,
     agentsLimit: 1,
     status: "active",
   });

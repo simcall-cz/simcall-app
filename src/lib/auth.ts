@@ -20,26 +20,26 @@ export interface SubscriptionInfo {
   plan: "solo" | "team";
   tier: number;
   status: "active" | "cancelled" | "past_due" | "trialing";
-  callsUsed: number;
-  callsLimit: number;
+  minutesUsed: number;
+  minutesLimit: number;
   agentsLimit: number;
   currentPeriodEnd: string | null;
   stripeCustomerId: string | null;
   stripeSubscriptionId: string | null;
 }
 
-export interface CallLimitCheck {
+export interface MinuteLimitCheck {
   canCall: boolean;
-  used: number;
-  limit: number;
-  remaining: number;
+  secondsUsed: number;
+  minutesLimit: number;
+  minutesRemaining: number;
   planRole: PlanRole;
 }
 
 // ============================================================
 // Constants
 // ============================================================
-const FREE_CALLS_LIMIT = 3;
+const FREE_MINUTES_LIMIT = 10;
 
 // ============================================================
 // Client-side functions
@@ -143,8 +143,8 @@ export async function getUserSubscription(): Promise<SubscriptionInfo | null> {
     plan: data.plan,
     tier: data.tier,
     status: data.status,
-    callsUsed: data.calls_used,
-    callsLimit: data.calls_limit,
+    minutesUsed: Math.floor((data.seconds_used || 0) / 60),
+    minutesLimit: data.minutes_limit,
     agentsLimit: data.agents_limit,
     currentPeriodEnd: data.current_period_end,
     stripeCustomerId: data.stripe_customer_id,
@@ -239,47 +239,53 @@ async function findSubscriptionForUser(db: ReturnType<typeof createServerClient>
 }
 
 /**
- * Server-side: check call limits for a user
+ * Server-side: check minute limits for a user
  */
-export async function checkCallLimit(userId: string): Promise<CallLimitCheck> {
+export async function checkMinuteLimit(userId: string): Promise<MinuteLimitCheck> {
   const db = createServerClient();
 
   // Check own or manager's subscription
   const sub = await findSubscriptionForUser(db, userId);
 
   if (sub) {
-    const remaining = Math.max(0, sub.calls_limit - sub.calls_used);
+    const secondsUsed = sub.seconds_used || 0;
+    const minutesLimit = sub.minutes_limit || 0;
+    const canCall = secondsUsed < minutesLimit * 60;
     return {
-      canCall: remaining > 0,
-      used: sub.calls_used,
-      limit: sub.calls_limit,
-      remaining,
+      canCall,
+      secondsUsed,
+      minutesLimit,
+      minutesRemaining: Math.max(0, minutesLimit - Math.floor(secondsUsed / 60)),
       planRole: sub.plan as PlanRole,
     };
   }
 
-  // No subscription — demo user, check total calls
-  const { count } = await db
+  // No subscription — demo user, sum duration_seconds from ALL completed calls
+  const { data: completedCalls } = await db
     .from("calls")
-    .select("*", { count: "exact", head: true })
-    .eq("user_id", userId);
+    .select("duration_seconds")
+    .eq("user_id", userId)
+    .eq("status", "completed");
 
-  const used = count || 0;
-  const remaining = Math.max(0, FREE_CALLS_LIMIT - used);
+  const totalSeconds = (completedCalls || []).reduce(
+    (sum: number, c: { duration_seconds: number }) => sum + (c.duration_seconds || 0),
+    0
+  );
+  const canCall = totalSeconds < FREE_MINUTES_LIMIT * 60;
 
   return {
-    canCall: remaining > 0,
-    used,
-    limit: FREE_CALLS_LIMIT,
-    remaining,
+    canCall,
+    secondsUsed: totalSeconds,
+    minutesLimit: FREE_MINUTES_LIMIT,
+    minutesRemaining: Math.max(0, FREE_MINUTES_LIMIT - Math.floor(totalSeconds / 60)),
     planRole: "demo",
   };
 }
 
 /**
- * Server-side: increment call usage for subscribed user (or their manager's subscription)
+ * Server-side: add seconds used after a call completes (to user's or manager's subscription)
  */
-export async function incrementCallUsage(userId: string): Promise<void> {
+export async function addSecondsUsed(userId: string, durationSeconds: number): Promise<void> {
   const db = createServerClient();
 
   const sub = await findSubscriptionForUser(db, userId);
@@ -288,11 +294,13 @@ export async function incrementCallUsage(userId: string): Promise<void> {
     await db
       .from("subscriptions")
       .update({
-        calls_used: sub.calls_used + 1,
+        seconds_used: (sub.seconds_used || 0) + Math.round(durationSeconds),
         updated_at: new Date().toISOString(),
       })
       .eq("id", sub.id);
   }
+  // Demo users: no subscription record to update.
+  // Their usage is derived by summing duration_seconds from the calls table.
 }
 
 /**
