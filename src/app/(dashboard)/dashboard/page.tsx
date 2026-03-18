@@ -376,7 +376,7 @@ function PaidDashboard({
   today,
   calls,
   isLoading,
-  totalCalls,
+  totalMinutes,
   avgSuccessRate,
   chartData,
   subscription,
@@ -385,7 +385,7 @@ function PaidDashboard({
   today: string;
   calls: ReturnType<typeof useCallHistory>["calls"];
   isLoading: boolean;
-  totalCalls: number;
+  totalMinutes: number;
   avgSuccessRate: number;
   chartData: { dateLabel: string; successRate: number }[];
   subscription: SubscriptionInfo;
@@ -412,7 +412,7 @@ function PaidDashboard({
   const stats = [
     {
       label: "Celkem minut",
-      value: totalCalls.toString(),
+      value: totalMinutes > 0 ? totalMinutes.toString() : "—",
       icon: Phone,
       bg: "bg-neutral-50",
       iconColor: "text-neutral-600",
@@ -825,6 +825,12 @@ export default function DashboardPage() {
 
   const totalCalls = calls.length;
   const completedCalls = calls.filter((c) => c.successRate > 0);
+  const totalMinutes = Math.round(
+    calls.reduce((sum, c) => {
+      const parts = c.duration.split(":");
+      return sum + (parseInt(parts[0] || "0") * 60 + parseInt(parts[1] || "0"));
+    }, 0) / 60
+  );
   const avgSuccessRate =
     completedCalls.length > 0
       ? Math.round(
@@ -869,7 +875,7 @@ export default function DashboardPage() {
       today={today}
       calls={calls}
       isLoading={isLoading}
-      totalCalls={totalCalls}
+      totalMinutes={totalMinutes}
       avgSuccessRate={avgSuccessRate}
       chartData={chartData}
       subscription={subscription}

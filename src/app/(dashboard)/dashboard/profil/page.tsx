@@ -109,7 +109,7 @@ export default function ProfilPage() {
   const stats = [
     {
       label: "Celkem minut",
-      value: totalCalls.toString(),
+      value: totalMinutes > 0 ? totalMinutes.toString() : "—",
       icon: Phone,
       bg: "bg-neutral-50",
       iconColor: "text-neutral-600",
