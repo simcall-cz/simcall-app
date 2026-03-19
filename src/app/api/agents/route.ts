@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
       const { data: demoAgents, error: demoError } = await supabase
         .from("agents")
         .select("*")
-        .eq("name", "Formulář na webu — Finanční tíseň")
+        .eq("name", "Zbyněk Zajíc")
         .not("elevenlabs_agent_id", "is", null)
         .limit(1);
       if (demoError) {
