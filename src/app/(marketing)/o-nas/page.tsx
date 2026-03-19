@@ -179,8 +179,8 @@ export default function ONasPage() {
         <Container>
           <ScrollReveal>
             <div className="text-center max-w-xl mx-auto">
-              <h2 className="text-3xl font-bold text-white">Chcete se přidat?</h2>
-              <p className="mt-3 text-neutral-400">Vyzkoušejte SimCall — 30 minut zdarma a bez kreditní karty.</p>
+              <h2 className="text-3xl font-bold text-white">Připraveni začít?</h2>
+              <p className="mt-3 text-neutral-400">Vyzkoušejte SimCall — 10 minut zdarma a bez kreditní karty.</p>
               <div className="mt-7 flex gap-3 justify-center flex-wrap">
                 <Link href="/registrace">
                   <Button size="lg" className="group">

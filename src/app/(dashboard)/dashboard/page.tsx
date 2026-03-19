@@ -337,7 +337,7 @@ function FreeDashboard({
                   "Až 1 000 minut/měsíc (Solo plán)",
                   "500 AI agentů k výběru",
                   "Detailní AI analýza hovoru",
-                  "Přepis hovoru s exportem PDF",
+                  "Přepis hovoru",
                   "Sledování pokroku a grafy",
                   "Personalizovaná doporučení",
                 ].map((feature) => (
@@ -517,7 +517,7 @@ function PaidDashboard({
                 Blížíte se limitu minut
               </p>
               <p className="text-xs text-amber-600 mt-0.5">
-                Zbývá vám {callsRemaining} minut. Zvyšte limit pro
+                Dochází vám minuty. Zbývá {callsRemaining} minut. Zvyšte limit pro
                 nepřerušený trénink.
               </p>
             </div>

@@ -10,6 +10,7 @@ import {
   User,
   Users,
   Check,
+  CheckCircle,
   Sparkles,
   Trophy,
   Wand2,
@@ -173,8 +174,8 @@ export default function HomePage() {
               <ScrollReveal delay={0.3}>
                 <div className="mt-8 flex flex-col sm:flex-row gap-3">
                   <Link href="/registrace">
-                    <Button size="lg" className="group w-full sm:w-auto">
-                      Vyzkoušet 30 minut zdarma
+                    <Button size="lg" className="h-12 px-8 text-base bg-white text-primary-600 hover:bg-neutral-100 hover:scale-105 transition-all shadow-xl group">
+                      Vyzkoušet 10 minut zdarma
                       <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </Link>
@@ -188,9 +189,10 @@ export default function HomePage() {
                     </Button>
                   </Link>
                 </div>
-                <p className="mt-3 text-xs text-neutral-400">
-                  30 minut na vyzkoušení, bez platby.
-                </p>
+                <div className="mt-3 flex items-center gap-2 text-neutral-400">
+                  <CheckCircle className="w-4 h-4 text-emerald-400" />
+                  10 minut na vyzkoušení, bez platby.
+                </div>
               </ScrollReveal>
             </div>
 
@@ -341,7 +343,7 @@ export default function HomePage() {
             <div className="mt-10 text-center">
               <Link href="/registrace">
                 <Button size="lg" className="group">
-                  Vyzkoušet zdarma
+                  Vyzkoušet 10 minut zdarma
                   <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
                 </Button>
               </Link>
@@ -393,9 +395,8 @@ export default function HomePage() {
               <ScrollReveal delay={0.2}>
                 <div className="mt-8 flex gap-3">
                   <Link href="/registrace">
-                    <Button size="sm" className="group">
-                      Vyzkoušet zdarma
-                      <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                    <Button size="lg" className="w-full sm:w-auto h-12 px-8 text-base bg-white text-neutral-900 hover:bg-neutral-100 hover:scale-105 transition-all shadow-[0_0_30px_rgba(255,255,255,0.3)]">
+                      Vyzkoušet 10 minut zdarma
                     </Button>
                   </Link>
                   <Link href="/cenik">

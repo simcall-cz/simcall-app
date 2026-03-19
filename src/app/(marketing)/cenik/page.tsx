@@ -71,7 +71,7 @@ const comparisonFeatures: {
     },
     {
       label: "Nahrávky hovorů (MP3)",
-      solo: false,
+      solo: true,
       team: true,
       enterprise: true,
     },
@@ -83,12 +83,6 @@ const comparisonFeatures: {
     },
     {
       label: "Pokročilá analýza (scoring)",
-      solo: true,
-      team: true,
-      enterprise: true,
-    },
-    {
-      label: "Export přepisů do CRM",
       solo: true,
       team: true,
       enterprise: true,

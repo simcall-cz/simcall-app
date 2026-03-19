@@ -17,6 +17,7 @@ interface UseTrainingCallOptions {
   onCallStarted?: (callId: string) => void;
   onCallEnded?: (callId: string) => void;
   onError?: (error: string) => void;
+  maxDurationSeconds?: number;
 }
 
 export interface ProcessingResult {
@@ -70,6 +71,14 @@ export function useTrainingCall(options: UseTrainingCallOptions = {}) {
           (Date.now() - startTimeRef.current) / 1000
         );
         setState((prev) => ({ ...prev, duration: elapsed }));
+
+        // Auto-disconnect if max duration is reached
+        if (
+          optionsRef.current.maxDurationSeconds &&
+          elapsed >= optionsRef.current.maxDurationSeconds
+        ) {
+          conversation.endSession();
+        }
       }, 1000);
     },
     onDisconnect: () => {

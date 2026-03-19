@@ -63,7 +63,7 @@ export const faqItems: FAQ[] = [
   {
     question: "Co je ve free verzi zdarma?",
     answer:
-      "Po registraci dostanete 30 minut a přístup ke 2 AI agentům úplně zdarma. Můžete si vyzkoušet celý průběh — hovor, přepis, AI analýzu a doporučení. Žádná platební karta není potřeba.",
+      "Po registraci dostanete 10 minut a přístup k 1 AI agentovi úplně zdarma. Můžete si vyzkoušet celý průběh — hovor, přepis, AI analýzu a doporučení. Žádná platební karta není potřeba.",
     category: "pricing",
   },
   {

@@ -147,7 +147,6 @@ const plans = [
       "Sledování pokroku a statistiky",
       "Personalizovaná doporučení",
       "Pokročilá analýza (detailní scoring)",
-      "Export přepisů do CRM",
     ],
     price: "od 990 Kč/měs",
     href: "/checkout?plan=solo&tier=0",
@@ -550,7 +549,7 @@ export default function FunkcePage() {
           <ScrollReveal>
             <div className="text-center max-w-xl mx-auto">
               <h2 className="text-3xl font-bold text-white">Připraveni začít?</h2>
-              <p className="mt-3 text-neutral-400">30 minut zdarma. Bez kreditní karty.</p>
+              <p className="mt-3 text-neutral-400">10 minut zdarma. Bez kreditní karty.</p>
               <div className="mt-7 flex gap-3 justify-center flex-wrap">
                 <Link href="/registrace">
                   <Button size="lg" className="group">

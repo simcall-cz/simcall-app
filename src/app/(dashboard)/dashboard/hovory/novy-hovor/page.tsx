@@ -58,6 +58,7 @@ export default function NovyHovorPage() {
   const [agents, setAgents] = useState<AIAgent[]>([]);
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [loading, setLoading] = useState(true);
+  const [maxDurationSeconds, setMaxDurationSeconds] = useState<number | undefined>();
 
   const [selectedScenario, setSelectedScenario] = useState<string | null>(null);
   const [step, setStep] = useState<"select" | "confirm" | "call">("select");
@@ -77,6 +78,7 @@ export default function NovyHovorPage() {
     toggleMute,
     reset,
   } = useTrainingCall({
+    maxDurationSeconds,
     onCallEnded: (id) => {
       console.log("Call ended:", id);
     },
@@ -87,9 +89,10 @@ export default function NovyHovorPage() {
       try {
         // Fetch agents via API (respects subscription/demo limits)
         const headers = await getAuthHeaders();
-        const [agentsApiRes, scenariosRes] = await Promise.all([
+        const [agentsApiRes, scenariosRes, subscriptionRes] = await Promise.all([
           fetch("/api/agents", { headers }),
-          supabase.from("scenarios").select("*")
+          supabase.from("scenarios").select("*"),
+          fetch("/api/subscription", { headers })
         ]);
 
         if (agentsApiRes.ok) {
@@ -122,6 +125,14 @@ export default function NovyHovorPage() {
             };
           });
           setScenarios(formattedScenarios);
+        }
+
+        if (subscriptionRes.ok) {
+          const subData = await subscriptionRes.json();
+          const limit = subData.minutesLimit || 0;
+          const used = subData.minutesUsed || 0;
+          const remainingMinutes = Math.max(0, limit - used);
+          setMaxDurationSeconds(remainingMinutes * 60);
         }
       } catch (err) {
         console.error("Error fetching data:", err);

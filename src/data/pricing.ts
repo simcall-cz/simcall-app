@@ -19,7 +19,6 @@ export const pricingPlans: PricingPlan[] = [
       { label: "Sledování pokroku a podrobné statistiky" },
       { label: "Personalizovaná doporučení" },
       { label: "Pokročilá analýza (detailní scoring)" },
-      { label: "Export přepisů (PDF/CSV)" },
     ],
     highlighted: false,
     cta: "Vybrat Solo",
