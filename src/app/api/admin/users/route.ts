@@ -141,22 +141,22 @@ export async function GET(request: NextRequest) {
 // Tier configs (mirrors pricing page)
 const TIER_CONFIG: Record<string, { minutes: number; agents: number }[]> = {
   solo: [
-    { minutes: 100, agents: 10 },
-    { minutes: 250, agents: 25 },
-    { minutes: 500, agents: 50 },
-    { minutes: 1000, agents: 100 },
+    { minutes: 100, agents: 20 },
+    { minutes: 250, agents: 50 },
+    { minutes: 500, agents: 100 },
+    { minutes: 1000, agents: 200 },
   ],
   team: [
-    { minutes: 500, agents: 50 },
-    { minutes: 1000, agents: 100 },
-    { minutes: 2500, agents: 250 },
-    { minutes: 5000, agents: 500 },
+    { minutes: 500, agents: 100 },
+    { minutes: 1000, agents: 200 },
+    { minutes: 2500, agents: 500 },
+    { minutes: 5000, agents: 1000 },
   ],
   team_manager: [
-    { minutes: 500, agents: 50 },
-    { minutes: 1000, agents: 100 },
-    { minutes: 2500, agents: 250 },
-    { minutes: 5000, agents: 500 },
+    { minutes: 500, agents: 100 },
+    { minutes: 1000, agents: 200 },
+    { minutes: 2500, agents: 500 },
+    { minutes: 5000, agents: 1000 },
   ],
 };
 

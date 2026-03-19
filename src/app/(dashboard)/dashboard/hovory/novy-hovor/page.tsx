@@ -14,6 +14,9 @@ import {
   Loader2,
   ZoomIn,
   X,
+  BookOpen,
+  GraduationCap,
+  Lightbulb,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +27,7 @@ import { supabase } from "@/lib/supabase";
 import { getAuthHeaders } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import type { AIAgent, Scenario } from "@/types";
+import { lessons, DIFFICULTY_CONFIG as LESSON_DIFF, type Lesson } from "@/data/lessons";
 
 const difficultyConfig = {
   easy: {
@@ -78,6 +82,7 @@ export default function NovyHovorPage() {
   const [step, setStep] = useState<"select" | "confirm" | "call">("select");
   const [selectedDifficulty, setSelectedDifficulty] = useState<"all" | "easy" | "medium" | "hard">("all");
   const [imageZoom, setImageZoom] = useState(false);
+  const [lessonModal, setLessonModal] = useState<Lesson | null>(null);
 
   const {
     phase,
@@ -199,6 +204,29 @@ export default function NovyHovorPage() {
     }
   };
 
+  // Find the best matching lesson for a scenario title
+  const findMatchingLesson = (scenarioTitle: string): Lesson | null => {
+    const words = scenarioTitle
+      .toLowerCase()
+      .replace(/[–—:,.\-()]/g, " ")
+      .split(/\s+/)
+      .filter((w) => w.length > 3);
+    let bestMatch: Lesson | null = null;
+    let bestScore = 0;
+    for (const lesson of lessons) {
+      const lt = lesson.title.toLowerCase();
+      let score = 0;
+      for (const w of words) {
+        if (lt.includes(w)) score++;
+      }
+      if (score > bestScore) {
+        bestScore = score;
+        bestMatch = lesson;
+      }
+    }
+    return bestScore >= 1 ? bestMatch : null;
+  };
+
   if (loading) {
     return (
       <div className="flex h-[50vh] items-center justify-center">
@@ -271,6 +299,135 @@ export default function NovyHovorPage() {
               className="max-h-[90vh] max-w-[90vw] rounded-lg object-contain shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             />
+          </div>
+        )}
+
+        {/* Lesson modal */}
+        {lessonModal && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            onClick={() => setLessonModal(null)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="relative w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-2xl bg-white shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal header */}
+              <div className="sticky top-0 z-10 flex items-center justify-between border-b border-neutral-100 bg-white px-6 py-4 rounded-t-2xl">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-100">
+                    <BookOpen className="h-4 w-4 text-primary-600" />
+                  </div>
+                  <div className="min-w-0">
+                    <h2 className="font-bold text-neutral-900 truncate">
+                      Lekce {lessonModal.number}
+                    </h2>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-xs text-neutral-400">
+                        {lessonModal.category}
+                      </span>
+                      <span
+                        className={cn(
+                          "inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold",
+                          LESSON_DIFF[lessonModal.difficulty].color
+                        )}
+                      >
+                        {LESSON_DIFF[lessonModal.difficulty].label}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setLessonModal(null)}
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full hover:bg-neutral-100 transition-colors"
+                >
+                  <X className="h-5 w-5 text-neutral-500" />
+                </button>
+              </div>
+
+              {/* Modal content */}
+              <div className="p-6 space-y-5">
+                <h3 className="text-lg font-bold text-neutral-900">
+                  {lessonModal.title}
+                </h3>
+
+                {/* Situation */}
+                <div>
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-2">
+                    Situace
+                  </h4>
+                  <p className="text-sm text-neutral-700 leading-relaxed">
+                    {lessonModal.situation}
+                  </p>
+                </div>
+
+                {/* Knowledge */}
+                {lessonModal.knowledge.length > 0 && (
+                  <div>
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-2">
+                      Co potřebujete vědět
+                    </h4>
+                    <ul className="space-y-2">
+                      {lessonModal.knowledge.map((k, i) => (
+                        <li
+                          key={i}
+                          className="flex items-start gap-2 text-sm text-neutral-600"
+                        >
+                          <GraduationCap className="h-4 w-4 shrink-0 mt-0.5 text-primary-400" />
+                          <span>{k}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Goal */}
+                <div>
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-2">
+                    Cíl
+                  </h4>
+                  <div className="flex items-start gap-2">
+                    <Target className="h-4 w-4 shrink-0 mt-0.5 text-green-500" />
+                    <p className="text-sm text-neutral-700">
+                      {lessonModal.goal}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Tips */}
+                {lessonModal.tips.length > 0 && (
+                  <div className="rounded-lg bg-amber-50/60 border border-amber-100 p-4">
+                    <h4 className="text-xs font-semibold text-amber-700 mb-2 flex items-center gap-1.5">
+                      <Lightbulb className="h-3.5 w-3.5" />
+                      Tipy
+                    </h4>
+                    <ul className="space-y-1.5">
+                      {lessonModal.tips.map((tip, i) => (
+                        <li
+                          key={i}
+                          className="flex items-start gap-2 text-sm text-amber-700"
+                        >
+                          <span className="shrink-0 mt-0.5">•</span>
+                          <span>{tip}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+
+              {/* Modal footer */}
+              <div className="sticky bottom-0 border-t border-neutral-100 bg-white px-6 py-4 rounded-b-2xl">
+                <Button
+                  onClick={() => setLessonModal(null)}
+                  className="w-full"
+                >
+                  Zavřít a pokračovat k hovoru
+                </Button>
+              </div>
+            </motion.div>
           </div>
         )}
 
@@ -472,6 +629,33 @@ export default function NovyHovorPage() {
                     ))}
                   </ul>
                 </div>
+
+                {/* Lesson hint button */}
+                {(() => {
+                  const matchedLesson = findMatchingLesson(scenario.title);
+                  if (!matchedLesson) return null;
+                  return (
+                    <div className="border-t border-neutral-100 p-6">
+                      <button
+                        onClick={() => setLessonModal(matchedLesson)}
+                        className="w-full flex items-center gap-3 rounded-lg border border-primary-200 bg-primary-50/50 px-4 py-3 text-left transition-colors hover:bg-primary-50 hover:border-primary-300"
+                      >
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-100">
+                          <BookOpen className="h-4 w-4 text-primary-600" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-primary-700">
+                            Přečíst si lekci k tomuto scénáři
+                          </p>
+                          <p className="text-xs text-primary-500 truncate mt-0.5">
+                            {matchedLesson.title}
+                          </p>
+                        </div>
+                        <ChevronRight className="h-4 w-4 shrink-0 text-primary-400" />
+                      </button>
+                    </div>
+                  );
+                })()}
               </div>
 
               {/* Start Button — mobile only */}

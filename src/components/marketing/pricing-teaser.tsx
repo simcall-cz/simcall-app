@@ -10,7 +10,7 @@ const plans = [
     price: "od 990 Kč",
     period: "/měsíc",
     description: "Pro jednotlivé makléře",
-    features: ["Až 50 agentů", "100–1 000 minut/měsíc", "AI analýza a scoring"],
+    features: ["Až 100 agentů", "100–1 000 minut/měsíc", "AI analýza a scoring"],
     highlighted: false,
     href: "/checkout?plan=solo&tier=0",
   },

@@ -875,7 +875,7 @@ export default function DashboardPage() {
       today={today}
       calls={calls}
       isLoading={isLoading}
-      totalMinutes={totalMinutes}
+      totalMinutes={subscription.minutesUsed}
       avgSuccessRate={avgSuccessRate}
       chartData={chartData}
       subscription={subscription}

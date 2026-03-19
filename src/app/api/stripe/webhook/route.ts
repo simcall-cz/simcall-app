@@ -441,7 +441,7 @@ export async function POST(request: NextRequest) {
                 plan: subRecord.scheduled_plan,
                 tier: subRecord.scheduled_tier,
                 minutes_limit: subRecord.scheduled_minutes_limit || subRecord.scheduled_tier,
-                agents_limit: subRecord.scheduled_agents_limit || 5,
+                agents_limit: subRecord.scheduled_agents_limit || 10,
                 scheduled_plan: null,
                 scheduled_tier: null,
                 scheduled_minutes_limit: null,

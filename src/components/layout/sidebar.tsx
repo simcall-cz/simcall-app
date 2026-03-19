@@ -22,6 +22,7 @@ import {
   Receipt,
   CreditCard,
   FileText,
+  BookOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
@@ -58,6 +59,11 @@ const agentNavItems: SidebarNavItem[] = [
     label: "Statistiky",
     href: "/dashboard/statistiky",
     icon: <BarChart3 className="w-5 h-5" />,
+  },
+  {
+    label: "Lekce",
+    href: "/dashboard/lekce",
+    icon: <BookOpen className="w-5 h-5" />,
   },
   {
     label: "Profil",

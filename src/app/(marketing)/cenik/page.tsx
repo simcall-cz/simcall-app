@@ -57,8 +57,8 @@ const comparisonFeatures: {
     },
     {
       label: "Počet AI agentů",
-      solo: "5 až 50",
-      team: "25 až 250",
+      solo: "10 až 100",
+      team: "50 až 500",
       enterprise: "Dohodou a vlastní",
     },
     { label: "AI analýza hovoru", solo: true, team: true, enterprise: true },

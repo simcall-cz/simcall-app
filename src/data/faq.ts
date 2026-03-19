@@ -49,7 +49,7 @@ export const faqItems: FAQ[] = [
   {
     question: "Kolik AI agentů je k dispozici?",
     answer:
-      "Počet agentů závisí na vašem balíčku od 5 agentů v nejmenším Solo balíčku až po stovky v největších. Každý agent má jinou osobnost, obtížnost a scénář. Ve free verzi máte k dispozici 2 agenty pro vyzkoušení.",
+      "Počet agentů závisí na vašem balíčku od 10 agentů v nejmenším Solo balíčku až po stovky v největších. Každý agent má jinou osobnost, obtížnost a scénář. Ve free verzi máte k dispozici 2 agenty pro vyzkoušení.",
     category: "technology",
   },
 

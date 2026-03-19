@@ -53,9 +53,9 @@ export async function GET(request: NextRequest) {
 
     // 4. Role-based defaults (admin-assigned, no Stripe subscription)
     const ROLE_DEFAULTS: Record<string, { plan: string; minutesLimit: number; agentsLimit: number }> = {
-      solo: { plan: "solo", minutesLimit: 100, agentsLimit: 5 },
-      team: { plan: "team", minutesLimit: 500, agentsLimit: 25 },
-      team_manager: { plan: "team", minutesLimit: 500, agentsLimit: 25 },
+      solo: { plan: "solo", minutesLimit: 100, agentsLimit: 10 },
+      team: { plan: "team", minutesLimit: 500, agentsLimit: 50 },
+      team_manager: { plan: "team", minutesLimit: 500, agentsLimit: 50 },
     };
 
     const defaults = ROLE_DEFAULTS[role];
