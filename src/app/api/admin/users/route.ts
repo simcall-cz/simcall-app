@@ -30,9 +30,10 @@ export async function GET(request: NextRequest) {
 
     // Apply search filter (email or name)
     if (search) {
-      query = query.or(
-        `email.ilike.%${search}%,full_name.ilike.%${search}%`
-      );
+      const sanitizedSearch = search.replace(/[%_(),.*\\]/g, "").slice(0, 100);
+      if (sanitizedSearch.length > 0) {
+        query = query.or(`email.ilike.%${sanitizedSearch}%,full_name.ilike.%${sanitizedSearch}%`);
+      }
     }
 
     // Apply role filter

@@ -30,17 +30,30 @@ const difficultyConfig = {
     label: "Začátečník",
     color: "success" as const,
     icon: Zap,
+    borderColor: "border-l-green-400",
+    bgTint: "bg-green-50/40",
   },
   medium: {
     label: "Pokročilý",
     color: "warning" as const,
     icon: Shield,
+    borderColor: "border-l-amber-400",
+    bgTint: "bg-amber-50/40",
   },
   hard: {
     label: "Expert",
     color: "default" as const,
     icon: Flame,
+    borderColor: "border-l-red-400",
+    bgTint: "bg-red-50/40",
   },
+};
+
+const filterChipColors: Record<string, string> = {
+  all: "border-primary-500 bg-primary-50 text-primary-600",
+  easy: "border-green-500 bg-green-50 text-green-700",
+  medium: "border-amber-500 bg-amber-50 text-amber-700",
+  hard: "border-red-500 bg-red-50 text-red-700",
 };
 
 const categoryLabels: Record<string, string> = {
@@ -59,6 +72,7 @@ export default function NovyHovorPage() {
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [loading, setLoading] = useState(true);
   const [maxDurationSeconds, setMaxDurationSeconds] = useState<number | undefined>();
+  const [userInitials, setUserInitials] = useState("U");
 
   const [selectedScenario, setSelectedScenario] = useState<string | null>(null);
   const [step, setStep] = useState<"select" | "confirm" | "call">("select");
@@ -134,6 +148,17 @@ export default function NovyHovorPage() {
           const remainingMinutes = Math.max(0, limit - used);
           setMaxDurationSeconds(remainingMinutes * 60);
         }
+
+        // Fetch user initials for call view
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const fullName = user.user_metadata?.full_name || "";
+          const parts = fullName.trim().split(/\s+/);
+          const initials = parts.length >= 2
+            ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+            : (fullName.slice(0, 2) || "U").toUpperCase();
+          setUserInitials(initials);
+        }
       } catch (err) {
         console.error("Error fetching data:", err);
       } finally {
@@ -192,6 +217,7 @@ export default function NovyHovorPage() {
           agentName={agent.name}
           agentPersonality={agent.personality}
           agentInitials={agent.avatarInitials}
+          userInitials={userInitials}
           isSpeaking={isSpeaking}
           isMuted={isMuted}
           error={callError}
@@ -495,7 +521,7 @@ export default function NovyHovorPage() {
             className={cn(
               "rounded-full border px-4 py-1.5 text-sm font-medium transition-colors",
               selectedDifficulty === diff
-                ? "border-primary-500 bg-primary-50 text-primary-600"
+                ? filterChipColors[diff]
                 : "border-neutral-200 bg-white text-neutral-600 hover:border-neutral-400 hover:text-neutral-900"
             )}
           >
@@ -524,15 +550,19 @@ export default function NovyHovorPage() {
               className="h-full"
             >
               <Card
-                className="cursor-pointer h-full flex flex-col transition-all hover:border-primary-200 hover:shadow-md overflow-hidden"
+                className={cn(
+                  "cursor-pointer h-full flex flex-col transition-all hover:shadow-md overflow-hidden border-l-4",
+                  diffConf.borderColor,
+                  diffConf.bgTint
+                )}
                 onClick={() => handleSelectScenario(s.id)}
               >
                 <div className="p-5 flex flex-col flex-1">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <div className="mb-2 flex flex-wrap items-center gap-2">
-                        <Badge variant={diffConf.color} className="gap-1">
-                          <DiffIcon className="h-3 w-3" />
+                      <div className="mb-3 flex flex-wrap items-center gap-2">
+                        <Badge variant={diffConf.color} className="gap-1.5 px-3 py-1 text-sm font-semibold">
+                          <DiffIcon className="h-3.5 w-3.5" />
                           {diffConf.label}
                         </Badge>
                         <span className="text-xs font-medium px-2 py-0.5 rounded bg-neutral-100 text-neutral-600">

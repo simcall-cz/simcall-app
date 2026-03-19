@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { verifyAdmin } from "@/lib/auth";
 import {
   notifyBusiness,
   NotifyColors,
@@ -10,7 +11,12 @@ import {
 } from "@/lib/notifications";
 
 // GET /api/notify/test — Test all Discord notifications
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const { isAdmin } = await verifyAdmin(request);
+  if (!isAdmin) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   const results: { event: string; ok: boolean; error?: string }[] = [];
 
   const tests = [

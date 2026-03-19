@@ -46,8 +46,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Max-length validation
+    const MAX_LENGTHS: Record<string, number> = { name: 200, email: 320, phone: 30, company: 200, subject: 500, message: 5000 };
+    for (const [field, maxLen] of Object.entries(MAX_LENGTHS)) {
+      const val = (body as any)[field];
+      if (typeof val === "string" && val.length > maxLen) {
+        return NextResponse.json({ error: `Pole ${field} je příliš dlouhé (max ${maxLen} znaků)` }, { status: 400 });
+      }
+    }
+
     // Basic email validation
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
       return NextResponse.json(
         { error: "Invalid email format" },
         { status: 400 }

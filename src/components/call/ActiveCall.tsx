@@ -21,6 +21,7 @@ interface ActiveCallProps {
   agentName: string;
   agentPersonality: string;
   agentInitials: string;
+  userInitials: string;
   isSpeaking: boolean;
   isMuted: boolean;
   error: string | null;
@@ -43,6 +44,7 @@ export function ActiveCall({
   agentName,
   agentPersonality,
   agentInitials,
+  userInitials,
   isSpeaking,
   isMuted,
   error,
@@ -54,16 +56,16 @@ export function ActiveCall({
 }: ActiveCallProps) {
   const [pulseScale, setPulseScale] = useState(1);
 
-  // Pulse animation when AI is speaking
+  // Pulse animation for active speaker
   useEffect(() => {
-    if (isSpeaking && phase === "active") {
+    if (phase === "active") {
       const interval = setInterval(() => {
-        setPulseScale((prev) => (prev === 1 ? 1.1 : 1));
+        setPulseScale((prev) => (prev === 1 ? 1.08 : 1));
       }, 500);
       return () => clearInterval(interval);
     }
     setPulseScale(1);
-  }, [isSpeaking, phase]);
+  }, [phase]);
 
   return (
     <div className="flex min-h-[50vh] sm:min-h-[60vh] flex-col items-center justify-center px-3 sm:px-4">
@@ -77,14 +79,29 @@ export function ActiveCall({
             exit={{ opacity: 0, scale: 0.9 }}
             className="flex flex-col items-center gap-4 sm:gap-6 text-center"
           >
-            <div className="relative">
-              <div className="flex h-24 w-24 sm:h-28 sm:w-28 items-center justify-center rounded-full bg-neutral-100">
-                <span className="text-2xl sm:text-3xl font-bold text-neutral-600">
-                  {agentInitials}
-                </span>
+            <div className="flex items-center gap-6 sm:gap-10">
+              {/* User circle */}
+              <div className="flex flex-col items-center gap-2">
+                <div className="flex h-20 w-20 sm:h-28 sm:w-28 items-center justify-center rounded-full bg-neutral-100">
+                  <span className="text-2xl sm:text-3xl font-bold text-neutral-600">
+                    {userInitials}
+                  </span>
+                </div>
+                <span className="text-xs sm:text-sm font-medium text-neutral-400">Vy</span>
               </div>
-              <div className="absolute -right-1 -bottom-1 flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-amber-100">
-                <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin text-amber-600" />
+              {/* Agent circle */}
+              <div className="flex flex-col items-center gap-2">
+                <div className="relative">
+                  <div className="flex h-20 w-20 sm:h-28 sm:w-28 items-center justify-center rounded-full bg-neutral-100">
+                    <span className="text-2xl sm:text-3xl font-bold text-neutral-600">
+                      {agentInitials}
+                    </span>
+                  </div>
+                  <div className="absolute -right-1 -bottom-1 flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-amber-100">
+                    <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin text-amber-600" />
+                  </div>
+                </div>
+                <span className="text-xs sm:text-sm font-medium text-neutral-400">{agentName.split(" ")[0]}</span>
               </div>
             </div>
             <div>
@@ -107,40 +124,65 @@ export function ActiveCall({
             exit={{ opacity: 0, scale: 0.9 }}
             className="flex flex-col items-center gap-5 sm:gap-8 text-center"
           >
-            {/* Avatar with speaking indicator */}
-            <div className="relative">
-              <motion.div
-                animate={{ scale: pulseScale }}
-                transition={{ duration: 0.3 }}
-                className={`flex h-24 w-24 sm:h-32 sm:w-32 items-center justify-center rounded-full ${
-                  isSpeaking
-                    ? "bg-primary-100 ring-4 ring-primary-300"
-                    : "bg-neutral-100"
-                }`}
-              >
-                <span className="text-3xl sm:text-4xl font-bold text-neutral-700">
-                  {agentInitials}
-                </span>
-              </motion.div>
+            {/* Two avatars side by side */}
+            <div className="flex items-center gap-6 sm:gap-10">
+              {/* LEFT: User (Makléř) circle */}
+              <div className="flex flex-col items-center gap-2">
+                <div className="relative">
+                  <motion.div
+                    animate={{ scale: !isSpeaking ? pulseScale : 1 }}
+                    transition={{ duration: 0.3 }}
+                    className={`flex h-20 w-20 sm:h-28 sm:w-28 items-center justify-center rounded-full transition-colors ${
+                      !isSpeaking
+                        ? "bg-green-100 ring-4 ring-green-300"
+                        : "bg-neutral-100"
+                    }`}
+                  >
+                    <span className="text-2xl sm:text-3xl font-bold text-neutral-700">
+                      {userInitials}
+                    </span>
+                  </motion.div>
+                  {!isSpeaking && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute -right-1 -bottom-1 flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-green-500"
+                    >
+                      <Mic className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                    </motion.div>
+                  )}
+                </div>
+                <span className="text-xs sm:text-sm font-medium text-neutral-500">Vy</span>
+              </div>
 
-              {/* Speaking indicator */}
-              {isSpeaking && (
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="absolute -right-1 -bottom-1 flex h-10 w-10 items-center justify-center rounded-full bg-primary-500"
-                >
-                  <Volume2 className="h-5 w-5 text-white" />
-                </motion.div>
-              )}
-            </div>
-
-            {/* Agent Info */}
-            <div>
-              <h2 className="text-2xl font-bold text-neutral-900">
-                {agentName}
-              </h2>
-              <p className="text-neutral-500">{agentPersonality}</p>
+              {/* RIGHT: Agent circle */}
+              <div className="flex flex-col items-center gap-2">
+                <div className="relative">
+                  <motion.div
+                    animate={{ scale: isSpeaking ? pulseScale : 1 }}
+                    transition={{ duration: 0.3 }}
+                    className={`flex h-20 w-20 sm:h-28 sm:w-28 items-center justify-center rounded-full transition-colors ${
+                      isSpeaking
+                        ? "bg-primary-100 ring-4 ring-primary-300"
+                        : "bg-neutral-100"
+                    }`}
+                  >
+                    <span className="text-2xl sm:text-3xl font-bold text-neutral-700">
+                      {agentInitials}
+                    </span>
+                  </motion.div>
+                  {isSpeaking && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute -right-1 -bottom-1 flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-primary-500"
+                    >
+                      <Volume2 className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                    </motion.div>
+                  )}
+                </div>
+                <span className="text-xs sm:text-sm font-medium text-neutral-500">{agentName.split(" ")[0]}</span>
+              </div>
             </div>
 
             {/* Duration */}
@@ -155,7 +197,7 @@ export function ActiveCall({
                 <span className="relative inline-flex h-3 w-3 rounded-full bg-green-500" />
               </span>
               <span className="text-sm text-green-600">
-                {isSpeaking ? "Klient mluví..." : "Hovor probíhá"}
+                {isSpeaking ? "Klient mluví..." : "Mluvíte vy"}
               </span>
             </div>
 

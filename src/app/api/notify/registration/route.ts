@@ -20,8 +20,11 @@ export async function POST(request: NextRequest) {
       name: string;
     };
 
-    if (!email) {
-      return NextResponse.json({ error: "email is required" }, { status: 400 });
+    if (!email || typeof email !== "string") {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+    if (email.length > 320 || (name && typeof name === "string" && name.length > 200)) {
+      return NextResponse.json({ error: "Input too long" }, { status: 400 });
     }
 
     await notifyNewRegistration(email, name || "");

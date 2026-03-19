@@ -23,8 +23,11 @@ export async function POST(request: NextRequest) {
       planName: string;
     };
 
-    if (!email) {
-      return NextResponse.json({ error: "email is required" }, { status: 400 });
+    if (!email || typeof email !== "string" || !fullName || typeof fullName !== "string") {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+    if (email.length > 320 || fullName.length > 200) {
+      return NextResponse.json({ error: "Input too long" }, { status: 400 });
     }
 
     const resend = getResend();
