@@ -174,7 +174,7 @@ export default function HomePage() {
               <ScrollReveal delay={0.3}>
                 <div className="mt-8 flex flex-col sm:flex-row gap-3">
                   <Link href="/registrace">
-                    <Button size="lg" className="h-12 px-8 text-base bg-white text-primary-600 hover:bg-neutral-100 hover:scale-105 transition-all shadow-xl group">
+                    <Button size="lg" className="group w-full sm:w-auto">
                       Vyzkoušet 10 minut zdarma
                       <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </Button>
@@ -395,8 +395,9 @@ export default function HomePage() {
               <ScrollReveal delay={0.2}>
                 <div className="mt-8 flex gap-3">
                   <Link href="/registrace">
-                    <Button size="lg" className="w-full sm:w-auto h-12 px-8 text-base bg-white text-neutral-900 hover:bg-neutral-100 hover:scale-105 transition-all shadow-[0_0_30px_rgba(255,255,255,0.3)]">
+                    <Button size="lg" className="group w-full sm:w-auto">
                       Vyzkoušet 10 minut zdarma
+                      <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                     </Button>
                   </Link>
                   <Link href="/cenik">
