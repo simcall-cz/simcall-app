@@ -67,7 +67,7 @@ export default function AccountCreatedEmail({
               Vítejte v SimCall, {firstName}! 🎉
             </Text>
             <Text style={paragraphStyle}>
-              Děkujeme za zakoupení plánu <strong>{planLabel} {tier}</strong>.
+              Děkujeme za zakoupení plánu <strong>{planLabel} {minutesLimit.toLocaleString("cs-CZ")} minut</strong>.
               Automaticky jsme vám vytvořili účet, abyste mohli ihned začít trénovat.
             </Text>
 
@@ -101,7 +101,7 @@ export default function AccountCreatedEmail({
                 <tbody>
                   <tr>
                     <td style={summaryLabelStyle}>Plán</td>
-                    <td style={summaryValueStyle}>{planLabel} {tier}</td>
+                    <td style={summaryValueStyle}>{planLabel} {minutesLimit.toLocaleString("cs-CZ")} minut</td>
                   </tr>
                   <tr>
                     <td style={summaryLabelStyle}>Minut měsíčně</td>

@@ -99,10 +99,10 @@ export default function WelcomeEmail({
                   Posuňte svůj trénink na další úroveň 🚀
                 </Text>
                 <Text style={upsellParagraphStyle}>
-                  V rámci verze <strong>Demo</strong> máte k dispozici prvních <strong>30 tréninkových minut s 1 AI agentem</strong> zcela zdarma.
+                  V rámci verze <strong>Demo</strong> máte k dispozici <strong>10 tréninkových minut</strong> zcela zdarma.
                 </Text>
                 <Text style={upsellParagraphStyle}>
-                  Chcete trénovat bez omezení? Získejte přístup ke všem AI agentům, neomezeným scénářům na míru a detailní pokročilé analytice.
+                  Chcete trénovat bez omezení? Získejte přístup ke 100 lekcím, volnému tréninkovému módu s více než 500 agenty a podrobné analytice.
                 </Text>
                 <Section style={upsellCtaContainerStyle}>
                   <Button style={upsellCtaButtonStyle} href="https://simcall.cz/cenik">

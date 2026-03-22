@@ -74,7 +74,7 @@ export default function OrderConfirmationEmail({
                 <tbody>
                   <tr>
                     <td style={summaryLabelStyle}>Plán</td>
-                    <td style={summaryValueStyle}>{planLabel} (Tier {tier})</td>
+                    <td style={summaryValueStyle}>{planLabel} {minutesLimit.toLocaleString("cs-CZ")} minut</td>
                   </tr>
                   <tr>
                     <td style={summaryLabelStyle}>Minut měsíčně</td>
