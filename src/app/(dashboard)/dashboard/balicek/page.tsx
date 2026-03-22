@@ -212,15 +212,6 @@ export default function BalicekPage() {
               </div>
               <div className="bg-neutral-50 rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-1">
-                  <Users className="w-4 h-4 text-neutral-400" />
-                  <span className="text-xs text-neutral-500">Agenti</span>
-                </div>
-                <p className="text-2xl font-bold text-neutral-900">
-                  {sub.agentsLimit}
-                </p>
-              </div>
-              <div className="bg-neutral-50 rounded-xl p-4">
-                <div className="flex items-center gap-2 mb-1">
                   <Calendar className="w-4 h-4 text-neutral-400" />
                   <span className="text-xs text-neutral-500">Obnovení</span>
                 </div>
@@ -452,7 +443,7 @@ export default function BalicekPage() {
                     Upgradujte na placený plán
                   </h3>
                   <p className="text-sm text-neutral-500 mt-0.5">
-                    Získejte více minut, agentů a pokročilé funkce. Vyberte si z plánu Solo (od 990 Kč) nebo Team (od 7 490 Kč).
+                    Získejte více minut a pokročilé funkce. Vyberte si z plánu Solo (od 990 Kč) nebo Team (od 7 490 Kč).
                   </p>
                 </div>
                 <Button

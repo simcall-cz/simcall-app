@@ -55,12 +55,6 @@ const comparisonFeatures: {
       team: "500 až 5 000",
       enterprise: "Dohodou",
     },
-    {
-      label: "Počet AI agentů",
-      solo: "10 až 100",
-      team: "50 až 500",
-      enterprise: "Dohodou a vlastní",
-    },
     { label: "AI analýza hovoru", solo: true, team: true, enterprise: true },
     { label: "Přepis hovoru", solo: true, team: true, enterprise: true },
     {
@@ -219,8 +213,6 @@ function PricingCard({ plan }: { plan: PricingPlan }) {
               <span className="text-neutral-400 text-sm">/měsíc</span>
               <div className="flex items-center gap-3 mt-2 text-sm text-neutral-500">
                 <span>{tier.calls} minut</span>
-                <span className="w-1 h-1 rounded-full bg-neutral-300" />
-                <span>{tier.agents} agentů</span>
               </div>
             </div>
           )}

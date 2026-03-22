@@ -48,9 +48,14 @@ const agentNavItems: SidebarNavItem[] = [
     icon: <LayoutDashboard className="w-5 h-5" />,
   },
   {
-    label: "Nový hovor",
+    label: "Trénink",
     href: "/dashboard/hovory/novy-hovor",
-    icon: <PhoneCall className="w-5 h-5" />,
+    icon: <Dumbbell className="w-5 h-5" />,
+  },
+  {
+    label: "Lekce",
+    href: "/dashboard/lekce",
+    icon: <GraduationCap className="w-5 h-5" />,
   },
   {
     label: "Hovory",
@@ -61,16 +66,6 @@ const agentNavItems: SidebarNavItem[] = [
     label: "Statistiky",
     href: "/dashboard/statistiky",
     icon: <BarChart3 className="w-5 h-5" />,
-  },
-  {
-    label: "Lekce",
-    href: "/dashboard/lekce",
-    icon: <GraduationCap className="w-5 h-5" />,
-  },
-  {
-    label: "Trénink",
-    href: "/dashboard/trenink",
-    icon: <Dumbbell className="w-5 h-5" />,
   },
   {
     label: "Profil",

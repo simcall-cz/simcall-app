@@ -88,7 +88,7 @@ export default function MaklerDetailPage() {
         const res = await fetch(`/api/lessons/progress/${userId}`, { headers });
         if (!res.ok) {
           const data = await res.json();
-          throw new Error(data.error || "Chyba pri nacitani");
+          throw new Error(data.error || "Chyba při načítání");
         }
         const data = await res.json();
         setProgress(data.progress || []);
@@ -152,7 +152,7 @@ export default function MaklerDetailPage() {
         <p className="text-neutral-500 mb-4">{error}</p>
         <Button variant="outline" onClick={() => router.push("/manager/tym")}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Zpet na tym
+          Zpět na tým
         </Button>
       </div>
     );
@@ -166,7 +166,7 @@ export default function MaklerDetailPage() {
         className="mb-5 flex items-center gap-2 text-sm text-neutral-500 transition-colors hover:text-neutral-900"
       >
         <ArrowLeft className="h-4 w-4" />
-        Zpet na tym
+        Zpět na tým
       </button>
 
       {/* User header */}
@@ -177,7 +177,7 @@ export default function MaklerDetailPage() {
           </span>
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900">{userName || "Makler"}</h1>
+          <h1 className="text-2xl font-bold text-neutral-900">{userName || "Makléř"}</h1>
           <p className="text-sm text-neutral-500">{userEmail}</p>
         </div>
       </div>
@@ -206,10 +206,10 @@ export default function MaklerDetailPage() {
       {/* Stats grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
         {[
-          { label: "Splnene lekce", value: `${completedCount}/100`, icon: GraduationCap },
-          { label: "Prumerny skore", value: avgScore > 0 ? `${avgScore}%` : "--", icon: BarChart3 },
-          { label: "Celkem pokusu", value: totalAttempts.toString(), icon: Target },
-          { label: "Pokusu/lekce", value: avgAttemptsPerLesson > 0 ? avgAttemptsPerLesson.toString() : "--", icon: Target },
+          { label: "Splněné lekce", value: `${completedCount}/100`, icon: GraduationCap },
+          { label: "Průměrné skóre", value: avgScore > 0 ? `${avgScore}%` : "--", icon: BarChart3 },
+          { label: "Celkem pokusů", value: totalAttempts.toString(), icon: Target },
+          { label: "Pokusů/lekce", value: avgAttemptsPerLesson > 0 ? avgAttemptsPerLesson.toString() : "--", icon: Target },
         ].map((stat, i) => (
           <div key={i} className="rounded-xl border border-neutral-200 bg-white p-4">
             <div className="flex items-center gap-2 mb-2">
@@ -227,25 +227,25 @@ export default function MaklerDetailPage() {
           <div className="rounded-xl border border-green-200 bg-green-50/40 p-4">
             <div className="flex items-center gap-2 mb-1">
               <TrendingUp className="h-4 w-4 text-green-600" />
-              <span className="text-xs text-green-700 font-medium">Nejlepsi kategorie</span>
+              <span className="text-xs text-green-700 font-medium">Nejlepší kategorie</span>
             </div>
             <p className="text-sm font-bold text-neutral-900">{bestCategory.category}</p>
-            <p className="text-xs text-neutral-500">{bestCategory.avgScore}% prumer</p>
+            <p className="text-xs text-neutral-500">{bestCategory.avgScore}% průměr</p>
           </div>
           <div className="rounded-xl border border-red-200 bg-red-50/40 p-4">
             <div className="flex items-center gap-2 mb-1">
               <TrendingDown className="h-4 w-4 text-red-500" />
-              <span className="text-xs text-red-700 font-medium">Nejhorsi kategorie</span>
+              <span className="text-xs text-red-700 font-medium">Nejhorší kategorie</span>
             </div>
             <p className="text-sm font-bold text-neutral-900">{worstCategory.category}</p>
-            <p className="text-xs text-neutral-500">{worstCategory.avgScore}% prumer</p>
+            <p className="text-xs text-neutral-500">{worstCategory.avgScore}% průměr</p>
           </div>
         </div>
       )}
 
       {/* Category breakdown */}
       <div className="mb-6">
-        <h2 className="text-sm font-bold text-neutral-900 mb-3">Progress dle kategorii</h2>
+        <h2 className="text-sm font-bold text-neutral-900 mb-3">Progress dle kategorií</h2>
         <div className="space-y-2">
           {categoryStats.map((cs) => {
             const catConf = CATEGORY_CONFIG[cs.category];
@@ -276,15 +276,15 @@ export default function MaklerDetailPage() {
 
       {/* Lesson detail table */}
       <div className="mb-8">
-        <h2 className="text-sm font-bold text-neutral-900 mb-3">Detail lekci</h2>
+        <h2 className="text-sm font-bold text-neutral-900 mb-3">Detail lekcí</h2>
         <div className="rounded-xl border border-neutral-200 bg-white overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-neutral-100 bg-neutral-50">
                   <th className="px-4 py-2.5 text-left text-xs font-semibold text-neutral-500">#</th>
-                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-neutral-500">Nazev</th>
-                  <th className="px-4 py-2.5 text-center text-xs font-semibold text-neutral-500">Skore</th>
+                  <th className="px-4 py-2.5 text-left text-xs font-semibold text-neutral-500">Název</th>
+                  <th className="px-4 py-2.5 text-center text-xs font-semibold text-neutral-500">Skóre</th>
                   <th className="px-4 py-2.5 text-center text-xs font-semibold text-neutral-500">Pokusy</th>
                   <th className="px-4 py-2.5 text-center text-xs font-semibold text-neutral-500">Stav</th>
                 </tr>

@@ -32,11 +32,11 @@ interface ProgressRecord {
 }
 
 const DIM_LABELS: Record<string, string> = {
-  legal: "Pravni",
-  communication: "Komunikacni",
-  process: "Procesni",
-  emotional: "Emocni",
-  financial: "Financni",
+  legal: "Právní",
+  communication: "Komunikační",
+  process: "Procesní",
+  emotional: "Emoční",
+  financial: "Finanční",
 };
 
 const DIM_SHORT: Record<string, string> = {
@@ -136,7 +136,7 @@ export default function LessonDetailPage() {
       <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
         <p className="text-neutral-500">Lekce nenalezena.</p>
         <Link href="/dashboard/lekce" className="mt-4 text-primary-500 hover:underline text-sm">
-          Zpet na mapu
+          Zpět na mapu
         </Link>
       </div>
     );
@@ -156,14 +156,14 @@ export default function LessonDetailPage() {
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100 mb-4">
           <Lock className="h-8 w-8 text-neutral-400" />
         </div>
-        <h1 className="text-xl font-bold text-neutral-900 mb-2">Lekce {lessonNumber} je zamcena</h1>
+        <h1 className="text-xl font-bold text-neutral-900 mb-2">Lekce {lessonNumber} je zamčená</h1>
         <p className="text-neutral-500 mb-6">
-          Nejprve splnte lekci {lessonNumber - 1} se skore alespon 80 % ve vsech pod-scenarech.
+          Nejprve splňte lekci {lessonNumber - 1} se skóre alespoň 80 % ve všech pod-scénářích.
         </p>
         <Link href="/dashboard/lekce">
           <Button variant="outline" className="gap-2">
             <ArrowLeft className="h-4 w-4" />
-            Zpet na mapu
+            Zpět na mapu
           </Button>
         </Link>
       </div>
@@ -197,18 +197,18 @@ export default function LessonDetailPage() {
                   <AlertTriangle className="h-5 w-5 text-amber-600" />
                 </div>
                 <h3 className="text-lg font-bold text-neutral-900">
-                  Zkuste si nejdrive zatrenovat
+                  Zkuste si nejdříve zatrénovat
                 </h3>
               </div>
               <p className="text-sm text-neutral-600 mb-6">
-                Na tomto pod-scenari jste 3x po sobe nedosahli 80 %. Doporucujeme prejit do volneho treninku,
-                kde si muzete bez omezeni procvicit podobne situace.
+                Na tomto pod-scénáři jste 3x po sobě nedosáhli 80 %. Doporučujeme přejít do volného tréninku,
+                kde si můžete bez omezení procvičit podobné situace.
               </p>
               <div className="flex gap-3">
                 <Link href="/dashboard/trenink" className="flex-1">
                   <Button className="w-full gap-2">
                     <Dumbbell className="h-4 w-4" />
-                    Prejit do treninku
+                    Přejít do tréninku
                   </Button>
                 </Link>
                 <Button
@@ -231,7 +231,7 @@ export default function LessonDetailPage() {
         className="mb-5 flex items-center gap-2 text-sm text-neutral-500 transition-colors hover:text-neutral-900"
       >
         <ArrowLeft className="h-4 w-4" />
-        Zpet na mapu
+        Zpět na mapu
       </button>
 
       {/* Header */}
@@ -249,7 +249,7 @@ export default function LessonDetailPage() {
           {completed && (
             <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700">
               <Check className="h-3 w-3" />
-              Splneno
+              Splněno
             </span>
           )}
         </div>
@@ -279,7 +279,7 @@ export default function LessonDetailPage() {
       {lesson.knowledge.length > 0 && (
         <div className="mb-5 rounded-xl border border-neutral-200 bg-white p-5">
           <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-3">
-            Co musite znat
+            Co musíte znát
           </h3>
           <ul className="space-y-2">
             {lesson.knowledge.map((k, i) => (
@@ -295,7 +295,7 @@ export default function LessonDetailPage() {
       {/* Goal */}
       <div className="mb-5 rounded-xl border border-neutral-200 bg-white p-5">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-2">
-          Cil hovoru
+          Cíl hovoru
         </h3>
         <div className="flex items-start gap-2.5">
           <Target className="h-4 w-4 shrink-0 mt-0.5 text-green-500" />
@@ -323,9 +323,12 @@ export default function LessonDetailPage() {
 
       {/* Sub-scenarios */}
       <div className="mb-8">
-        <h3 className="text-sm font-bold text-neutral-900 mb-4">
-          3 pod-scenare k absolvovani
+        <h3 className="text-sm font-bold text-neutral-900 mb-2">
+          3 pod-scénáře k absolvování
         </h3>
+        <p className="text-xs text-neutral-500 mb-4">
+          Pro postup do další lekce je potřeba dosáhnout minimálně <strong className="text-neutral-700">80 %</strong> u každého ze 3 hovorů.
+        </p>
         <div className="space-y-3">
           {subStats.map(({ sub, attempts, bestScore, passed, consecutiveFails }) => {
             const diffLabel = sub.difficulty;
@@ -401,7 +404,7 @@ export default function LessonDetailPage() {
                   <div className="mt-3 flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2">
                     <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0" />
                     <p className="text-xs text-amber-700">
-                      3x po sobe pod 80 %. Zvazte volny trenink.
+                      3x po sobě pod 80 %. Zvažte volný trénink.
                     </p>
                   </div>
                 )}
@@ -414,10 +417,10 @@ export default function LessonDetailPage() {
                       size="sm"
                       className="w-full gap-2 opacity-50 cursor-not-allowed"
                       disabled
-                      title="Agenti pro lekce budou brzy k dispozici"
+                      title="Agenti pro lekce budou brzy k dispozici. Pro postup je potřeba min. 80 %."
                     >
                       <Phone className="h-4 w-4" />
-                      Zahajit hovor (pripravujeme)
+                      Zahájit hovor (připravujeme)
                     </Button>
                   </div>
                 )}
@@ -432,7 +435,7 @@ export default function LessonDetailPage() {
         <div className="mb-12 text-center">
           <Link href={`/dashboard/lekce/${lessonNumber + 1}`}>
             <Button size="lg" className="gap-2">
-              Dalsi lekce
+              Další lekce
               <ArrowLeft className="h-4 w-4 rotate-180" />
             </Button>
           </Link>

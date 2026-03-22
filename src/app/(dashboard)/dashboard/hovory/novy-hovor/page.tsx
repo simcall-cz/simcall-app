@@ -690,9 +690,9 @@ export default function NovyHovorPage() {
           <ArrowLeft className="h-4 w-4" />
           Zpět na hovory
         </button>
-        <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900">Nový hovor</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900">Trénink</h1>
         <p className="mt-2 text-neutral-500">
-          Vyberte scénář pro tréninkový hovor. K dispozici je {filteredScenarios.length} agentů pro různé situace z praxe.
+          Vyberte scénář a trénujte s AI agenty. K dispozici je {filteredScenarios.length} agentů pro různé situace z praxe.
         </p>
       </div>
 

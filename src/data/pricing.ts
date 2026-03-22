@@ -7,10 +7,10 @@ export const pricingPlans: PricingPlan[] = [
     description:
       "Pro jednotlivé makléře, kteří chtějí zlepšit své telefonní dovednosti a zvýšit úspěšnost hovorů.",
     tiers: [
-      { calls: 100, agents: 10, price: 990 },
-      { calls: 250, agents: 20, price: 2490 },
-      { calls: 500, agents: 50, price: 4990 },
-      { calls: 1000, agents: 100, price: 9990 },
+      { calls: 100, agents: 0, price: 990 },
+      { calls: 250, agents: 0, price: 2490 },
+      { calls: 500, agents: 0, price: 4990 },
+      { calls: 1000, agents: 0, price: 9990 },
     ],
     features: [
       { label: "AI analýza hovoru" },
@@ -30,10 +30,10 @@ export const pricingPlans: PricingPlan[] = [
     description:
       "Pro firmy a týmy. Správa celého týmu z jednoho místa s neomezeným počtem členů.",
     tiers: [
-      { calls: 500, agents: 50, price: 7490 },
-      { calls: 1000, agents: 100, price: 14990 },
-      { calls: 2500, agents: 200, price: 37490 },
-      { calls: 5000, agents: 500, price: 74990 },
+      { calls: 500, agents: 0, price: 7490 },
+      { calls: 1000, agents: 0, price: 14990 },
+      { calls: 2500, agents: 0, price: 37490 },
+      { calls: 5000, agents: 0, price: 74990 },
     ],
     features: [
       { label: "Vše ze Solo" },
@@ -90,7 +90,7 @@ export const pricingPlans: PricingPlan[] = [
         tooltip:
           "Přímý kontakt na vašeho osobního vývojáře ze SimCall, který vám pomůže se vším od nastavení po nové analytiky a funkce na míru",
       },
-      { label: "Počet minut a agentů dohodou" },
+      { label: "Počet minut dohodou" },
     ],
     highlighted: false,
     cta: "Domluvit schůzku",

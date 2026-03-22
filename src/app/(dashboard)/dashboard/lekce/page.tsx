@@ -148,27 +148,30 @@ export default function LekcePage() {
           <Lock className="h-10 w-10 text-neutral-400" />
         </div>
         <h1 className="text-2xl font-bold text-neutral-900 mb-2">
-          Lekce jsou dostupne v placenem planu
+          Lekce jsou dostupné v placeném plánu
         </h1>
         <p className="text-neutral-500 max-w-md mb-6">
-          100 strukturovanych lekci z realitni praxe s mapou postupu a sledovanim progressu.
+          100 strukturovaných lekcí z realitní praxe s mapou postupu a sledováním progressu.
         </p>
         <Link href="/dashboard/balicek">
           <Button size="lg" className="gap-2">
             <GraduationCap className="h-5 w-5" />
-            Zobrazit plany
+            Zobrazit plány
           </Button>
         </Link>
       </div>
     );
   }
 
-  // Board game rows: 5 nodes per row, snake pattern
+  // Board game rows: 5 nodes per row, snake pattern (grid-based for symmetry)
   function renderBoardRows(categoryLessons: typeof lessonsV2, colorKey: string) {
     const colors = COLOR_MAP[colorKey] || COLOR_MAP.blue;
-    const rows: typeof lessonsV2[] = [];
+    const rows: (typeof lessonsV2[number] | null)[][] = [];
     for (let i = 0; i < categoryLessons.length; i += 5) {
-      rows.push(categoryLessons.slice(i, i + 5));
+      const row = categoryLessons.slice(i, i + 5);
+      // Pad to 5 with nulls
+      while (row.length < 5) row.push(null as unknown as typeof lessonsV2[number]);
+      rows.push(row);
     }
 
     return rows.map((row, rowIdx) => {
@@ -178,26 +181,44 @@ export default function LekcePage() {
 
       return (
         <div key={rowIdx}>
-          {/* Nodes row */}
-          <div className="flex items-center justify-between gap-1 sm:gap-2">
+          {/* Nodes row — equal 5-column grid */}
+          <div className="grid grid-cols-5">
             {displayRow.map((lesson, nodeIdx) => {
+              if (!lesson) {
+                return <div key={`empty-${nodeIdx}`} className="h-14 sm:h-[72px]" />;
+              }
+
               const completed = isLessonCompleted(lesson.number, progress);
               const unlocked = isLessonUnlocked(lesson.number, progress);
               const bestScore = getBestScore(lesson.number, progress);
               const isCurrent = unlocked && !completed;
 
+              // Check if next cell in display row is a real lesson (for connector)
+              const nextLesson = nodeIdx < 4 ? displayRow[nodeIdx + 1] : null;
+              const hasRight = nextLesson !== null && nextLesson !== undefined;
+
               return (
-                <div key={lesson.number} className="flex items-center">
-                  {/* Connector line (not before first node) */}
-                  {nodeIdx > 0 && (
-                    <div className={cn("h-0.5 w-3 sm:w-6", completed ? colors.nodeDone : colors.line)} />
+                <div key={lesson.number} className="relative flex items-center justify-center h-14 sm:h-[72px]">
+                  {/* Left half connector */}
+                  {nodeIdx > 0 && displayRow[nodeIdx - 1] && (
+                    <div className={cn(
+                      "absolute top-1/2 -translate-y-1/2 left-0 w-[calc(50%-28px)] sm:w-[calc(50%-36px)] h-0.5",
+                      colors.line
+                    )} />
+                  )}
+                  {/* Right half connector */}
+                  {hasRight && (
+                    <div className={cn(
+                      "absolute top-1/2 -translate-y-1/2 right-0 w-[calc(50%-28px)] sm:w-[calc(50%-36px)] h-0.5",
+                      colors.line
+                    )} />
                   )}
                   {/* Node */}
                   <button
                     onClick={() => unlocked ? router.push(`/dashboard/lekce/${lesson.number}`) : undefined}
                     disabled={!unlocked}
                     className={cn(
-                      "relative flex flex-col items-center justify-center rounded-xl border-2 w-14 h-14 sm:w-[72px] sm:h-[72px] transition-all",
+                      "relative z-10 flex flex-col items-center justify-center rounded-xl border-2 w-14 h-14 sm:w-[72px] sm:h-[72px] transition-all shrink-0",
                       completed
                         ? `${colors.nodeDone} border-transparent text-white shadow-md`
                         : isCurrent
@@ -237,15 +258,16 @@ export default function LekcePage() {
                 </div>
               );
             })}
-            {/* Pad empty slots for incomplete rows */}
-            {displayRow.length < 5 && Array.from({ length: 5 - displayRow.length }).map((_, i) => (
-              <div key={`pad-${i}`} className="w-14 h-14 sm:w-[72px] sm:h-[72px]" />
-            ))}
           </div>
           {/* Vertical connector to next row */}
           {!isLastRow && (
-            <div className="flex" style={{ justifyContent: isReversed ? "flex-start" : "flex-end" }}>
-              <div className={cn("w-0.5 h-6 mx-7 sm:mx-9", colors.line)} />
+            <div className="grid grid-cols-5">
+              <div className={cn(
+                "flex justify-center",
+                isReversed ? "col-start-1" : "col-start-5"
+              )}>
+                <div className={cn("w-0.5 h-6", colors.line)} />
+              </div>
             </div>
           )}
         </div>
@@ -263,7 +285,7 @@ export default function LekcePage() {
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900">Lekce</h1>
-            <p className="text-sm text-neutral-500">100 lekci z realitni praxe</p>
+            <p className="text-sm text-neutral-500">100 lekcí z realitní praxe</p>
           </div>
         </div>
       </div>
@@ -277,7 +299,7 @@ export default function LekcePage() {
           </div>
           <div className="text-right">
             <p className="text-2xl font-bold text-neutral-900">{completedCount}<span className="text-sm font-normal text-neutral-400">/100</span></p>
-            <p className="text-xs text-neutral-500">{progressPct} % splneno</p>
+            <p className="text-xs text-neutral-500">{progressPct} % splněno</p>
           </div>
         </div>
         {/* Bar */}
@@ -300,6 +322,11 @@ export default function LekcePage() {
             </span>
           ))}
         </div>
+      </div>
+
+      {/* 80% requirement info */}
+      <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50/50 px-4 py-3 text-sm text-amber-800">
+        Pro postup do další lekce je potřeba dosáhnout minimálně <strong>80 %</strong> u každého ze 3 hovorů v aktuální lekci.
       </div>
 
       {/* Board game map */}
@@ -326,7 +353,7 @@ export default function LekcePage() {
                   <div>
                     <h2 className={cn("text-sm font-bold", colors.text)}>{category}</h2>
                     <p className="text-[11px] text-neutral-500">
-                      {catCompleted}/{catLessons.length} splneno
+                      {catCompleted}/{catLessons.length} splněno
                     </p>
                   </div>
                 </div>
@@ -357,7 +384,7 @@ export default function LekcePage() {
             : "bg-neutral-100 text-neutral-400"
         )}>
           <GraduationCap className="h-5 w-5" />
-          {completedCount >= 100 ? "Elitni makler" : "Cil: Elitni makler"}
+          {completedCount >= 100 ? "Elitní makléř" : "Cíl: Elitní makléř"}
         </div>
       </div>
     </div>
