@@ -23,6 +23,8 @@ import {
   CreditCard,
   FileText,
   BookOpen,
+  Dumbbell,
+  GraduationCap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
@@ -63,7 +65,12 @@ const agentNavItems: SidebarNavItem[] = [
   {
     label: "Lekce",
     href: "/dashboard/lekce",
-    icon: <BookOpen className="w-5 h-5" />,
+    icon: <GraduationCap className="w-5 h-5" />,
+  },
+  {
+    label: "Trénink",
+    href: "/dashboard/trenink",
+    icon: <Dumbbell className="w-5 h-5" />,
   },
   {
     label: "Profil",

@@ -10,6 +10,7 @@ import {
   AlertCircle,
   Trash2,
   X,
+  Eye,
 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -375,9 +376,22 @@ export default function TeamPage() {
                     </div>
                   </div>
 
+                  {/* Progress detail button */}
+                  {member.role !== "manager" && (
+                    <div className="mt-4">
+                      <a
+                        href={`/manager/makler/${member.userId}`}
+                        className="flex items-center justify-center gap-2 w-full rounded-lg border border-primary-200 bg-primary-50/50 px-3 py-2 text-sm font-medium text-primary-600 transition-colors hover:bg-primary-50 hover:border-primary-300"
+                      >
+                        <Eye className="h-4 w-4" />
+                        Zobrazit progress
+                      </a>
+                    </div>
+                  )}
+
                   {/* Remove Button (not for managers) */}
                   {member.role !== "manager" && (
-                    <div className="mt-5 pt-4 border-t border-neutral-100">
+                    <div className="mt-3 pt-3 border-t border-neutral-100">
                       {deletingId === member.userId ? (
                         <div className="flex items-center gap-2">
                           <span className="text-xs text-red-600 flex-1">
