@@ -28,7 +28,7 @@ const timeSlots = {
 };
 
 const enterpriseFeatures = [
-  "White-label — SimCall pod vaší značkou",
+  "White-label, SimCall pod vaší značkou",
   "Vlastní AI agenti a scénáře na míru",
   "Dedikovaný account manažer",
   "Počet minut a agentů dohodou",
@@ -129,7 +129,7 @@ export default function DomluvitSchuzku() {
                   </div>
                   <p className="text-xs text-neutral-500 leading-relaxed">
                     Každý Enterprise klient dostane přímý kontakt na svého
-                    osobního vývojáře ze SimCall, který pomůže s čímkoli — od
+                    osobního vývojáře ze SimCall, který pomůže s čímkoli, od
                     nastavení po nové funkce na míru.
                   </p>
                 </div>

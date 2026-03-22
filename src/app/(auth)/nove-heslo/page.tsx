@@ -232,7 +232,7 @@ export default function NoveHesloPage() {
         </div>
 
         <p className="text-center text-xs text-neutral-400 mt-6">
-          © 2026 SimCall — AI tréninkový simulátor pro realitní makléře
+          © 2026 SimCall, AI tréninkový simulátor pro realitní makléře
         </p>
       </div>
     </div>

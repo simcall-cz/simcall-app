@@ -38,7 +38,7 @@ export default function AccountCreatedEmail({
   return (
     <Html lang="cs">
       <Head />
-      <Preview>Váš účet SimCall byl vytvořen — přihlašovací údaje</Preview>
+      <Preview>Váš účet SimCall byl vytvořen. Zde jsou přihlašovací údaje</Preview>
       <Body style={bodyStyle}>
         <Container style={containerStyle}>
           {/* Logo */}
@@ -152,7 +152,7 @@ export default function AccountCreatedEmail({
               </a>
             </Text>
             <Text style={footerSmallStyle}>
-              SimCall — AI tréninková platforma pro realitní makléře
+              SimCall | AI tréninková platforma pro realitní makléře
             </Text>
           </Section>
         </Container>

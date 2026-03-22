@@ -62,7 +62,7 @@ export default function AuthLayout({
         {/* CTA */}
         <div className="relative z-10 rounded-xl bg-white/5 border border-white/10 p-6">
           <p className="text-sm text-neutral-300 leading-relaxed">
-            Vyzkoušejte SimCall zdarma — 30 tréninkových minut bez závazků.
+            Vyzkoušejte SimCall zdarma. 30 tréninkových minut bez závazků.
             Připravte se na reálné situace s AI klienty, kteří reagují přirozeně.
           </p>
         </div>

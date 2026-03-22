@@ -320,7 +320,7 @@ export default function RegistracePage() {
         <div className="rounded-lg bg-neutral-50 border border-neutral-100 p-3">
           <p className="text-xs text-neutral-500 text-center">
             <span className="font-medium text-neutral-700">Demo zdarma</span>
-            {" — "}10 tréninkových minut, 1 AI agent, základní zpětná vazba.
+            {", "}10 tréninkových minut, 1 AI agent, základní zpětná vazba.
             Plné plány od 990 Kč/měsíc.
           </p>
         </div>

@@ -5,7 +5,7 @@ export const faqItems: FAQ[] = [
   {
     question: "Co je SimCall a jak funguje?",
     answer:
-      "SimCall je tréninková platforma pro realitní makléře. Nabízí dva hlavní režimy: Lekce — strukturovanou cestu 100 lekcí od začátečníka po elitního makléře, a Trénink — volný mód s více než 500 AI agenty pro trénink libovolných situací. Po každém hovoru dostanete detailní AI analýzu s konkrétními doporučeními ke zlepšení.",
+      "SimCall je tréninková platforma pro realitní makléře. Nabízí dva hlavní režimy: Lekce, strukturovanou cestu 100 lekcí od začátečníka po elitního makléře, a Trénink, volný mód s více než 500 AI agenty pro trénink libovolných situací. Po každém hovoru dostanete detailní AI analýzu s konkrétními doporučeními ke zlepšení.",
     category: "general",
   },
   {
@@ -23,7 +23,7 @@ export const faqItems: FAQ[] = [
   {
     question: "Jak se liší trénink s AI od reálného hovoru?",
     answer:
-      "AI agenti reagují v reálném čase, mají různé osobnosti a scénáře odpovídají českému realitnímu trhu. Hlavní výhoda je, že můžete trénovat bez stresu, opakovat scénáře a dostanete okamžitou zpětnou vazbu. Není to náhrada za praxi, ale výborná příprava — to, co se na zkoušce z dokumentu nenaučíte, v praxi natrénujete tady.",
+      "AI agenti reagují v reálném čase, mají různé osobnosti a scénáře odpovídají českému realitnímu trhu. Hlavní výhoda je, že můžete trénovat bez stresu, opakovat scénáře a dostanete okamžitou zpětnou vazbu. Není to náhrada za praxi, ale výborná příprava. To, co se na zkoušce z dokumentu nenaučíte, v praxi natrénujete tady.",
     category: "general",
   },
 
@@ -63,7 +63,7 @@ export const faqItems: FAQ[] = [
   {
     question: "Co je ve free verzi zdarma?",
     answer:
-      "Po registraci dostanete 10 minut zdarma. Můžete si vyzkoušet celý průběh — hovor, přepis, AI analýzu a doporučení. Žádná platební karta není potřeba.",
+      "Po registraci dostanete 10 minut zdarma. Můžete si vyzkoušet celý průběh: hovor, přepis, AI analýzu a doporučení. Žádná platební karta není potřeba.",
     category: "pricing",
   },
   {
@@ -75,7 +75,7 @@ export const faqItems: FAQ[] = [
   {
     question: "Nabízíte Enterprise řešení pro velké týmy?",
     answer:
-      "Ano. Enterprise plán zahrnuje Whitelabel branding, vlastní AI agenty a scénáře na míru, dedikovaného account manažera a individuální počet minut. Cena je dohodou — domluvte si nezávaznou schůzku a připravíme nabídku přímo pro vás.",
+      "Ano. Enterprise plán zahrnuje Whitelabel branding, vlastní AI agenty a scénáře na míru, dedikovaného account manažera a individuální počet minut. Cena je dohodou. Domluvte si nezávaznou schůzku a připravíme nabídku přímo pro vás.",
     category: "pricing",
   },
 

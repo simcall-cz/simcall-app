@@ -15,7 +15,7 @@ export const pricingPlans: PricingPlan[] = [
       { calls: 2000, agents: 0, price: 19990 },
     ],
     features: [
-      { label: "100 lekcí — cesta k Elitnímu makléři" },
+      { label: "100 lekcí pro cestu k Elitnímu makléři" },
       { label: "Volný tréninkový mód (500+ agentů)" },
       { label: "AI analýza hovoru a přepis" },
       { label: "Historie hovorů a nahrávky" },

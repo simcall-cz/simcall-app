@@ -25,7 +25,7 @@ export default function WelcomeEmail({
   return (
     <Html lang="cs">
       <Head />
-      <Preview>Vítejte v SimCall — Vaše AI tréninková platforma</Preview>
+      <Preview>Vítejte v SimCall. Vaše AI tréninková platforma je připravena</Preview>
       <Body style={bodyStyle}>
         <Container style={containerStyle}>
           {/* Logo */}
@@ -124,7 +124,7 @@ export default function WelcomeEmail({
               </a>
             </Text>
             <Text style={footerSmallStyle}>
-              SimCall — AI tréninková platforma pro realitní makléře
+              SimCall | AI tréninková platforma pro realitní makléře
             </Text>
           </Section>
         </Container>

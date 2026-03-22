@@ -130,7 +130,7 @@ function FreeDashboard({
           <Link href="/cenik">
             <Button className="bg-amber-500 hover:bg-amber-600">
               <Crown className="w-4 h-4 mr-2" />
-              Upgrade — limit vyčerpán
+              Upgrade, limit vyčerpán
             </Button>
           </Link>
         )}

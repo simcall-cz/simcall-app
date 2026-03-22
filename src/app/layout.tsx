@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "SimCall | AI simulátor pro realitní makléře",
-    description: "AI trénink hovorů pro realitní makléře — realistické simulace a okamžitá zpětná vazba.",
+    description: "AI trénink hovorů pro realitní makléře. Realistické simulace a okamžitá zpětná vazba.",
   },
   icons: {
     icon: [

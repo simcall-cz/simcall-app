@@ -74,7 +74,7 @@ export default function PrihlaseniPage() {
         // Use full page reload so middleware picks up the new auth cookies
         window.location.href = getRedirectUrl();
       } else {
-        setError("Přihlášení se nezdařilo — žádná session");
+        setError("Přihlášení se nezdařilo, žádná session");
       }
     } catch (err) {
       console.error("Login error:", err);

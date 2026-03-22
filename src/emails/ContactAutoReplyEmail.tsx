@@ -22,7 +22,7 @@ export default function ContactAutoReplyEmail({
   return (
     <Html lang="cs">
       <Head />
-      <Preview>Vaši zprávu jsme přijali — odpovíme do 24 hodin</Preview>
+      <Preview>Vaši zprávu jsme přijali. Odpovíme do 24 hodin</Preview>
       <Body style={bodyStyle}>
         <Container style={containerStyle}>
           {/* Logo */}
@@ -76,7 +76,7 @@ export default function ContactAutoReplyEmail({
               nebudeme reagovat.
             </Text>
             <Text style={footerSmallStyle}>
-              SimCall — AI tréninková platforma pro realitní makléře
+              SimCall | AI tréninková platforma pro realitní makléře
             </Text>
           </Section>
         </Container>

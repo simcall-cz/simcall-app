@@ -92,7 +92,7 @@ export default function ContactFormEmail({
 
           <Section style={footerStyle}>
             <Text style={footerTextStyle}>
-              SimCall — kontaktní formulář na simcall.cz/kontakt
+              SimCall | kontaktní formulář na simcall.cz/kontakt
             </Text>
           </Section>
         </Container>

@@ -36,7 +36,7 @@ export default function OrderConfirmationEmail({
   return (
     <Html lang="cs">
       <Head />
-      <Preview>Potvrzení objednávky — SimCall {planLabel}</Preview>
+      <Preview>Potvrzení objednávky SimCall {planLabel}</Preview>
       <Body style={bodyStyle}>
         <Container style={containerStyle}>
           {/* Logo */}
@@ -124,7 +124,7 @@ export default function OrderConfirmationEmail({
               </a>
             </Text>
             <Text style={footerSmallStyle}>
-              SimCall — AI tréninková platforma pro realitní makléře
+              SimCall | AI tréninková platforma pro realitní makléře
             </Text>
           </Section>
         </Container>

@@ -78,7 +78,7 @@ export function AnalyticsMockup({ className, compact }: AnalyticsMockupProps) {
 
           {/* Meta info */}
           <div className="flex-1 min-w-0">
-            <h4 className="font-semibold text-neutral-800 text-sm">Petr Svoboda — Horký lead</h4>
+            <h4 className="font-semibold text-neutral-800 text-sm">Petr Svoboda, Horký lead</h4>
             <div className="flex items-center gap-3 mt-1 text-xs text-neutral-400">
               <span>4:32</span>
               <span>3/4 cílů</span>

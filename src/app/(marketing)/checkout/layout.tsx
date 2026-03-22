@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
     title: "Checkout",
-    description: "Dokončete objednávku SimCall — vyberte balíček a vyplňte fakturační údaje.",
+    description: "Dokončete objednávku SimCall. Vyberte balíček a vyplňte fakturační údaje.",
     robots: { index: false, follow: false },
 };
 

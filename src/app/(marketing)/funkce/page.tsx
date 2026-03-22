@@ -174,7 +174,7 @@ const plans = [
     bg: "bg-primary-50/50",
     highlighted: false,
     items: [
-      "100 lekcí — cesta k Elitnímu makléři",
+      "100 lekcí pro cestu k Elitnímu makléři",
       "Volný tréninkový mód (500+ agentů)",
       "AI analýza hovoru a přepis",
       "Historie hovorů a nahrávky",
@@ -347,10 +347,10 @@ export default function FunkcePage() {
                   {[
                     "100 lekcí pokrývajících kompletní realitní praxi",
                     "300 pod-scénářů s rostoucí obtížností",
-                    "Postupné odemykání — nelze přeskočit",
+                    "Postupné odemykání, nelze přeskočit",
                     "Minimálně 80 % u každého hovoru pro postup",
                     "Edukační materiály a tipy před každým hovorem",
-                    "10 barevně odlišených kategorií",
+                    "10 odlišných kategorií",
                     "Progress bar od Začátečníka po Elitního makléře",
                   ].map((item) => (
                     <li key={item} className="flex items-start gap-2 text-sm text-neutral-600">
@@ -377,7 +377,7 @@ export default function FunkcePage() {
                   {[
                     "Více než 500 AI agentů se scénáři z praxe",
                     "Filtry dle obtížnosti a kategorie klienta",
-                    "Bez omezení pořadí — trénujte cokoli",
+                    "Bez omezení pořadí, trénujte cokoli",
                     "Situace podle skutečných případů z praxe",
                     "Každý agent má vlastní osobnost a styl",
                     "Horký, teplý i studený lead",

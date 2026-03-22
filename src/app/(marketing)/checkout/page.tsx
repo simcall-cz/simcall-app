@@ -254,7 +254,7 @@ function CheckoutPage() {
                       >
                         {plan.tiers.map((t, i) => (
                           <option key={i} value={i}>
-                            {t.calls} minut / {t.agents} agentů — {t.price.toLocaleString("cs-CZ")} Kč/měs
+                            {t.calls} minut za {t.price.toLocaleString("cs-CZ")} Kč/měs
                           </option>
                         ))}
                       </select>
@@ -348,7 +348,7 @@ function CheckoutPage() {
                   ) : (
                     <>
                       <Lock className="h-4 w-4" />
-                      Zaplatit kartou — {tier.price.toLocaleString("cs-CZ")} Kč/měs
+                      Zaplatit kartou za {tier.price.toLocaleString("cs-CZ")} Kč/měs
                     </>
                   )}
                 </button>

@@ -118,7 +118,7 @@ export default function AdminPlatbyPage() {
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="text-2xl font-bold text-neutral-900">Přehled plateb</h1>
         <p className="text-neutral-500 mt-1">
-          Všechny přijaté platby — Stripe i fakturační
+          Všechny přijaté platby, Stripe i fakturační
         </p>
       </motion.div>
 

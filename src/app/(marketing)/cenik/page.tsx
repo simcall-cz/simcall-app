@@ -56,7 +56,7 @@ const comparisonFeatures: {
       enterprise: "Individuálně",
     },
     {
-      label: "100 lekcí — cesta k Elitnímu makléři",
+      label: "100 lekcí pro cestu k Elitnímu makléři",
       solo: true,
       team: true,
       enterprise: true,
