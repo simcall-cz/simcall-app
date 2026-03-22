@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
 import { verifyAdmin } from "@/lib/auth";
+import { getResend, getFromEmail } from "@/lib/resend";
+import TicketResponseEmail from "@/emails/TicketResponseEmail";
 
 // GET /api/admin/tickets - Get all tickets (admin)
 export async function GET(request: NextRequest) {
@@ -37,7 +39,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// PATCH /api/admin/tickets - Update ticket status
+// PATCH /api/admin/tickets - Update ticket status and/or respond
 export async function PATCH(request: NextRequest) {
   try {
     const { isAdmin } = await verifyAdmin(request);
@@ -64,12 +66,17 @@ export async function PATCH(request: NextRequest) {
     }
 
     const db = createServerClient();
+
+    // Build update data
     const updateData: Record<string, unknown> = {
       status,
       updated_at: new Date().toISOString(),
     };
-    if (adminNote !== undefined) {
+
+    // If admin wrote a response, mark as unread for user
+    if (adminNote !== undefined && adminNote.trim()) {
       updateData.admin_note = adminNote;
+      updateData.user_read = false;
     }
 
     const { error } = await db
@@ -80,6 +87,36 @@ export async function PATCH(request: NextRequest) {
     if (error) {
       console.error("Admin PATCH ticket error:", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    // Send email notification to user if admin wrote a response
+    if (adminNote?.trim()) {
+      try {
+        // Fetch ticket details + user profile
+        const { data: ticket } = await db
+          .from("support_tickets")
+          .select("*, profiles(email, full_name)")
+          .eq("id", ticketId)
+          .single();
+
+        if (ticket?.profiles?.email) {
+          const resend = getResend();
+          await resend.emails.send({
+            from: getFromEmail(),
+            to: [ticket.profiles.email],
+            subject: `Odpověď na váš tiket: ${ticket.subject}`,
+            react: TicketResponseEmail({
+              customerName: ticket.profiles.full_name || "zákazníku",
+              ticketSubject: ticket.subject,
+              ticketMessage: ticket.message,
+              adminResponse: adminNote.trim(),
+            }),
+          });
+        }
+      } catch (emailErr) {
+        // Log but don't fail the status update
+        console.error("Failed to send ticket response email:", emailErr);
+      }
     }
 
     return NextResponse.json({ success: true });

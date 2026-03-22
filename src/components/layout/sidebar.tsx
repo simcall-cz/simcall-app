@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
+import { getAuthHeaders } from "@/lib/auth";
 
 interface SidebarProps {
   variant: "agent" | "manager" | "team_manager" | "admin";
@@ -146,6 +147,7 @@ export function Sidebar({ variant, isOpen, onClose }: SidebarProps) {
   const [userName, setUserName] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [unreadTickets, setUnreadTickets] = useState(0);
 
   const isTeamManager = variant === "team_manager";
   const isAdmin = variant === "admin";
@@ -156,6 +158,27 @@ export function Sidebar({ variant, isOpen, onClose }: SidebarProps) {
       : variant === "manager"
         ? managerNavItems
         : agentNavItems;
+
+  // Fetch unread ticket count for agent sidebar
+  useEffect(() => {
+    if (isAdmin || variant === "manager") return;
+
+    async function fetchUnread() {
+      try {
+        const headers = await getAuthHeaders();
+        const res = await fetch("/api/tickets/unread", { headers });
+        const data = await res.json();
+        setUnreadTickets(data.count || 0);
+      } catch {
+        // silent
+      }
+    }
+
+    fetchUnread();
+    // Poll every 60 seconds for new responses
+    const interval = setInterval(fetchUnread, 60000);
+    return () => clearInterval(interval);
+  }, [isAdmin, variant]);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -198,28 +221,37 @@ export function Sidebar({ variant, isOpen, onClose }: SidebarProps) {
       .slice(0, 2)
     : userEmail?.[0]?.toUpperCase() || "?";
 
-  const renderNavLink = (item: SidebarNavItem) => (
-    <Link
-      key={item.href}
-      href={item.href}
-      onClick={onClose}
-      className={cn(
-        "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-        isActive(item.href)
-          ? "bg-primary-50 text-primary-500"
-          : "text-neutral-500 hover:text-neutral-800 hover:bg-neutral-50"
-      )}
-    >
-      <span
+  const renderNavLink = (item: SidebarNavItem) => {
+    const showBadge = item.href === "/dashboard/podpora" && unreadTickets > 0;
+    return (
+      <Link
+        key={item.href}
+        href={item.href}
+        onClick={onClose}
         className={cn(
-          isActive(item.href) ? "text-primary-500" : "text-neutral-400"
+          "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+          isActive(item.href)
+            ? "bg-primary-50 text-primary-500"
+            : "text-neutral-500 hover:text-neutral-800 hover:bg-neutral-50"
         )}
       >
-        {item.icon}
-      </span>
-      {item.label}
-    </Link>
-  );
+        <span
+          className={cn(
+            "relative",
+            isActive(item.href) ? "text-primary-500" : "text-neutral-400"
+          )}
+        >
+          {item.icon}
+          {showBadge && (
+            <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+              {unreadTickets}
+            </span>
+          )}
+        </span>
+        {item.label}
+      </Link>
+    );
+  };
 
   const sidebarContent = (
     <div className="flex flex-col h-full">

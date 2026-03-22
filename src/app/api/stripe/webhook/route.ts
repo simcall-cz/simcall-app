@@ -297,7 +297,7 @@ export async function POST(request: NextRequest) {
             await resend.emails.send({
               from: getFromEmail(),
               to: [orderEmail],
-              subject: "Váš účet SimCall byl vytvořen — přihlašovací údaje 🔑",
+              subject: "Váš účet SimCall byl vytvořen, přihlašovací údaje 🔑",
               react: AccountCreatedEmail({
                 customerName: customerName || "zákazníku",
                 email: orderEmail,
@@ -312,7 +312,7 @@ export async function POST(request: NextRequest) {
             await resend.emails.send({
               from: getFromEmail(),
               to: [orderEmail],
-              subject: "Potvrzení objednávky — SimCall ✅",
+              subject: "Potvrzení objednávky SimCall ✅",
               react: OrderConfirmationEmail({
                 customerName: customerName || "zákazníku",
                 plan,
@@ -441,7 +441,7 @@ export async function POST(request: NextRequest) {
                 plan: subRecord.scheduled_plan,
                 tier: subRecord.scheduled_tier,
                 minutes_limit: subRecord.scheduled_minutes_limit || subRecord.scheduled_tier,
-                agents_limit: subRecord.scheduled_agents_limit || 10,
+                agents_limit: subRecord.scheduled_agents_limit || 0,
                 scheduled_plan: null,
                 scheduled_tier: null,
                 scheduled_minutes_limit: null,

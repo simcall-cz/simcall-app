@@ -75,3 +75,32 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
+
+// PATCH /api/tickets - Mark tickets as read
+export async function PATCH(request: NextRequest) {
+  try {
+    const user = await getUserFromRequest(request);
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const db = createServerClient();
+
+    // Mark all user's unread tickets as read
+    const { error } = await db
+      .from("support_tickets")
+      .update({ user_read: true })
+      .eq("user_id", user.id)
+      .eq("user_read", false);
+
+    if (error) {
+      console.error("PATCH tickets read error:", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error("PATCH /api/tickets error:", err);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}

@@ -27,16 +27,18 @@ export function getStripe(): Stripe {
 
 export const PLAN_PRICES: Record<string, Record<number, { price: number; agents: number }>> = {
   solo: {
-    100: { price: 990, agents: 20 },
-    250: { price: 2490, agents: 50 },
-    500: { price: 4990, agents: 100 },
-    1000: { price: 9990, agents: 200 },
+    100: { price: 990, agents: 0 },
+    250: { price: 2490, agents: 0 },
+    500: { price: 4990, agents: 0 },
+    1000: { price: 9990, agents: 0 },
+    1500: { price: 14990, agents: 0 },
+    2000: { price: 19990, agents: 0 },
   },
   team: {
-    500: { price: 7490, agents: 100 },
-    1000: { price: 14990, agents: 200 },
-    2500: { price: 37490, agents: 500 },
-    5000: { price: 74990, agents: 1000 },
+    500: { price: 7490, agents: 0 },
+    1000: { price: 14990, agents: 0 },
+    2500: { price: 37490, agents: 0 },
+    5000: { price: 74990, agents: 0 },
   },
 };
 

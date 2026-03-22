@@ -387,7 +387,7 @@ function CheckoutPage() {
                       <p className="font-semibold text-neutral-800">{plan.name}</p>
                       <p className="font-bold text-neutral-800">{tier.price.toLocaleString("cs-CZ")} Kč</p>
                     </div>
-                    <p className="text-xs text-neutral-400 mt-1">{tier.calls} minut / {tier.agents} agentů / měsíc</p>
+                    <p className="text-xs text-neutral-400 mt-1">{tier.calls} minut / měsíc</p>
                   </div>
                   <div className="border-t border-neutral-100" />
                   <div className="space-y-2">

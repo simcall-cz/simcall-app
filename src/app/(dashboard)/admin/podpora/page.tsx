@@ -9,6 +9,8 @@ import {
   CheckCircle,
   ArrowRight,
   MessageSquare,
+  Send,
+  Mail,
 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -28,7 +30,7 @@ interface Ticket {
 }
 
 const statusConfig = {
-  open: { label: "Otevřený", variant: "warning" as const, icon: Clock },
+  open: { label: "Nový", variant: "warning" as const, icon: Clock },
   in_progress: { label: "Řeší se", variant: "default" as const, icon: ArrowRight },
   resolved: { label: "Vyřešeno", variant: "success" as const, icon: CheckCircle },
 };
@@ -40,6 +42,7 @@ export default function AdminPodporaPage() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [adminNote, setAdminNote] = useState("");
   const [updating, setUpdating] = useState<string | null>(null);
+  const [emailSent, setEmailSent] = useState<string | null>(null);
 
   async function fetchTickets() {
     try {
@@ -64,7 +67,7 @@ export default function AdminPodporaPage() {
     setUpdating(ticketId);
     try {
       const headers = await getAuthHeaders();
-      await fetch("/api/admin/tickets", {
+      const res = await fetch("/api/admin/tickets", {
         method: "PATCH",
         headers: { ...headers, "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -73,6 +76,12 @@ export default function AdminPodporaPage() {
           adminNote: note || undefined,
         }),
       });
+
+      if (res.ok && note?.trim()) {
+        setEmailSent(ticketId);
+        setTimeout(() => setEmailSent(null), 3000);
+      }
+
       await fetchTickets();
       setExpandedId(null);
       setAdminNote("");
@@ -102,11 +111,22 @@ export default function AdminPodporaPage() {
         </p>
       </motion.div>
 
+      {emailSent && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-2 rounded-lg bg-green-50 border border-green-200 p-3.5 text-sm text-green-700"
+        >
+          <Mail className="w-4 h-4" />
+          Odpověď byla odeslána e-mailem zákazníkovi.
+        </motion.div>
+      )}
+
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
           { key: "all", label: "Celkem", count: counts.all },
-          { key: "open", label: "Otevřené", count: counts.open },
+          { key: "open", label: "Nové", count: counts.open },
           { key: "in_progress", label: "Řeší se", count: counts.in_progress },
           { key: "resolved", label: "Vyřešené", count: counts.resolved },
         ].map((s) => (
@@ -177,31 +197,75 @@ export default function AdminPodporaPage() {
                         animate={{ opacity: 1, height: "auto" }}
                         className="mt-3 pl-0 space-y-3"
                       >
-                        <div className="bg-neutral-50 rounded-lg p-3 text-sm text-neutral-700">
-                          {ticket.message}
+                        {/* User info */}
+                        <div className="flex items-center gap-2 text-xs text-neutral-500">
+                          <span>E-mail: <strong className="text-neutral-700">{ticket.profiles?.email || "—"}</strong></span>
                         </div>
 
+                        {/* User's message */}
+                        <div>
+                          <p className="text-xs font-medium text-neutral-500 mb-1">Zpráva od uživatele:</p>
+                          <div className="bg-neutral-50 rounded-lg p-3 text-sm text-neutral-700 whitespace-pre-wrap">
+                            {ticket.message}
+                          </div>
+                        </div>
+
+                        {/* Existing admin note */}
+                        {ticket.admin_note && (
+                          <div>
+                            <p className="text-xs font-medium text-neutral-500 mb-1">Předchozí odpověď:</p>
+                            <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 text-sm text-blue-700">
+                              {ticket.admin_note}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Admin response textarea */}
                         <div>
                           <label className="block text-xs font-medium text-neutral-500 mb-1">
-                            Odpověď / poznámka
+                            Odpověď (odešle e-mail zákazníkovi)
                           </label>
                           <textarea
                             value={adminNote}
                             onChange={(e) => setAdminNote(e.target.value)}
-                            rows={2}
+                            rows={3}
                             className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-900 placeholder-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 resize-none"
                             placeholder="Napište odpověď uživateli..."
                           />
                         </div>
 
-                        <div className="flex gap-2">
+                        <div className="flex flex-wrap gap-2">
+                          {/* Send response + change status */}
+                          {adminNote.trim() && (
+                            <Button
+                              size="sm"
+                              disabled={updating === ticket.id}
+                              onClick={() =>
+                                handleStatusChange(
+                                  ticket.id,
+                                  ticket.status === "open" ? "in_progress" : ticket.status,
+                                  adminNote
+                                )
+                              }
+                              className="gap-1.5"
+                            >
+                              {updating === ticket.id ? (
+                                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              ) : (
+                                <Send className="w-3.5 h-3.5" />
+                              )}
+                              Odpovědět a odeslat e-mail
+                            </Button>
+                          )}
+
+                          {/* Status buttons */}
                           {ticket.status !== "in_progress" && (
                             <Button
                               size="sm"
                               variant="outline"
                               disabled={updating === ticket.id}
                               onClick={() =>
-                                handleStatusChange(ticket.id, "in_progress", adminNote)
+                                handleStatusChange(ticket.id, "in_progress", adminNote || undefined)
                               }
                             >
                               Řeší se
@@ -210,9 +274,10 @@ export default function AdminPodporaPage() {
                           {ticket.status !== "resolved" && (
                             <Button
                               size="sm"
+                              variant="outline"
                               disabled={updating === ticket.id}
                               onClick={() =>
-                                handleStatusChange(ticket.id, "resolved", adminNote)
+                                handleStatusChange(ticket.id, "resolved", adminNote || undefined)
                               }
                             >
                               Vyřešit
@@ -224,7 +289,7 @@ export default function AdminPodporaPage() {
                               variant="outline"
                               disabled={updating === ticket.id}
                               onClick={() =>
-                                handleStatusChange(ticket.id, "open", adminNote)
+                                handleStatusChange(ticket.id, "open", adminNote || undefined)
                               }
                             >
                               Znovu otevřít

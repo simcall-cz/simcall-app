@@ -6,7 +6,7 @@ import { notifyPlanUpgrade, notifyPlanDowngrade } from "@/lib/notifications";
 
 // POST /api/stripe/create-upgrade-session
 // Handles plan changes:
-//   - Upgrade (higher tier): immediate change with proration
+//   - Upgrade (higher tier): immediate change + fixed one-time surcharge (price difference)
 //   - Downgrade (lower tier): scheduled at end of current billing period
 export async function POST(request: NextRequest) {
   if (!process.env.STRIPE_SECRET_KEY) {
@@ -89,9 +89,37 @@ export async function POST(request: NextRequest) {
         if (stripeSub && stripeSub.status === "active") {
           if (isUpgrade) {
             // ============================================================
-            // UPGRADE: Immediate change with proration
-            // User pays the difference for remaining days right away
+            // UPGRADE: Fixed surcharge + immediate plan change
+            // User pays the FULL price difference as a one-time charge.
+            // Billing day stays the same (billing_cycle_anchor: unchanged).
+            // From next cycle, they pay the new full price.
+            //
+            // Example: 1000min (9990) → 2000min (19990) = surcharge 10000 CZK
             // ============================================================
+
+            const surcharge = targetPrice - currentPrice; // in CZK (halíře × 100)
+
+            // 1. Create a one-time invoice item for the surcharge
+            if (surcharge > 0 && currentSub.stripe_customer_id) {
+              await stripe.invoiceItems.create({
+                customer: currentSub.stripe_customer_id,
+                amount: surcharge * 100, // Stripe uses smallest currency unit (haléře)
+                currency: "czk",
+                description: `Doplatek za upgrade: ${currentSub.plan.toUpperCase()} ${currentSub.tier} → ${plan.toUpperCase()} ${tier} (${surcharge.toLocaleString("cs-CZ")} Kč)`,
+              });
+
+              // 2. Create and pay the invoice immediately
+              const invoice = await stripe.invoices.create({
+                customer: currentSub.stripe_customer_id,
+                auto_advance: true, // Auto-finalize
+              });
+
+              if (invoice.id) {
+                await stripe.invoices.pay(invoice.id);
+              }
+            }
+
+            // 3. Update the subscription to new price (no proration, keep billing anchor)
             await stripe.subscriptions.update(
               currentSub.stripe_subscription_id,
               {
@@ -101,7 +129,8 @@ export async function POST(request: NextRequest) {
                     price: stripePriceId,
                   },
                 ],
-                proration_behavior: "create_prorations",
+                proration_behavior: "none", // No automatic proration — we handle it manually
+                billing_cycle_anchor: "unchanged", // Keep the same billing day
                 metadata: {
                   plan,
                   tier: tier.toString(),
@@ -113,7 +142,7 @@ export async function POST(request: NextRequest) {
               }
             );
 
-            // Update local DB immediately
+            // 4. Update local DB immediately
             await db
               .from("subscriptions")
               .update({
@@ -125,7 +154,7 @@ export async function POST(request: NextRequest) {
               })
               .eq("id", currentSub.id);
 
-            // Update profile role
+            // 5. Update profile role
             const profileRole = plan === "team" ? "team_manager" : plan;
             await db
               .from("profiles")
@@ -142,7 +171,8 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({
               success: true,
               upgraded: true,
-              message: "Plán byl úspěšně upgradován",
+              surcharge,
+              message: `Plán byl úspěšně upgradován. Doplatek: ${surcharge.toLocaleString("cs-CZ")} Kč`,
             });
 
           } else {

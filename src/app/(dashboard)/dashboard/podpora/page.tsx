@@ -11,6 +11,7 @@ import {
   CheckCircle,
   ArrowRight,
   Send,
+  Mail,
 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -23,12 +24,13 @@ interface Ticket {
   message: string;
   status: "open" | "in_progress" | "resolved";
   admin_note: string | null;
+  user_read: boolean;
   created_at: string;
   updated_at: string;
 }
 
 const statusConfig = {
-  open: { label: "Otevřený", variant: "warning" as const, icon: Clock },
+  open: { label: "Odesláno", variant: "warning" as const, icon: Send },
   in_progress: { label: "Řeší se", variant: "default" as const, icon: ArrowRight },
   resolved: { label: "Vyřešeno", variant: "success" as const, icon: CheckCircle },
 };
@@ -56,8 +58,22 @@ export default function PodporaPage() {
     }
   }
 
+  // Mark all tickets as read when page is opened
+  async function markAsRead() {
+    try {
+      const headers = await getAuthHeaders();
+      await fetch("/api/tickets", {
+        method: "PATCH",
+        headers,
+      });
+    } catch {
+      // silent
+    }
+  }
+
   useEffect(() => {
     fetchTickets();
+    markAsRead();
   }, []);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -219,10 +235,11 @@ export default function PodporaPage() {
                 {tickets.map((ticket) => {
                   const cfg = statusConfig[ticket.status] || statusConfig.open;
                   const StatusIcon = cfg.icon;
+                  const hasNewResponse = ticket.admin_note && !ticket.user_read;
                   return (
                     <div
                       key={ticket.id}
-                      className="py-4 first:pt-0 last:pb-0"
+                      className={`py-4 first:pt-0 last:pb-0 ${hasNewResponse ? "bg-primary-50/30 -mx-4 px-4 rounded-lg" : ""}`}
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1 min-w-0">
@@ -231,12 +248,18 @@ export default function PodporaPage() {
                             <h3 className="font-medium text-neutral-900 text-sm truncate">
                               {ticket.subject}
                             </h3>
+                            {hasNewResponse && (
+                              <span className="shrink-0 flex items-center gap-1 rounded-full bg-primary-100 text-primary-600 px-2 py-0.5 text-[10px] font-semibold">
+                                <Mail className="w-3 h-3" />
+                                Nová odpověď
+                              </span>
+                            )}
                           </div>
                           <p className="text-xs text-neutral-500 line-clamp-2 ml-6">
                             {ticket.message}
                           </p>
                           {ticket.admin_note && (
-                            <div className="mt-2 ml-6 rounded-lg bg-primary-50 p-2.5 text-xs text-primary-700">
+                            <div className="mt-2 ml-6 rounded-lg bg-blue-50 border border-blue-100 p-2.5 text-xs text-blue-700">
                               <strong>Odpověď:</strong> {ticket.admin_note}
                             </div>
                           )}

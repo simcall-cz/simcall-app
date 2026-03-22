@@ -47,6 +47,8 @@ const tierDetails: Record<string, { minutes: number; price: number }[]> = {
     { minutes: 250, price: 2490 },
     { minutes: 500, price: 4990 },
     { minutes: 1000, price: 9990 },
+    { minutes: 1500, price: 14990 },
+    { minutes: 2000, price: 19990 },
   ],
   team: [
     { minutes: 500, price: 7490 },
@@ -122,7 +124,8 @@ export default function BalicekPage() {
   const isTeamMember = !!sub.isTeamMember;
   const daysLeft = sub.currentPeriodEnd ? getDaysRemaining(sub.currentPeriodEnd) : null;
   const currentTiers = tierDetails[sub.plan] || [];
-  const currentTierIndex = sub.tier ? sub.tier - 1 : 0;
+  const currentTierIndex = currentTiers.findIndex((t) => t.minutes === sub.minutesLimit);
+  const currentTierPrice = currentTierIndex >= 0 ? currentTiers[currentTierIndex].price : 0;
 
   return (
     <div className="space-y-6">
@@ -335,7 +338,7 @@ export default function BalicekPage() {
                 Změnit balíček
               </h3>
               <p className="text-sm text-neutral-500 mb-4">
-                Přejděte na jiný tier. Při upgradu zaplatíte jen poměrný doplatek za zbývající dny.
+                Přejděte na jiný tier. Při upgradu zaplatíte fixní doplatek (rozdíl cen), den obnovení se nemění.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {currentTiers.map((t, idx) => {
@@ -416,6 +419,11 @@ export default function BalicekPage() {
                         {t.price.toLocaleString("cs-CZ")} Kč
                         <span className="text-xs font-normal text-neutral-400">/měs</span>
                       </p>
+                      {!isCurrentTier && !isScheduledTier && isUpgrade && (
+                        <p className="text-xs text-green-600 mt-1">
+                          Doplatek: {(t.price - currentTierPrice).toLocaleString("cs-CZ")} Kč
+                        </p>
+                      )}
                     </button>
                   );
                 })}
