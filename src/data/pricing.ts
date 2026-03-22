@@ -5,19 +5,21 @@ export const pricingPlans: PricingPlan[] = [
     id: "solo",
     name: "Solo",
     description:
-      "Pro jednotlivé makléře, kteří chtějí zlepšit své telefonní dovednosti a zvýšit úspěšnost hovorů.",
+      "Pro jednotlivé makléře, kteří chtějí projít kompletní cestu od začátečníka po elitního makléře a zlepšit své telefonní dovednosti.",
     tiers: [
       { calls: 100, agents: 0, price: 990 },
       { calls: 250, agents: 0, price: 2490 },
       { calls: 500, agents: 0, price: 4990 },
       { calls: 1000, agents: 0, price: 9990 },
+      { calls: 1500, agents: 0, price: 14990 },
+      { calls: 2000, agents: 0, price: 19990 },
     ],
     features: [
-      { label: "AI analýza hovoru" },
-      { label: "Přepis hovoru" },
+      { label: "100 lekcí — cesta k Elitnímu makléři" },
+      { label: "Volný tréninkový mód (500+ agentů)" },
+      { label: "AI analýza hovoru a přepis" },
       { label: "Historie hovorů a nahrávky" },
       { label: "Sledování pokroku a podrobné statistiky" },
-      { label: "Personalizovaná doporučení" },
       { label: "Pokročilá analýza (detailní scoring)" },
     ],
     highlighted: false,
@@ -71,7 +73,7 @@ export const pricingPlans: PricingPlan[] = [
     id: "enterprise",
     name: "Enterprise",
     description:
-      "Kompletní řešení na míru pro velké realitní kanceláře s vlastním brandingem a dedikovanou podporou.",
+      "Potřebujete více minut nebo řešení na míru? Domluvte si schůzku a vytvoříme balíček přesně pro vás s individuální cenou.",
     tiers: [],
     features: [
       { label: "Vše z Team" },
@@ -90,7 +92,7 @@ export const pricingPlans: PricingPlan[] = [
         tooltip:
           "Přímý kontakt na vašeho osobního vývojáře ze SimCall, který vám pomůže se vším od nastavení po nové analytiky a funkce na míru",
       },
-      { label: "Počet minut dohodou" },
+      { label: "Individuální počet minut a cena" },
     ],
     highlighted: false,
     cta: "Domluvit schůzku",

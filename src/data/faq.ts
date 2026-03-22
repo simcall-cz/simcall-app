@@ -5,25 +5,25 @@ export const faqItems: FAQ[] = [
   {
     question: "Co je SimCall a jak funguje?",
     answer:
-      "SimCall je tréninková platforma pro realitní makléře. Zavoláte AI agentovi, který simuluje reálného klienta, reaguje přirozeně, má vlastní osobnost a námitky. Po každém hovoru dostanete detailní AI analýzu s konkrétními doporučeními ke zlepšení.",
+      "SimCall je tréninková platforma pro realitní makléře. Nabízí dva hlavní režimy: Lekce — strukturovanou cestu 100 lekcí od začátečníka po elitního makléře, a Trénink — volný mód s více než 500 AI agenty pro trénink libovolných situací. Po každém hovoru dostanete detailní AI analýzu s konkrétními doporučeními ke zlepšení.",
     category: "general",
   },
   {
     question: "Pro koho je SimCall určen?",
     answer:
-      "Primárně pro realitní makléře, ať už začínající, kteří si chtějí vybudovat sebevědomí při cold callingu, tak zkušené profesionály, kteří chtějí zlepšit svůj přístup. Plán Team je určen pro realitní kanceláře, které chtějí systematicky trénovat celý tým a sledovat pokrok zaměstnanců.",
+      "Primárně pro realitní makléře, ať už začínající, kteří si chtějí projít kompletní cestu 100 lekcí a vybudovat si sebevědomí, tak zkušené profesionály, kteří chtějí zlepšit svůj přístup ve volném tréninkovém módu. Plán Team je určen pro realitní kanceláře, které chtějí systematicky trénovat celý tým a sledovat pokrok zaměstnanců.",
     category: "general",
   },
   {
     question: "Mohu si SimCall vyzkoušet zdarma?",
     answer:
-      "Ano. Po registraci získáte zdarma 30 tréninkových minut a přístup ke 2 AI agentům. Díky tomu si můžete vyzkoušet, jak platforma funguje, ještě než se rozhodnete pro placený balíček.",
+      "Ano. Po registraci získáte zdarma 10 tréninkových minut a přístup k platformě. Díky tomu si můžete vyzkoušet, jak platforma funguje, ještě než se rozhodnete pro placený balíček.",
     category: "general",
   },
   {
     question: "Jak se liší trénink s AI od reálného hovoru?",
     answer:
-      "AI agenti reagují v reálném čase, mají různé osobnosti a scénáře odpovídají českému realitnímu trhu. Hlavní výhoda je, že můžete trénovat bez stresu, opakovat scénáře a dostanete okamžitou zpětnou vazbu. Není to náhrada za praxi, ale výborná příprava.",
+      "AI agenti reagují v reálném čase, mají různé osobnosti a scénáře odpovídají českému realitnímu trhu. Hlavní výhoda je, že můžete trénovat bez stresu, opakovat scénáře a dostanete okamžitou zpětnou vazbu. Není to náhrada za praxi, ale výborná příprava — to, co se na zkoušce z dokumentu nenaučíte, v praxi natrénujete tady.",
     category: "general",
   },
 
@@ -31,7 +31,7 @@ export const faqItems: FAQ[] = [
   {
     question: "Funguje platforma v češtině?",
     answer:
-      "Ano, SimCall je kompletně v češtině. AI agenti mluví česky, scénáře reflektují český realitní trh a zpětná vazba je v češtině. Neustále pracujeme na tom, aby konverzace byla co nejpřirozenější.",
+      "Ano, SimCall je kompletně v češtině. AI agenti mluví česky, všech 100 lekcí reflektuje český realitní trh včetně legislativy a zpětná vazba je v češtině. Neustále pracujeme na tom, aby konverzace byla co nejpřirozenější.",
     category: "technology",
   },
   {
@@ -47,9 +47,9 @@ export const faqItems: FAQ[] = [
     category: "technology",
   },
   {
-    question: "Kolik AI agentů je k dispozici?",
+    question: "Jaký je rozdíl mezi Lekcemi a Tréninkem?",
     answer:
-      "Počet agentů závisí na vašem balíčku od 10 agentů v nejmenším Solo balíčku až po stovky v největších. Každý agent má jinou osobnost, obtížnost a scénář. Ve free verzi máte k dispozici 2 agenty pro vyzkoušení.",
+      "Lekce jsou strukturovaná cesta 100 lekcí rozdělených do 10 kategorií (prodej, nájem, finance, právní vady atd.). Každá lekce má 3 pod-scénáře s rostoucí obtížností a pro postup musíte získat minimálně 80 % u každého. Trénink je volný mód s více než 500 AI agenty, kde si můžete vybrat libovolnou situaci a trénovat bez omezení pořadí.",
     category: "technology",
   },
 
@@ -57,13 +57,13 @@ export const faqItems: FAQ[] = [
   {
     question: "Jak funguje ceník a platby?",
     answer:
-      "Nabízíme balíčky Solo (pro jednotlivce, od 990 Kč/měs) a Team (pro firmy, od 7 490 Kč/měs). Platíte měsíčně za zvolený počet minut. Můžete platit kartou online nebo bankovním převodem na fakturu. Balíček lze kdykoliv změnit nebo zrušit.",
+      "Nabízíme balíčky Solo (pro jednotlivce, od 990 Kč/měs) a Team (pro firmy, od 7 490 Kč/měs). Platíte měsíčně za zvolený počet minut. V ceně je vždy přístup ke 100 lekcím i volnému tréninkovému módu. Můžete platit kartou online nebo bankovním převodem na fakturu. Balíček lze kdykoliv změnit nebo zrušit.",
     category: "pricing",
   },
   {
     question: "Co je ve free verzi zdarma?",
     answer:
-      "Po registraci dostanete 10 minut a přístup k 1 AI agentovi úplně zdarma. Můžete si vyzkoušet celý průběh — hovor, přepis, AI analýzu a doporučení. Žádná platební karta není potřeba.",
+      "Po registraci dostanete 10 minut zdarma. Můžete si vyzkoušet celý průběh — hovor, přepis, AI analýzu a doporučení. Žádná platební karta není potřeba.",
     category: "pricing",
   },
   {
@@ -75,7 +75,7 @@ export const faqItems: FAQ[] = [
   {
     question: "Nabízíte Enterprise řešení pro velké týmy?",
     answer:
-      "Ano. Enterprise plán zahrnuje Whitelabel branding, vlastní AI agenty a scénáře na míru, dedikovaného account manažera a individuální počet minut a agentů. Cena je dohodou, proto si domluvte nezávaznou schůzku a připravíme nabídku přímo pro vás.",
+      "Ano. Enterprise plán zahrnuje Whitelabel branding, vlastní AI agenty a scénáře na míru, dedikovaného account manažera a individuální počet minut. Cena je dohodou — domluvte si nezávaznou schůzku a připravíme nabídku přímo pro vás.",
     category: "pricing",
   },
 

@@ -51,9 +51,21 @@ const comparisonFeatures: {
 }[] = [
     {
       label: "Počet minut",
-      solo: "100 až 1 000",
+      solo: "100 až 2 000",
       team: "500 až 5 000",
-      enterprise: "Dohodou",
+      enterprise: "Individuálně",
+    },
+    {
+      label: "100 lekcí — cesta k Elitnímu makléři",
+      solo: true,
+      team: true,
+      enterprise: true,
+    },
+    {
+      label: "Volný tréninkový mód (500+ agentů)",
+      solo: true,
+      team: true,
+      enterprise: true,
     },
     { label: "AI analýza hovoru", solo: true, team: true, enterprise: true },
     { label: "Přepis hovoru", solo: true, team: true, enterprise: true },

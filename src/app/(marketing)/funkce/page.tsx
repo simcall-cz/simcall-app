@@ -19,6 +19,11 @@ import {
   UserX,
   Briefcase,
   Globe,
+  GraduationCap,
+  Map,
+  Target,
+  BookOpen,
+  Dumbbell,
 } from "lucide-react";
 
 import { Container } from "@/components/shared/container";
@@ -28,14 +33,22 @@ import { GradientText } from "@/components/shared/gradient-text";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AnalyticsMockup } from "@/components/marketing/analytics-mockup";
+import { BoardGameMockup } from "@/components/marketing/board-game-mockup";
 
 export const metadata: Metadata = {
   title: "Funkce | SimCall",
   description:
-    "Všechny funkce SimCall: AI analýza hovorů, přepisy, manager dashboard, žebříčky a vlastní AI agenti na míru.",
+    "Všechny funkce SimCall: 100 lekcí z realitní praxe, volný tréninkový mód, AI analýza hovorů, přepisy, manager dashboard a žebříčky.",
 };
 
 const features = [
+  {
+    icon: GraduationCap,
+    title: "100 lekcí z realitní praxe",
+    desc: "Kompletní učební cesta od začátečníka po elitního makléře. 10 tematických kategorií pokrývajících vše od prodeje po etiku.",
+    tag: "Lekce",
+    tagColor: "bg-emerald-50 text-emerald-600",
+  },
   {
     icon: Sparkles,
     title: "Okamžitá AI analýza po zavěšení",
@@ -75,6 +88,13 @@ const features = [
     icon: ShieldCheck,
     title: "Zabudovaná česká realiťácká pravidla",
     desc: "Naši AI agenti plně znají českou legislativu, správný rezervační proces i katastrální postupy. Makléř nemůže říct hloupost.",
+    tag: "Obsahuje",
+    tagColor: "bg-emerald-50 text-emerald-600",
+  },
+  {
+    icon: Dumbbell,
+    title: "Volný tréninkový mód",
+    desc: "Více než 500 AI agentů se scénáři ze skutečných případů. Trénujte kdykoli, cokoli, bez omezení tématu.",
     tag: "Obsahuje",
     tagColor: "bg-emerald-50 text-emerald-600",
   },
@@ -131,6 +151,19 @@ const scenarios = [
   },
 ];
 
+const lessonCategories = [
+  { label: "Prodej", count: 15, color: "bg-blue-500" },
+  { label: "Nájem", count: 13, color: "bg-emerald-500" },
+  { label: "Finance", count: 10, color: "bg-yellow-500" },
+  { label: "Právní vady", count: 13, color: "bg-purple-500" },
+  { label: "Katastr", count: 5, color: "bg-indigo-500" },
+  { label: "Technické", count: 11, color: "bg-orange-500" },
+  { label: "Smlouvy", count: 7, color: "bg-cyan-500" },
+  { label: "Speciální typy", count: 11, color: "bg-rose-500" },
+  { label: "Marketing", count: 7, color: "bg-pink-500" },
+  { label: "Etika a klienti", count: 8, color: "bg-teal-500" },
+];
+
 const plans = [
   {
     id: "solo",
@@ -141,11 +174,11 @@ const plans = [
     bg: "bg-primary-50/50",
     highlighted: false,
     items: [
-      "AI analýza hovoru",
-      "Přepis hovoru",
+      "100 lekcí — cesta k Elitnímu makléři",
+      "Volný tréninkový mód (500+ agentů)",
+      "AI analýza hovoru a přepis",
       "Historie hovorů a nahrávky",
       "Sledování pokroku a statistiky",
-      "Personalizovaná doporučení",
       "Pokročilá analýza (detailní scoring)",
     ],
     price: "od 990 Kč/měs",
@@ -163,8 +196,7 @@ const plans = [
       "Vše ze Solo",
       "Manager dashboard",
       "Neomezený počet uživatelů",
-      "Správa týmu",
-      "Analytika zaměstnanců",
+      "Správa týmu a analytika",
       "Žebříčky v týmu",
       "Sdílený pool minut",
     ],
@@ -184,7 +216,7 @@ const plans = [
       "Whitelabel řešení",
       "Vlastní AI agenti a scénáře",
       "Dedikovaný account manažer",
-      "Počet minut a agentů dohodou",
+      "Počet minut dohodou",
       "Vlastní analytiky na míru",
     ],
     price: "Cena dohodou",
@@ -209,7 +241,7 @@ export default function FunkcePage() {
                 <GradientText>Reálné provize.</GradientText>
               </h1>
               <p className="mt-5 text-lg text-neutral-500 leading-relaxed">
-                Neztrácejte ostré leady na trénink juniorů. S našimi AI agenty projdou makléři tím nejhorším ještě před zvednutím prvního reálného telefonu.
+                100 lekcí z realitní praxe vás provedou kompletní cestou od začátečníka po elitního makléře. Co je před zkouškou z dokumentu, to se v praxi naučíte tady.
               </p>
             </ScrollReveal>
             <ScrollReveal delay={0.1}>
@@ -223,6 +255,140 @@ export default function FunkcePage() {
                 <Link href="/cenik">
                   <Button variant="outline" size="lg">Zobrazit ceník</Button>
                 </Link>
+              </div>
+            </ScrollReveal>
+          </div>
+        </Container>
+      </section>
+
+      {/* 100 LESSONS — LEARNING PATH */}
+      <section className="py-16 sm:py-24 bg-neutral-50/80">
+        <Container>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center max-w-6xl mx-auto">
+            <div>
+              <ScrollReveal>
+                <Badge className="mb-4">Hlavní produkt</Badge>
+                <h2 className="text-3xl sm:text-4xl font-bold text-neutral-800 tracking-tight">
+                  100 lekcí k titulu{" "}
+                  <GradientText>Elitní makléř</GradientText>
+                </h2>
+                <p className="mt-4 text-neutral-500 leading-relaxed">
+                  Strukturovaná učební cesta postavená na reálných situacích, které makléři každý den řeší v praxi. Každá lekce obsahuje 3 pod-scénáře s rostoucí obtížností. Pro postup musíte získat minimálně 80 % u každého hovoru.
+                </p>
+              </ScrollReveal>
+              <ScrollReveal delay={0.1}>
+                <div className="mt-6 space-y-3">
+                  {[
+                    { icon: Map, text: "Interaktivní mapa s postupným odemykáním lekcí" },
+                    { icon: Target, text: "3 pod-scénáře v každé lekci (začátečník → pokročilý)" },
+                    { icon: BookOpen, text: "Edukační úvod s tipy před každým hovorem" },
+                    { icon: TrendingUp, text: "Progress od Začátečníka po Elitního makléře" },
+                  ].map((item) => (
+                    <div key={item.text} className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center shrink-0 mt-0.5">
+                        <item.icon className="w-4 h-4 text-primary-500" />
+                      </div>
+                      <p className="text-sm text-neutral-600 leading-relaxed">{item.text}</p>
+                    </div>
+                  ))}
+                </div>
+              </ScrollReveal>
+
+              {/* Category breakdown */}
+              <ScrollReveal delay={0.2}>
+                <div className="mt-8">
+                  <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-3">10 tematických kategorií</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {lessonCategories.map((cat) => (
+                      <div key={cat.label} className="flex items-center gap-2 text-sm text-neutral-600">
+                        <span className={`w-2.5 h-2.5 rounded-full ${cat.color} shrink-0`} />
+                        <span>{cat.label}</span>
+                        <span className="text-neutral-400 text-xs">({cat.count})</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </ScrollReveal>
+            </div>
+
+            <ScrollReveal delay={0.15}>
+              <div className="flex justify-center">
+                <BoardGameMockup className="max-w-sm w-full" />
+              </div>
+            </ScrollReveal>
+          </div>
+        </Container>
+      </section>
+
+      {/* TWO MODES: LEKCE + TRÉNINK */}
+      <section className="py-16 sm:py-24">
+        <Container>
+          <ScrollReveal>
+            <SectionHeader
+              badge="Dva režimy"
+              title="Lekce i volný trénink"
+              subtitle="Strukturovaná cesta pro systematický růst. Volný mód pro trénink čehokoli, kdykoli."
+            />
+          </ScrollReveal>
+
+          <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            <ScrollReveal delay={0.05}>
+              <div className="h-full rounded-2xl border-2 border-primary-200 bg-primary-50/30 p-7">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center">
+                    <GraduationCap className="w-6 h-6 text-primary-500" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-neutral-800 text-lg">Lekce</h3>
+                    <span className="text-xs text-primary-600 font-medium">Strukturovaná cesta</span>
+                  </div>
+                </div>
+                <ul className="space-y-2.5">
+                  {[
+                    "100 lekcí pokrývajících kompletní realitní praxi",
+                    "300 pod-scénářů s rostoucí obtížností",
+                    "Postupné odemykání — nelze přeskočit",
+                    "Minimálně 80 % u každého hovoru pro postup",
+                    "Edukační materiály a tipy před každým hovorem",
+                    "10 barevně odlišených kategorií",
+                    "Progress bar od Začátečníka po Elitního makléře",
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-2 text-sm text-neutral-600">
+                      <Check className="w-4 h-4 text-primary-500 shrink-0 mt-0.5" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </ScrollReveal>
+
+            <ScrollReveal delay={0.1}>
+              <div className="h-full rounded-2xl border-2 border-amber-200 bg-amber-50/30 p-7">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center">
+                    <Dumbbell className="w-6 h-6 text-amber-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-neutral-800 text-lg">Trénink</h3>
+                    <span className="text-xs text-amber-600 font-medium">Volný mód</span>
+                  </div>
+                </div>
+                <ul className="space-y-2.5">
+                  {[
+                    "Více než 500 AI agentů se scénáři z praxe",
+                    "Filtry dle obtížnosti a kategorie klienta",
+                    "Bez omezení pořadí — trénujte cokoli",
+                    "Situace podle skutečných případů z praxe",
+                    "Každý agent má vlastní osobnost a styl",
+                    "Horký, teplý i studený lead",
+                    "Vhodný pro opakování slabých míst",
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-2 text-sm text-neutral-600">
+                      <Check className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
               </div>
             </ScrollReveal>
           </div>
@@ -312,7 +478,7 @@ export default function FunkcePage() {
             <SectionHeader badge="Co dostanete" title="Klíčové funkce" />
           </ScrollReveal>
 
-          <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl mx-auto">
+          <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-6xl mx-auto">
             {features.map((f, i) => (
               <ScrollReveal key={f.title} delay={i * 0.07}>
                 <div className="h-full bg-white rounded-2xl border border-neutral-100 p-6 hover:shadow-lg transition-shadow group">
@@ -447,7 +613,7 @@ export default function FunkcePage() {
                   </div>
                 </div>
                 <p className="text-sm text-neutral-700 italic border-l-2 border-rose-300 pl-3 mb-3">
-                  "Potřebuji to vyřešit co nejrychleji. Rozvádíme se."
+                  &quot;Potřebuji to vyřešit co nejrychleji. Rozvádíme se.&quot;
                 </p>
                 <p className="text-sm text-neutral-600 leading-relaxed flex-1">
                   Klientka volá, chce prodat společnou nemovitost kvůli rozvodu. Cílem je projevit empatii, ale hlavně zjistit, zda s prodejem souhlasí i partner. Bez jeho souhlasu nelze nemovitost prodat.
@@ -469,7 +635,7 @@ export default function FunkcePage() {
                   </div>
                 </div>
                 <p className="text-sm text-neutral-700 italic border-l-2 border-red-300 pl-3 mb-3">
-                  "Odkud máte mé číslo?!"
+                  &quot;Odkud máte mé číslo?!&quot;
                 </p>
                 <p className="text-sm text-neutral-600 leading-relaxed flex-1">
                   Voláte vlastníkovi domu z katastru. Okamžitě je agresivní a podezíravý. Musíte překonat první odpor a rychle přejít k hodnotě, kterou můžete nabídnout.
@@ -491,7 +657,7 @@ export default function FunkcePage() {
                   </div>
                 </div>
                 <p className="text-sm text-neutral-700 italic border-l-2 border-amber-300 pl-3 mb-3">
-                  "Chci prodat dům, ale babička tam má doživotní právo bydlet."
+                  &quot;Chci prodat dům, ale babička tam má doživotní právo bydlet.&quot;
                 </p>
                 <p className="text-sm text-neutral-600 leading-relaxed flex-1">
                   Klient chce prodat dům, na kterém vázne věcné břemeno dožití. Musíte vysvětlit vliv na cenu a okruh kupců, a navrhnout řešení.
@@ -513,7 +679,7 @@ export default function FunkcePage() {
                   </div>
                 </div>
                 <p className="text-sm text-neutral-700 italic border-l-2 border-purple-300 pl-3 mb-3">
-                  "Chceme koupit první byt, ale vůbec nevíme kde začít."
+                  &quot;Chceme koupit první byt, ale vůbec nevíme kde začít.&quot;
                 </p>
                 <p className="text-sm text-neutral-600 leading-relaxed flex-1">
                   Mladý pár volá poprvé. Jsou vyděšení z celého procesu, potřebují průvodce. Cílem je stát se jejich důvěryhodným partnerem na celou cestu.
@@ -525,11 +691,11 @@ export default function FunkcePage() {
             </ScrollReveal>
           </div>
 
-          {/* '496 dalších' */}
+          {/* '500+ dalších' */}
           <ScrollReveal delay={0.25}>
             <div className="mt-8 text-center">
               <p className="text-neutral-500 text-sm mb-5">
-                ...a dalších <span className="font-bold text-neutral-800">496 scénářů</span> v naší databázi
+                ...a dalších <span className="font-bold text-neutral-800">500+ scénářů</span> ve volném tréninkovém módu
               </p>
               <Link href="/registrace">
                 <Button size="lg" className="group">
