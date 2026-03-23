@@ -19,7 +19,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getAuthHeaders } from "@/lib/auth";
+import { getAuthHeaders, getUserSessionInfo } from "@/lib/auth";
 
 interface SubscriptionData {
   plan: string;
@@ -77,6 +77,7 @@ import { Suspense } from "react";
 
 function BalicekContent() {
   const [sub, setSub] = useState<SubscriptionData | null>(null);
+  const [userSession, setUserSession] = useState<{ email: string; name: string } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isPortalLoading, setIsPortalLoading] = useState(false);
   const [upgradingTier, setUpgradingTier] = useState<number | null>(null);
@@ -92,6 +93,11 @@ function BalicekContent() {
         const res = await fetch("/api/subscription", { headers });
         const data = await res.json();
         if (data && !data.error) setSub(data);
+        
+        const sessionInfo = await getUserSessionInfo();
+        if (sessionInfo) {
+          setUserSession({ email: sessionInfo.email, name: sessionInfo.fullName });
+        }
       } catch {
         // silent
       } finally {
@@ -166,8 +172,9 @@ function BalicekContent() {
     : 0;
   const remaining = Math.max(0, sub.minutesLimit - displayMinutesUsed);
   const daysLeft = sub.currentPeriodEnd ? getDaysRemaining(sub.currentPeriodEnd) : null;
-  const currentTiers = tierDetails[sub.plan] || [];
-  const currentTierIndex = currentTiers.findIndex((t) => t.minutes === sub.minutesLimit);
+  const planForTiers = isPaid ? sub.plan : "solo";
+  const currentTiers = tierDetails[planForTiers] || [];
+  const currentTierIndex = isPaid ? currentTiers.findIndex((t) => t.minutes === sub.minutesLimit) : -1;
   const currentTierPrice = currentTierIndex >= 0 ? currentTiers[currentTierIndex].price : 0;
 
   return (
@@ -412,7 +419,7 @@ function BalicekContent() {
       )}
 
       {/* Upgrade / Downgrade Options — only for solo/team_manager, NOT team members */}
-      {isPaid && !isTeamMember && currentTiers.length > 0 && (
+      {!isTeamMember && currentTiers.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -421,10 +428,12 @@ function BalicekContent() {
           <Card>
             <CardContent className="p-6">
               <h3 className="text-lg font-bold text-neutral-900 mb-1">
-                Změnit balíček
+                {isPaid ? "Změnit balíček" : "Vyberte si placený tarif"}
               </h3>
               <p className="text-sm text-neutral-500 mb-4">
-                Přejděte na jiný tier. Při upgradu zaplatíte fixní doplatek (rozdíl cen), den obnovení se nemění.
+                {isPaid 
+                  ? "Přejděte na jiný tier. Při upgradu zaplatíte fixní doplatek (rozdíl cen), den obnovení se nemění."
+                  : "Odemkněte plný potenciál s plánem Solo. Zvolte si měsíční dávku minut, která Vám vyhovuje."}
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {currentTiers.map((t, idx) => {
@@ -440,7 +449,7 @@ function BalicekContent() {
                         if (isCurrentTier || isScheduledTier) return;
 
                         // Confirm downgrade
-                        if (!isUpgrade) {
+                        if (isPaid && !isUpgrade) {
                           const confirmed = window.confirm(
                             `Opravdu chcete downgrade na ${t.minutes} minut? Změna se projeví na konci aktuálního období.`
                           );
@@ -449,6 +458,30 @@ function BalicekContent() {
                         setUpgradingTier(t.minutes);
                         try {
                           const headers = await getAuthHeaders();
+                          
+                          if (!isPaid) {
+                            // Demo user -> create generic checkout session
+                            const res = await fetch("/api/stripe/create-checkout-session", {
+                              method: "POST",
+                              headers: { ...headers, "Content-Type": "application/json" },
+                              body: JSON.stringify({
+                                plan: "solo",
+                                tier: t.minutes,
+                                email: userSession?.email || sub.managerEmail || "demo@simcall.cz",
+                                name: userSession?.name || "Uživatel"
+                              }),
+                            });
+                            const data = await res.json();
+                            if (data.url) {
+                              window.location.href = data.url;
+                            } else {
+                              alert(data.error || "Nepodařilo se přejít k platbě.");
+                              setUpgradingTier(null);
+                            }
+                            return; // Stop execution here
+                          }
+
+                          // Paid user -> create upgrade session
                           const res = await fetch("/api/stripe/create-upgrade-session", {
                             method: "POST",
                             headers: { ...headers, "Content-Type": "application/json" },
@@ -513,39 +546,6 @@ function BalicekContent() {
                     </button>
                   );
                 })}
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      )}
-
-      {/* Free → Paid CTA */}
-      {!isPaid && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-100 to-blue-100 flex items-center justify-center shrink-0">
-                  <TrendingUp className="w-6 h-6 text-primary-600" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-neutral-900">
-                    Upgradujte na placený plán
-                  </h3>
-                  <p className="text-sm text-neutral-500 mt-0.5">
-                    Získejte více minut a pokročilé funkce. Vyberte si z plánu Solo (od 990 Kč) nebo Team (od 7 490 Kč).
-                  </p>
-                </div>
-                <Button
-                  onClick={() => (window.location.href = "/cenik")}
-                  className="shrink-0"
-                >
-                  Zobrazit ceník
-                </Button>
               </div>
             </CardContent>
           </Card>

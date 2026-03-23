@@ -127,7 +127,7 @@ function FreeDashboard({
             </Button>
           </Link>
         ) : (
-          <Link href="/cenik">
+          <Link href="/dashboard/balicek">
             <Button className="bg-amber-500 hover:bg-amber-600">
               <Crown className="w-4 h-4 mr-2" />
               Upgrade, limit vyčerpán
@@ -354,7 +354,7 @@ function FreeDashboard({
             <div className="text-center sm:text-right shrink-0">
               <p className="text-2xl font-bold text-neutral-900">od 990 Kč</p>
               <p className="text-xs text-neutral-400 mb-3">/ měsíc</p>
-              <Link href="/cenik">
+              <Link href="/dashboard/balicek">
                 <Button size="lg" className="whitespace-nowrap">
                   <Sparkles className="w-4 h-4 mr-2" />
                   Vybrat plán
@@ -442,7 +442,7 @@ function PaidDashboard({
           <p className="text-sm text-neutral-500 mt-1">{today}</p>
         </div>
         {isOutOfCalls ? (
-          <Link href="/cenik">
+          <Link href="/dashboard/balicek">
             <Button className="bg-amber-500 hover:bg-amber-600">
               <Crown className="w-4 h-4 mr-2" />
               Zvýšit limit
@@ -521,7 +521,7 @@ function PaidDashboard({
                 nepřerušený trénink.
               </p>
             </div>
-            <Link href="/cenik">
+            <Link href="/dashboard/balicek">
               <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white shrink-0">
                 Zvýšit limit
               </Button>
@@ -543,7 +543,7 @@ function PaidDashboard({
                 Pro pokračování v tréninku přejděte na vyšší balíček.
               </p>
             </div>
-            <Link href="/cenik">
+            <Link href="/dashboard/balicek">
               <Button size="sm" className="bg-red-500 hover:bg-red-600 text-white shrink-0">
                 <Crown className="w-4 h-4 mr-1" />
                 Zvýšit balíček
