@@ -25,6 +25,7 @@ import {
   BookOpen,
   Dumbbell,
   GraduationCap,
+  Calendar,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
@@ -133,6 +134,11 @@ const adminNavItems: SidebarNavItem[] = [
     label: "Dotazy",
     href: "/admin/dotazy",
     icon: <MessageSquare className="w-5 h-5" />,
+  },
+  {
+    label: "Schůzky",
+    href: "/admin/schuzky",
+    icon: <Calendar className="w-5 h-5" />,
   },
   {
     label: "Podpora",
