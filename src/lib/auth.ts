@@ -240,7 +240,11 @@ async function findSubscriptionForUser(db: ReturnType<typeof createServerClient>
 
 /**
  * Server-side: check minute limits for a user
+ * Includes protection against race conditions by counting pending (in-progress) calls
+ * and adding a buffer for each one.
  */
+const PENDING_CALL_BUFFER_SECONDS = 300; // 5 min buffer per pending call
+
 export async function checkMinuteLimit(userId: string): Promise<MinuteLimitCheck> {
   const db = createServerClient();
 
@@ -250,12 +254,19 @@ export async function checkMinuteLimit(userId: string): Promise<MinuteLimitCheck
   if (sub) {
     const secondsUsed = sub.seconds_used || 0;
     const minutesLimit = sub.minutes_limit || 0;
-    const canCall = secondsUsed < minutesLimit * 60;
+
+    // Race condition protection: count all pending/in-progress calls
+    // for ALL users sharing this subscription and add buffer time
+    const pendingSeconds = await getPendingCallsBuffer(db, sub);
+
+    const effectiveSecondsUsed = secondsUsed + pendingSeconds;
+    const canCall = effectiveSecondsUsed < minutesLimit * 60;
+
     return {
       canCall,
-      secondsUsed,
+      secondsUsed: effectiveSecondsUsed,
       minutesLimit,
-      minutesRemaining: Math.max(0, minutesLimit - Math.floor(secondsUsed / 60)),
+      minutesRemaining: Math.max(0, minutesLimit - Math.floor(effectiveSecondsUsed / 60)),
       planRole: sub.plan as PlanRole,
     };
   }
@@ -271,15 +282,69 @@ export async function checkMinuteLimit(userId: string): Promise<MinuteLimitCheck
     (sum: number, c: { duration_seconds: number }) => sum + (c.duration_seconds || 0),
     0
   );
-  const canCall = totalSeconds < FREE_MINUTES_LIMIT * 60;
+
+  // Also count pending calls for demo users
+  const { count: pendingCount } = await db
+    .from("calls")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .eq("status", "pending");
+
+  const effectiveSeconds = totalSeconds + (pendingCount || 0) * PENDING_CALL_BUFFER_SECONDS;
+  const canCall = effectiveSeconds < FREE_MINUTES_LIMIT * 60;
 
   return {
     canCall,
-    secondsUsed: totalSeconds,
+    secondsUsed: effectiveSeconds,
     minutesLimit: FREE_MINUTES_LIMIT,
-    minutesRemaining: Math.max(0, FREE_MINUTES_LIMIT - Math.floor(totalSeconds / 60)),
+    minutesRemaining: Math.max(0, FREE_MINUTES_LIMIT - Math.floor(effectiveSeconds / 60)),
     planRole: "demo",
   };
+}
+
+/**
+ * Count pending/in-progress calls for all users sharing a subscription
+ * and return estimated buffer seconds to prevent race conditions.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function getPendingCallsBuffer(db: ReturnType<typeof createServerClient>, sub: any): Promise<number> {
+  // For team subscriptions, we need to find ALL users sharing this subscription
+  const userIds: string[] = [sub.user_id];
+
+  if (sub.plan === "team") {
+    // Find all team members under this manager
+    const { data: managerMembership } = await db
+      .from("company_members")
+      .select("company_id")
+      .eq("user_id", sub.user_id)
+      .eq("role", "manager")
+      .limit(1)
+      .single();
+
+    if (managerMembership) {
+      const { data: members } = await db
+        .from("company_members")
+        .select("user_id")
+        .eq("company_id", managerMembership.company_id);
+
+      if (members) {
+        for (const m of members) {
+          if (!userIds.includes(m.user_id)) {
+            userIds.push(m.user_id);
+          }
+        }
+      }
+    }
+  }
+
+  // Count pending calls across all team members
+  const { count: pendingCount } = await db
+    .from("calls")
+    .select("id", { count: "exact", head: true })
+    .in("user_id", userIds)
+    .eq("status", "pending");
+
+  return (pendingCount || 0) * PENDING_CALL_BUFFER_SECONDS;
 }
 
 /**

@@ -41,9 +41,12 @@ export async function GET(request: NextRequest) {
       if (managerResult) {
         // Sum the team member's own seconds this month as their usage
         const totalSeconds = await sumSecondsThisMonth(supabase, user.id);
+        // Also show total team usage from the subscription (shared pool)
+        const teamMinutesUsed = Math.floor((managerResult.subscription.seconds_used || 0) / 60);
         return NextResponse.json({
           ...formatSub(managerResult.subscription),
           minutesUsed: Math.floor(totalSeconds / 60),
+          teamMinutesUsed,
           isTeamMember: true,
           managerPlan: true,
           managerEmail: managerResult.managerEmail || null,

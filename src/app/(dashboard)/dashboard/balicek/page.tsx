@@ -30,6 +30,7 @@ interface SubscriptionData {
   stripeCustomerId?: string;
   isTeamMember?: boolean;
   managerEmail?: string;
+  teamMinutesUsed?: number;
   scheduledPlan?: string | null;
   scheduledTier?: number | null;
   billingMethod?: string;
@@ -116,12 +117,17 @@ export default function BalicekPage() {
 
   if (!sub) return null;
 
-  const usagePercent = sub.minutesLimit > 0
-    ? Math.min(100, Math.round((sub.minutesUsed / sub.minutesLimit) * 100))
-    : 0;
-  const remaining = Math.max(0, sub.minutesLimit - sub.minutesUsed);
   const isPaid = sub.plan !== "demo";
   const isTeamMember = !!sub.isTeamMember;
+
+  // For team members, show team-wide usage for pool visibility
+  const displayMinutesUsed = isTeamMember && sub.teamMinutesUsed !== undefined
+    ? sub.teamMinutesUsed
+    : sub.minutesUsed;
+  const usagePercent = sub.minutesLimit > 0
+    ? Math.min(100, Math.round((displayMinutesUsed / sub.minutesLimit) * 100))
+    : 0;
+  const remaining = Math.max(0, sub.minutesLimit - displayMinutesUsed);
   const daysLeft = sub.currentPeriodEnd ? getDaysRemaining(sub.currentPeriodEnd) : null;
   const currentTiers = tierDetails[sub.plan] || [];
   const currentTierIndex = currentTiers.findIndex((t) => t.minutes === sub.minutesLimit);
@@ -190,16 +196,30 @@ export default function BalicekPage() {
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+            <div className={`grid grid-cols-2 ${isTeamMember ? "sm:grid-cols-4" : "sm:grid-cols-3"} gap-4 mb-6`}>
+              {isTeamMember && sub.teamMinutesUsed !== undefined && (
+                <div className="bg-purple-50 rounded-xl p-4">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Users className="w-4 h-4 text-purple-400" />
+                    <span className="text-xs text-purple-600">Tým celkem</span>
+                  </div>
+                  <p className="text-2xl font-bold text-purple-900">
+                    {sub.teamMinutesUsed}
+                    <span className="text-sm font-normal text-purple-400">
+                      /{sub.minutesLimit}
+                    </span>
+                  </p>
+                </div>
+              )}
               <div className="bg-neutral-50 rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <Phone className="w-4 h-4 text-neutral-400" />
-                  <span className="text-xs text-neutral-500">Minuty</span>
+                  <span className="text-xs text-neutral-500">{isTeamMember ? "Moje minuty" : "Minuty"}</span>
                 </div>
                 <p className="text-2xl font-bold text-neutral-900">
                   {sub.minutesUsed}
                   <span className="text-sm font-normal text-neutral-400">
-                    /{sub.minutesLimit}
+                    {!isTeamMember && `/${sub.minutesLimit}`}
                   </span>
                 </p>
               </div>
@@ -235,7 +255,7 @@ export default function BalicekPage() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-neutral-600">
-                  Využití minut tento měsíc
+                  {isTeamMember ? "Využití minut celého týmu" : "Využití minut tento měsíc"}
                 </span>
                 <span className="text-sm font-medium text-neutral-900">
                   {usagePercent}%
