@@ -13,6 +13,7 @@ import {
   Calendar,
   ArrowDown,
   ArrowUp,
+  CheckCircle,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -70,11 +71,17 @@ function getDaysRemaining(endDate: string): number {
   return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
 }
 
-export default function BalicekPage() {
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
+
+function BalicekContent() {
   const [sub, setSub] = useState<SubscriptionData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isPortalLoading, setIsPortalLoading] = useState(false);
   const [upgradingTier, setUpgradingTier] = useState<number | null>(null);
+
+  const searchParams = useSearchParams();
+  const isUpgraded = searchParams.get("upgraded") === "true";
 
   useEffect(() => {
     async function load() {
@@ -148,6 +155,25 @@ export default function BalicekPage() {
           Správa vašeho předplatného a minut
         </p>
       </motion.div>
+
+      {isUpgraded && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <div className="bg-green-50 border border-green-200 text-green-800 rounded-xl p-4 flex items-start gap-3">
+            <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center shrink-0 mt-0.5">
+              <CheckCircle className="w-5 h-5 text-green-600" />
+            </div>
+            <div>
+              <h3 className="font-semibold">Upgrade proběhl úspěšně</h3>
+              <p className="text-sm text-green-700 mt-0.5">
+                Váš balíček byl úspěšně navýšen a minuty jsou vám ihned k dispozici. Na email jsme vám poslali potvrzení o úhradě doplatku.
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      )}
 
       {/* Plan Info Card */}
       <motion.div
@@ -491,5 +517,17 @@ export default function BalicekPage() {
       )}
 
     </div>
+  );
+}
+
+export default function BalicekPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-6 h-6 animate-spin text-neutral-400" />
+      </div>
+    }>
+      <BalicekContent />
+    </Suspense>
   );
 }

@@ -71,6 +71,137 @@ export async function POST(request: NextRequest) {
         const session = event.data.object as Stripe.Checkout.Session;
         const metadata = session.metadata || {};
 
+        // ================================================================
+        // Handle UPGRADE SURCHARGE payment (one-time payment mode checkout)
+        // ================================================================
+        if (metadata.type === "upgrade_surcharge") {
+          const userId = metadata.user_id;
+          const plan = metadata.plan;
+          const tier = parseInt(metadata.tier || "0", 10);
+          const minutesLimit = parseInt(metadata.minutes_limit || "0", 10);
+          const agentsLimit = parseInt(metadata.agents_limit || "0", 10);
+          const stripeSubId = metadata.stripe_subscription_id;
+          const stripePriceId = metadata.stripe_price_id;
+          const surcharge = parseInt(metadata.surcharge || "0", 10);
+          const subscriptionId = metadata.subscription_id;
+          const customerEmail = metadata.customer_email || "";
+          const customerName = metadata.customer_name || "";
+
+          if (!userId || !plan || !tier || !stripeSubId || !stripePriceId) {
+            console.error("[stripe/webhook] upgrade_surcharge missing metadata", metadata);
+            break;
+          }
+
+          try {
+            const stripe = getStripe();
+
+            // 1. Update the Stripe subscription to the new price
+            const stripeSub = await stripe.subscriptions.retrieve(stripeSubId);
+            if (stripeSub && stripeSub.items.data.length > 0) {
+              await stripe.subscriptions.update(stripeSubId, {
+                items: [
+                  {
+                    id: stripeSub.items.data[0].id,
+                    price: stripePriceId,
+                  },
+                ],
+                proration_behavior: "none",
+                billing_cycle_anchor: "unchanged",
+                metadata: {
+                  plan,
+                  tier: tier.toString(),
+                  minutes_limit: minutesLimit.toString(),
+                  agents_limit: agentsLimit.toString(),
+                  user_id: userId,
+                },
+              });
+            }
+
+            // 2. Update local DB subscription (and clear any scheduled downgrade)
+            await db
+              .from("subscriptions")
+              .update({
+                plan,
+                tier,
+                minutes_limit: minutesLimit || tier,
+                agents_limit: agentsLimit,
+                scheduled_plan: null,
+                scheduled_tier: null,
+                scheduled_minutes_limit: null,
+                scheduled_agents_limit: null,
+                updated_at: new Date().toISOString(),
+              })
+              .eq("id", subscriptionId);
+
+            // 3. Update profile role
+            const profileRole = plan === "team" ? "team_manager" : plan;
+            await db
+              .from("profiles")
+              .update({ role: profileRole, updated_at: new Date().toISOString() })
+              .eq("id", userId);
+
+            // 4. Log payment record
+            try {
+              await db.from("payments").insert({
+                user_id: userId,
+                user_email: customerEmail,
+                user_name: customerName || null,
+                plan,
+                tier,
+                amount: surcharge,
+                method: "stripe",
+                status: "completed",
+                stripe_session_id: session.id,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+              });
+            } catch (payErr) {
+              console.warn("[stripe/webhook] Failed to log upgrade payment:", payErr);
+            }
+
+            // 5. Send upgrade confirmation email
+            try {
+              const resend = getResend();
+              const UpgradeConfirmationEmail = (await import("@/emails/UpgradeConfirmationEmail")).default;
+              await resend.emails.send({
+                from: getFromEmail(),
+                to: [customerEmail],
+                subject: "Potvrzení upgradu balíčku SimCall ⬆️",
+                react: UpgradeConfirmationEmail({
+                  customerName: customerName || "zákazníku",
+                  previousPlan: metadata.previous_plan || "",
+                  previousTier: parseInt(metadata.previous_tier || "0", 10),
+                  newPlan: plan,
+                  newTier: tier,
+                  surcharge,
+                }),
+              });
+            } catch (emailErr) {
+              console.warn("[stripe/webhook] Failed to send upgrade email:", emailErr);
+            }
+
+            // 6. Discord notification
+            const { notifyPlanUpgrade } = await import("@/lib/notifications");
+            await notifyPlanUpgrade(
+              customerEmail,
+              metadata.previous_plan || "",
+              parseInt(metadata.previous_tier || "0", 10),
+              plan,
+              tier
+            );
+
+            console.log(`[stripe/webhook] upgrade_surcharge completed — ${metadata.previous_plan}/${metadata.previous_tier} → ${plan}/${tier} for user ${userId}`);
+          } catch (upgradeErr) {
+            console.error("[stripe/webhook] upgrade_surcharge processing error:", upgradeErr);
+          }
+
+          break;
+        }
+
+        // ================================================================
+        // Normal checkout.session.completed (new subscription purchase)
+        // ================================================================
+
         const plan = metadata.plan || "solo";
         const tier = parseInt(metadata.tier || "0", 10);
         const minutesLimit = parseInt(metadata.minutes_limit || "0", 10);

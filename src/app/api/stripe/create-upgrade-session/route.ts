@@ -2,15 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { getStripe, PLAN_PRICES, getStripePriceId, getPlanPrice } from "@/lib/stripe";
 import { getUserFromRequest } from "@/lib/auth";
 import { createServerClient } from "@/lib/supabase";
-import { notifyPlanUpgrade, notifyPlanDowngrade } from "@/lib/notifications";
+import { notifyPlanDowngrade } from "@/lib/notifications";
 import { getResend, getFromEmail } from "@/lib/resend";
-import UpgradeConfirmationEmail from "@/emails/UpgradeConfirmationEmail";
 import DowngradeScheduledEmail from "@/emails/DowngradeScheduledEmail";
 
 // POST /api/stripe/create-upgrade-session
 // Handles plan changes:
-//   - Upgrade (higher tier): immediate change + fixed one-time surcharge (price difference)
-//   - Downgrade (lower tier): scheduled at end of current billing period
+//   - Upgrade (higher tier): redirect to Stripe Checkout to pay the fixed price difference
+//   - Downgrade (lower tier): scheduled at end of current billing period (DB only)
 export async function POST(request: NextRequest) {
   if (!process.env.STRIPE_SECRET_KEY) {
     return NextResponse.json(
@@ -92,13 +91,9 @@ export async function POST(request: NextRequest) {
         if (stripeSub && stripeSub.status === "active") {
           if (isUpgrade) {
             // ============================================================
-            // UPGRADE: Fixed surcharge + immediate plan change
-            // User pays the FULL price difference as a one-time charge.
-            // Billing day stays the same (billing_cycle_anchor: unchanged).
-            // From next cycle, they pay the new full price.
-            //
-            // IMPORTANT: We ONLY update subscription after payment succeeds.
-            // If payment fails, we do NOT upgrade — user stays on current plan.
+            // UPGRADE: Redirect to Stripe Checkout to pay the surcharge
+            // After payment is confirmed via webhook, the subscription
+            // will be updated to the new plan/tier.
             // ============================================================
 
             const surcharge = targetPrice - currentPrice; // in CZK
@@ -117,138 +112,53 @@ export async function POST(request: NextRequest) {
               );
             }
 
-            // 1. Create a one-time invoice item for the surcharge
-            await stripe.invoiceItems.create({
+            const origin = request.headers.get("origin") || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
+            // Create a Checkout Session in payment mode for the surcharge
+            const checkoutSession = await stripe.checkout.sessions.create({
+              mode: "payment",
               customer: currentSub.stripe_customer_id,
-              amount: surcharge * 100, // Stripe uses smallest currency unit (haléře)
-              currency: "czk",
-              description: `Doplatek za upgrade: ${currentSub.plan.toUpperCase()} ${currentSub.tier} → ${plan.toUpperCase()} ${tier} (${surcharge.toLocaleString("cs-CZ")} Kč)`,
-            });
-
-            // 2. Create and pay the invoice immediately
-            const invoice = await stripe.invoices.create({
-              customer: currentSub.stripe_customer_id,
-              auto_advance: true,
-            });
-
-            if (!invoice.id) {
-              return NextResponse.json(
-                { error: "Nepodařilo se vytvořit fakturu. Kontaktujte podporu." },
-                { status: 500 }
-              );
-            }
-
-            // 3. Pay the invoice — if this fails, the upgrade is CANCELLED
-            const paidInvoice = await stripe.invoices.pay(invoice.id);
-
-            if (paidInvoice.status !== "paid") {
-              return NextResponse.json(
-                { error: "Platba doplatku selhala. Zkontrolujte platební metodu ve Stripe portálu." },
-                { status: 402 }
-              );
-            }
-
-            // ✅ Payment succeeded — NOW update Stripe subscription and DB
-
-            // 4. Update the subscription to new price (no proration, keep billing anchor)
-            await stripe.subscriptions.update(
-              currentSub.stripe_subscription_id,
-              {
-                items: [
-                  {
-                    id: stripeSub.items.data[0].id,
-                    price: stripePriceId,
+              line_items: [
+                {
+                  price_data: {
+                    currency: "czk",
+                    unit_amount: surcharge * 100, // haléře
+                    product_data: {
+                      name: `Doplatek za upgrade: ${currentSub.plan.toUpperCase()} ${currentSub.tier} → ${plan.toUpperCase()} ${tier}`,
+                      description: `Jednorázový doplatek ${surcharge.toLocaleString("cs-CZ")} Kč za navýšení balíčku`,
+                    },
                   },
-                ],
-                proration_behavior: "none",
-                billing_cycle_anchor: "unchanged",
-                metadata: {
-                  plan,
-                  tier: tier.toString(),
-                  minutes_limit: tier.toString(),
-                  agents_limit: priceInfo.agents.toString(),
-                  user_id: user.id,
-                  upgrade: "true",
+                  quantity: 1,
                 },
-              }
-            );
-
-            // 5. Update local DB
-            await db
-              .from("subscriptions")
-              .update({
-                plan,
-                tier,
-                minutes_limit: tier,
-                agents_limit: priceInfo.agents,
-                updated_at: new Date().toISOString(),
-              })
-              .eq("id", currentSub.id);
-
-            // 6. Update profile role
-            const profileRole = plan === "team" ? "team_manager" : plan;
-            await db
-              .from("profiles")
-              .update({ role: profileRole, updated_at: new Date().toISOString() })
-              .eq("id", user.id);
-
-            // 7. Log payment record
-            try {
-              await db.from("payments").insert({
+              ],
+              metadata: {
+                type: "upgrade_surcharge",
                 user_id: user.id,
-                user_email: customerEmail,
-                user_name: customerName || null,
                 plan,
-                tier,
-                amount: surcharge,
-                method: "stripe",
-                status: "completed",
-                stripe_session_id: invoice.id,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-              });
-            } catch (payErr) {
-              console.warn("[upgrade] Failed to log payment:", payErr);
-            }
-
-            // 8. Send upgrade confirmation email
-            try {
-              const resend = getResend();
-              await resend.emails.send({
-                from: getFromEmail(),
-                to: [customerEmail],
-                subject: "Potvrzení upgradu balíčku SimCall ⬆️",
-                react: UpgradeConfirmationEmail({
-                  customerName: customerName || "zákazníku",
-                  previousPlan: currentSub.plan,
-                  previousTier: currentSub.tier,
-                  newPlan: plan,
-                  newTier: tier,
-                  surcharge,
-                }),
-              });
-            } catch (emailErr) {
-              console.warn("[upgrade] Failed to send confirmation email:", emailErr);
-            }
-
-            // Discord notification
-            notifyPlanUpgrade(
-              customerEmail,
-              currentSub.plan, currentSub.tier,
-              plan, tier
-            );
+                tier: tier.toString(),
+                minutes_limit: tier.toString(),
+                agents_limit: priceInfo.agents.toString(),
+                previous_plan: currentSub.plan,
+                previous_tier: currentSub.tier.toString(),
+                stripe_subscription_id: currentSub.stripe_subscription_id,
+                stripe_price_id: stripePriceId,
+                surcharge: surcharge.toString(),
+                customer_name: customerName,
+                customer_email: customerEmail,
+                subscription_id: currentSub.id,
+              },
+              success_url: `${origin}/dashboard/balicek?upgraded=true`,
+              cancel_url: `${origin}/dashboard/balicek`,
+              locale: "cs",
+            });
 
             return NextResponse.json({
-              success: true,
-              upgraded: true,
-              surcharge,
-              message: `Plán byl úspěšně upgradován. Doplatek: ${surcharge.toLocaleString("cs-CZ")} Kč`,
+              url: checkoutSession.url,
             });
 
           } else {
             // ============================================================
             // DOWNGRADE: Schedule change at end of current billing period
-            // User keeps current plan until period ends, then switches.
             // We do NOT change Stripe subscription items now — that happens
             // in the invoice.payment_succeeded webhook when the scheduled
             // downgrade is applied.
