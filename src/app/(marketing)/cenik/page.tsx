@@ -51,8 +51,8 @@ const comparisonFeatures: {
 }[] = [
     {
       label: "Počet minut",
-      solo: "100 až 2 000",
-      team: "500 až 5 000",
+      solo: "30 až 2 000",
+      team: "30 až 5 000",
       enterprise: "Individuálně",
     },
     {

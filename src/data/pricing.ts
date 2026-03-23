@@ -7,6 +7,7 @@ export const pricingPlans: PricingPlan[] = [
     description:
       "Pro jednotlivé makléře, kteří chtějí projít kompletní cestu od začátečníka po elitního makléře a zlepšit své telefonní dovednosti.",
     tiers: [
+      { calls: 30, agents: 0, price: 29 },
       { calls: 100, agents: 0, price: 990 },
       { calls: 250, agents: 0, price: 2490 },
       { calls: 500, agents: 0, price: 4990 },
@@ -32,6 +33,7 @@ export const pricingPlans: PricingPlan[] = [
     description:
       "Pro firmy a týmy. Správa celého týmu z jednoho místa s neomezeným počtem členů.",
     tiers: [
+      { calls: 30, agents: 0, price: 29 },
       { calls: 500, agents: 0, price: 7490 },
       { calls: 1000, agents: 0, price: 14990 },
       { calls: 2500, agents: 0, price: 37490 },
