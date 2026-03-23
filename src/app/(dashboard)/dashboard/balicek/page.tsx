@@ -14,6 +14,7 @@ import {
   ArrowDown,
   ArrowUp,
   CheckCircle,
+  X,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -79,6 +80,7 @@ function BalicekContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [isPortalLoading, setIsPortalLoading] = useState(false);
   const [upgradingTier, setUpgradingTier] = useState<number | null>(null);
+  const [isCanceling, setIsCanceling] = useState(false);
 
   const searchParams = useSearchParams();
   const isUpgraded = searchParams.get("upgraded") === "true";
@@ -115,6 +117,30 @@ function BalicekContent() {
       // silent
     } finally {
       setIsPortalLoading(false);
+    }
+  }
+
+  async function handleCancelDowngrade() {
+    const confirmed = window.confirm("Opravdu chcete zrušit plánovanou změnu na nižší balíček? Váš aktuální plán zůstane zachován.");
+    if (!confirmed) return;
+
+    setIsCanceling(true);
+    try {
+      const headers = await getAuthHeaders();
+      const res = await fetch("/api/stripe/cancel-downgrade", {
+        method: "POST",
+        headers,
+      });
+      const data = await res.json();
+      if (data.success) {
+        window.location.reload();
+      } else {
+        alert(data.error || "Nepodařilo se zrušit naplánovanou změnu.");
+      }
+    } catch {
+      alert("Chyba při komunikaci se serverem.");
+    } finally {
+      setIsCanceling(false);
     }
   }
 
@@ -325,23 +351,33 @@ function BalicekContent() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
         >
-          <Card>
-            <CardContent className="p-4">
+          <Card className="border-amber-200">
+            <CardContent className="p-4 bg-amber-50/50">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
                   <ArrowDown className="w-5 h-5 text-amber-600" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-neutral-800">
+                  <p className="text-sm font-semibold text-neutral-900">
                     Plánovaná změna: {sub.scheduledPlan.toUpperCase()} {sub.scheduledTier}
                   </p>
-                  <p className="text-xs text-neutral-500">
+                  <p className="text-xs text-neutral-600">
                     Aktivuje se {sub.currentPeriodEnd
                       ? new Date(sub.currentPeriodEnd).toLocaleDateString("cs-CZ")
                       : "na konci aktuálního období"
                     }. Do té doby máte aktuální balíček.
                   </p>
                 </div>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleCancelDowngrade} 
+                  disabled={isCanceling}
+                  className="shrink-0 gap-1.5 mt-2 sm:mt-0"
+                >
+                  {isCanceling ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <X className="w-3.5 h-3.5" />}
+                  Zrušit změnu
+                </Button>
               </div>
             </CardContent>
           </Card>
