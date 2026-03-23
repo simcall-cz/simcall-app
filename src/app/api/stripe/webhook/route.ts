@@ -466,12 +466,13 @@ export async function POST(request: NextRequest) {
 
         // Admin Notification
         try {
-          await db.from("admin_notifications").insert({
+          const { error: notifError } = await db.from("admin_notifications").insert({
             title: "Nová platba",
             message: `${customerName || customerEmail} zaplatil(a) ${amount} Kč za tarif ${plan} (${minutesLimit} min).`,
             type: "payment",
             link: "/admin/platby"
           });
+          if (notifError) console.error("Admin notif DB insert err:", notifError);
         } catch (e) {
           console.error("Admin notification err", e);
         }

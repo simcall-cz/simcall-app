@@ -120,12 +120,13 @@ export async function POST(request: NextRequest) {
 
       // 4. Admin UI Notification
       try {
-        await db.from("admin_notifications").insert({
+        const { error: notifError } = await db.from("admin_notifications").insert({
           title: "Nový dotaz z webu",
           message: `${trimmedName} (${trimmedEmail}) vložil(a) nový dotaz: ${subject || 'Bez předmětu'}.`,
           type: "form",
           link: "/admin/dotazy"
         });
+        if (notifError) console.error("Admin notif DB insert err:", notifError);
       } catch (e) {
         console.error("Failed to insert admin notification", e);
       }

@@ -67,15 +67,17 @@ export async function POST(request: NextRequest) {
       .single();
 
     // 3.5 Create an admin notification
+    // 3.5 Create an admin notification
     try {
-      await db.from("admin_notifications").insert({
+      const { error: notifError } = await db.from("admin_notifications").insert({
         title: "Nová schůzka",
         message: `${guest_name} si rezervoval(a) schůzku na ${start.toLocaleDateString("cs-CZ")} v ${start.toLocaleTimeString("cs-CZ", { hour: '2-digit', minute: '2-digit' })}.`,
         type: "meeting",
         link: "/admin/schuzky"
       });
-    } catch (notifError) {
-      console.error("Failed to create admin notification:", notifError);
+      if (notifError) console.error("Admin notif DB insert error:", notifError);
+    } catch (e) {
+      console.error("Failed to create admin notification:", e);
     }
 
     // 4. Send Confirmation Email

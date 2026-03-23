@@ -50,12 +50,13 @@ export async function POST(request: NextRequest) {
     // Admin UI Notification
     try {
       const db = createServerClient();
-      await db.from("admin_notifications").insert({
+      const { error: notifError } = await db.from("admin_notifications").insert({
         title: "Nová registrace",
         message: `${fullName} (${email}) se právě zaregistroval(a) s tarifem ${planName || "Demo"}.`,
         type: "user",
         link: "/admin/uzivatele"
       });
+      if (notifError) console.error("Admin notif DB insert err:", notifError);
     } catch (e) {
       console.error("Failed to insert admin notification", e);
     }
