@@ -450,6 +450,30 @@ export async function POST(request: NextRequest) {
               })
               .eq("id", subRecord.id);
 
+            // Also update Stripe subscription to use the new (lower) price
+            try {
+              const { getStripePriceId: getPrice } = await import("@/lib/stripe");
+              const newPriceId = getPrice(subRecord.scheduled_plan, subRecord.scheduled_tier);
+              if (newPriceId && stripeSubId) {
+                const stripe = getStripe();
+                const stripeSub = await stripe.subscriptions.retrieve(stripeSubId);
+                if (stripeSub && stripeSub.items.data.length > 0) {
+                  await stripe.subscriptions.update(stripeSubId, {
+                    items: [
+                      {
+                        id: stripeSub.items.data[0].id,
+                        price: newPriceId,
+                      },
+                    ],
+                    proration_behavior: "none",
+                  });
+                  console.log(`[stripe/webhook] Updated Stripe sub ${stripeSubId} to price ${newPriceId}`);
+                }
+              }
+            } catch (stripeUpdateErr) {
+              console.error("[stripe/webhook] Failed to update Stripe sub for downgrade:", stripeUpdateErr);
+            }
+
             // Update profile role to match new plan
             if (subRecord.user_id) {
               const newRole = subRecord.scheduled_plan === "team" ? "team_manager" : subRecord.scheduled_plan;

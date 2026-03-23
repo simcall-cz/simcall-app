@@ -7,11 +7,12 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function check() {
-  const { data, error } = await supabase.from('agents').select('name');
-  if (error) console.error(error);
-  else {
-    console.log("Names:");
-    data.forEach(d => console.log(d.name));
-  }
+  const { data: agents } = await supabase.from('agents').select('id, name');
+  console.log("Agents:");
+  console.log(agents);
+
+  const { data: scenarios } = await supabase.from('scenarios').select('id, title, agent_id');
+  console.log("Scenarios:");
+  console.log(scenarios);
 }
 check();

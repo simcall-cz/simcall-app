@@ -1,22 +1,75 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
-import { CheckCircle, ArrowRight, Mail, CreditCard, FileText } from "lucide-react";
+import {
+  CheckCircle,
+  ArrowRight,
+  Mail,
+  CreditCard,
+  Loader2,
+  UserPlus,
+  RefreshCw,
+  AlertCircle,
+} from "lucide-react";
 import { Container } from "@/components/shared/container";
 import { Button } from "@/components/ui/button";
+
+interface SessionDetails {
+  plan: string;
+  tier: number;
+  minutesLimit: number;
+  customerEmail: string;
+  customerName: string;
+  displayName: string;
+  isUpgrade: boolean;
+  status: string;
+}
 
 function ThankYouContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("session_id");
-  const plan = searchParams.get("plan") || "solo";
-  const tier = searchParams.get("tier") || "50";
+  const isUpgrade = searchParams.get("upgrade") === "true";
 
-  const isStripe = !!sessionId;
+  const [session, setSession] = useState<SessionDetails | null>(null);
+  const [isLoading, setIsLoading] = useState(!!sessionId);
 
-  const planName = plan === "team" ? "Team" : "Solo";
-  const displayName = `${planName} ${tier}`;
+  useEffect(() => {
+    if (!sessionId) return;
+
+    async function fetchSession() {
+      try {
+        const res = await fetch(`/api/stripe/session-details?session_id=${sessionId}`);
+        const data = await res.json();
+        if (data && !data.error) {
+          setSession(data);
+        }
+      } catch {
+        // If fetch fails, we'll show fallback content
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchSession();
+  }, [sessionId]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary-500 mx-auto mb-4" />
+          <p className="text-neutral-500">Načítám detaily objednávky...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const displayName = session?.displayName || "váš plán";
+  const planLabel = session
+    ? `${session.plan === "team" ? "Team" : "Solo"} ${session.minutesLimit} minut`
+    : "váš plán";
 
   return (
     <div className="min-h-screen bg-white">
@@ -28,37 +81,78 @@ function ThankYouContent() {
           </div>
 
           <h1 className="text-3xl font-bold text-neutral-900 mb-3">
-            Děkujeme za objednávku!
+            {isUpgrade ? "Upgrade úspěšný!" : "Děkujeme za objednávku!"}
           </h1>
 
           <p className="text-lg text-neutral-600 mb-8">
-            Váš plán <span className="font-semibold text-neutral-900">{displayName}</span> je připraven.
+            Váš plán{" "}
+            <span className="font-semibold text-neutral-900">{displayName}</span>{" "}
+            je připraven.
           </p>
 
-          {/* Payment method info */}
-          <div className="bg-neutral-50 rounded-xl p-6 mb-8 text-left">
-            <div className="flex items-start gap-3 mb-4">
+          {/* Payment info */}
+          <div className="bg-neutral-50 rounded-xl p-6 mb-6 text-left space-y-4">
+            <div className="flex items-start gap-3">
               <CreditCard className="w-5 h-5 text-primary-500 mt-0.5 shrink-0" />
               <div>
                 <h3 className="font-semibold text-neutral-900">
-                  {isStripe ? "Platba úspěšná" : "Objednávka přijata"}
+                  {sessionId ? "Platba úspěšná" : "Objednávka přijata"}
                 </h3>
                 <p className="text-sm text-neutral-500 mt-1">
-                  {isStripe
-                    ? "Platba byla úspěšně zpracována. Váš plán je aktivní ihned."
+                  {sessionId
+                    ? `Platba byla úspěšně zpracována. Váš plán ${planLabel} je aktivní ihned.`
                     : "Vaše objednávka byla přijata."
                   }
                 </p>
               </div>
             </div>
 
+            {/* Auto-created account info */}
             <div className="border-t border-neutral-200 pt-4">
               <div className="flex items-start gap-3">
-                <Mail className="w-5 h-5 text-blue-500 mt-0.5 shrink-0" />
+                <UserPlus className="w-5 h-5 text-green-500 mt-0.5 shrink-0" />
                 <div>
-                  <h3 className="font-semibold text-neutral-900">Propojení s účtem</h3>
+                  <h3 className="font-semibold text-neutral-900">Nový účet?</h3>
                   <p className="text-sm text-neutral-500 mt-1">
-                    Pokud ještě nemáte účet, vytvořte si ho. Do <strong>60 minut</strong> bude váš účet automaticky napojený na zakoupený plán.
+                    Pokud jste ještě neměli účet v SimCall, byl vám{" "}
+                    <strong>automaticky vytvořen</strong>. Přihlašovací údaje jsme
+                    zaslali na váš e-mail.{" "}
+                    <strong>Zkontrolujte prosím i složku spam.</strong>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Existing account info */}
+            <div className="border-t border-neutral-200 pt-4">
+              <div className="flex items-start gap-3">
+                <RefreshCw className="w-5 h-5 text-blue-500 mt-0.5 shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-neutral-900">Máte účet?</h3>
+                  <p className="text-sm text-neutral-500 mt-1">
+                    Pokud máte účet se stejným e-mailem, váš balíček byl{" "}
+                    <strong>automaticky aktualizován</strong>. Stačí se přihlásit
+                    a můžete ihned trénovat.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Support info */}
+            <div className="border-t border-neutral-200 pt-4">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-amber-500 mt-0.5 shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-neutral-900">Problém?</h3>
+                  <p className="text-sm text-neutral-500 mt-1">
+                    V případě jakýchkoliv problémů nás kontaktujte na{" "}
+                    <a
+                      href="mailto:simcallcz@gmail.com"
+                      className="text-primary-500 hover:text-primary-600 font-medium"
+                    >
+                      simcallcz@gmail.com
+                    </a>
+                    .
                   </p>
                 </div>
               </div>
@@ -67,15 +161,15 @@ function ThankYouContent() {
 
           {/* CTA buttons */}
           <div className="flex flex-col sm:flex-row items-center gap-3 justify-center">
-            <Link href="/registrace">
+            <Link href="/prihlaseni">
               <Button size="lg" className="gap-2">
-                Vytvořit účet
+                Přihlásit se
                 <ArrowRight className="w-4 h-4" />
               </Button>
             </Link>
-            <Link href="/prihlaseni">
+            <Link href="/registrace">
               <Button variant="outline" size="lg">
-                Přihlásit se
+                Vytvořit účet
               </Button>
             </Link>
           </div>
@@ -103,3 +197,4 @@ export default function DekujemePage() {
     </Suspense>
   );
 }
+
