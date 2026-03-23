@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
 import { cs } from "date-fns/locale";
 import Link from "next/link";
+import { getAuthHeaders } from "@/lib/auth";
 
 interface Notification {
   id: string;
@@ -41,7 +42,8 @@ export default function AdminNotificationsPage() {
   async function fetchNotifications() {
     setIsLoading(true);
     try {
-      const res = await fetch("/api/admin/notifications");
+      const headers = await getAuthHeaders();
+      const res = await fetch("/api/admin/notifications", { headers });
       if (res.ok) {
         const data = await res.json();
         setNotifications(data.notifications || []);
@@ -58,9 +60,10 @@ export default function AdminNotificationsPage() {
       // Optimistic update
       setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
       
+      const headers = await getAuthHeaders();
       await fetch(`/api/admin/notifications/${id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({ is_read: true })
       });
       // Optionally re-fetch to sync completely
@@ -72,8 +75,10 @@ export default function AdminNotificationsPage() {
   async function deleteNotification(id: string) {
     try {
       setNotifications(prev => prev.filter(n => n.id !== id));
+      const headers = await getAuthHeaders();
       await fetch(`/api/admin/notifications/${id}`, {
-        method: "DELETE"
+        method: "DELETE",
+        headers
       });
     } catch (e) {
       console.error(e);
@@ -86,11 +91,11 @@ export default function AdminNotificationsPage() {
 
     setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
 
-    // For simplicity, we can just loop them. In a real heavy app we'd have a bulk endpoint.
+    const headers = await getAuthHeaders();
     for (const id of unreadIds) {
       fetch(`/api/admin/notifications/${id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({ is_read: true })
       }).catch(console.error);
     }

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, PhoneCall, ChevronRight, Lightbulb } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
+import { getAuthHeaders } from "@/lib/auth";
 
 interface DashboardTopbarProps {
   onMenuClick: () => void;
@@ -33,19 +34,29 @@ export function DashboardTopbar({ onMenuClick }: DashboardTopbarProps) {
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
-    if (isAdminPath) {
-      fetch("/api/admin/notifications/unread")
-        .then((res) => {
-          if (res.ok) return res.json();
-          return { count: 0 };
-        })
-        .then((data) => {
-          if (typeof data.count === "number") {
+    let isMounted = true;
+    
+    async function fetchUnread() {
+      if (!isAdminPath) return;
+      try {
+        const headers = await getAuthHeaders();
+        const res = await fetch("/api/admin/notifications/unread", { headers });
+        if (res.ok) {
+          const data = await res.json();
+          if (isMounted && typeof data.count === "number") {
             setUnreadCount(data.count);
           }
-        })
-        .catch(console.error);
+        }
+      } catch (err) {
+        console.error(err);
+      }
     }
+
+    fetchUnread();
+
+    return () => {
+      isMounted = false;
+    };
   }, [isAdminPath, pathname]);
 
   // Build breadcrumb segments
