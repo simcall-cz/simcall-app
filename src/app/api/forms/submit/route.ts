@@ -117,6 +117,18 @@ export async function POST(request: NextRequest) {
 
       // 3. Discord notification
       await notifyContactForm(trimmedName, trimmedEmail, message?.trim() || "");
+
+      // 4. Admin UI Notification
+      try {
+        await db.from("admin_notifications").insert({
+          title: "Nový dotaz z webu",
+          message: `${trimmedName} (${trimmedEmail}) vložil(a) nový dotaz: ${subject || 'Bez předmětu'}.`,
+          type: "form",
+          link: "/admin/dotazy"
+        });
+      } catch (e) {
+        console.error("Failed to insert admin notification", e);
+      }
     }
 
     // Removed schuzka block

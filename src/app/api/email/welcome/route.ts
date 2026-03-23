@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createServerClient } from "@/lib/supabase";
 import { getResend, getFromEmail } from "@/lib/resend";
 import WelcomeEmail from "@/emails/WelcomeEmail";
 import { notifyNewRegistration } from "@/lib/notifications";
@@ -45,6 +46,20 @@ export async function POST(request: NextRequest) {
     }
 
     await notifyNewRegistration(email, fullName || "");
+
+    // Admin UI Notification
+    try {
+      const db = createServerClient();
+      await db.from("admin_notifications").insert({
+        title: "Nová registrace",
+        message: `${fullName} (${email}) se právě zaregistroval(a) s tarifem ${planName || "Demo"}.`,
+        type: "user",
+        link: "/admin/uzivatele"
+      });
+    } catch (e) {
+      console.error("Failed to insert admin notification", e);
+    }
+
     return NextResponse.json({ success: true, id: data?.id });
   } catch (err) {
     console.error("[email/welcome] Error:", err);

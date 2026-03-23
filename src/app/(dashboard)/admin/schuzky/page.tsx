@@ -11,12 +11,28 @@ import {
   CheckCircle,
   AlertCircle,
   Loader2,
-  List as ListIcon
+  List as ListIcon,
+  ChevronLeft,
+  ChevronRight,
+  CalendarDays
 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { getAuthHeaders } from "@/lib/auth";
+import {
+  startOfMonth,
+  endOfMonth,
+  startOfWeek,
+  endOfWeek,
+  addDays,
+  subMonths,
+  addMonths,
+  format,
+  isSameDay,
+  isSameMonth
+} from "date-fns";
+import { cs } from "date-fns/locale";
 
 interface Meeting {
   id: string;
@@ -38,7 +54,8 @@ interface Availability {
 const DAYS_OF_WEEK = ["Neděle", "Pondělí", "Úterý", "Středa", "Čtvrtek", "Pátek", "Sobota"];
 
 export default function AdminSchuzkyPage() {
-  const [activeTab, setActiveTab] = useState<"list" | "settings">("list");
+  const [activeTab, setActiveTab] = useState<"list" | "calendar" | "settings">("list");
+  const [currentCalendarMonth, setCurrentCalendarMonth] = useState(new Date());
   
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [isMeetingsLoading, setIsMeetingsLoading] = useState(true);
@@ -145,7 +162,16 @@ export default function AdminSchuzkyPage() {
             }`}
           >
             <ListIcon className="w-4 h-4" />
-            Schůzky
+            Seznam
+          </button>
+          <button
+            onClick={() => setActiveTab("calendar")}
+            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
+              activeTab === "calendar" ? "bg-white text-neutral-900 shadow-sm" : "text-neutral-500 hover:text-neutral-700"
+            }`}
+          >
+            <CalendarDays className="w-4 h-4" />
+            Kalendář
           </button>
           <button
             onClick={() => setActiveTab("settings")}
@@ -229,6 +255,105 @@ export default function AdminSchuzkyPage() {
                       })}
                     </tbody>
                   </table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {/* Tab: Kalendář */}
+      {activeTab === "calendar" && (
+        <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }}>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-lg">Měsíční přehled</CardTitle>
+              <div className="flex items-center gap-4">
+                <Button variant="outline" size="icon" onClick={() => setCurrentCalendarMonth(subMonths(currentCalendarMonth, 1))}>
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                <div className="font-medium text-neutral-800 min-w-[120px] text-center capitalize">
+                  {format(currentCalendarMonth, "MMMM yyyy", { locale: cs })}
+                </div>
+                <Button variant="outline" size="icon" onClick={() => setCurrentCalendarMonth(addMonths(currentCalendarMonth, 1))}>
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {isMeetingsLoading ? (
+                <div className="flex justify-center py-20">
+                  <Loader2 className="w-8 h-8 animate-spin text-neutral-400" />
+                </div>
+              ) : (
+                <div className="rounded-lg border border-neutral-200 overflow-hidden bg-white">
+                  {/* Days of week header */}
+                  <div className="grid grid-cols-7 border-b border-neutral-200 bg-neutral-50">
+                    {["Po", "Út", "St", "Čt", "Pá", "So", "Ne"].map(d => (
+                      <div key={d} className="py-2 text-center text-xs font-semibold text-neutral-500 uppercase tracking-wider border-r border-neutral-200 last:border-r-0">
+                        {d}
+                      </div>
+                    ))}
+                  </div>
+                  {/* Calendar Grid */}
+                  <div className="flex flex-col">
+                    {(() => {
+                      const monthStart = startOfMonth(currentCalendarMonth);
+                      const monthEnd = endOfMonth(monthStart);
+                      const startDate = startOfWeek(monthStart, { weekStartsOn: 1 });
+                      const endDate = endOfWeek(monthEnd, { weekStartsOn: 1 });
+
+                      const rows = [];
+                      let days = [];
+                      let day = startDate;
+                      let formattedDate = "";
+
+                      while (day <= endDate) {
+                        for (let i = 0; i < 7; i++) {
+                          formattedDate = format(day, "d");
+                          const cloneDay = day;
+                          const dayMeetings = meetings.filter(m => isSameDay(new Date(m.start_time), cloneDay));
+                          
+                          days.push(
+                            <div
+                              className={`min-h-[100px] border-b border-r border-neutral-200 p-1.5 sm:p-2 transition-colors ${
+                                !isSameMonth(day, monthStart)
+                                  ? "bg-neutral-50/50 text-neutral-400"
+                                  : "bg-white text-neutral-900"
+                              } hover:bg-neutral-50`}
+                              key={day.toString()}
+                            >
+                              <div className="flex justify-end mb-1">
+                                <span className={`text-xs font-medium w-6 h-6 flex items-center justify-center rounded-full ${isSameDay(day, new Date()) ? 'bg-primary-500 text-white' : ''}`}>
+                                  {formattedDate}
+                                </span>
+                              </div>
+                              <div className="space-y-1">
+                                {dayMeetings.slice(0, 4).map(m => (
+                                  <div key={m.id} className={`text-[10px] leading-tight p-1 rounded border truncate ${m.status === 'cancelled' ? 'bg-neutral-100 text-neutral-500 border-neutral-200' : 'bg-primary-50 text-primary-700 border-primary-100 relative'}`} title={`${format(new Date(m.start_time), "HH:mm")} - ${m.guest_name}`}>
+                                    <span className="font-semibold">{format(new Date(m.start_time), "HH:mm")}</span> {m.guest_name}
+                                  </div>
+                                ))}
+                                {dayMeetings.length > 4 && (
+                                  <div className="text-[10px] text-neutral-500 font-medium pl-1">
+                                    + {dayMeetings.length - 4} další
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          );
+                          day = addDays(day, 1);
+                        }
+                        rows.push(
+                          <div className="grid grid-cols-7 last:border-b-0" key={day.toString()}>
+                            {days}
+                          </div>
+                        );
+                        days = [];
+                      }
+                      return rows;
+                    })()}
+                  </div>
                 </div>
               )}
             </CardContent>

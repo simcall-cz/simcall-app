@@ -12,6 +12,8 @@ import {
   Loader2,
   AlertCircle,
 } from "lucide-react";
+import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from "date-fns";
+import { cs } from "date-fns/locale";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -84,6 +86,15 @@ export default function AdminPlatbyPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const now = new Date();
+  const todayLabel = format(now, "d. M. yyyy", { locale: cs });
+  const weekStart = startOfWeek(now, { weekStartsOn: 1 });
+  const weekEnd = endOfWeek(now, { weekStartsOn: 1 });
+  const weekLabel = `${format(weekStart, "d. M.")} – ${format(weekEnd, "d. M. yyyy")}`;
+  const monthStart = startOfMonth(now);
+  const monthEnd = endOfMonth(now);
+  const monthLabel = `${format(monthStart, "d. M.")} – ${format(monthEnd, "d. M. yyyy")}`;
+
   async function fetchPayments() {
     try {
       const headers = await getAuthHeaders();
@@ -152,7 +163,10 @@ export default function AdminPlatbyPage() {
                   <DollarSign className="w-5 h-5 text-green-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-neutral-500 uppercase tracking-wide">Dnes</p>
+                  <div className="flex items-center gap-1">
+                    <p className="text-xs text-neutral-500 uppercase tracking-wide">Dnes</p>
+                    <span className="text-[10px] text-neutral-400">({todayLabel})</span>
+                  </div>
                   <p className="text-xl font-bold text-neutral-900">{formatCurrency(dailyRevenue)}</p>
                 </div>
               </div>
@@ -167,7 +181,10 @@ export default function AdminPlatbyPage() {
                   <TrendingUp className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-neutral-500 uppercase tracking-wide">Tento týden</p>
+                  <div className="flex items-center gap-1">
+                    <p className="text-xs text-neutral-500 uppercase tracking-wide">Tento týden</p>
+                  </div>
+                  <p className="text-[10px] text-neutral-400 mb-0.5">{weekLabel}</p>
                   <p className="text-xl font-bold text-neutral-900">{formatCurrency(weeklyRevenue)}</p>
                 </div>
               </div>
@@ -182,7 +199,10 @@ export default function AdminPlatbyPage() {
                   <CreditCard className="w-5 h-5 text-purple-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-neutral-500 uppercase tracking-wide">Tento měsíc</p>
+                  <div className="flex items-center gap-1">
+                    <p className="text-xs text-neutral-500 uppercase tracking-wide">Tento měsíc</p>
+                  </div>
+                  <p className="text-[10px] text-neutral-400 mb-0.5">{monthLabel}</p>
                   <p className="text-xl font-bold text-neutral-900">{formatCurrency(monthlyRevenue)}</p>
                 </div>
               </div>

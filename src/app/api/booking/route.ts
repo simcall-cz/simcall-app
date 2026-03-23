@@ -66,6 +66,18 @@ export async function POST(request: NextRequest) {
       .select()
       .single();
 
+    // 3.5 Create an admin notification
+    try {
+      await db.from("admin_notifications").insert({
+        title: "Nová schůzka",
+        message: `${guest_name} si rezervoval(a) schůzku na ${start.toLocaleDateString("cs-CZ")} v ${start.toLocaleTimeString("cs-CZ", { hour: '2-digit', minute: '2-digit' })}.`,
+        type: "meeting",
+        link: "/admin/schuzky"
+      });
+    } catch (notifError) {
+      console.error("Failed to create admin notification:", notifError);
+    }
+
     // 4. Send Confirmation Email
     try {
       const { getResend, getFromEmail, ADMIN_EMAIL } = await import("@/lib/resend");

@@ -1,8 +1,9 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, PhoneCall, ChevronRight } from "lucide-react";
+import { Menu, PhoneCall, ChevronRight, Lightbulb } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 
 interface DashboardTopbarProps {
@@ -17,15 +18,35 @@ const breadcrumbLabels: Record<string, string> = {
   profil: "Profil",
   admin: "Admin",
   uzivatele: "Uživatelé",
-  "financni-prehled": "Finance",
+  upozorneni: "Upozornění",
   agenti: "Agenti",
   dotazy: "Dotazy",
   manager: "Manager",
   tym: "Tým",
+  schuzky: "Schůzky",
+  platby: "Platby",
 };
 
 export function DashboardTopbar({ onMenuClick }: DashboardTopbarProps) {
   const pathname = usePathname();
+  const isAdminPath = pathname.startsWith("/admin");
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (isAdminPath) {
+      fetch("/api/admin/notifications/unread")
+        .then((res) => {
+          if (res.ok) return res.json();
+          return { count: 0 };
+        })
+        .then((data) => {
+          if (typeof data.count === "number") {
+            setUnreadCount(data.count);
+          }
+        })
+        .catch(console.error);
+    }
+  }, [isAdminPath, pathname]);
 
   // Build breadcrumb segments
   const segments = pathname.split("/").filter(Boolean);
@@ -73,6 +94,23 @@ export function DashboardTopbar({ onMenuClick }: DashboardTopbarProps) {
 
       {/* Right */}
       <div className="flex items-center gap-2 sm:gap-3">
+        {/* Admin Notifications */}
+        {isAdminPath && (
+          <Link
+            href="/admin/upozorneni"
+            className="relative flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-lg hover:bg-neutral-50 transition-colors mr-1 sm:mr-2"
+            aria-label="Upozornění"
+          >
+            <Lightbulb className="w-5 h-5 text-neutral-600 hover:text-yellow-500 transition-colors" />
+            {unreadCount > 0 && (
+              <span className="absolute top-1.5 right-1.5 flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500 border-2 border-white"></span>
+              </span>
+            )}
+          </Link>
+        )}
+
         {/* New Call Button */}
         <Link
           href="/dashboard/hovory/novy-hovor"

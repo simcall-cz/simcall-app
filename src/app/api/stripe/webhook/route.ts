@@ -463,6 +463,19 @@ export async function POST(request: NextRequest) {
         if (accountAutoCreated) {
           await notifyAutoAccountCreated(customerEmail, customerName, plan, tier);
         }
+
+        // Admin Notification
+        try {
+          await db.from("admin_notifications").insert({
+            title: "Nová platba",
+            message: `${customerName || customerEmail} zaplatil(a) ${amount} Kč za tarif ${plan} (${minutesLimit} min).`,
+            type: "payment",
+            link: "/admin/platby"
+          });
+        } catch (e) {
+          console.error("Admin notification err", e);
+        }
+
         break;
       }
 

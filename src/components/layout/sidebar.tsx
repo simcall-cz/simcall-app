@@ -26,6 +26,7 @@ import {
   Dumbbell,
   GraduationCap,
   Calendar,
+  Lightbulb,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
@@ -111,11 +112,6 @@ const adminNavItems: SidebarNavItem[] = [
     icon: <Users className="w-5 h-5" />,
   },
   {
-    label: "Finance",
-    href: "/admin/financni-prehled",
-    icon: <DollarSign className="w-5 h-5" />,
-  },
-  {
     label: "Hovory",
     href: "/admin/hovory",
     icon: <PhoneCall className="w-5 h-5" />,
@@ -139,6 +135,11 @@ const adminNavItems: SidebarNavItem[] = [
     label: "Schůzky",
     href: "/admin/schuzky",
     icon: <Calendar className="w-5 h-5" />,
+  },
+  {
+    label: "Upozornění",
+    href: "/admin/upozorneni",
+    icon: <Lightbulb className="w-5 h-5" />,
   },
   {
     label: "Podpora",
