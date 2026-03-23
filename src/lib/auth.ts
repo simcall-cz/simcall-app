@@ -243,7 +243,7 @@ async function findSubscriptionForUser(db: ReturnType<typeof createServerClient>
  * Includes protection against race conditions by counting pending (in-progress) calls
  * and adding a buffer for each one.
  */
-const PENDING_CALL_BUFFER_SECONDS = 300; // 5 min buffer per pending call
+const PENDING_CALL_BUFFER_SECONDS = 600; // 10 min buffer per pending call
 
 export async function checkMinuteLimit(userId: string): Promise<MinuteLimitCheck> {
   const db = createServerClient();
