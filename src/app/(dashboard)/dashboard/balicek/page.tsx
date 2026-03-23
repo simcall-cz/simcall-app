@@ -45,6 +45,7 @@ const planLabels: Record<string, string> = {
 const tierDetails: Record<string, { minutes: number; price: number }[]> = {
   solo: [
     { minutes: 30, price: 29 },
+    { minutes: 60, price: 55 },
     { minutes: 100, price: 990 },
     { minutes: 250, price: 2490 },
     { minutes: 500, price: 4990 },
@@ -54,6 +55,7 @@ const tierDetails: Record<string, { minutes: number; price: number }[]> = {
   ],
   team: [
     { minutes: 30, price: 29 },
+    { minutes: 60, price: 55 },
     { minutes: 500, price: 7490 },
     { minutes: 1000, price: 14990 },
     { minutes: 2500, price: 37490 },
