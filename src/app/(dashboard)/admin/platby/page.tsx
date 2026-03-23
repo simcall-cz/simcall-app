@@ -51,11 +51,32 @@ function formatCurrency(amount: number) {
   return amount.toLocaleString("cs-CZ") + " Kč";
 }
 
-function isWithinDays(dateStr: string, days: number) {
+function isToday(dateStr: string) {
   const d = new Date(dateStr);
   const now = new Date();
-  const diff = now.getTime() - d.getTime();
-  return diff <= days * 24 * 60 * 60 * 1000 && diff >= 0;
+  return d.getDate() === now.getDate() &&
+         d.getMonth() === now.getMonth() &&
+         d.getFullYear() === now.getFullYear();
+}
+
+function isThisWeek(dateStr: string) {
+  const d = new Date(dateStr);
+  const now = new Date();
+  
+  // Get Monday of the current week
+  const dayOfWeek = now.getDay() === 0 ? 6 : now.getDay() - 1; // 0 = Sunday, we want 0 = Monday
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - dayOfWeek);
+  monday.setHours(0, 0, 0, 0);
+
+  return d >= monday;
+}
+
+function isThisMonth(dateStr: string) {
+  const d = new Date(dateStr);
+  const now = new Date();
+  return d.getMonth() === now.getMonth() &&
+         d.getFullYear() === now.getFullYear();
 }
 
 export default function AdminPlatbyPage() {
@@ -79,19 +100,18 @@ export default function AdminPlatbyPage() {
 
   useEffect(() => { fetchPayments(); }, []);
 
-
   const completedPayments = useMemo(() => payments.filter((p) => p.status === "completed"), [payments]);
 
   const dailyRevenue = useMemo(
-    () => completedPayments.filter((p) => isWithinDays(p.created_at, 1)).reduce((s, p) => s + p.amount, 0),
+    () => completedPayments.filter((p) => isToday(p.created_at)).reduce((s, p) => s + p.amount, 0),
     [completedPayments]
   );
   const weeklyRevenue = useMemo(
-    () => completedPayments.filter((p) => isWithinDays(p.created_at, 7)).reduce((s, p) => s + p.amount, 0),
+    () => completedPayments.filter((p) => isThisWeek(p.created_at)).reduce((s, p) => s + p.amount, 0),
     [completedPayments]
   );
   const monthlyRevenue = useMemo(
-    () => completedPayments.filter((p) => isWithinDays(p.created_at, 30)).reduce((s, p) => s + p.amount, 0),
+    () => completedPayments.filter((p) => isThisMonth(p.created_at)).reduce((s, p) => s + p.amount, 0),
     [completedPayments]
   );
   const pendingCount = useMemo(() => payments.filter((p) => p.status === "pending").length, [payments]);
