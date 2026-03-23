@@ -84,6 +84,20 @@ export async function POST(request: NextRequest) {
     // ----------------------------------------------------------------
     notifyCheckoutStarted({ name, email, phone, plan, tier, companyName });
 
+    // Admin notification
+    try {
+      const { createServerClient } = await import("@/lib/supabase");
+      const db = createServerClient();
+      await db.from("admin_notifications").insert({
+        title: "Nový checkout",
+        message: `${name} (${email}) rozepsal(a) objednávku na tarif ${plan} ${tier}.`,
+        type: "payment",
+        link: "/admin/platby" // Or wherever makes sense
+      });
+    } catch (e) {
+      console.error("Admin notif err:", e);
+    }
+
     return NextResponse.json({ url: session.url });
   } catch (error: unknown) {
     console.error("[create-checkout-session] Error:", error);

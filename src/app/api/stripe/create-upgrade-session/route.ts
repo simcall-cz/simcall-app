@@ -213,6 +213,18 @@ export async function POST(request: NextRequest) {
               plan, tier
             );
 
+            // Admin notification
+            try {
+              await db.from("admin_notifications").insert({
+               title: "Downgrade naplánován",
+               message: `Uživatel ${customerEmail} naplánoval downgrade z ${currentSub.plan} ${currentSub.tier} na ${plan} ${tier}.`,
+               type: "payment",
+               link: "/admin/platby"
+              });
+            } catch (e) {
+              console.error("Admin notif err:", e);
+            }
+
             return NextResponse.json({
               success: true,
               scheduled: true,

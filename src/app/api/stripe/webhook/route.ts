@@ -190,6 +190,17 @@ export async function POST(request: NextRequest) {
               tier
             );
 
+            // 7. Admin Notification
+            try {
+              await db.from("admin_notifications").insert({
+                title: "Upgrade tarifu",
+                message: `Uživatel ${customerEmail} upgradoval z ${metadata.previous_plan} ${metadata.previous_tier} na ${plan} ${tier}`,
+                type: "payment"
+              });
+            } catch (authErr) {
+              console.warn("[stripe/webhook] Failed to create admin notification:", authErr);
+            }
+
             console.log(`[stripe/webhook] upgrade_surcharge completed — ${metadata.previous_plan}/${metadata.previous_tier} → ${plan}/${tier} for user ${userId}`);
           } catch (upgradeErr) {
             console.error("[stripe/webhook] upgrade_surcharge processing error:", upgradeErr);
@@ -540,6 +551,22 @@ export async function POST(request: NextRequest) {
 
         console.log(`[stripe/webhook] customer.subscription.deleted — ${stripeSubId}`);
         await notifySubscriptionCancelled(sub?.user_id || "", stripeSubId);
+
+        // Admin Notification
+        try {
+          if (sub?.user_id) {
+            const { data: profile } = await db.from("profiles").select("email").eq("id", sub.user_id).single();
+            await db.from("admin_notifications").insert({
+              title: "Zrušení předplatného",
+              message: `Uživatel ${profile?.email || sub.user_id} zrušil své předplatné.`,
+              type: "user",
+              link: "/admin/uzivatele"
+            });
+          }
+        } catch (e) {
+          console.error("Admin notif err:", e);
+        }
+
         break;
       }
 
@@ -629,6 +656,21 @@ export async function POST(request: NextRequest) {
             }
 
             console.log(`[stripe/webhook] Applied scheduled downgrade: ${subRecord.scheduled_plan}/${subRecord.scheduled_tier} for sub ${subRecord.id}`);
+
+            // Admin notification for successful downgrade application
+            try {
+              if (subRecord.user_id) {
+                const { data: profile } = await db.from("profiles").select("email").eq("id", subRecord.user_id).single();
+                await db.from("admin_notifications").insert({
+                  title: "Downgrade aplikován",
+                  message: `Plán pro uživatele ${profile?.email || subRecord.user_id} se nyní změnil na ${subRecord.scheduled_plan} ${subRecord.scheduled_tier}.`,
+                  type: "payment",
+                  link: "/admin/platby"
+                });
+              }
+            } catch (e) {
+              console.error("Admin notif err:", e);
+            }
           }
 
           console.log(`[stripe/webhook] invoice.payment_succeeded — ${stripeSubId} calls reset`);

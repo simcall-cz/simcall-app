@@ -67,7 +67,20 @@ export async function POST(request: NextRequest) {
 
     // Discord notification
     const { data: profile } = await db.from("profiles").select("email").eq("id", user.id).single();
-    notifySupportTicket(profile?.email || user.email || "", subject.trim(), message.trim());
+    const posterEmail = profile?.email || user.email || "";
+    notifySupportTicket(posterEmail, subject.trim(), message.trim());
+
+    // Admin notification
+    try {
+      await db.from("admin_notifications").insert({
+        title: "Nový support ticket",
+        message: `Uživatel ${posterEmail} vytvořil nový ticket: ${subject.trim()}`,
+        type: "form",
+        link: "/admin/dotazy"
+      });
+    } catch (e) {
+      console.error("Admin notif err:", e);
+    }
 
     return NextResponse.json({ ticket: data });
   } catch (err) {

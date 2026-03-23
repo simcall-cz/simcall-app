@@ -29,6 +29,20 @@ export async function POST(request: NextRequest) {
 
     await notifyNewRegistration(email, name || "");
 
+    // Admin UI Notification
+    try {
+      const { createServerClient } = await import("@/lib/supabase");
+      const db = createServerClient();
+      await db.from("admin_notifications").insert({
+        title: "Nová registrace",
+        message: `${name || "Uživatel"} (${email}) se právě zaregistroval(a).`,
+        type: "user",
+        link: "/admin/uzivatele"
+      });
+    } catch (e) {
+      console.error("Admin notif err:", e);
+    }
+
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("[notify/registration] Error:", err);
