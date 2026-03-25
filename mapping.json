@@ -1,0 +1,2530 @@
+[
+  {
+    "agent_id": "agent_4901kmgp40xxej1vjybwfej5n3nx",
+    "topic_id": "sales.first_contact",
+    "tier": "beginner",
+    "persona_name": "Iveta Strnadová",
+    "difficulty": 3.9,
+    "status": "pending"
+  },
+  {
+    "agent_id": "agent_4301kmgpmyx7effsn3jnw5c686j4",
+    "topic_id": "sales.first_contact",
+    "tier": "beginner",
+    "persona_name": "Igor Hájek",
+    "difficulty": 3.6,
+    "status": "pending"
+  },
+  {
+    "agent_id": "agent_5001kmgppz2vfedbxdkearn5az48",
+    "topic_id": "sales.first_contact",
+    "tier": "intermediate",
+    "persona_name": "Cecílie Kejvalová",
+    "difficulty": 4.3,
+    "status": "pending"
+  },
+  {
+    "agent_id": "agent_0301kmj6r4zpf8z8ddrcm0jpayh0",
+    "topic_id": "sales.first_contact",
+    "tier": "advanced",
+    "persona_name": "Denisa Strnadová",
+    "difficulty": 7.6,
+    "status": "pending"
+  },
+  {
+    "agent_id": "agent_6101kmj98w3bexmrepfgfndjjk0h",
+    "topic_id": "cadastre.area_mismatch",
+    "tier": "beginner",
+    "persona_name": "Jaromír Stránský",
+    "difficulty": 3.5,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_5301kmj9as29ehwrpaj4r0a1xz6g",
+    "topic_id": "cadastre.area_mismatch",
+    "tier": "intermediate",
+    "persona_name": "Filoména Hrabalová",
+    "difficulty": 4.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3101kmj9cdy3fpprkb7gn04p62fa",
+    "topic_id": "cadastre.area_mismatch",
+    "tier": "advanced",
+    "persona_name": "Filoména Štefanová",
+    "difficulty": 7.4,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_6601kmj9dnwke9raxvg8aea0verz",
+    "topic_id": "cadastre.entry_types",
+    "tier": "beginner",
+    "persona_name": "Stanislava Dušková",
+    "difficulty": 3.6,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_6401kmj9f4ceenzra2grvq9mzfqe",
+    "topic_id": "cadastre.entry_types",
+    "tier": "intermediate",
+    "persona_name": "Dagmar Votavová",
+    "difficulty": 4.4,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_5001kmj9gzzkfftssbb4ng8v4vjj",
+    "topic_id": "cadastre.entry_types",
+    "tier": "advanced",
+    "persona_name": "Gita Havránková",
+    "difficulty": 7.4,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1201kmj9j0aze1xsa14j5095p9b0",
+    "topic_id": "cadastre.geometric_plan",
+    "tier": "beginner",
+    "persona_name": "Vendula Vlčková",
+    "difficulty": 2.5,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1101kmj9kky5e71tp4vnkrrdtrwq",
+    "topic_id": "cadastre.geometric_plan",
+    "tier": "intermediate",
+    "persona_name": "Milan Němec",
+    "difficulty": 4.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3701kmj9mrjeehvt8gx4q5evkv91",
+    "topic_id": "cadastre.geometric_plan",
+    "tier": "advanced",
+    "persona_name": "Radka Urbanová",
+    "difficulty": 7.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3401kmj9p9c3etxsfpcjafx7swj8",
+    "topic_id": "cadastre.reading_extract",
+    "tier": "beginner",
+    "persona_name": "Gabriela Havránková",
+    "difficulty": 3.9,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_8701kmj9qmfxe8k96tt67133f78e",
+    "topic_id": "cadastre.reading_extract",
+    "tier": "intermediate",
+    "persona_name": "Robert Šafář",
+    "difficulty": 4.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1701kmj9s49cfhza3hjxfmjsy00m",
+    "topic_id": "cadastre.reading_extract",
+    "tier": "advanced",
+    "persona_name": "Vladimír Votava",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_8301kmj9t4qde5w938r58fd8tfnj",
+    "topic_id": "cadastre.registration_process",
+    "tier": "beginner",
+    "persona_name": "Marta Říhová",
+    "difficulty": 3.7,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_0701kmj9v1jzf7ctxg6mrg9gt2e5",
+    "topic_id": "cadastre.registration_process",
+    "tier": "intermediate",
+    "persona_name": "Štěpán Havel",
+    "difficulty": 4.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_9701kmj9wmxxf6nry6adqx14ebv9",
+    "topic_id": "cadastre.registration_process",
+    "tier": "advanced",
+    "persona_name": "Norbert Čížek",
+    "difficulty": 7.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4501kmj9y8yre25bf8xs2g3jrwq6",
+    "topic_id": "contracts.aml_obligations",
+    "tier": "beginner",
+    "persona_name": "Božena Králová",
+    "difficulty": 3.7,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_7001kmj9zgejfnqtxmshmwkzhjb7",
+    "topic_id": "contracts.aml_obligations",
+    "tier": "intermediate",
+    "persona_name": "Bohuslav Baloun",
+    "difficulty": 4.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_2401kmja18kmfkh9jwgs55nvkys3",
+    "topic_id": "contracts.aml_obligations",
+    "tier": "advanced",
+    "persona_name": "Magdaléna Hloušková",
+    "difficulty": 7.6,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_8901kmja3715fpxvxsde497pke2d",
+    "topic_id": "contracts.exclusive_vs_open",
+    "tier": "beginner",
+    "persona_name": "Libor Neumann",
+    "difficulty": 3.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3001kmja4dr3ejnam3c2g8ac692g",
+    "topic_id": "contracts.exclusive_vs_open",
+    "tier": "intermediate",
+    "persona_name": "Otakar Karas",
+    "difficulty": 4.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_6301kmja74f0f04t7k0krgtrxn37",
+    "topic_id": "contracts.exclusive_vs_open",
+    "tier": "advanced",
+    "persona_name": "Tereza Urbanecová",
+    "difficulty": 7.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1201kmja8mqqf6at0dv7tg1h4zx9",
+    "topic_id": "contracts.future_purchase",
+    "tier": "beginner",
+    "persona_name": "Petra Burešová",
+    "difficulty": 3.7,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4501kmjaa111f9z9emq9htzygw2d",
+    "topic_id": "contracts.future_purchase",
+    "tier": "intermediate",
+    "persona_name": "Václav Chlup",
+    "difficulty": 4.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_9601kmjabhrfe21b13gn0vg8jwm4",
+    "topic_id": "contracts.future_purchase",
+    "tier": "advanced",
+    "persona_name": "Felix Kolář",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_8001kmjaczceffzsjw4w70tw652s",
+    "topic_id": "contracts.handover_protocol",
+    "tier": "beginner",
+    "persona_name": "Irena Vlachová",
+    "difficulty": 2.5,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1501kmjaetywf4v9fg52pn6x9ftx",
+    "topic_id": "contracts.handover_protocol",
+    "tier": "intermediate",
+    "persona_name": "Erik Kadlec",
+    "difficulty": 4.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_8801kmjagex3fnxtws4anvcfz4xr",
+    "topic_id": "contracts.handover_protocol",
+    "tier": "advanced",
+    "persona_name": "Veronika Kovářová",
+    "difficulty": 7.6,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3201kmjaj2zjf3gtws8jeqy7eq04",
+    "topic_id": "contracts.lease_clauses",
+    "tier": "beginner",
+    "persona_name": "Bedřich Chlup",
+    "difficulty": 3.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1801kmjakrtne8ka9h0skhfkb61s",
+    "topic_id": "contracts.lease_clauses",
+    "tier": "intermediate",
+    "persona_name": "Diana Dušková",
+    "difficulty": 4.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_5901kmjanc21evsrfq78btr4gwpz",
+    "topic_id": "contracts.lease_clauses",
+    "tier": "advanced",
+    "persona_name": "Jan Hrabě",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_5101kmjapspafzz89994jfkaem0n",
+    "topic_id": "contracts.purchase_agreement",
+    "tier": "beginner",
+    "persona_name": "Milan Horáček",
+    "difficulty": 2.8,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_2501kmjarfr6f8eapbj5p8yjwbxt",
+    "topic_id": "contracts.purchase_agreement",
+    "tier": "intermediate",
+    "persona_name": "Alena Šimková",
+    "difficulty": 5.4,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_0001kmjat9f5fgv94sp2281k3pxv",
+    "topic_id": "contracts.purchase_agreement",
+    "tier": "advanced",
+    "persona_name": "Adriana Balounová",
+    "difficulty": 7.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_7101kmjavjj4e7ta5hx2d9vyfr5j",
+    "topic_id": "contracts.reservation_agreement",
+    "tier": "beginner",
+    "persona_name": "Ivana Hrušková",
+    "difficulty": 3.9,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_0601kmjaww2dfv08nq015q7mshh5",
+    "topic_id": "contracts.reservation_agreement",
+    "tier": "intermediate",
+    "persona_name": "Theodor Zíka",
+    "difficulty": 4.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_7601kmjaya7bfedavjx6708qafw2",
+    "topic_id": "contracts.reservation_agreement",
+    "tier": "advanced",
+    "persona_name": "Leo Šimánek",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_2301kmjb0mnxfs9aym0ym3ftxh07",
+    "topic_id": "ethics.client_bypass",
+    "tier": "beginner",
+    "persona_name": "Zoran Duda",
+    "difficulty": 3.7,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_2601kmjb2fn0eyqv86aqsmksghzr",
+    "topic_id": "ethics.client_bypass",
+    "tier": "intermediate",
+    "persona_name": "Aneta Kmentová",
+    "difficulty": 5.5,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4501kmjb3p2nfvetz003446xeajy",
+    "topic_id": "ethics.client_bypass",
+    "tier": "advanced",
+    "persona_name": "Roman Stránský",
+    "difficulty": 7.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_0201kmjb53fkf6n8rbvd9ckjmrqp",
+    "topic_id": "ethics.client_in_distress",
+    "tier": "beginner",
+    "persona_name": "Roman Hejna",
+    "difficulty": 3.9,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_0501kmjb60x5ftxsbvs7h8hp2vf8",
+    "topic_id": "ethics.client_in_distress",
+    "tier": "intermediate",
+    "persona_name": "Jaroslav Pták",
+    "difficulty": 5.9,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1701kmjb7czhf0s92583csgekq8x",
+    "topic_id": "ethics.client_in_distress",
+    "tier": "advanced",
+    "persona_name": "Dan Kadlec",
+    "difficulty": 7.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_6901kmjb98pyfddbcb1j3262bysx",
+    "topic_id": "ethics.competitor_poaching",
+    "tier": "beginner",
+    "persona_name": "Jiřina Vránová",
+    "difficulty": 3.9,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4601kmjbatf7fastn8frnnzggxvt",
+    "topic_id": "ethics.competitor_poaching",
+    "tier": "intermediate",
+    "persona_name": "Mojmír Urbanec",
+    "difficulty": 4.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4401kmjbcnn4e8e89gmh3ty8vzxe",
+    "topic_id": "ethics.competitor_poaching",
+    "tier": "advanced",
+    "persona_name": "Františka Kučerová",
+    "difficulty": 7.5,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_0001kmjbe5wtez3s13cgthrc9ev8",
+    "topic_id": "ethics.conflict_of_interest",
+    "tier": "beginner",
+    "persona_name": "Alžběta Zelenková",
+    "difficulty": 3.9,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3101kmjbfn00ee6bmwmeks3hqmpx",
+    "topic_id": "ethics.conflict_of_interest",
+    "tier": "intermediate",
+    "persona_name": "Arnošt Lukavský",
+    "difficulty": 4.7,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3001kmjbgkzve9sbnp9bq514czwx",
+    "topic_id": "ethics.conflict_of_interest",
+    "tier": "advanced",
+    "persona_name": "Miluše Dvořáková",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_6201kmjbhksnf4nb04tkr1zw63tr",
+    "topic_id": "ethics.false_advertising",
+    "tier": "beginner",
+    "persona_name": "Filoména Vondrková",
+    "difficulty": 3.8,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1601kmjbjmypf6pbvpdmn9tnzpdc",
+    "topic_id": "ethics.false_advertising",
+    "tier": "intermediate",
+    "persona_name": "Tadeáš Žák",
+    "difficulty": 5.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4201kmjbkwgce5qrfewah0449p76",
+    "topic_id": "ethics.false_advertising",
+    "tier": "advanced",
+    "persona_name": "Kamil Šafář",
+    "difficulty": 7.6,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_0401kmjbnca3e43vsaq7bjwtrenj",
+    "topic_id": "ethics.post_sale_complaint",
+    "tier": "beginner",
+    "persona_name": "Stanislava Strnadová",
+    "difficulty": 3.8,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3401kmjbpkztejqa2j6hj48ajdd1",
+    "topic_id": "ethics.post_sale_complaint",
+    "tier": "intermediate",
+    "persona_name": "David Kratochvíl",
+    "difficulty": 4.6,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3401kmjbr101e4886m15hd495k0r",
+    "topic_id": "ethics.post_sale_complaint",
+    "tier": "advanced",
+    "persona_name": "Marek Pánek",
+    "difficulty": 7.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4901kmjbt827fpeaa6nq0488pzzt",
+    "topic_id": "ethics.sensitive_info",
+    "tier": "beginner",
+    "persona_name": "Soňa Musilová",
+    "difficulty": 3.4,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_0301kmjbvwchfv9bmr5p396vbkw2",
+    "topic_id": "ethics.sensitive_info",
+    "tier": "intermediate",
+    "persona_name": "Antonín Polák",
+    "difficulty": 4.8,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3201kmjbxgk1eyhtfycne00nxj3q",
+    "topic_id": "ethics.sensitive_info",
+    "tier": "advanced",
+    "persona_name": "Jaroslav Urbanec",
+    "difficulty": 7.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_8901kmjbyqf9fy59n17cye3e2hz4",
+    "topic_id": "finance.appraisal_vs_market",
+    "tier": "beginner",
+    "persona_name": "Vladimíra Žáková",
+    "difficulty": 3.6,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_9601kmjc0dtnfd3sf2rdw2c3ne9n",
+    "topic_id": "finance.appraisal_vs_market",
+    "tier": "intermediate",
+    "persona_name": "Zdenka Šolcová",
+    "difficulty": 4.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_6601kmjc2d5gergr39ayt4jd9bbg",
+    "topic_id": "finance.appraisal_vs_market",
+    "tier": "advanced",
+    "persona_name": "Vojtěch Hruška",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1201kmjc3tmteg58wtqxvyq18bwd",
+    "topic_id": "finance.delayed_signing",
+    "tier": "beginner",
+    "persona_name": "Anna Urbanová",
+    "difficulty": 3.9,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_6101kmjc516tf9jtrdjq1tzk1b0m",
+    "topic_id": "finance.delayed_signing",
+    "tier": "intermediate",
+    "persona_name": "Emil Kment",
+    "difficulty": 5.5,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_9901kmjc6bg2eqg9kyrjjtja314f",
+    "topic_id": "finance.delayed_signing",
+    "tier": "advanced",
+    "persona_name": "Žofie Vaňková",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_7701kmjc73wweehv6ez2pgdmw00q",
+    "topic_id": "finance.escrow_options",
+    "tier": "beginner",
+    "persona_name": "Gabriela Lukavská",
+    "difficulty": 3.4,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_9101kmjc8jsvfxnb05k4rrmqcwa0",
+    "topic_id": "finance.escrow_options",
+    "tier": "intermediate",
+    "persona_name": "Fedor Vrána",
+    "difficulty": 4.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_9601kmjca29xfn0s82179c5shcrn",
+    "topic_id": "finance.escrow_options",
+    "tier": "advanced",
+    "persona_name": "Iva Beranová",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3301kmjcbxqae6cs49esa4049s7j",
+    "topic_id": "finance.income_tax_sale",
+    "tier": "beginner",
+    "persona_name": "Samuel Kroupa",
+    "difficulty": 2.5,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1901kmjcdgkxend8jr5f33ma0f6b",
+    "topic_id": "finance.income_tax_sale",
+    "tier": "intermediate",
+    "persona_name": "Amálie Pokorná",
+    "difficulty": 4.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1101kmjcfe68exha8nr83krcz9xv",
+    "topic_id": "finance.income_tax_sale",
+    "tier": "advanced",
+    "persona_name": "Petr Karas",
+    "difficulty": 7.8,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1901kmjcgmphfwr93g0cpx14hkcx",
+    "topic_id": "finance.insufficient_funds",
+    "tier": "beginner",
+    "persona_name": "Josef Šafář",
+    "difficulty": 3.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_2701kmjcj49gfzg8d1a68t39wxej",
+    "topic_id": "finance.insufficient_funds",
+    "tier": "intermediate",
+    "persona_name": "Jarmila Zemanová",
+    "difficulty": 4.6,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_9801kmjckkwcee0tsf04d8pqjn5w",
+    "topic_id": "finance.insufficient_funds",
+    "tier": "advanced",
+    "persona_name": "Tomáš Mrázek",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4901kmjcmzpmfyvbavh8qj2y8507",
+    "topic_id": "finance.interest_deduction",
+    "tier": "beginner",
+    "persona_name": "Alena Dobiášová",
+    "difficulty": 2.7,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_5801kmjcp5q2ea3b6zym6z2wevx5",
+    "topic_id": "finance.interest_deduction",
+    "tier": "intermediate",
+    "persona_name": "Lukáš Klimeš",
+    "difficulty": 4.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_7201kmjcqep7f6dsge63wkf9tn4q",
+    "topic_id": "finance.interest_deduction",
+    "tier": "advanced",
+    "persona_name": "Jarmila Orlovská",
+    "difficulty": 7.8,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3201kmjcs7zzfchrk5658rdx0h40",
+    "topic_id": "finance.investment_calc",
+    "tier": "beginner",
+    "persona_name": "Blanka Urbanová",
+    "difficulty": 3.4,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_9701kmjctrpgegt87dmb72znfsrc",
+    "topic_id": "finance.investment_calc",
+    "tier": "intermediate",
+    "persona_name": "Juraj Vlach",
+    "difficulty": 4.6,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_8001kmjcwvr0ey6tffrt4admh4es",
+    "topic_id": "finance.investment_calc",
+    "tier": "advanced",
+    "persona_name": "Gustav Novotný",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_7601kmjcy2h9f92vqhag5z8msp45",
+    "topic_id": "finance.mortgage_basics",
+    "tier": "beginner",
+    "persona_name": "Darina Veselská",
+    "difficulty": 3.9,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_5401kmjczr3je4yb0c6wybzdexcz",
+    "topic_id": "finance.mortgage_basics",
+    "tier": "intermediate",
+    "persona_name": "Martina Sojková",
+    "difficulty": 5.0,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3701kmjd0xrjek1spgbvapx2n2h3",
+    "topic_id": "finance.mortgage_basics",
+    "tier": "advanced",
+    "persona_name": "Diana Nováková",
+    "difficulty": 7.8,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1301kmjd2cg8e97tjjq7rvfqyvt9",
+    "topic_id": "finance.mortgage_insurance",
+    "tier": "beginner",
+    "persona_name": "Jaroslava Šuková",
+    "difficulty": 3.7,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_0101kmjd3mb4fprarvaytabk29jk",
+    "topic_id": "finance.mortgage_insurance",
+    "tier": "intermediate",
+    "persona_name": "Leona Mašínová",
+    "difficulty": 4.4,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1301kmjd56qafhysqyynct7ca0pr",
+    "topic_id": "finance.mortgage_insurance",
+    "tier": "advanced",
+    "persona_name": "Marian Šimůnek",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3101kmjd6w01eeps0d2cr0azvzaj",
+    "topic_id": "finance.vat_new_properties",
+    "tier": "beginner",
+    "persona_name": "Šárka Tomsová",
+    "difficulty": 3.8,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3601kmjd8gc1e5mbeysyjk621g5d",
+    "topic_id": "finance.vat_new_properties",
+    "tier": "intermediate",
+    "persona_name": "Zuzana Hanáková",
+    "difficulty": 4.4,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_6101kmjda0zpf7t8qk1hrp66gkqk",
+    "topic_id": "finance.vat_new_properties",
+    "tier": "advanced",
+    "persona_name": "Beatrice Kmentová",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4901kmjdbx3xfdhtpqc41nk69rcy",
+    "topic_id": "legal.bank_lien",
+    "tier": "beginner",
+    "persona_name": "Zdeňka Karasová",
+    "difficulty": 3.9,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_8801kmjddnazecxrj45ztq02h2fq",
+    "topic_id": "legal.bank_lien",
+    "tier": "intermediate",
+    "persona_name": "Eva Černá",
+    "difficulty": 6.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1501kmjdezv6e85bxvfgp5j51qv5",
+    "topic_id": "legal.bank_lien",
+    "tier": "advanced",
+    "persona_name": "Petr Pospíšil",
+    "difficulty": 7.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_8201kmjdgpvefzwsqzd5r0ehk7s9",
+    "topic_id": "legal.building_right",
+    "tier": "beginner",
+    "persona_name": "Julie Červenková",
+    "difficulty": 3.6,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1501kmjdjqq2ef19habn3p398z6y",
+    "topic_id": "legal.building_right",
+    "tier": "intermediate",
+    "persona_name": "Lucie Bílková",
+    "difficulty": 4.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_8401kmjdm2zcf3rbarhstpjj3h94",
+    "topic_id": "legal.building_right",
+    "tier": "advanced",
+    "persona_name": "Norbert Staněk",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_7801kmjdnf0mef4vbbcwrc9fr9v3",
+    "topic_id": "legal.cadastre_seal",
+    "tier": "beginner",
+    "persona_name": "Dagmar Votavová",
+    "difficulty": 3.6,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_6201kmjdqjxtfvttv8sdbpjv883y",
+    "topic_id": "legal.cadastre_seal",
+    "tier": "intermediate",
+    "persona_name": "Iveta Bílková",
+    "difficulty": 6.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_7801kmjds37reh6s4tzq7ca3jm5n",
+    "topic_id": "legal.cadastre_seal",
+    "tier": "advanced",
+    "persona_name": "Adam Sojka",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3701kmjdte7meqeazwa3g46qkj1w",
+    "topic_id": "legal.contractual_preemptive",
+    "tier": "beginner",
+    "persona_name": "Lenka Doubková",
+    "difficulty": 3.8,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_6601kmjdvs39fmf822egfmcps50z",
+    "topic_id": "legal.contractual_preemptive",
+    "tier": "intermediate",
+    "persona_name": "Pavel Sýkora",
+    "difficulty": 4.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3501kmjdxbvbef6v7r7sne75p8hn",
+    "topic_id": "legal.contractual_preemptive",
+    "tier": "advanced",
+    "persona_name": "Radoslav Svoboda",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4501kmjdzhgpehtbam2zaxsdndsr",
+    "topic_id": "legal.disputed_inheritance",
+    "tier": "beginner",
+    "persona_name": "Bohdan Klimeš",
+    "difficulty": 3.6,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4001kmje208rey7sgxdgtn25qbb6",
+    "topic_id": "legal.disputed_inheritance",
+    "tier": "intermediate",
+    "persona_name": "Fedor Bureš",
+    "difficulty": 6.9,
+    "status": "pending"
+  },
+  {
+    "agent_id": "agent_2901kmje3zb9eazb70hcr58n417q",
+    "topic_id": "legal.disputed_inheritance",
+    "tier": "advanced",
+    "persona_name": "Richard Pecha",
+    "difficulty": 8.1,
+    "status": "pending"
+  },
+  {
+    "agent_id": "agent_2001kmje72w9fs7aq9x1tfdk5wq2",
+    "topic_id": "legal.easement_habitation",
+    "tier": "beginner",
+    "persona_name": "Dušan Kubát",
+    "difficulty": 3.5,
+    "status": "pending"
+  },
+  {
+    "agent_id": "agent_8201kmje9mvafhtv0n1hx8tyd130",
+    "topic_id": "legal.easement_habitation",
+    "tier": "intermediate",
+    "persona_name": "Ilona Chalupová",
+    "difficulty": 5.3,
+    "status": "pending"
+  },
+  {
+    "agent_id": "agent_8001kmjgv1a8fxeskkj1dfy6hcay",
+    "topic_id": "legal.easement_habitation",
+    "tier": "advanced",
+    "persona_name": "Mojmír Hejna",
+    "difficulty": 7.5,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_9101kmjgwmddfbevpbc2y724d0rq",
+    "topic_id": "legal.easement_passage",
+    "tier": "beginner",
+    "persona_name": "Viktor Valenta",
+    "difficulty": 2.4,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_8101kmjgyd12fpq8y9ppmjdjmv5n",
+    "topic_id": "legal.easement_passage",
+    "tier": "intermediate",
+    "persona_name": "Leo Šindelář",
+    "difficulty": 4.8,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_9101kmjh03s1ekjvwehrstfbm3b5",
+    "topic_id": "legal.easement_passage",
+    "tier": "advanced",
+    "persona_name": "Dušan Doubek",
+    "difficulty": 7.5,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_8101kmjh25afesfbacvc7veq9re7",
+    "topic_id": "legal.easement_water",
+    "tier": "beginner",
+    "persona_name": "Nela Novotná",
+    "difficulty": 3.8,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_8101kmjh3sjvfqvtv2szzqxtqzgc",
+    "topic_id": "legal.easement_water",
+    "tier": "intermediate",
+    "persona_name": "Libuše Tykalová",
+    "difficulty": 4.7,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_7401kmjh5p5vew8s1q151g2tnzma",
+    "topic_id": "legal.easement_water",
+    "tier": "advanced",
+    "persona_name": "Andrea Němcová",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_8601kmjh7c31fqm89ts1nyn88kkx",
+    "topic_id": "legal.execution",
+    "tier": "beginner",
+    "persona_name": "Diana Šimková",
+    "difficulty": 3.6,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_0001kmjh8qp4ey7r0pgdxgcwc0mr",
+    "topic_id": "legal.execution",
+    "tier": "intermediate",
+    "persona_name": "Hynek Lukáš",
+    "difficulty": 6.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_7201kmjhaxb5e1q9ffawr22w5vm8",
+    "topic_id": "legal.execution",
+    "tier": "advanced",
+    "persona_name": "Norbert Švestka",
+    "difficulty": 8.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4701kmjhd0e8ew1r38wa0wk90nxp",
+    "topic_id": "legal.illegal_construction",
+    "tier": "beginner",
+    "persona_name": "Radmila Urbanová",
+    "difficulty": 3.9,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1701kmjheetjfw8scvjksgjfv3cf",
+    "topic_id": "legal.illegal_construction",
+    "tier": "intermediate",
+    "persona_name": "Dagmar Rybářová",
+    "difficulty": 5.0,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3701kmjhgsp5fj1tf86fkhxw05cc",
+    "topic_id": "legal.illegal_construction",
+    "tier": "advanced",
+    "persona_name": "Iva Dudová",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1301kmjhhzqqf2xaz8nh4j3v2ve7",
+    "topic_id": "legal.insolvency",
+    "tier": "beginner",
+    "persona_name": "Ctirad Veselský",
+    "difficulty": 3.5,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3801kmjhken2fa09r7aww5hs508c",
+    "topic_id": "legal.insolvency",
+    "tier": "intermediate",
+    "persona_name": "Marek Fišer",
+    "difficulty": 6.8,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_7601kmjhn7tfevkv71pc8re17zq7",
+    "topic_id": "legal.insolvency",
+    "tier": "advanced",
+    "persona_name": "Jakub Strnad",
+    "difficulty": 8.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_5201kmjhpk2dfat9jdqea13wteep",
+    "topic_id": "legal.multiple_executions",
+    "tier": "beginner",
+    "persona_name": "Marian Svoboda",
+    "difficulty": 3.9,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4801kmjhrctse3jaabds1brj69qw",
+    "topic_id": "legal.multiple_executions",
+    "tier": "intermediate",
+    "persona_name": "Šárka Pokorná",
+    "difficulty": 6.8,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_6201kmjhsg85fbmr1eys00vfzqmd",
+    "topic_id": "legal.multiple_executions",
+    "tier": "advanced",
+    "persona_name": "Vlasta Šolcová",
+    "difficulty": 8.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_6101kmjhv940eagrh1th6m3jj670",
+    "topic_id": "legal.preemptive_right",
+    "tier": "beginner",
+    "persona_name": "Leoš Šolc",
+    "difficulty": 3.9,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_7301kmjhwvkcfhnbd67vd7pat0f1",
+    "topic_id": "legal.preemptive_right",
+    "tier": "intermediate",
+    "persona_name": "Ctibor Lorenc",
+    "difficulty": 5.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_6601kmjhy7wwe59a1b6qp9r6hdt8",
+    "topic_id": "legal.preemptive_right",
+    "tier": "advanced",
+    "persona_name": "Lenka Vránová",
+    "difficulty": 7.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_9801kmjhzrygfa8bt1kvwz9t55zd",
+    "topic_id": "marketing.bad_photos",
+    "tier": "beginner",
+    "persona_name": "Eliška Zajícová",
+    "difficulty": 3.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_2501kmjj14a5fdmspgrkf0q9bq6z",
+    "topic_id": "marketing.bad_photos",
+    "tier": "intermediate",
+    "persona_name": "Ludmila Kroupová",
+    "difficulty": 5.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_0001kmjj2wy5e0w97p51t4nw08n5",
+    "topic_id": "marketing.bad_photos",
+    "tier": "advanced",
+    "persona_name": "Boris Nedvěd",
+    "difficulty": 7.4,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4101kmjj4cxhf09916a5v2pz4804",
+    "topic_id": "marketing.home_staging",
+    "tier": "beginner",
+    "persona_name": "Bohdan Štěpánek",
+    "difficulty": 3.6,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_6101kmjj5kyefm6tegr2g0e0379x",
+    "topic_id": "marketing.home_staging",
+    "tier": "intermediate",
+    "persona_name": "Ilona Kovářová",
+    "difficulty": 4.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1001kmjj7a40e9dtqfh43ttxv79h",
+    "topic_id": "marketing.home_staging",
+    "tier": "advanced",
+    "persona_name": "Jakub Kříž",
+    "difficulty": 7.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4201kmjj8x3te3x9snh2bxvy5dcg",
+    "topic_id": "marketing.legal_ad_requirements",
+    "tier": "beginner",
+    "persona_name": "Dušan Pták",
+    "difficulty": 2.6,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_5001kmjja5j6f65b50gamr8bzfmb",
+    "topic_id": "marketing.legal_ad_requirements",
+    "tier": "intermediate",
+    "persona_name": "Vladivoj Hnát",
+    "difficulty": 4.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4301kmjjcfg1f68stf24qpsjzzwq",
+    "topic_id": "marketing.legal_ad_requirements",
+    "tier": "advanced",
+    "persona_name": "Daniela Zelenková",
+    "difficulty": 7.6,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_5501kmjjegc8fhcreek9gq7heky1",
+    "topic_id": "marketing.online_buyer_qualification",
+    "tier": "beginner",
+    "persona_name": "Vlasta Králová",
+    "difficulty": 3.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4101kmjjg5xqe95scfp6r7c1bwkn",
+    "topic_id": "marketing.online_buyer_qualification",
+    "tier": "intermediate",
+    "persona_name": "Lucie Vlachová",
+    "difficulty": 4.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_7101kmjjhwf1fbrvn2h0zyd75ycn",
+    "topic_id": "marketing.online_buyer_qualification",
+    "tier": "advanced",
+    "persona_name": "Zikmund Doležal",
+    "difficulty": 7.6,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3601kmjjkfztewb8bhfx3xw04h03",
+    "topic_id": "marketing.open_house",
+    "tier": "beginner",
+    "persona_name": "Hedvika Doubková",
+    "difficulty": 3.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_8601kmjjn5dke0q92ebcfvyfp2t3",
+    "topic_id": "marketing.open_house",
+    "tier": "intermediate",
+    "persona_name": "Patrik Procházka",
+    "difficulty": 4.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4501kmjjps40epar2618rxn8sx5j",
+    "topic_id": "marketing.open_house",
+    "tier": "advanced",
+    "persona_name": "Markéta Kratochvílová",
+    "difficulty": 7.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_6701kmjjr62qf7sbtvn52v26f605",
+    "topic_id": "marketing.personal_brand",
+    "tier": "beginner",
+    "persona_name": "Olga Stránská",
+    "difficulty": 3.5,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_6801kmjjt7cyew9sdw92fp07cepp",
+    "topic_id": "marketing.personal_brand",
+    "tier": "intermediate",
+    "persona_name": "Alžběta Oulická",
+    "difficulty": 4.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_7001kmjjv6dqemerjs4azj2nnxpf",
+    "topic_id": "marketing.personal_brand",
+    "tier": "advanced",
+    "persona_name": "Radka Slezáková",
+    "difficulty": 7.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1101kmjjxatnfzeb7pd6a4kx2qpa",
+    "topic_id": "marketing.social_media",
+    "tier": "beginner",
+    "persona_name": "Jiří Kohout",
+    "difficulty": 3.4,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_8301kmjjz7xefq4abe8rnxftzdc9",
+    "topic_id": "marketing.social_media",
+    "tier": "intermediate",
+    "persona_name": "Stanislava Valentová",
+    "difficulty": 4.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4701kmjk1s4ee11tnkakq5gkkdr1",
+    "topic_id": "marketing.social_media",
+    "tier": "advanced",
+    "persona_name": "Lubomír Váňa",
+    "difficulty": 7.7,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3401kmjk3y9kfrctmempx72e802b",
+    "topic_id": "objections.commission",
+    "tier": "beginner",
+    "persona_name": "Róbert Růžička",
+    "difficulty": 3.6,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3101kmjk52chete8sh3a8cy3hdeg",
+    "topic_id": "objections.commission",
+    "tier": "intermediate",
+    "persona_name": "Antonín Hejna",
+    "difficulty": 4.6,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_8601kmjk6ngeeyc8ya60htpdxnn9",
+    "topic_id": "objections.commission",
+    "tier": "advanced",
+    "persona_name": "Miroslav Tomsa",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_6201kmjk7wb7epp8g40qqs3dt4sm",
+    "topic_id": "objections.existing_agent",
+    "tier": "beginner",
+    "persona_name": "Marta Marková",
+    "difficulty": 3.6,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4501kmjk96e6f8xakt9ep7y2k1mn",
+    "topic_id": "objections.existing_agent",
+    "tier": "intermediate",
+    "persona_name": "Eva Němcová",
+    "difficulty": 4.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3701kmjkb07gfpas9xyzy1baffxp",
+    "topic_id": "objections.existing_agent",
+    "tier": "advanced",
+    "persona_name": "Blanka Doubková",
+    "difficulty": 7.6,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4901kmjkcgetfk7sagm72rywv7qe",
+    "topic_id": "personality.aggressive_client",
+    "tier": "beginner",
+    "persona_name": "Ervín Mašín",
+    "difficulty": 3.8,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1001kmjke3btfr78xpryabcwcczt",
+    "topic_id": "personality.aggressive_client",
+    "tier": "intermediate",
+    "persona_name": "Veronika Zíková",
+    "difficulty": 6.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4401kmjkfgxkextt1k111hzvrx9m",
+    "topic_id": "personality.aggressive_client",
+    "tier": "advanced",
+    "persona_name": "Gustav Hrabal",
+    "difficulty": 7.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_9901kmjkgjedfsr8jryhdc9r9wmq",
+    "topic_id": "personality.aggressive_tester",
+    "tier": "beginner",
+    "persona_name": "Ivana Kubátová",
+    "difficulty": 3.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4401kmjkj314f64svfs2sadt3m9p",
+    "topic_id": "personality.aggressive_tester",
+    "tier": "intermediate",
+    "persona_name": "Beatrice Marková",
+    "difficulty": 5.4,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_7001kmjkkm59ffyvxxf49zbm161n",
+    "topic_id": "personality.aggressive_tester",
+    "tier": "advanced",
+    "persona_name": "Františka Štěpánková",
+    "difficulty": 7.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_2701kmjkn8zye9w8wrhhe0c9kdwa",
+    "topic_id": "pricing.emotional_attachment",
+    "tier": "beginner",
+    "persona_name": "Eliška Malá",
+    "difficulty": 3.7,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_9301kmjkpt5wf0a8vvx1tgvs4tgz",
+    "topic_id": "pricing.emotional_attachment",
+    "tier": "intermediate",
+    "persona_name": "Miroslava Malá",
+    "difficulty": 5.5,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4501kmjkrc4gfasvg14ksvmyeks9",
+    "topic_id": "pricing.emotional_attachment",
+    "tier": "advanced",
+    "persona_name": "Soňa Váňová",
+    "difficulty": 7.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_8301kmjkswgxe7qskeh86yk09agt",
+    "topic_id": "pricing.overpricing",
+    "tier": "beginner",
+    "persona_name": "Marcel Zelenka",
+    "difficulty": 3.8,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_0801kmjmd3jbeh4rfd12ecvvzp05",
+    "topic_id": "pricing.overpricing",
+    "tier": "intermediate",
+    "persona_name": "Dita Chlupová",
+    "difficulty": 5.0,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_0201kmjmepdqf3asb1m8pkpryach",
+    "topic_id": "pricing.overpricing",
+    "tier": "advanced",
+    "persona_name": "Milada Sedláčková",
+    "difficulty": 7.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1601kmjmgfe5e548mkwrm4gb6c8j",
+    "topic_id": "pricing.price_disagreement",
+    "tier": "beginner",
+    "persona_name": "Boris Stránský",
+    "difficulty": 3.8,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_2101kmjmjt1me8nts36vvrn3265z",
+    "topic_id": "pricing.price_disagreement",
+    "tier": "intermediate",
+    "persona_name": "Filip Bílek",
+    "difficulty": 5.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_6901kmjmmrhzfncv8sp0yzfbh4sg",
+    "topic_id": "pricing.price_disagreement",
+    "tier": "advanced",
+    "persona_name": "Anna Mrkosová",
+    "difficulty": 7.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_2101kmjmppg8fax9jsj2mq3c1ag0",
+    "topic_id": "reluctant.fsbo",
+    "tier": "beginner",
+    "persona_name": "Jana Kejvalová",
+    "difficulty": 3.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_6701kmjmre8se4xax690kwp9y74n",
+    "topic_id": "reluctant.fsbo",
+    "tier": "intermediate",
+    "persona_name": "Samuel Pokorný",
+    "difficulty": 4.4,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_2401kmjmt303f2ravkg93vn4da8p",
+    "topic_id": "reluctant.fsbo",
+    "tier": "advanced",
+    "persona_name": "Milena Hrabalová",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_5501kmjmw3z9evb8dqh4sk3dcp2a",
+    "topic_id": "reluctant.procrastinator",
+    "tier": "beginner",
+    "persona_name": "Nela Urbanová",
+    "difficulty": 3.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3201kmjmy7z9e69t858sykzgq343",
+    "topic_id": "reluctant.procrastinator",
+    "tier": "intermediate",
+    "persona_name": "Mojmír Kment",
+    "difficulty": 5.4,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3701kmjn0d7nezt9ypqnsd780dcx",
+    "topic_id": "reluctant.procrastinator",
+    "tier": "advanced",
+    "persona_name": "Nela Tykalová",
+    "difficulty": 7.4,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_2901kmjn26g8fdmrbwrkjqhvcwqt",
+    "topic_id": "rental.airbnb_legal",
+    "tier": "beginner",
+    "persona_name": "Cecílie Tomsová",
+    "difficulty": 3.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4601kmjn4fbvfz4sjzqxfqhkh1gc",
+    "topic_id": "rental.airbnb_legal",
+    "tier": "intermediate",
+    "persona_name": "Ervín Šilhán",
+    "difficulty": 4.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_2401kmjn607fewevj78xh828aamt",
+    "topic_id": "rental.airbnb_legal",
+    "tier": "advanced",
+    "persona_name": "Arnošt Mašek",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_7301kmjn8252e6stj8bm0qa8nr9r",
+    "topic_id": "rental.commercial_lease",
+    "tier": "beginner",
+    "persona_name": "Filoména Dudová",
+    "difficulty": 3.9,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_0701kmjna2x2e7ebwxcn24fcxvgn",
+    "topic_id": "rental.commercial_lease",
+    "tier": "intermediate",
+    "persona_name": "Soňa Hejnová",
+    "difficulty": 4.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1701kmjnambkfadscegs152gxexq",
+    "topic_id": "rental.commercial_lease",
+    "tier": "advanced",
+    "persona_name": "Věra Křížková",
+    "difficulty": 7.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_5101kmjnd3ane0x9yvxvz3t77rg3",
+    "topic_id": "rental.first_contact",
+    "tier": "beginner",
+    "persona_name": "Milán Jelínek",
+    "difficulty": 3.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_8801kmjnezzbf1r8rfgy68v7rzt6",
+    "topic_id": "rental.first_contact",
+    "tier": "intermediate",
+    "persona_name": "Tomáš Navrátil",
+    "difficulty": 4.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4901kmjnh655f6ka4vfe4r1abr76",
+    "topic_id": "rental.first_contact",
+    "tier": "advanced",
+    "persona_name": "Denisa Burešová",
+    "difficulty": 7.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_5901kmjnjrp3fcwvhvsec1resc3x",
+    "topic_id": "rental.handover_protocol",
+    "tier": "beginner",
+    "persona_name": "Hynek Baloun",
+    "difficulty": 3.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_8701kmjnm893fq6vge5xqcp5hhpp",
+    "topic_id": "rental.handover_protocol",
+    "tier": "intermediate",
+    "persona_name": "Petra Šilhánová",
+    "difficulty": 4.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_6201kmjnnx0ffjg8vfw156gbyex9",
+    "topic_id": "rental.handover_protocol",
+    "tier": "advanced",
+    "persona_name": "Věra Urbanecová",
+    "difficulty": 7.8,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_5901kmjnqk5genx9bmhvnyw3xyh4",
+    "topic_id": "rental.lease_essentials",
+    "tier": "beginner",
+    "persona_name": "Svatopluk Vrána",
+    "difficulty": 3.4,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4201kmjnrxr9eb29maf0vdzm3g80",
+    "topic_id": "rental.lease_essentials",
+    "tier": "intermediate",
+    "persona_name": "Edita Benešová",
+    "difficulty": 4.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_5301kmjntkrte3p8ecwde3qdrpqz",
+    "topic_id": "rental.lease_essentials",
+    "tier": "advanced",
+    "persona_name": "Edita Králová",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1001kmjnw56pfyt84pkxhcdcxfa4",
+    "topic_id": "rental.lease_termination",
+    "tier": "beginner",
+    "persona_name": "Ctirad Valenta",
+    "difficulty": 3.6,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_0701kmjnxzfmf61rq2jpx27h5j17",
+    "topic_id": "rental.lease_termination",
+    "tier": "intermediate",
+    "persona_name": "Radim Toman",
+    "difficulty": 4.9,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_8401kmjnzqw3eycryb7fmn4febhn",
+    "topic_id": "rental.lease_termination",
+    "tier": "advanced",
+    "persona_name": "Zdeněk Vrána",
+    "difficulty": 7.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_8301kmjp1530f0xac1nddnfxyvqw",
+    "topic_id": "rental.nonpaying_tenant",
+    "tier": "beginner",
+    "persona_name": "Rostislav Svoboda",
+    "difficulty": 3.9,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3101kmjp2bsnf63r174132cm8w0t",
+    "topic_id": "rental.nonpaying_tenant",
+    "tier": "intermediate",
+    "persona_name": "Amálie Černá",
+    "difficulty": 6.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_8901kmjp47s1e2393c8w5awr2mza",
+    "topic_id": "rental.nonpaying_tenant",
+    "tier": "advanced",
+    "persona_name": "Erik Polák",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_9101kmjp5rg3f90vq44pdmywgcn5",
+    "topic_id": "rental.property_damage",
+    "tier": "beginner",
+    "persona_name": "Václav Bureš",
+    "difficulty": 3.9,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3401kmjp7q72e8ma315z8tvsx2m1",
+    "topic_id": "rental.property_damage",
+    "tier": "intermediate",
+    "persona_name": "Lukáš Krejčí",
+    "difficulty": 4.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1901kmjp9946fpkat06p819y82rs",
+    "topic_id": "rental.property_damage",
+    "tier": "advanced",
+    "persona_name": "Františka Čermáková",
+    "difficulty": 7.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_6501kmjpbqjtfxj9dd6n5bz588cd",
+    "topic_id": "rental.rent_pricing",
+    "tier": "beginner",
+    "persona_name": "Theodor Kroupa",
+    "difficulty": 3.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_2701kmjpczfrfjt8ygm859r0zgs1",
+    "topic_id": "rental.rent_pricing",
+    "tier": "intermediate",
+    "persona_name": "Tereza Zíková",
+    "difficulty": 4.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_8201kmjpf08zen2v3fe1pycykq60",
+    "topic_id": "rental.rent_pricing",
+    "tier": "advanced",
+    "persona_name": "Dita Čížková",
+    "difficulty": 7.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_2501kmjpgpnnf5n8sr9nva4fwa3k",
+    "topic_id": "rental.shared_housing",
+    "tier": "beginner",
+    "persona_name": "Edita Mašková",
+    "difficulty": 3.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_5701kmjpjs2nfcv9sde61ky16xw9",
+    "topic_id": "rental.shared_housing",
+    "tier": "intermediate",
+    "persona_name": "Vladislav Navrátil",
+    "difficulty": 4.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_2401kmjpmweme22vf1at576ggz97",
+    "topic_id": "rental.shared_housing",
+    "tier": "advanced",
+    "persona_name": "Marie Šuková",
+    "difficulty": 7.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_9101kmjppks6fhx847d16zf0vzfj",
+    "topic_id": "rental.short_vs_long",
+    "tier": "beginner",
+    "persona_name": "Jarmila Mrázková",
+    "difficulty": 3.5,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_2201kmjpr0djetcr4rjbj2t2zf8f",
+    "topic_id": "rental.short_vs_long",
+    "tier": "intermediate",
+    "persona_name": "René Macek",
+    "difficulty": 4.9,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_7901kmjpsrjcfej92246c4rmn96c",
+    "topic_id": "rental.short_vs_long",
+    "tier": "advanced",
+    "persona_name": "Klára Valentová",
+    "difficulty": 7.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3301kmjpvhg5f9fvegw3b371n3kf",
+    "topic_id": "rental.tenant_screening",
+    "tier": "beginner",
+    "persona_name": "Miloš Zelenka",
+    "difficulty": 3.8,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_8501kmjpxhddemdak9ryp9dpcc3f",
+    "topic_id": "rental.tenant_screening",
+    "tier": "intermediate",
+    "persona_name": "Viktor Kment",
+    "difficulty": 4.4,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3601kmjpz909fedv0v0aejv59wry",
+    "topic_id": "rental.tenant_screening",
+    "tier": "advanced",
+    "persona_name": "Ivan Šindelář",
+    "difficulty": 7.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_7101kmjq1ckme97vv10b27t7jjm0",
+    "topic_id": "rental.tenant_viewing",
+    "tier": "beginner",
+    "persona_name": "Barbora Burešová",
+    "difficulty": 2.4,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_5201kmjq38ndf3sv1yvpjjms06e8",
+    "topic_id": "rental.tenant_viewing",
+    "tier": "intermediate",
+    "persona_name": "Klára Pitrová",
+    "difficulty": 4.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_8101kmjq5507enrspec0nmavv8w3",
+    "topic_id": "rental.tenant_viewing",
+    "tier": "advanced",
+    "persona_name": "Gabriela Králová",
+    "difficulty": 7.5,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3201kmjq75q3fycr5ny860fygynz",
+    "topic_id": "sales.abroad_owner",
+    "tier": "beginner",
+    "persona_name": "Dan Strnad",
+    "difficulty": 3.9,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_0401kmjq9mkeeqrsqkzekef87668",
+    "topic_id": "sales.abroad_owner",
+    "tier": "intermediate",
+    "persona_name": "Vladimír Kroupa",
+    "difficulty": 4.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_5201kmjqbqgffbdatcyr1t6j8r9z",
+    "topic_id": "sales.abroad_owner",
+    "tier": "advanced",
+    "persona_name": "Tibor Plíhal",
+    "difficulty": 7.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_8601kmjqdharf9kb0jrv27nze12k",
+    "topic_id": "sales.buyer_objections",
+    "tier": "beginner",
+    "persona_name": "Amálie Vítová",
+    "difficulty": 3.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1101kmjqfkcff8tsqhqj35rfzj12",
+    "topic_id": "sales.buyer_objections",
+    "tier": "intermediate",
+    "persona_name": "Ludmila Brůnová",
+    "difficulty": 4.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_8001kmjqh3anev9refzwxa60y5f9",
+    "topic_id": "sales.buyer_objections",
+    "tier": "advanced",
+    "persona_name": "Bořek Bartoš",
+    "difficulty": 7.5,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3801kmjqk0tkf8qahkvdtm27zb8w",
+    "topic_id": "sales.closing_deal",
+    "tier": "beginner",
+    "persona_name": "Hana Neumannová",
+    "difficulty": 3.8,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_0201kmjqnbjgeq6rf9t7n0vy70vn",
+    "topic_id": "sales.closing_deal",
+    "tier": "intermediate",
+    "persona_name": "Jakub Novotný",
+    "difficulty": 4.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_8401kmjqq6bgf9zbxsg5kt6bx209",
+    "topic_id": "sales.closing_deal",
+    "tier": "advanced",
+    "persona_name": "Milan Staněk",
+    "difficulty": 7.5,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_9601kmjqrh05enjsp9f1qwh684v4",
+    "topic_id": "sales.co_ownership",
+    "tier": "beginner",
+    "persona_name": "Radoslav Holub",
+    "difficulty": 3.8,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3301kmjqt0tsegv977sdf156yzbb",
+    "topic_id": "sales.co_ownership",
+    "tier": "intermediate",
+    "persona_name": "Martina Burešová",
+    "difficulty": 5.4,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1101kmjqvy3pfwyvge2kdz0p1h7q",
+    "topic_id": "sales.co_ownership",
+    "tier": "advanced",
+    "persona_name": "Antonín Křížek",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_6901kmjqx2q9f8cvr2z8pqz42gfm",
+    "topic_id": "sales.inherited_property",
+    "tier": "beginner",
+    "persona_name": "Antonín Kříž",
+    "difficulty": 3.9,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_6801kmjqyvqmekr9stjerxpxjfay",
+    "topic_id": "sales.inherited_property",
+    "tier": "intermediate",
+    "persona_name": "Michaela Zíková",
+    "difficulty": 5.6,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1501kmjr1da8e7m9e6j8cva68hrt",
+    "topic_id": "sales.inherited_property",
+    "tier": "advanced",
+    "persona_name": "Milada Langerová",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_8801kmjr3byqft4a0czjqdd51hzd",
+    "topic_id": "sales.multiple_offers",
+    "tier": "beginner",
+    "persona_name": "Theodor Rybář",
+    "difficulty": 3.9,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4001kmjr5772fz2rw5c4n3b4seew",
+    "topic_id": "sales.multiple_offers",
+    "tier": "intermediate",
+    "persona_name": "Nikolaj Staněk",
+    "difficulty": 4.8,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_5201kmjr7tsye3arw0ndxyhb324p",
+    "topic_id": "sales.multiple_offers",
+    "tier": "advanced",
+    "persona_name": "Miloš Oulický",
+    "difficulty": 7.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_5101kmjr9j2yeapsjqy7hhg9s3j3",
+    "topic_id": "sales.premium_segment",
+    "tier": "beginner",
+    "persona_name": "Jaroslava Hájková",
+    "difficulty": 3.7,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4701kmjraw1nfm1atmwxfyhjd25v",
+    "topic_id": "sales.premium_segment",
+    "tier": "intermediate",
+    "persona_name": "Žofie Hrabalová",
+    "difficulty": 4.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_5101kmjrcrrye9ksmaapgzw38ynf",
+    "topic_id": "sales.premium_segment",
+    "tier": "advanced",
+    "persona_name": "Zoran Zelenka",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_9401kmjrfedveqe9pgvg2gjhj5ef",
+    "topic_id": "sales.pricing_analysis",
+    "tier": "beginner",
+    "persona_name": "Tereza Sýkorová",
+    "difficulty": 3.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_0801kmjrht6cf618fjt3kgcmtdca",
+    "topic_id": "sales.pricing_analysis",
+    "tier": "intermediate",
+    "persona_name": "Dušan Kubát",
+    "difficulty": 4.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_6001kmjrm0fhf7s91n661728wck2",
+    "topic_id": "sales.pricing_analysis",
+    "tier": "advanced",
+    "persona_name": "Štěpán Žák",
+    "difficulty": 7.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4301kmjrr6rnfeha6ehrfn3xarqx",
+    "topic_id": "sales.property_viewing",
+    "tier": "beginner",
+    "persona_name": "Kryštof Šimůnek",
+    "difficulty": 3.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_5401kmjrszrxe3xs326c6987zm2a",
+    "topic_id": "sales.property_viewing",
+    "tier": "intermediate",
+    "persona_name": "Adam Šedivý",
+    "difficulty": 4.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3501kmjrva96fvjv2x2t7847c6v4",
+    "topic_id": "sales.property_viewing",
+    "tier": "advanced",
+    "persona_name": "Adéla Němcová",
+    "difficulty": 7.5,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_2701kmjry644eyd9hncd7fcwjc7k",
+    "topic_id": "sales.sjm_divorce",
+    "tier": "beginner",
+    "persona_name": "Michal Horák",
+    "difficulty": 3.7,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_2601kmjs0ef6ehnvcqbm6v7xzw7h",
+    "topic_id": "sales.sjm_divorce",
+    "tier": "intermediate",
+    "persona_name": "Miroslava Růžičková",
+    "difficulty": 5.9,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_2801kmjs22hhfvjtsjvh83fymsrt",
+    "topic_id": "sales.sjm_divorce",
+    "tier": "advanced",
+    "persona_name": "Monika Langerová",
+    "difficulty": 7.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4601kmjs3gt4e0xrch6knqptj5xz",
+    "topic_id": "sales.tenant_occupied",
+    "tier": "beginner",
+    "persona_name": "Norbert Stránský",
+    "difficulty": 3.7,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_5601kmjs619ce928r1ceewy6kzbv",
+    "topic_id": "sales.tenant_occupied",
+    "tier": "intermediate",
+    "persona_name": "Eva Jíchová",
+    "difficulty": 4.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_0701kmjs8474fpstjy77bj3f418x",
+    "topic_id": "sales.tenant_occupied",
+    "tier": "advanced",
+    "persona_name": "René Zíka",
+    "difficulty": 7.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4201kmjs93wge558ag00k63zf0cs",
+    "topic_id": "special.agricultural_land",
+    "tier": "beginner",
+    "persona_name": "Martina Beranová",
+    "difficulty": 3.9,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_2701kmjsawy3etvbg1t3chmj4acn",
+    "topic_id": "special.agricultural_land",
+    "tier": "intermediate",
+    "persona_name": "Vladislav Pitra",
+    "difficulty": 4.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_5101kmjscj6geg5rzxwdj41n4an0",
+    "topic_id": "special.agricultural_land",
+    "tier": "advanced",
+    "persona_name": "Ilona Tomsová",
+    "difficulty": 7.4,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_7101kmjserzweeg84qa988r1px5s",
+    "topic_id": "special.auction_sale",
+    "tier": "beginner",
+    "persona_name": "Hubert Horáček",
+    "difficulty": 3.8,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_0501kmjsgjw3e1qsdnkfj02afvvx",
+    "topic_id": "special.auction_sale",
+    "tier": "intermediate",
+    "persona_name": "Ervín Navrátil",
+    "difficulty": 5.9,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_9501kmjsjf0eexftgk73a13mdbjw",
+    "topic_id": "special.auction_sale",
+    "tier": "advanced",
+    "persona_name": "Daniela Mašková",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_2201kmjskwz9enpvm9z7pa86vkfe",
+    "topic_id": "special.business_property",
+    "tier": "beginner",
+    "persona_name": "Jitka Klimešová",
+    "difficulty": 3.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4301kmjsn485et79rg1bw006282e",
+    "topic_id": "special.business_property",
+    "tier": "intermediate",
+    "persona_name": "Gustav Plíhal",
+    "difficulty": 4.8,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4701kmjspz0mf50a4a3hz8jtbgm8",
+    "topic_id": "special.business_property",
+    "tier": "advanced",
+    "persona_name": "Monika Navrátilová",
+    "difficulty": 7.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_6101kmjsr9spe1v9knmd8jvfbq0g",
+    "topic_id": "special.commercial_first_contact",
+    "tier": "beginner",
+    "persona_name": "Dominik Slezák",
+    "difficulty": 3.8,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_9201kmjst2ydejdvhn84bqawyf4k",
+    "topic_id": "special.commercial_first_contact",
+    "tier": "intermediate",
+    "persona_name": "Ivo Polák",
+    "difficulty": 5.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_8401kmjsvr5ne6grgy66eggzgdc6",
+    "topic_id": "special.commercial_first_contact",
+    "tier": "advanced",
+    "persona_name": "Jiří Blaha",
+    "difficulty": 7.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1201kmjsxfpzfamtsm6wfve1pb2c",
+    "topic_id": "special.cooperative_to_private",
+    "tier": "beginner",
+    "persona_name": "Ivan Nedvěd",
+    "difficulty": 3.9,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_5501kmjsz9c3fvd90319898adx1p",
+    "topic_id": "special.cooperative_to_private",
+    "tier": "intermediate",
+    "persona_name": "Robert Horák",
+    "difficulty": 4.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_0301kmjt1d15emcvj4zb3f0k9wcx",
+    "topic_id": "special.cooperative_to_private",
+    "tier": "advanced",
+    "persona_name": "Naděžda Hlaváčová",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_7001kmjt3w1efymtww8w9x09bcr5",
+    "topic_id": "special.cooperative_transfer",
+    "tier": "beginner",
+    "persona_name": "Stanislava Horáčková",
+    "difficulty": 3.8,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_7101kmjt5pwffm3bsvcaasjkx01x",
+    "topic_id": "special.cooperative_transfer",
+    "tier": "intermediate",
+    "persona_name": "Karel Dvořáček",
+    "difficulty": 5.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_9401kmjt7459etst3cqj3hh69fyt",
+    "topic_id": "special.cooperative_transfer",
+    "tier": "advanced",
+    "persona_name": "Marian Blažek",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4701kmjt8y59e7xrjfrz1aeajk74",
+    "topic_id": "special.cultural_monument",
+    "tier": "beginner",
+    "persona_name": "Veronika Kopecká",
+    "difficulty": 3.5,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_2601kmjtayxxeqescs0ksnqet76r",
+    "topic_id": "special.cultural_monument",
+    "tier": "intermediate",
+    "persona_name": "Petr Rybář",
+    "difficulty": 4.7,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_5501kmjtcy9eekt95jychvtf84w0",
+    "topic_id": "special.cultural_monument",
+    "tier": "advanced",
+    "persona_name": "Jakub Havel",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4501kmjte8n6e5f9x9zkp9hr6jhc",
+    "topic_id": "special.land_no_utilities",
+    "tier": "beginner",
+    "persona_name": "Anna Tomsová",
+    "difficulty": 3.4,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3101kmjtfp6bed89hxemrkgpsm60",
+    "topic_id": "special.land_no_utilities",
+    "tier": "intermediate",
+    "persona_name": "Ludmila Dušková",
+    "difficulty": 4.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1201kmjth4khf9na28fr2brqte9h",
+    "topic_id": "special.land_no_utilities",
+    "tier": "advanced",
+    "persona_name": "Zdeňka Součková",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_6601kmjtjpwnfabr3vj3kzq9pp9c",
+    "topic_id": "special.new_build_developer",
+    "tier": "beginner",
+    "persona_name": "Stanislav Šedivý",
+    "difficulty": 3.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3301kmjtnk4ge17aw9h26tct97v7",
+    "topic_id": "special.new_build_developer",
+    "tier": "intermediate",
+    "persona_name": "Jiřina Štefanová",
+    "difficulty": 4.4,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1701kmjtr6f0fjk8hs1cp5t1pwhb",
+    "topic_id": "special.new_build_developer",
+    "tier": "advanced",
+    "persona_name": "Jiří Tichý",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_2001kmjtsrasfjf8c8zkmvhks5hp",
+    "topic_id": "special.property_in_renovation",
+    "tier": "beginner",
+    "persona_name": "Jan Pokorný",
+    "difficulty": 3.5,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_5401kmjtw1mneb7bm4cnq9mftyhe",
+    "topic_id": "special.property_in_renovation",
+    "tier": "intermediate",
+    "persona_name": "Rostislav Tykal",
+    "difficulty": 4.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_7601kmjtxycvfj9rn45jn5dss3np",
+    "topic_id": "special.property_in_renovation",
+    "tier": "advanced",
+    "persona_name": "Alžběta Žáková",
+    "difficulty": 7.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_9001kmjtzv3zfk5arn4tmtmgaww3",
+    "topic_id": "special.svj_unit_sale",
+    "tier": "beginner",
+    "persona_name": "Dominik Navrátil",
+    "difficulty": 3.6,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_5401kmjv1eb5f01vhfcrhvxek1n3",
+    "topic_id": "special.svj_unit_sale",
+    "tier": "intermediate",
+    "persona_name": "Karel Pospíšil",
+    "difficulty": 4.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_5201kmjv37fff19ttk7t08bcnkk7",
+    "topic_id": "special.svj_unit_sale",
+    "tier": "advanced",
+    "persona_name": "Martin Navrátil",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_8801kmjv4ch6eetttvz4nx2ygect",
+    "topic_id": "technical.asbestos_roof",
+    "tier": "beginner",
+    "persona_name": "Kateřina Karasová",
+    "difficulty": 3.8,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_7501kmjv5vcgfz6sj0qqrq2vmt93",
+    "topic_id": "technical.asbestos_roof",
+    "tier": "intermediate",
+    "persona_name": "Dana Růžičková",
+    "difficulty": 4.9,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_7801kmjv6xj4em0a5zwdcvj129bv",
+    "topic_id": "technical.asbestos_roof",
+    "tier": "advanced",
+    "persona_name": "Ivana Váchová",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_7301kmjv88d1ej4r97c9caqmrrgn",
+    "topic_id": "technical.electrical_gas_inspection",
+    "tier": "beginner",
+    "persona_name": "Hynek Polák",
+    "difficulty": 3.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4101kmjv9nggeppv762arnfv5dce",
+    "topic_id": "technical.electrical_gas_inspection",
+    "tier": "intermediate",
+    "persona_name": "Oskar Strnad",
+    "difficulty": 4.4,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_2101kmjvamc5ey7b0rpez21cgsce",
+    "topic_id": "technical.electrical_gas_inspection",
+    "tier": "advanced",
+    "persona_name": "Drahomíra Hlaváčová",
+    "difficulty": 7.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_6701kmjvc16veqwscs589d2kfser",
+    "topic_id": "technical.energy_certificate",
+    "tier": "beginner",
+    "persona_name": "Jiří Horák",
+    "difficulty": 3.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1801kmjve84ffddb68jk44136kqg",
+    "topic_id": "technical.energy_certificate",
+    "tier": "intermediate",
+    "persona_name": "Juraj Souček",
+    "difficulty": 4.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_7501kmjvfbwcfg6smx531n759ex9",
+    "topic_id": "technical.energy_certificate",
+    "tier": "advanced",
+    "persona_name": "Miloslav Novotný",
+    "difficulty": 7.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1801kmjvh70df5aaajpqzqqp5eha",
+    "topic_id": "technical.flood_zone",
+    "tier": "beginner",
+    "persona_name": "Rudolf Černý",
+    "difficulty": 3.9,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4901kmjvk59bfsc9c663bb1rewp4",
+    "topic_id": "technical.flood_zone",
+    "tier": "intermediate",
+    "persona_name": "Petra Novotná",
+    "difficulty": 5.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_5701kmjvn125etfsefv859mtd9y0",
+    "topic_id": "technical.flood_zone",
+    "tier": "advanced",
+    "persona_name": "Karin Kosová",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1301kmjvpwcwf17awe7ya5crmxwh",
+    "topic_id": "technical.insulation_renovation",
+    "tier": "beginner",
+    "persona_name": "Nikolaj Oulický",
+    "difficulty": 3.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_5601kmjvs7nzf44tv0xc2q68y0d7",
+    "topic_id": "technical.insulation_renovation",
+    "tier": "intermediate",
+    "persona_name": "Imrich Růžička",
+    "difficulty": 4.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_9201kmjvv9x3ecgs0wsxx35p0bzv",
+    "topic_id": "technical.insulation_renovation",
+    "tier": "advanced",
+    "persona_name": "Kamil Souček",
+    "difficulty": 7.4,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4801kmjvwpe7efc9y718jjya5hz0",
+    "topic_id": "technical.missing_approval",
+    "tier": "beginner",
+    "persona_name": "Amálie Skálová",
+    "difficulty": 3.9,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_6001kmjvy68yf24bzakfj8x74xtb",
+    "topic_id": "technical.missing_approval",
+    "tier": "intermediate",
+    "persona_name": "Arnošt Šimánek",
+    "difficulty": 4.8,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_6101kmjw05ggfjm9f4j68kehrfs9",
+    "topic_id": "technical.missing_approval",
+    "tier": "advanced",
+    "persona_name": "Renata Rybová",
+    "difficulty": 7.1,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4601kmjw2754fmbaz3127mev4rnd",
+    "topic_id": "technical.moisture_mold",
+    "tier": "beginner",
+    "persona_name": "Beatrice Fialová",
+    "difficulty": 3.4,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3401kmjw47qjfspbgjqa8s5htthz",
+    "topic_id": "technical.moisture_mold",
+    "tier": "intermediate",
+    "persona_name": "Emílie Turková",
+    "difficulty": 4.9,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_7601kmjw62v5ejpsxd8pbrre1q84",
+    "topic_id": "technical.moisture_mold",
+    "tier": "advanced",
+    "persona_name": "Viktor Černý",
+    "difficulty": 7.6,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_6801kmjw7qfbfmfvg1gp53nm1kw8",
+    "topic_id": "technical.protective_zones",
+    "tier": "beginner",
+    "persona_name": "Šárka Tesařová",
+    "difficulty": 3.6,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_6501kmjwa3wrfwmvmt1nbggyvhax",
+    "topic_id": "technical.protective_zones",
+    "tier": "intermediate",
+    "persona_name": "Dita Rybová",
+    "difficulty": 4.7,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_4901kmjwbdc6fkc9a8pn0wddw5ma",
+    "topic_id": "technical.protective_zones",
+    "tier": "advanced",
+    "persona_name": "Michal Havel",
+    "difficulty": 7.5,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_0801kmjwdxh3eg5afa6dr9fw3sqe",
+    "topic_id": "technical.radon",
+    "tier": "beginner",
+    "persona_name": "Filoména Balounová",
+    "difficulty": 3.6,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_9101kmjwfn46e96sj8xsyr2s6v9f",
+    "topic_id": "technical.radon",
+    "tier": "intermediate",
+    "persona_name": "Beatrice Strnadová",
+    "difficulty": 4.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3001kmjwhp6mfq2rv3baffmxkns7",
+    "topic_id": "technical.radon",
+    "tier": "advanced",
+    "persona_name": "Jarmila Urbanecová",
+    "difficulty": 7.3,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1101kmjwkdy9e3jr8jj02z2x084q",
+    "topic_id": "technical.structural_cracks",
+    "tier": "beginner",
+    "persona_name": "Agáta Dvořáková",
+    "difficulty": 3.7,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_3701kmjwnmy8fe4a6kt4tbqfb84d",
+    "topic_id": "technical.structural_cracks",
+    "tier": "intermediate",
+    "persona_name": "Eduard Novák",
+    "difficulty": 4.6,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_7501kmjwr09mf46tp0r3pgxqrp3v",
+    "topic_id": "technical.structural_cracks",
+    "tier": "advanced",
+    "persona_name": "Michaela Bílková",
+    "difficulty": 7.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1201kmjwsnqxeap8amr9yycyyvse",
+    "topic_id": "technical.zoning_plan",
+    "tier": "beginner",
+    "persona_name": "Agáta Kejvalová",
+    "difficulty": 3.9,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1801kmjwv2ksfertfmx91jcgeazg",
+    "topic_id": "technical.zoning_plan",
+    "tier": "intermediate",
+    "persona_name": "Soňa Pospíšilová",
+    "difficulty": 4.2,
+    "status": "approved"
+  },
+  {
+    "agent_id": "agent_1301kmjwxk31fqw8bfzwprpn9tzh",
+    "topic_id": "technical.zoning_plan",
+    "tier": "advanced",
+    "persona_name": "Vojtěch Vaněk",
+    "difficulty": 7.1,
+    "status": "approved"
+  }
+]
