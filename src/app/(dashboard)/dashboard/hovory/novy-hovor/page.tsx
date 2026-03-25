@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   Phone,
@@ -69,8 +69,10 @@ const categoryLabels: Record<string, string> = {
   "listing": "Získání zakázky",
 };
 
-export default function NovyHovorPage() {
+function NovyHovorContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const scenarioIdParam = searchParams.get("scenarioId");
 
   const [agents, setAgents] = useState<AIAgent[]>([]);
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
@@ -83,6 +85,17 @@ export default function NovyHovorPage() {
   const [selectedDifficulty, setSelectedDifficulty] = useState<"all" | "easy" | "medium" | "hard">("all");
   const [imageZoom, setImageZoom] = useState(false);
   const [lessonModal, setLessonModal] = useState<Lesson | null>(null);
+
+  // Auto-select scenario if provided in URL
+  useEffect(() => {
+    if (scenarioIdParam && scenarios.length > 0) {
+      const exists = scenarios.find(s => s.id === scenarioIdParam);
+      if (exists && !selectedScenario) {
+        setSelectedScenario(scenarioIdParam);
+        setStep("confirm");
+      }
+    }
+  }, [scenarioIdParam, scenarios, selectedScenario]);
 
   const {
     phase,
@@ -796,5 +809,17 @@ export default function NovyHovorPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function NovyHovorPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex h-[50vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary-500" />
+      </div>
+    }>
+      <NovyHovorContent />
+    </Suspense>
   );
 }

@@ -409,19 +409,19 @@ export default function LessonDetailPage() {
                   </div>
                 )}
 
-                {/* Start button — placeholder, not connected to real agent */}
+                {/* Start button */}
                 {!passed && (
                   <div className="mt-3">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full gap-2 opacity-50 cursor-not-allowed"
-                      disabled
-                      title="Agenti pro lekce budou brzy k dispozici. Pro postup je potřeba min. 80 %."
-                    >
-                      <Phone className="h-4 w-4" />
-                      Zahájit hovor (připravujeme)
-                    </Button>
+                    <Link href={`/dashboard/hovory/novy-hovor?scenarioId=sc-${lessonNumber}-${sub.difficulty === 'Začátečník' ? 'easy' : sub.difficulty === 'Středně pokročilý' ? 'medium' : 'hard'}`}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full gap-2 transition-colors hover:bg-primary-50 hover:text-primary-600 hover:border-primary-200"
+                      >
+                        <Phone className="h-4 w-4" />
+                        Zahájit hovor
+                      </Button>
+                    </Link>
                   </div>
                 )}
               </div>
