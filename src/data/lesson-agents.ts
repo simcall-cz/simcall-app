@@ -1,5 +1,5 @@
 // Auto-generated from mapping.json + topic_lesson_mapping.md
-// Maps lesson number (1-105) to their 3 agents (beginner, intermediate, advanced)
+// Maps lesson number (1-100) to their 3 agents (beginner, intermediate, advanced)
 
 export interface LessonAgent {
   agentId: string;  // ElevenLabs agent_id
@@ -514,36 +514,26 @@ export const LESSON_AGENTS: Record<number, LessonAgentSet> = {
     intermediate: { agentId: "agent_3401kmjbpkztejqa2j6hj48ajdd1", name: "David Kratochvíl", tier: "intermediate" },
     advanced: { agentId: "agent_3401kmjbr101e4886m15hd495k0r", name: "Marek Pánek", tier: "advanced" },
   },
-  101: {
-    beginner: { agentId: "agent_3401kmjk3y9kfrctmempx72e802b", name: "Róbert Růžička", tier: "beginner" },
-    intermediate: { agentId: "agent_3101kmjk52chete8sh3a8cy3hdeg", name: "Antonín Hejna", tier: "intermediate" },
-    advanced: { agentId: "agent_8601kmjk6ngeeyc8ya60htpdxnn9", name: "Miroslav Tomsa", tier: "advanced" },
-  },
-  102: {
-    beginner: { agentId: "agent_9901kmjkgjedfsr8jryhdc9r9wmq", name: "Ivana Kubátová", tier: "beginner" },
-    intermediate: { agentId: "agent_4401kmjkj314f64svfs2sadt3m9p", name: "Beatrice Marková", tier: "intermediate" },
-    advanced: { agentId: "agent_7001kmjkkm59ffyvxxf49zbm161n", name: "Františka Štěpánková", tier: "advanced" },
-  },
-  103: {
-    beginner: { agentId: "agent_2701kmjkn8zye9w8wrhhe0c9kdwa", name: "Eliška Malá", tier: "beginner" },
-    intermediate: { agentId: "agent_9301kmjkpt5wf0a8vvx1tgvs4tgz", name: "Miroslava Malá", tier: "intermediate" },
-    advanced: { agentId: "agent_4501kmjkrc4gfasvg14ksvmyeks9", name: "Soňa Váňová", tier: "advanced" },
-  },
-  104: {
-    beginner: { agentId: "agent_8301kmjkswgxe7qskeh86yk09agt", name: "Marcel Zelenka", tier: "beginner" },
-    intermediate: { agentId: "agent_0801kmjmd3jbeh4rfd12ecvvzp05", name: "Dita Chlupová", tier: "intermediate" },
-    advanced: { agentId: "agent_0201kmjmepdqf3asb1m8pkpryach", name: "Milada Sedláčková", tier: "advanced" },
-  },
-  105: {
-    beginner: { agentId: "agent_5501kmjmw3z9evb8dqh4sk3dcp2a", name: "Nela Urbanová", tier: "beginner" },
-    intermediate: { agentId: "agent_3201kmjmy7z9e69t858sykzgq343", name: "Mojmír Kment", tier: "intermediate" },
-    advanced: { agentId: "agent_3701kmjn0d7nezt9ypqnsd780dcx", name: "Nela Tykalová", tier: "advanced" },
-  },
 };
 
 // Agent IDs that go to the training section (not in any lesson)
 export const TRAINING_AGENT_IDS: string[] = [
   "agent_4901kmgp40xxej1vjybwfej5n3nx", // Iveta Strnadová
+  "agent_3401kmjk3y9kfrctmempx72e802b", // Róbert Růžička
+  "agent_3101kmjk52chete8sh3a8cy3hdeg", // Antonín Hejna
+  "agent_8601kmjk6ngeeyc8ya60htpdxnn9", // Miroslav Tomsa
+  "agent_9901kmjkgjedfsr8jryhdc9r9wmq", // Ivana Kubátová
+  "agent_4401kmjkj314f64svfs2sadt3m9p", // Beatrice Marková
+  "agent_7001kmjkkm59ffyvxxf49zbm161n", // Františka Štěpánková
+  "agent_2701kmjkn8zye9w8wrhhe0c9kdwa", // Eliška Malá
+  "agent_9301kmjkpt5wf0a8vvx1tgvs4tgz", // Miroslava Malá
+  "agent_4501kmjkrc4gfasvg14ksvmyeks9", // Soňa Váňová
+  "agent_8301kmjkswgxe7qskeh86yk09agt", // Marcel Zelenka
+  "agent_0801kmjmd3jbeh4rfd12ecvvzp05", // Dita Chlupová
+  "agent_0201kmjmepdqf3asb1m8pkpryach", // Milada Sedláčková
+  "agent_5501kmjmw3z9evb8dqh4sk3dcp2a", // Nela Urbanová
+  "agent_3201kmjmy7z9e69t858sykzgq343", // Mojmír Kment
+  "agent_3701kmjn0d7nezt9ypqnsd780dcx", // Nela Tykalová
 ];
 
 // All agent IDs assigned to lessons (for filtering)
@@ -554,7 +544,6 @@ export const ALL_LESSON_AGENT_IDS: Set<string> = new Set([
   "agent_0001kmjj2wy5e0w97p51t4nw08n5",
   "agent_0101kmjd3mb4fprarvaytabk29jk",
   "agent_0201kmjb53fkf6n8rbvd9ckjmrqp",
-  "agent_0201kmjmepdqf3asb1m8pkpryach",
   "agent_0201kmjqnbjgeq6rf9t7n0vy70vn",
   "agent_0301kmj6r4zpf8z8ddrcm0jpayh0",
   "agent_0301kmjbvwchfv9bmr5p396vbkw2",
@@ -568,7 +557,6 @@ export const ALL_LESSON_AGENT_IDS: Set<string> = new Set([
   "agent_0701kmjna2x2e7ebwxcn24fcxvgn",
   "agent_0701kmjnxzfmf61rq2jpx27h5j17",
   "agent_0701kmjs8474fpstjy77bj3f418x",
-  "agent_0801kmjmd3jbeh4rfd12ecvvzp05",
   "agent_0801kmjrht6cf618fjt3kgcmtdca",
   "agent_0801kmjwdxh3eg5afa6dr9fw3sqe",
   "agent_1001kmjj7a40e9dtqfh43ttxv79h",
@@ -628,7 +616,6 @@ export const ALL_LESSON_AGENT_IDS: Set<string> = new Set([
   "agent_2601kmjs0ef6ehnvcqbm6v7xzw7h",
   "agent_2601kmjtayxxeqescs0ksnqet76r",
   "agent_2701kmjcj49gfzg8d1a68t39wxej",
-  "agent_2701kmjkn8zye9w8wrhhe0c9kdwa",
   "agent_2701kmjpczfrfjt8ygm859r0zgs1",
   "agent_2701kmjry644eyd9hncd7fcwjc7k",
   "agent_2701kmjsawy3etvbg1t3chmj4acn",
@@ -641,13 +628,11 @@ export const ALL_LESSON_AGENT_IDS: Set<string> = new Set([
   "agent_3101kmj9cdy3fpprkb7gn04p62fa",
   "agent_3101kmjbfn00ee6bmwmeks3hqmpx",
   "agent_3101kmjd6w01eeps0d2cr0azvzaj",
-  "agent_3101kmjk52chete8sh3a8cy3hdeg",
   "agent_3101kmjp2bsnf63r174132cm8w0t",
   "agent_3101kmjtfp6bed89hxemrkgpsm60",
   "agent_3201kmjaj2zjf3gtws8jeqy7eq04",
   "agent_3201kmjbxgk1eyhtfycne00nxj3q",
   "agent_3201kmjcs7zzfchrk5658rdx0h40",
-  "agent_3201kmjmy7z9e69t858sykzgq343",
   "agent_3201kmjq75q3fycr5ny860fygynz",
   "agent_3301kmjcbxqae6cs49esa4049s7j",
   "agent_3301kmjpvhg5f9fvegw3b371n3kf",
@@ -656,7 +641,6 @@ export const ALL_LESSON_AGENT_IDS: Set<string> = new Set([
   "agent_3401kmj9p9c3etxsfpcjafx7swj8",
   "agent_3401kmjbpkztejqa2j6hj48ajdd1",
   "agent_3401kmjbr101e4886m15hd495k0r",
-  "agent_3401kmjk3y9kfrctmempx72e802b",
   "agent_3401kmjp7q72e8ma315z8tvsx2m1",
   "agent_3401kmjw47qjfspbgjqa8s5htthz",
   "agent_3501kmjdxbvbef6v7r7sne75p8hn",
@@ -669,7 +653,6 @@ export const ALL_LESSON_AGENT_IDS: Set<string> = new Set([
   "agent_3701kmjdte7meqeazwa3g46qkj1w",
   "agent_3701kmjhgsp5fj1tf86fkhxw05cc",
   "agent_3701kmjkb07gfpas9xyzy1baffxp",
-  "agent_3701kmjn0d7nezt9ypqnsd780dcx",
   "agent_3701kmjwnmy8fe4a6kt4tbqfb84d",
   "agent_3801kmjhken2fa09r7aww5hs508c",
   "agent_3801kmjqk0tkf8qahkvdtm27zb8w",
@@ -682,19 +665,18 @@ export const ALL_LESSON_AGENT_IDS: Set<string> = new Set([
   "agent_4201kmjj8x3te3x9snh2bxvy5dcg",
   "agent_4201kmjnrxr9eb29maf0vdzm3g80",
   "agent_4201kmjs93wge558ag00k63zf0cs",
+  "agent_4301kmgpmyx7effsn3jnw5c686j4",
   "agent_4301kmjjcfg1f68stf24qpsjzzwq",
   "agent_4301kmjrr6rnfeha6ehrfn3xarqx",
   "agent_4301kmjsn485et79rg1bw006282e",
   "agent_4401kmjbcnn4e8e89gmh3ty8vzxe",
   "agent_4401kmjkfgxkextt1k111hzvrx9m",
-  "agent_4401kmjkj314f64svfs2sadt3m9p",
   "agent_4501kmj9y8yre25bf8xs2g3jrwq6",
   "agent_4501kmjaa111f9z9emq9htzygw2d",
   "agent_4501kmjb3p2nfvetz003446xeajy",
   "agent_4501kmjdzhgpehtbam2zaxsdndsr",
   "agent_4501kmjjps40epar2618rxn8sx5j",
   "agent_4501kmjk96e6f8xakt9ep7y2k1mn",
-  "agent_4501kmjkrc4gfasvg14ksvmyeks9",
   "agent_4501kmjte8n6e5f9x9zkp9hr6jhc",
   "agent_4601kmjbatf7fastn8frnnzggxvt",
   "agent_4601kmjn4fbvfz4sjzqxfqhkh1gc",
@@ -707,7 +689,6 @@ export const ALL_LESSON_AGENT_IDS: Set<string> = new Set([
   "agent_4701kmjt8y59e7xrjfrz1aeajk74",
   "agent_4801kmjhrctse3jaabds1brj69qw",
   "agent_4801kmjvwpe7efc9y718jjya5hz0",
-  "agent_4301kmgpmyx7effsn3jnw5c686j4",
   "agent_4901kmjbt827fpeaa6nq0488pzzt",
   "agent_4901kmjcmzpmfyvbavh8qj2y8507",
   "agent_4901kmjdbx3xfdhtpqc41nk69rcy",
@@ -735,7 +716,6 @@ export const ALL_LESSON_AGENT_IDS: Set<string> = new Set([
   "agent_5401kmjtw1mneb7bm4cnq9mftyhe",
   "agent_5401kmjv1eb5f01vhfcrhvxek1n3",
   "agent_5501kmjjegc8fhcreek9gq7heky1",
-  "agent_5501kmjmw3z9evb8dqh4sk3dcp2a",
   "agent_5501kmjsz9c3fvd90319898adx1p",
   "agent_5501kmjtcy9eekt95jychvtf84w0",
   "agent_5601kmjs619ce928r1ceewy6kzbv",
@@ -780,7 +760,6 @@ export const ALL_LESSON_AGENT_IDS: Set<string> = new Set([
   "agent_6901kmjqx2q9f8cvr2z8pqz42gfm",
   "agent_7001kmj9zgejfnqtxmshmwkzhjb7",
   "agent_7001kmjjv6dqemerjs4azj2nnxpf",
-  "agent_7001kmjkkm59ffyvxxf49zbm161n",
   "agent_7001kmjt3w1efymtww8w9x09bcr5",
   "agent_7101kmjavjj4e7ta5hx2d9vyfr5j",
   "agent_7101kmjjhwf1fbrvn2h0zyd75ycn",
@@ -819,7 +798,6 @@ export const ALL_LESSON_AGENT_IDS: Set<string> = new Set([
   "agent_8201kmjpf08zen2v3fe1pycykq60",
   "agent_8301kmj9t4qde5w938r58fd8tfnj",
   "agent_8301kmjjz7xefq4abe8rnxftzdc9",
-  "agent_8301kmjkswgxe7qskeh86yk09agt",
   "agent_8301kmjp1530f0xac1nddnfxyvqw",
   "agent_8401kmjdm2zcf3rbarhstpjj3h94",
   "agent_8401kmjnzqw3eycryb7fmn4febhn",
@@ -828,7 +806,6 @@ export const ALL_LESSON_AGENT_IDS: Set<string> = new Set([
   "agent_8501kmjpxhddemdak9ryp9dpcc3f",
   "agent_8601kmjh7c31fqm89ts1nyn88kkx",
   "agent_8601kmjjn5dke0q92ebcfvyfp2t3",
-  "agent_8601kmjk6ngeeyc8ya60htpdxnn9",
   "agent_8601kmjqdharf9kb0jrv27nze12k",
   "agent_8701kmj9qmfxe8k96tt67133f78e",
   "agent_8701kmjnm893fq6vge5xqcp5hhpp",
@@ -849,7 +826,6 @@ export const ALL_LESSON_AGENT_IDS: Set<string> = new Set([
   "agent_9101kmjwfn46e96sj8xsyr2s6v9f",
   "agent_9201kmjst2ydejdvhn84bqawyf4k",
   "agent_9201kmjvv9x3ecgs0wsxx35p0bzv",
-  "agent_9301kmjkpt5wf0a8vvx1tgvs4tgz",
   "agent_9401kmjrfedveqe9pgvg2gjhj5ef",
   "agent_9401kmjt7459etst3cqj3hh69fyt",
   "agent_9501kmjsjf0eexftgk73a13mdbjw",
@@ -862,5 +838,4 @@ export const ALL_LESSON_AGENT_IDS: Set<string> = new Set([
   "agent_9801kmjckkwcee0tsf04d8pqjn5w",
   "agent_9801kmjhzrygfa8bt1kvwz9t55zd",
   "agent_9901kmjc6bg2eqg9kyrjjtja314f",
-  "agent_9901kmjkgjedfsr8jryhdc9r9wmq",
 ]);

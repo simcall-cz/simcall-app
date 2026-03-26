@@ -29,6 +29,7 @@ import { getAuthHeaders } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import type { AIAgent, Scenario } from "@/types";
 import { lessons, DIFFICULTY_CONFIG as LESSON_DIFF, type Lesson } from "@/data/lessons";
+import { TRAINING_AGENT_IDS } from "@/data/lesson-agents";
 
 const difficultyConfig = {
   easy: {
@@ -127,7 +128,9 @@ function NovyHovorContent() {
         ]);
 
         if (agentsRes.data) {
-          const formattedAgents: AIAgent[] = agentsRes.data.map((a: any) => ({
+          const formattedAgents: AIAgent[] = agentsRes.data
+            .filter((a: any) => TRAINING_AGENT_IDS.includes(a.elevenlabs_agent_id))
+            .map((a: any) => ({
             id: a.id,
             name: a.name || "Agent",
             personality: a.personality || "",

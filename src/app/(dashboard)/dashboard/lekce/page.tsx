@@ -77,7 +77,7 @@ function getBestScore(lessonNum: number, progress: ProgressRecord[]): number | n
 
 function getCompletedCount(progress: ProgressRecord[]): number {
   let count = 0;
-  for (let i = 1; i <= 105; i++) {
+  for (let i = 1; i <= 100; i++) {
     if (isLessonCompleted(i, progress)) count++;
   }
   return count;
@@ -286,7 +286,7 @@ export default function LekcePage() {
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900">Lekce</h1>
-            <p className="text-sm text-neutral-500">105 lekcí z realitní praxe</p>
+            <p className="text-sm text-neutral-500">100 lekcí z realitní praxe</p>
           </div>
         </div>
       </div>
@@ -299,7 +299,7 @@ export default function LekcePage() {
             <p className="text-xs text-neutral-500">{level.description}</p>
           </div>
           <div className="text-right">
-            <p className="text-2xl font-bold text-neutral-900">{completedCount}<span className="text-sm font-normal text-neutral-400">/105</span></p>
+            <p className="text-2xl font-bold text-neutral-900">{completedCount}<span className="text-sm font-normal text-neutral-400">/100</span></p>
             <p className="text-xs text-neutral-500">{progressPct} % splněno</p>
           </div>
         </div>
@@ -380,12 +380,12 @@ export default function LekcePage() {
       <div className="mt-8 mb-12 text-center">
         <div className={cn(
           "inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-bold",
-          completedCount >= 105
+          completedCount >= 100
             ? "bg-gradient-to-r from-yellow-400 to-amber-500 text-white shadow-lg"
             : "bg-neutral-100 text-neutral-400"
         )}>
           <GraduationCap className="h-5 w-5" />
-          {completedCount >= 105 ? "Elitní makléř" : "Cíl: Elitní makléř"}
+          {completedCount >= 100 ? "Elitní makléř" : "Cíl: Elitní makléř"}
         </div>
       </div>
     </div>

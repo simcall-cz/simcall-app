@@ -43,8 +43,8 @@ export async function POST(request: NextRequest) {
   const { lessonNumber, subScenario, score, callId } = body;
 
   // Validate
-  if (!lessonNumber || lessonNumber < 1 || lessonNumber > 105) {
-    return NextResponse.json({ error: "Invalid lessonNumber (1-105)" }, { status: 400 });
+  if (!lessonNumber || lessonNumber < 1 || lessonNumber > 100) {
+    return NextResponse.json({ error: "Invalid lessonNumber (1-100)" }, { status: 400 });
   }
   if (!subScenario || subScenario < 1 || subScenario > 3) {
     return NextResponse.json({ error: "Invalid subScenario (1-3)" }, { status: 400 });

@@ -41,7 +41,6 @@ export const CATEGORY_CONFIG: Record<string, { icon: string; color: string }> = 
   'Speciální typy': { icon: 'Building2', color: 'rose' },
   'Marketing': { icon: 'Megaphone', color: 'pink' },
   'Etika & klienti': { icon: 'Handshake', color: 'teal' },
-  'Bonus': { icon: 'GraduationCap', color: 'amber' },
 };
 
 export const CATEGORIES = [
@@ -55,7 +54,6 @@ export const CATEGORIES = [
   'Speciální typy',
   'Marketing',
   'Etika & klienti',
-  'Bonus',
 ] as const;
 
 export const PROGRESS_LEVELS = [
@@ -64,7 +62,7 @@ export const PROGRESS_LEVELS = [
   { min: 31, max: 50, title: 'Pokročilý makléř', description: 'Zvládá běžné situace z praxe' },
   { min: 51, max: 70, title: 'Zkušený makléř', description: 'Schopný řešit složitější případy' },
   { min: 71, max: 90, title: 'Expertní makléř', description: 'Právní a komunikační mistrovství' },
-  { min: 91, max: 105, title: 'Elitní makléř', description: 'Kompletní zvládnutí všech oblastí' },
+  { min: 91, max: 100, title: 'Elitní makléř', description: 'Kompletní zvládnutí všech oblastí' },
 ] as const;
 
 export const lessonsV2: LessonV2[] = [
@@ -2792,86 +2790,5 @@ export const lessonsV2: LessonV2[] = [
       'Dokumentujte: co jste při prodeji kupujícímu sdělili, jaké podklady jste měli k dispozici',
       'Kontaktujte svou pojišťovnu – nahlaste potenciální škodní událost i preventivně',
     ],
-  },
-  // ===== BONUS LESSONS (L101–L105) =====
-  {
-    number: 101,
-    title: 'Námitka na výši provize makléře',
-    category: 'Bonus',
-    maxDifficulty: 'Střední',
-    dimensions: { legal: 1, communication: 3, process: 1, emotional: 2, financial: 2 },
-    situation: 'Klient namítá, že vaše provize je příliš vysoká a požaduje slevu nebo odmítá podepsat smlouvu.',
-    subScenarios: [
-      { number: 1, title: 'Klient srovnává s levnějším makléřem', difficulty: 'Začátečník', situation: 'Porovnává vaši provizi s jiným makléřem.', goal: 'Vysvětlit hodnotu vašich služeb.' },
-      { number: 2, title: 'Klient chce snížit provizi', difficulty: 'Středně pokročilý', situation: 'Požaduje 50% slevu na provizi.', goal: 'Vyjednat kompromis bez ztratové dohody.' },
-      { number: 3, title: 'Klient odmítá platit provizi', difficulty: 'Pokročilý', situation: 'Tvrdí, že kupujícího našel sám.', goal: 'Vyřešit spor profesionálně, odkazem na smlouvu.' },
-    ],
-    knowledge: ['Provize makléře je smluvní záležitost', 'Běžná provize v ČR: 3–5 % z prodejní ceny'],
-    goal: 'Profesionálně obhájit výši provize a vysvětlit hodnotu svých služeb.',
-    tips: ['Připravte si konkrétní seznam služeb, které poskytujete', 'Nikdy neodepisujte provizi preventivně'],
-  },
-  {
-    number: 102,
-    title: 'Agresivní tester kompetencí makléře',
-    category: 'Bonus',
-    maxDifficulty: 'Vysoká',
-    dimensions: { legal: 2, communication: 3, process: 1, emotional: 3, financial: 1 },
-    situation: 'Klient záměrně testuje vaše znalosti agresivními otázkami a provokacemi.',
-    subScenarios: [
-      { number: 1, title: 'Klient klade zlošácké otázky', difficulty: 'Začátečník', situation: 'Ptá se na detaily zákona, aby vás nachytal.', goal: 'Odpovědět klidně a profesionálně.' },
-      { number: 2, title: 'Klient zpochybňuje vaše zkušenosti', difficulty: 'Středně pokročilý', situation: 'Tvrdí, že jste příliš mladý/nezkušený.', goal: 'Dokázat kompetenci bez agrese.' },
-      { number: 3, title: 'Klient provokuje osobními útolky', difficulty: 'Pokročilý', situation: 'Přechází do osobních útoků.', goal: 'Udržet profesionalitu, nastavit hranice.' },
-    ],
-    knowledge: ['Zvládání konfliktních situací', 'Techniky aktivního naslouchání'],
-    goal: 'Udržet profesionalitu při agresivním testování vašich kompetencí.',
-    tips: ['Nedělejte si z provokací osobní záležitost', 'Odkažte na konkrétní výsledky a reference'],
-  },
-  {
-    number: 103,
-    title: 'Emocionální vazba k ceně nemovitosti',
-    category: 'Bonus',
-    maxDifficulty: 'Střední',
-    dimensions: { legal: 0, communication: 3, process: 1, emotional: 3, financial: 2 },
-    situation: 'Prodejce má emocionální vazbu k nemovitosti a nadhodnocuje její cenu kvůli vzpomínkám.',
-    subScenarios: [
-      { number: 1, title: 'Prodejce vs. tržní cena', difficulty: 'Začátečník', situation: 'Vzpomíná na dětství, nechce slevit.', goal: 'Empaticky vysvětlit tržní realitu.' },
-      { number: 2, title: 'Prodejce odmítá snížit cenu', difficulty: 'Středně pokročilý', situation: 'Tvrdí, že nemovitost je jedinečná.', goal: 'Ukázat srovnatelné prodeje v okolí.' },
-      { number: 3, title: 'Prodejce plače při jednání', difficulty: 'Pokročilý', situation: 'Emocionální zhroucení při diskusi o ceně.', goal: 'Profesionálně zvládnout emoce, nabídnout čas.' },
-    ],
-    knowledge: ['Emocionální vyjednávání', 'Komparativní tržní analýza'],
-    goal: 'Empaticky přesvědčit prodejce o reálné tržní ceně.',
-    tips: ['Uznejte emoce prodejce, neříkejte \'to nic není\'', 'Použijte data místo názorů'],
-  },
-  {
-    number: 104,
-    title: 'Přestřelená cenová představa prodavajícího',
-    category: 'Bonus',
-    maxDifficulty: 'Střední',
-    dimensions: { legal: 0, communication: 2, process: 1, emotional: 2, financial: 3 },
-    situation: 'Prodejce požaduje cenu výrazně nad tržní hodnotou a nechce slevit.',
-    subScenarios: [
-      { number: 1, title: 'Prodejce chce o 30% více', difficulty: 'Začátečník', situation: 'Odhaduje nemovitost výrazně nad cenu.', goal: 'Ukázat tržní data a srovnání.' },
-      { number: 2, title: 'Prodejce odmítá akceptovat posudek', difficulty: 'Středně pokročilý', situation: 'Má vlastní \'posudek\' od kamaráda.', goal: 'Vysvětlit rozdíl mezi tržním a amatérským odhadem.' },
-      { number: 3, title: 'Prodejce vyhrožuje odchodem', difficulty: 'Pokročilý', situation: 'Vyhrožuje, že půjde k jinému makléři.', goal: 'Zachovat profesionalitu, vysvětlit důsledky nadhodnocení.' },
-    ],
-    knowledge: ['Komparativní tržní analýza (CMA)', 'Vliv nadhodnocení na dobu prodeje'],
-    goal: 'Korigovat cenová očekávání prodejce pomocí dat a argumentů.',
-    tips: ['Nikdy neříkejte \'vaše cena je příliš vysoká\'', 'Použijte graf \'doba prodeje vs. cena\''],
-  },
-  {
-    number: 105,
-    title: 'Chronický odkládač prodeje',
-    category: 'Bonus',
-    maxDifficulty: 'Střední',
-    dimensions: { legal: 0, communication: 3, process: 1, emotional: 3, financial: 1 },
-    situation: 'Klient stále odkládá rozhodnutí o prodeji — porad se, vyčkává, mění podmínky.',
-    subScenarios: [
-      { number: 1, title: 'Klient říká \'eště počkám\'', difficulty: 'Začátečník', situation: 'Odkládá podpis smlouvy už druhý měsíc.', goal: 'Zjistit skutečný důvod a motivovat k akci.' },
-      { number: 2, title: 'Klient mění podmínky', difficulty: 'Středně pokročilý', situation: 'Každý týden chce jinou cenu, jiné podmínky.', goal: 'Nastavit jasné hranice a závazky.' },
-      { number: 3, title: 'Klient říká \'musím se poradit\'', difficulty: 'Pokročilý', situation: 'Neustále konzultuje s rodinou, přáteli, sousedy.', goal: 'Nabídnout společnou schůzku se všemi zainteresovanými.' },
-    ],
-    knowledge: ['Techniky uzavírání obchodu', 'Identifikace skutečných obav vs. výmluv'],
-    goal: 'Přimět odkládače k rozhodnutí pomocí empatie a jasných argumentů.',
-    tips: ['Ptát se: \'Co by vás mohlo přesvědčit?\'', 'Nabídnout \'nežný deadline\''],
   },
 ];
