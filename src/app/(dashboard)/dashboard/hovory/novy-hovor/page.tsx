@@ -119,17 +119,14 @@ function NovyHovorContent() {
   useEffect(() => {
     async function fetchData() {
       try {
-        // Fetch agents via API (respects subscription/demo limits)
-        const headers = await getAuthHeaders();
-        const [agentsApiRes, scenariosRes, subscriptionRes] = await Promise.all([
-          fetch("/api/agents", { headers }),
+        // Fetch agents and scenarios directly from Supabase (avoids auth-gated API race conditions)
+        const [agentsRes, scenariosRes] = await Promise.all([
+          supabase.from("agents").select("*").not("elevenlabs_agent_id", "is", null),
           supabase.from("scenarios").select("*"),
-          fetch("/api/subscription", { headers })
         ]);
 
-        if (agentsApiRes.ok) {
-          const agentsData = await agentsApiRes.json();
-          const formattedAgents: AIAgent[] = (agentsData.agents || []).map((a: any) => ({
+        if (agentsRes.data) {
+          const formattedAgents: AIAgent[] = agentsRes.data.map((a: any) => ({
             id: a.id,
             name: a.name,
             personality: a.personality,
@@ -159,12 +156,20 @@ function NovyHovorContent() {
           setScenarios(formattedScenarios);
         }
 
-        if (subscriptionRes.ok) {
-          const subData = await subscriptionRes.json();
-          const limit = subData.minutesLimit || 0;
-          const used = subData.minutesUsed || 0;
-          const remainingMinutes = Math.max(0, limit - used);
-          setMaxDurationSeconds(remainingMinutes * 60);
+        // Fetch subscription info for minute limit
+        try {
+          const headers = await getAuthHeaders();
+          const subscriptionRes = await fetch("/api/subscription", { headers });
+          if (subscriptionRes.ok) {
+            const subData = await subscriptionRes.json();
+            const limit = subData.minutesLimit || 0;
+            const used = subData.minutesUsed || 0;
+            const remainingMinutes = Math.max(0, limit - used);
+            setMaxDurationSeconds(remainingMinutes * 60);
+          }
+        } catch {
+          // If subscription fetch fails, still allow the page to load
+          console.warn("Could not fetch subscription info");
         }
 
         // Fetch user initials for call view
