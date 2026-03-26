@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import {
   Phone,
   ArrowLeft,
@@ -128,11 +129,11 @@ function NovyHovorContent() {
         if (agentsRes.data) {
           const formattedAgents: AIAgent[] = agentsRes.data.map((a: any) => ({
             id: a.id,
-            name: a.name,
-            personality: a.personality,
+            name: a.name || "Agent",
+            personality: a.personality || "",
             description: a.description || "",
             difficulty: a.difficulty as any,
-            avatarInitials: a.avatar_initials,
+            avatarInitials: a.avatar_initials || (a.name ? a.name.slice(0, 2).toUpperCase() : "AG"),
             traits: a.traits || [],
             exampleScenario: a.example_scenario || ""
           }));
@@ -819,12 +820,14 @@ function NovyHovorContent() {
 
 export default function NovyHovorPage() {
   return (
-    <Suspense fallback={
-      <div className="flex h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary-500" />
-      </div>
-    }>
-      <NovyHovorContent />
-    </Suspense>
+    <ErrorBoundary>
+      <Suspense fallback={
+        <div className="flex h-[50vh] items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary-500" />
+        </div>
+      }>
+        <NovyHovorContent />
+      </Suspense>
+    </ErrorBoundary>
   );
 }
