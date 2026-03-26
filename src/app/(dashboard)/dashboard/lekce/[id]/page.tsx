@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
   ArrowLeft,
   Lock,
   Check,
-  X,
   Loader2,
   Target,
   Lightbulb,
@@ -15,13 +14,19 @@ import {
   RotateCcw,
   Dumbbell,
   AlertTriangle,
+  Trophy,
+  ChevronRight,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { getAuthHeaders } from "@/lib/auth";
 import { lessonsV2, CATEGORY_CONFIG } from "@/data/lessons-v2";
-import type { LessonV2 } from "@/data/lessons-v2";
+import { LESSON_AGENTS } from "@/data/lesson-agents";
+import type { LessonAgent } from "@/data/lesson-agents";
+import { ActiveCall } from "@/components/call/ActiveCall";
+import { useTrainingCall } from "@/hooks/useTrainingCall";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Link from "next/link";
 
 interface ProgressRecord {
@@ -31,37 +36,19 @@ interface ProgressRecord {
   score: number;
 }
 
-const DIM_LABELS: Record<string, string> = {
-  legal: "Právní",
-  communication: "Komunikační",
-  process: "Procesní",
-  emotional: "Emoční",
-  financial: "Finanční",
+const TIER_LABELS: Record<string, string> = {
+  beginner: "Začátečník",
+  intermediate: "Pokročilý",
+  advanced: "Expert",
 };
 
-const DIM_SHORT: Record<string, string> = {
-  legal: "P",
-  communication: "K",
-  process: "R",
-  emotional: "E",
-  financial: "F",
+const TIER_COLORS: Record<string, { bg: string; text: string; border: string; ring: string }> = {
+  beginner: { bg: "bg-green-50", text: "text-green-700", border: "border-green-200", ring: "ring-green-500" },
+  intermediate: { bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200", ring: "ring-amber-500" },
+  advanced: { bg: "bg-red-50", text: "text-red-700", border: "border-red-200", ring: "ring-red-500" },
 };
 
-function DifficultyDots({ level }: { level: number }) {
-  return (
-    <span className="inline-flex gap-0.5">
-      {[1, 2, 3].map((i) => (
-        <span
-          key={i}
-          className={cn(
-            "h-2 w-2 rounded-full",
-            i <= level ? "bg-current" : "bg-neutral-300"
-          )}
-        />
-      ))}
-    </span>
-  );
-}
+const TIER_ORDER: ("beginner" | "intermediate" | "advanced")[] = ["beginner", "intermediate", "advanced"];
 
 function isLessonCompleted(lessonNum: number, progress: ProgressRecord[]): boolean {
   const lp = progress.filter((p) => p.lesson_number === lessonNum);
@@ -79,59 +66,90 @@ function isLessonUnlocked(lessonNum: number, progress: ProgressRecord[]): boolea
   return isLessonCompleted(lessonNum - 1, progress);
 }
 
-export default function LessonDetailPage() {
+function LessonDetailContent() {
   const params = useParams();
   const router = useRouter();
   const lessonNumber = Number(params.id);
 
   const [progress, setProgress] = useState<ProgressRecord[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeAgent, setActiveAgent] = useState<LessonAgent | null>(null);
+  const [activeSubScenario, setActiveSubScenario] = useState<number>(0);
   const [showTrainingSuggestion, setShowTrainingSuggestion] = useState(false);
 
   const lesson = lessonsV2.find((l) => l.number === lessonNumber);
+  const lessonAgents = LESSON_AGENTS[lessonNumber];
+
+  // Training call hook
+  const callHook = useTrainingCall({
+    onCallEnded: async (callId) => {
+      // After call ends, save progress via API
+      if (callHook.processingResult && activeSubScenario > 0) {
+        try {
+          const headers = await getAuthHeaders();
+          await fetch("/api/lessons/progress", {
+            method: "POST",
+            headers,
+            body: JSON.stringify({
+              lessonNumber,
+              subScenario: activeSubScenario,
+              score: callHook.processingResult.overall_score,
+              callId,
+            }),
+          });
+          // Refresh progress
+          fetchProgress();
+        } catch (e) {
+          console.error("Failed to save lesson progress:", e);
+        }
+      }
+    },
+  });
+
+  const fetchProgress = useCallback(async () => {
+    try {
+      const headers = await getAuthHeaders();
+      const res = await fetch("/api/lessons/progress", { headers });
+      if (res.ok) {
+        const data = await res.json();
+        setProgress(data.progress || []);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
 
   useEffect(() => {
-    async function fetchProgress() {
-      try {
-        const headers = await getAuthHeaders();
-        const res = await fetch("/api/lessons/progress", { headers });
-        if (res.ok) {
-          const data = await res.json();
-          setProgress(data.progress || []);
-        }
-      } catch {
-        // ignore
-      } finally {
-        setLoading(false);
-      }
+    async function init() {
+      await fetchProgress();
+      setLoading(false);
     }
-    fetchProgress();
-  }, []);
+    init();
+  }, [fetchProgress]);
 
   const unlocked = useMemo(() => isLessonUnlocked(lessonNumber, progress), [lessonNumber, progress]);
   const completed = useMemo(() => isLessonCompleted(lessonNumber, progress), [lessonNumber, progress]);
 
-  // Per-sub-scenario stats
-  const subStats = useMemo(() => {
-    if (!lesson) return [];
-    return lesson.subScenarios.map((sub) => {
+  // Per-agent stats (sub_scenario 1=beginner, 2=intermediate, 3=advanced)
+  const agentStats = useMemo(() => {
+    if (!lessonAgents) return [];
+    return TIER_ORDER.map((tier, idx) => {
+      const subNum = idx + 1;
+      const agent = lessonAgents[tier];
       const attempts = progress
-        .filter((p) => p.lesson_number === lessonNumber && p.sub_scenario === sub.number)
+        .filter((p) => p.lesson_number === lessonNumber && p.sub_scenario === subNum)
         .sort((a, b) => a.attempt - b.attempt);
       const bestScore = attempts.reduce((max, p) => Math.max(max, p.score), 0);
       const passed = bestScore >= 80;
-      const consecutiveFails = getConsecutiveFails(attempts);
-      return { sub, attempts, bestScore, passed, consecutiveFails };
+      const totalAttempts = attempts.length;
+      return { agent, tier, subNum, attempts, bestScore, passed, totalAttempts };
     });
-  }, [lesson, lessonNumber, progress]);
+  }, [lessonAgents, lessonNumber, progress]);
 
-  // Check for 3 consecutive fails on any sub-scenario
-  useEffect(() => {
-    const hasTripleFail = subStats.some((s) => s.consecutiveFails >= 3 && !s.passed);
-    if (hasTripleFail) setShowTrainingSuggestion(true);
-  }, [subStats]);
+  const passedCount = agentStats.filter((s) => s.passed).length;
+  const remainingCount = 3 - passedCount;
 
-  if (!lesson) {
+  if (!lesson || !lessonAgents) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
         <p className="text-neutral-500">Lekce nenalezena.</p>
@@ -158,7 +176,7 @@ export default function LessonDetailPage() {
         </div>
         <h1 className="text-xl font-bold text-neutral-900 mb-2">Lekce {lessonNumber} je zamčená</h1>
         <p className="text-neutral-500 mb-6">
-          Nejprve splňte lekci {lessonNumber - 1} se skóre alespoň 80 % ve všech pod-scénářích.
+          Nejprve splňte lekci {lessonNumber - 1} se skóre alespoň 80 % ve všech 3 hovorech.
         </p>
         <Link href="/dashboard/lekce">
           <Button variant="outline" className="gap-2">
@@ -170,8 +188,63 @@ export default function LessonDetailPage() {
     );
   }
 
+  // If a call is active, show ActiveCall
+  if (callHook.phase !== "idle" && activeAgent) {
+    return (
+      <div className="max-w-3xl mx-auto px-2 sm:px-0">
+        <ActiveCall
+          phase={callHook.phase}
+          duration={callHook.duration}
+          agentName={activeAgent.name}
+          agentPersonality={TIER_LABELS[activeAgent.tier] || ""}
+          agentInitials={activeAgent.name.slice(0, 2).toUpperCase()}
+          userInitials="JA"
+          isSpeaking={callHook.isSpeaking}
+          isMuted={callHook.isMuted}
+          error={callHook.error}
+          processingResult={callHook.processingResult}
+          onEndCall={callHook.endCall}
+          onToggleMute={callHook.toggleMute}
+          onReset={() => {
+            callHook.reset();
+            setActiveAgent(null);
+            setActiveSubScenario(0);
+            fetchProgress();
+          }}
+          onViewResults={() => {
+            // Save progress if we have a score
+            if (callHook.processingResult && activeSubScenario > 0) {
+              getAuthHeaders().then((headers) => {
+                fetch("/api/lessons/progress", {
+                  method: "POST",
+                  headers,
+                  body: JSON.stringify({
+                    lessonNumber,
+                    subScenario: activeSubScenario,
+                    score: callHook.processingResult!.overall_score,
+                    callId: callHook.callId,
+                  }),
+                }).then(() => fetchProgress());
+              });
+            }
+            callHook.reset();
+            setActiveAgent(null);
+            setActiveSubScenario(0);
+            fetchProgress();
+          }}
+        />
+      </div>
+    );
+  }
+
   const catConf = CATEGORY_CONFIG[lesson.category];
-  const catColor = catConf?.color || "blue";
+
+  const handleStartCall = async (agent: LessonAgent, subNum: number) => {
+    setActiveAgent(agent);
+    setActiveSubScenario(subNum);
+    // Use the agent's elevenlabs ID directly
+    await callHook.startCall(agent.agentId, `lesson-${lessonNumber}-${subNum}`);
+  };
 
   return (
     <div className="max-w-3xl mx-auto px-2 sm:px-0">
@@ -201,11 +274,10 @@ export default function LessonDetailPage() {
                 </h3>
               </div>
               <p className="text-sm text-neutral-600 mb-6">
-                Na tomto pod-scénáři jste 3x po sobě nedosáhli 80 %. Doporučujeme přejít do volného tréninku,
-                kde si můžete bez omezení procvičit podobné situace.
+                Na tomto hovoru jste 3× po sobě nedosáhli 80 %. Doporučujeme přejít do volného tréninku.
               </p>
               <div className="flex gap-3">
-                <Link href="/dashboard/trenink" className="flex-1">
+                <Link href="/dashboard/hovory/novy-hovor" className="flex-1">
                   <Button className="w-full gap-2">
                     <Dumbbell className="h-4 w-4" />
                     Přejít do tréninku
@@ -239,12 +311,12 @@ export default function LessonDetailPage() {
         <div className="flex items-center gap-2 mb-2">
           <span className={cn(
             "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold",
-            `bg-${catColor}-100 text-${catColor}-700`
+            `bg-${catConf?.color || "blue"}-100 text-${catConf?.color || "blue"}-700`
           )}>
             {lesson.category}
           </span>
           <span className="text-xs text-neutral-400">
-            Lekce {lesson.number}/100
+            Lekce {lesson.number}/105
           </span>
           {completed && (
             <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700">
@@ -254,20 +326,9 @@ export default function LessonDetailPage() {
           )}
         </div>
         <h1 className="text-2xl font-bold text-neutral-900 mb-2">{lesson.title}</h1>
-        <p className="text-sm text-neutral-500">{lesson.maxDifficulty}</p>
       </div>
 
-      {/* 5 difficulty dimensions */}
-      <div className="mb-6 flex flex-wrap gap-4 rounded-lg border border-neutral-200 bg-white p-4">
-        {Object.entries(lesson.dimensions).map(([key, val]) => (
-          <div key={key} className="flex items-center gap-2">
-            <span className="text-xs font-bold text-neutral-400 w-3">{DIM_SHORT[key]}</span>
-            <DifficultyDots level={val} />
-          </div>
-        ))}
-      </div>
-
-      {/* Situation */}
+      {/* Lesson overview info */}
       <div className="mb-5 rounded-xl border border-neutral-200 bg-white p-5">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-2">
           Situace
@@ -292,17 +353,6 @@ export default function LessonDetailPage() {
         </div>
       )}
 
-      {/* Goal */}
-      <div className="mb-5 rounded-xl border border-neutral-200 bg-white p-5">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-2">
-          Cíl hovoru
-        </h3>
-        <div className="flex items-start gap-2.5">
-          <Target className="h-4 w-4 shrink-0 mt-0.5 text-green-500" />
-          <p className="text-sm text-neutral-700">{lesson.goal}</p>
-        </div>
-      </div>
-
       {/* Tips */}
       {lesson.tips.length > 0 && (
         <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50/50 p-5">
@@ -321,122 +371,191 @@ export default function LessonDetailPage() {
         </div>
       )}
 
-      {/* Sub-scenarios */}
-      <div className="mb-8">
-        <h3 className="text-sm font-bold text-neutral-900 mb-2">
-          3 pod-scénáře k absolvování
+      {/* Progress summary */}
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="text-sm font-bold text-neutral-900">
+          3 hovory k absolvování
         </h3>
-        <p className="text-xs text-neutral-500 mb-4">
-          Pro postup do další lekce je potřeba dosáhnout minimálně <strong className="text-neutral-700">80 %</strong> u každého ze 3 hovorů.
-        </p>
-        <div className="space-y-3">
-          {subStats.map(({ sub, attempts, bestScore, passed, consecutiveFails }) => {
-            const diffLabel = sub.difficulty;
-            const totalAttempts = attempts.length;
+        {remainingCount > 0 && !completed ? (
+          <span className="text-xs text-neutral-500">
+            Zbývá dokončit: <strong className="text-neutral-700">{remainingCount}</strong>
+          </span>
+        ) : completed ? (
+          <span className="inline-flex items-center gap-1 text-xs font-semibold text-green-600">
+            <Trophy className="h-3.5 w-3.5" />
+            Lekce dokončena!
+          </span>
+        ) : null}
+      </div>
 
-            return (
-              <div
-                key={sub.number}
-                className={cn(
-                  "rounded-xl border p-4 sm:p-5 transition-all",
-                  passed
-                    ? "border-green-200 bg-green-50/40"
-                    : "border-neutral-200 bg-white"
-                )}
-              >
-                <div className="flex items-start justify-between gap-3 mb-2">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className={cn(
-                        "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold",
-                        sub.number === 1
-                          ? "bg-green-100 text-green-700"
-                          : sub.number === 2
-                            ? "bg-amber-100 text-amber-700"
-                            : "bg-red-100 text-red-700"
-                      )}>
-                        {diffLabel}
-                      </span>
-                      {passed && <Check className="h-4 w-4 text-green-500" />}
-                    </div>
-                    <p className="text-sm font-medium text-neutral-900">{sub.title}</p>
-                    <p className="text-xs text-neutral-500 mt-1">{sub.situation}</p>
+      <p className="text-xs text-neutral-500 mb-4">
+        Pro postup do další lekce je potřeba dosáhnout minimálně <strong className="text-neutral-700">80 %</strong> u každého ze 3 hovorů.
+      </p>
+
+      {/* Agent cards */}
+      <div className="space-y-3 mb-8">
+        {agentStats.map(({ agent, tier, subNum, attempts, bestScore, passed, totalAttempts }) => {
+          const colors = TIER_COLORS[tier] || TIER_COLORS.beginner;
+          const consecutiveFails = getConsecutiveFails(attempts);
+
+          return (
+            <motion.div
+              key={subNum}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: subNum * 0.1 }}
+              className={cn(
+                "rounded-xl border p-5 transition-all",
+                passed
+                  ? "border-green-200 bg-green-50/40"
+                  : colors.border, colors.bg
+              )}
+            >
+              {/* Agent header row */}
+              <div className="flex items-start justify-between gap-3 mb-3">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <div className={cn(
+                    "flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-bold",
+                    passed ? "bg-green-500 text-white" : `${colors.bg} ${colors.text} border ${colors.border}`
+                  )}>
+                    {passed ? <Check className="h-5 w-5" /> : agent.name.slice(0, 2).toUpperCase()}
                   </div>
-                  {/* Score */}
-                  {totalAttempts > 0 && (
-                    <div className="text-right shrink-0">
-                      <p className={cn(
-                        "text-xl font-bold",
-                        passed ? "text-green-600" : "text-amber-600"
-                      )}>
-                        {bestScore}%
-                      </p>
-                      <p className="text-[10px] text-neutral-400">
-                        {totalAttempts} {totalAttempts === 1 ? "pokus" : totalAttempts < 5 ? "pokusy" : "pokusu"}
-                      </p>
-                    </div>
-                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-neutral-900 leading-tight">{agent.name}</p>
+                    <span className={cn(
+                      "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold mt-1",
+                      passed ? "bg-green-100 text-green-700" : `${colors.bg} ${colors.text}`
+                    )}>
+                      {TIER_LABELS[tier]}
+                    </span>
+                  </div>
                 </div>
 
-                {/* Attempt history dots */}
+                {/* Score display */}
                 {totalAttempts > 0 && (
-                  <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-neutral-100">
-                    <span className="text-[10px] text-neutral-400 mr-1">Pokusy:</span>
-                    {attempts.map((a, i) => (
-                      <span
-                        key={i}
-                        className={cn(
-                          "h-5 w-5 rounded-full flex items-center justify-center text-[9px] font-bold",
-                          a.score >= 80
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-600"
-                        )}
-                        title={`Pokus ${a.attempt}: ${a.score}%`}
-                      >
-                        {a.score}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                {/* Consecutive fails warning */}
-                {consecutiveFails >= 3 && !passed && (
-                  <div className="mt-3 flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2">
-                    <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0" />
-                    <p className="text-xs text-amber-700">
-                      3x po sobě pod 80 %. Zvažte volný trénink.
+                  <div className="text-right shrink-0">
+                    <p className={cn(
+                      "text-xl font-bold",
+                      passed ? "text-green-600" : bestScore >= 60 ? "text-amber-600" : "text-red-500"
+                    )}>
+                      {bestScore}%
+                    </p>
+                    <p className="text-[10px] text-neutral-400">
+                      {totalAttempts} {totalAttempts === 1 ? "pokus" : totalAttempts < 5 ? "pokusy" : "pokusů"}
                     </p>
                   </div>
                 )}
-
-                {/* Start button */}
-                {!passed && (
-                  <div className="mt-3">
-                    <Link href={`/dashboard/hovory/novy-hovor?scenarioId=sc-${lessonNumber}-${sub.difficulty === 'Začátečník' ? 'easy' : sub.difficulty === 'Středně pokročilý' ? 'medium' : 'hard'}`}>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full gap-2 transition-colors hover:bg-primary-50 hover:text-primary-600 hover:border-primary-200"
-                      >
-                        <Phone className="h-4 w-4" />
-                        Zahájit hovor
-                      </Button>
-                    </Link>
-                  </div>
-                )}
               </div>
-            );
-          })}
-        </div>
+
+              {/* Mini progress bar */}
+              <div className="mb-3">
+                <div className="relative h-2 rounded-full bg-neutral-100 overflow-hidden">
+                  {/* 80% threshold marker */}
+                  <div className="absolute top-0 bottom-0 left-[80%] w-px bg-neutral-300 z-10" />
+                  {/* Score bar */}
+                  {totalAttempts > 0 && (
+                    <motion.div
+                      className={cn(
+                        "absolute inset-y-0 left-0 rounded-full",
+                        passed
+                          ? "bg-gradient-to-r from-green-400 to-green-500"
+                          : bestScore >= 60
+                            ? "bg-gradient-to-r from-amber-400 to-amber-500"
+                            : "bg-gradient-to-r from-red-400 to-red-500"
+                      )}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${Math.min(bestScore, 100)}%` }}
+                      transition={{ duration: 0.6, ease: "easeOut" }}
+                    />
+                  )}
+                </div>
+                <div className="flex justify-between mt-1">
+                  <span className="text-[9px] text-neutral-400">0</span>
+                  <span className="text-[9px] text-neutral-400 ml-auto mr-[18%]">80</span>
+                  <span className="text-[9px] text-neutral-400">100</span>
+                </div>
+              </div>
+
+              {/* Passed badge */}
+              {passed && (
+                <div className="flex items-center gap-2 mb-3 rounded-lg bg-green-100 px-3 py-2">
+                  <Check className="h-4 w-4 text-green-600" />
+                  <span className="text-xs font-semibold text-green-700">Dokončeno</span>
+                </div>
+              )}
+
+              {/* Attempt history dots */}
+              {totalAttempts > 0 && (
+                <div className="flex items-center gap-1.5 mb-3">
+                  <span className="text-[10px] text-neutral-400 mr-1">Pokusy:</span>
+                  {attempts.slice(-10).map((a, i) => (
+                    <span
+                      key={i}
+                      className={cn(
+                        "h-5 w-5 rounded-full flex items-center justify-center text-[9px] font-bold",
+                        a.score >= 80
+                          ? "bg-green-100 text-green-700"
+                          : "bg-red-100 text-red-600"
+                      )}
+                      title={`Pokus ${a.attempt}: ${a.score}%`}
+                    >
+                      {a.score}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Consecutive fails warning */}
+              {consecutiveFails >= 3 && !passed && (
+                <div className="mb-3 flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2">
+                  <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0" />
+                  <p className="text-xs text-amber-700">
+                    3× po sobě pod 80 %. Zvažte volný trénink.
+                  </p>
+                </div>
+              )}
+
+              {/* Call button */}
+              {!passed && (
+                <Button
+                  onClick={() => handleStartCall(agent, subNum)}
+                  className="w-full gap-2 bg-red-500 hover:bg-red-600 text-white"
+                  size="sm"
+                >
+                  <Phone className="h-4 w-4" />
+                  Zavolat
+                </Button>
+              )}
+
+              {/* Retry button for passed */}
+              {passed && (
+                <Button
+                  onClick={() => handleStartCall(agent, subNum)}
+                  variant="outline"
+                  className="w-full gap-2 text-neutral-500 hover:text-neutral-700"
+                  size="sm"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  Zavolat znovu
+                </Button>
+              )}
+            </motion.div>
+          );
+        })}
       </div>
 
-      {/* Next lesson button */}
-      {completed && lessonNumber < 100 && (
+      {/* Lesson completed → next lesson */}
+      {completed && lessonNumber < 105 && (
         <div className="mb-12 text-center">
+          <div className="rounded-xl border border-green-200 bg-green-50 p-6 mb-4">
+            <Trophy className="h-8 w-8 text-green-500 mx-auto mb-2" />
+            <h3 className="text-lg font-bold text-green-800 mb-1">Lekce {lessonNumber} splněna!</h3>
+            <p className="text-sm text-green-600">Další lekce je odemčena. Pokračujte v cestě k titulu Elitního makléře.</p>
+          </div>
           <Link href={`/dashboard/lekce/${lessonNumber + 1}`}>
             <Button size="lg" className="gap-2">
               Další lekce
-              <ArrowLeft className="h-4 w-4 rotate-180" />
+              <ChevronRight className="h-4 w-4" />
             </Button>
           </Link>
         </div>
@@ -452,4 +571,12 @@ function getConsecutiveFails(attempts: ProgressRecord[]): number {
     else break;
   }
   return count;
+}
+
+export default function LessonDetailPage() {
+  return (
+    <ErrorBoundary>
+      <LessonDetailContent />
+    </ErrorBoundary>
+  );
 }

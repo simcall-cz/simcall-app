@@ -34,7 +34,7 @@ interface ProgressRecord {
 }
 
 const CATEGORY_ICONS: Record<string, React.ElementType> = {
-  Home, Key, Banknote, Scale, MapPin, Wrench, FileText, Building2, Megaphone, Handshake,
+  Home, Key, Banknote, Scale, MapPin, Wrench, FileText, Building2, Megaphone, Handshake, GraduationCap,
 };
 
 const COLOR_MAP: Record<string, { bg: string; border: string; text: string; node: string; nodeDone: string; line: string }> = {
@@ -48,6 +48,7 @@ const COLOR_MAP: Record<string, { bg: string; border: string; text: string; node
   rose:    { bg: "bg-rose-50/60",    border: "border-rose-200",    text: "text-rose-700",    node: "bg-rose-100 border-rose-300",    nodeDone: "bg-rose-500",    line: "bg-rose-200" },
   pink:    { bg: "bg-pink-50/60",    border: "border-pink-200",    text: "text-pink-700",    node: "bg-pink-100 border-pink-300",    nodeDone: "bg-pink-500",    line: "bg-pink-200" },
   teal:    { bg: "bg-teal-50/60",    border: "border-teal-200",    text: "text-teal-700",    node: "bg-teal-100 border-teal-300",    nodeDone: "bg-teal-500",    line: "bg-teal-200" },
+  amber:   { bg: "bg-amber-50/60",   border: "border-amber-200",   text: "text-amber-700",   node: "bg-amber-100 border-amber-300",   nodeDone: "bg-amber-500",   line: "bg-amber-200" },
 };
 
 function isLessonCompleted(lessonNum: number, progress: ProgressRecord[]): boolean {
@@ -76,7 +77,7 @@ function getBestScore(lessonNum: number, progress: ProgressRecord[]): number | n
 
 function getCompletedCount(progress: ProgressRecord[]): number {
   let count = 0;
-  for (let i = 1; i <= 100; i++) {
+  for (let i = 1; i <= 105; i++) {
     if (isLessonCompleted(i, progress)) count++;
   }
   return count;
@@ -285,7 +286,7 @@ export default function LekcePage() {
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900">Lekce</h1>
-            <p className="text-sm text-neutral-500">100 lekcí z realitní praxe</p>
+            <p className="text-sm text-neutral-500">105 lekcí z realitní praxe</p>
           </div>
         </div>
       </div>
@@ -298,7 +299,7 @@ export default function LekcePage() {
             <p className="text-xs text-neutral-500">{level.description}</p>
           </div>
           <div className="text-right">
-            <p className="text-2xl font-bold text-neutral-900">{completedCount}<span className="text-sm font-normal text-neutral-400">/100</span></p>
+            <p className="text-2xl font-bold text-neutral-900">{completedCount}<span className="text-sm font-normal text-neutral-400">/105</span></p>
             <p className="text-xs text-neutral-500">{progressPct} % splněno</p>
           </div>
         </div>
@@ -379,12 +380,12 @@ export default function LekcePage() {
       <div className="mt-8 mb-12 text-center">
         <div className={cn(
           "inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-bold",
-          completedCount >= 100
+          completedCount >= 105
             ? "bg-gradient-to-r from-yellow-400 to-amber-500 text-white shadow-lg"
             : "bg-neutral-100 text-neutral-400"
         )}>
           <GraduationCap className="h-5 w-5" />
-          {completedCount >= 100 ? "Elitní makléř" : "Cíl: Elitní makléř"}
+          {completedCount >= 105 ? "Elitní makléř" : "Cíl: Elitní makléř"}
         </div>
       </div>
     </div>
