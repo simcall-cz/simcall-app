@@ -525,7 +525,7 @@ function NovyHovorContent() {
                     </div>
                   </div>
                   <div className="mt-3 flex flex-wrap gap-1.5">
-                    {agent.traits?.map((trait) => (
+                    {(Array.isArray(agent.traits) ? agent.traits : []).map((trait) => (
                       <span
                         key={trait}
                         className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs text-neutral-600"
@@ -593,7 +593,7 @@ function NovyHovorContent() {
                       </div>
                     </div>
                     <div className="mt-3 flex flex-wrap gap-1.5">
-                      {agent.traits?.map((trait) => (
+                      {(Array.isArray(agent.traits) ? agent.traits : []).map((trait) => (
                         <span
                           key={trait}
                           className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs text-neutral-600"
@@ -635,7 +635,7 @@ function NovyHovorContent() {
                     Cíle hovoru
                   </h3>
                   <ul className="space-y-2.5">
-                    {scenario.objectives?.map((obj, i) => (
+                    {(Array.isArray(scenario.objectives) ? scenario.objectives : []).map((obj, i) => (
                       <li key={i} className="flex items-start gap-2.5">
                         <Target className="mt-0.5 h-4 w-4 shrink-0 text-primary-500" />
                         <span className="text-sm text-neutral-700">{obj}</span>
