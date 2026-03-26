@@ -62,9 +62,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { agent_id, scenario_id } = body;
 
-    if (!agent_id || !scenario_id) {
+    if (!agent_id) {
       return NextResponse.json(
-        { error: "agent_id and scenario_id are required" },
+        { error: "agent_id is required" },
         { status: 400 }
       );
     }
@@ -120,12 +120,16 @@ export async function POST(request: NextRequest) {
     const { signed_url } = await elevenLabsResponse.json();
 
     // Create call record in Supabase
+    // If scenario_id is a dynamic lesson ID (e.g., "lesson-1-1"),
+    // pass null to bypass the legacy calls_scenario_id_fkey constraint.
+    const finalScenarioId = (scenario_id && scenario_id.startsWith("lesson-")) ? null : scenario_id;
+
     const { data: call, error: callError } = await supabase
       .from("calls")
       .insert({
         user_id: user.id,
         agent_id,
-        scenario_id,
+        scenario_id: finalScenarioId,
         status: "pending",
         date: new Date().toISOString(),
       })
