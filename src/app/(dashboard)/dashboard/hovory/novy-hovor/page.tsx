@@ -141,17 +141,27 @@ function NovyHovorContent() {
         }
 
         if (scenariosRes.data) {
+          // Helper to safely parse array fields that might be stored as JSON strings
+          const toArray = (val: unknown): string[] => {
+            if (Array.isArray(val)) return val;
+            if (typeof val === "string") {
+              try { const parsed = JSON.parse(val); return Array.isArray(parsed) ? parsed : []; }
+              catch { return []; }
+            }
+            return [];
+          };
+
           const formattedScenarios: Scenario[] = scenariosRes.data.map((s: any) => {
             return {
               id: s.id,
-              title: s.title,
+              title: s.title || "",
               description: s.description || "",
               category: s.category as any,
               difficulty: s.difficulty as any,
-              objectives: s.objectives || [],
+              objectives: toArray(s.objectives),
               agentId: s.agent_id,
               imageUrl: s.image_url || "",
-              tips: s.tips || []
+              tips: toArray(s.tips)
             };
           });
           setScenarios(formattedScenarios);
