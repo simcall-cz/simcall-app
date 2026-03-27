@@ -1,678 +1,374 @@
 "use client";
 
-import Link from "next/link";
-import {
-  ArrowRight,
-  Mic,
-  FileText,
-  BarChart3,
-  TrendingUp,
-  User,
-  Users,
-  Check,
-  CheckCircle,
-  Sparkles,
-  Trophy,
-  Wand2,
-  Building2,
-  Shield,
-} from "lucide-react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-import { Container } from "@/components/shared/container";
-import { SectionHeader } from "@/components/shared/section-header";
-import { ScrollReveal } from "@/components/shared/scroll-reveal";
-import { GradientText } from "@/components/shared/gradient-text";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+// ─── Stats data ────────────────────────────────────────────────────────────────
+const STATS = [
+  { value: "315+", label: "AI personas v databázi" },
+  { value: "105", label: "tréninkových lekcí" },
+  { value: "24/7", label: "k dispozici" },
+  { value: "0", label: "reálných klientů ohroženo" },
+];
 
-import { HeroMockup } from "@/components/marketing/hero-mockup";
-import { AnalyticsMockup } from "@/components/marketing/analytics-mockup";
-import { PricingTeaser } from "@/components/marketing/pricing-teaser";
-
-import { aiAgents } from "@/data/ai-agents";
-
-/* ------------------------------------------------------------------ */
-/*  Difficulty config                                                   */
-/* ------------------------------------------------------------------ */
-const difficultyColors = {
-  easy: "bg-green-500",
-  medium: "bg-yellow-500",
-  hard: "bg-red-500",
-} as const;
-
-const difficultyLabels = {
-  easy: "Snadný",
-  medium: "Střední",
-  hard: "Těžký",
-} as const;
-
-/* ------------------------------------------------------------------ */
-/*  Steps data                                                          */
-/* ------------------------------------------------------------------ */
-const steps = [
+const FEATURES = [
   {
-    num: "01",
-    icon: Mic,
-    title: "Vyberte scénář",
-    desc: "Zvolte AI agenta a typ hovoru od studeného kontaktu po náročné námitky.",
+    icon: "🎙️",
+    title: "Živý hlasový hovor",
+    desc: "Trénuj přes telefon nebo mikrofon — ne přes chat. Přesně jako v realitě.",
   },
   {
-    num: "02",
-    icon: BarChart3,
-    title: "Zavolejte AI agentovi",
-    desc: "Hovor probíhá v reálném čase přímo ve vašem prohlížeči. Bez instalace.",
+    icon: "🧠",
+    title: "AI klient, který tlačí",
+    desc: "Každá persona má svůj příběh, motivaci a námitky. Žádné papírové dialogy.",
   },
   {
-    num: "03",
-    icon: TrendingUp,
-    title: "Získejte zpětnou vazbu",
-    desc: "Okamžitá AI analýza se skóre, přepisem, výplňovými slovy a doporučeními.",
+    icon: "📊",
+    title: "Zpětná vazba po každém hovoru",
+    desc: "Skóre, checkpointy, co fungovalo a co příště udělat jinak. Konkrétně.",
+  },
+  {
+    icon: "⚡",
+    title: "Stovky scénářů",
+    desc: "Od prvního kontaktu přes exekuce po rozvody. Tréninky reálných situací.",
   },
 ];
 
-/* ------------------------------------------------------------------ */
-/*  Features                                                            */
-/* ------------------------------------------------------------------ */
-const features = [
-  {
-    icon: Sparkles,
-    title: "AI analýza každého hovoru",
-    desc: "Automatické vyhodnocení se skóre, silnými stránkami a konkrétními tipy ke zlepšení.",
-    tag: "Solo",
-    tagColor: "bg-primary-50 text-primary-600",
-  },
-  {
-    icon: FileText,
-    title: "Přepis a nahrávka",
-    desc: "Kompletní přepis hovoru a detekce výplňových slov, které zabíjejí vaše obchody.",
-    tag: "Solo",
-    tagColor: "bg-primary-50 text-primary-600",
-  },
-  {
-    icon: TrendingUp,
-    title: "Sledování pokroku",
-    desc: "Detailní statistiky vašeho zlepšení v čase. Vidíte přesně, kde rostete.",
-    tag: "Solo",
-    tagColor: "bg-primary-50 text-primary-600",
-  },
-  {
-    icon: BarChart3,
-    title: "Manager dashboard",
-    desc: "Přehled výkonu celého týmu na jednom místě. Analytika každého makléře.",
-    tag: "Team",
-    tagColor: "bg-blue-50 text-blue-600",
-  },
-  {
-    icon: Trophy,
-    title: "Žebříčky v týmu",
-    desc: "Gamifikace motivující makléře k pravidelnému tréninku. Sdílený pool minut.",
-    tag: "Team",
-    tagColor: "bg-blue-50 text-blue-600",
-  },
-  {
-    icon: Wand2,
-    title: "AI agenti na míru",
-    desc: "Scénáře z reálných situací vaší firmy. Whitelabel řešení pod vaší značkou.",
-    tag: "Enterprise",
-    tagColor: "bg-purple-50 text-purple-600",
-  },
-];
+// ─── Password form ──────────────────────────────────────────────────────────────
+function PasswordGate({ onSuccess }: { onSuccess: () => void }) {
+  const [pw, setPw] = useState("");
+  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-/* ------------------------------------------------------------------ */
-/*  Page                                                                */
-/* ------------------------------------------------------------------ */
-export default function HomePage() {
-  const showcaseAgents = aiAgents.slice(0, 5);
-  const extraAgentsCount = 495;
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError(false);
+
+    if (pw === "MercedesCLE53") {
+      // Set cookie for 30 days
+      const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
+      document.cookie = `site-password=MercedesCLE53; expires=${expires}; path=/`;
+      setTimeout(() => onSuccess(), 150);
+    } else {
+      setError(true);
+      setLoading(false);
+      setPw("");
+    }
+  }
 
   return (
-    <>
-      {/* ============================================ */}
-      {/* HERO                                         */}
-      {/* ============================================ */}
-      <section className="relative overflow-hidden pt-16 pb-16 sm:pt-24 sm:pb-24 lg:pt-28 lg:pb-28">
-        {/* Background decoration */}
-        <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute top-20 right-0 w-[500px] h-[500px] rounded-full bg-primary-50/60 blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-primary-50/30 blur-3xl" />
+    <div className="border border-white/10 rounded-2xl p-6 bg-white/[0.03] backdrop-blur-sm">
+      <p className="text-xs text-white/40 uppercase tracking-widest mb-4 font-medium">
+        Přístup pro partnery
+      </p>
+      <form onSubmit={handleSubmit} className="flex gap-3">
+        <input
+          type="password"
+          value={pw}
+          onChange={(e) => {
+            setPw(e.target.value);
+            setError(false);
+          }}
+          placeholder="Přístupové heslo"
+          className={`flex-1 bg-white/5 border rounded-xl px-4 py-3 text-white placeholder-white/30 text-sm outline-none focus:ring-1 transition-all ${
+            error
+              ? "border-red-500/60 focus:ring-red-500/40"
+              : "border-white/10 focus:ring-white/20 focus:border-white/20"
+          }`}
+          autoComplete="off"
+        />
+        <button
+          type="submit"
+          disabled={loading || pw.length === 0}
+          className="px-5 py-3 bg-white text-black font-semibold text-sm rounded-xl hover:bg-white/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+        >
+          {loading ? "..." : "Vstup"}
+        </button>
+      </form>
+      {error && (
+        <p className="text-red-400 text-xs mt-2 ml-1">Nesprávné heslo</p>
+      )}
+    </div>
+  );
+}
+
+// ─── Email subscribe form ───────────────────────────────────────────────────────
+function SubscribeForm() {
+  const [email, setEmail] = useState("");
+  const [terms, setTerms] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email || !terms) return;
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const res = await fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, terms }),
+      });
+
+      if (res.ok) {
+        setSuccess(true);
+      } else {
+        const data = await res.json();
+        setError(data.error || "Chyba při odesílání");
+      }
+    } catch {
+      setError("Zkus to znovu");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (success) {
+    return (
+      <div className="text-center py-4">
+        <div className="text-4xl mb-3">✅</div>
+        <p className="text-white font-semibold text-lg">Perfektní, jsme v kontaktu.</p>
+        <p className="text-white/50 text-sm mt-1">Dostaneš zprávu jako první.</p>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="tvuj@email.cz"
+          required
+          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-white/30 text-sm outline-none focus:ring-1 focus:ring-white/20 focus:border-white/20 transition-all"
+        />
+      </div>
+      <label className="flex items-start gap-3 cursor-pointer group">
+        <div
+          className={`relative mt-0.5 w-5 h-5 rounded flex-shrink-0 border transition-all ${
+            terms
+              ? "bg-[#e8491d] border-[#e8491d]"
+              : "border-white/20 group-hover:border-white/40"
+          }`}
+          onClick={() => setTerms(!terms)}
+        >
+          {terms && (
+            <svg className="absolute inset-0 m-auto w-3 h-3 text-white" fill="none" viewBox="0 0 12 12">
+              <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          )}
         </div>
+        <input type="checkbox" className="sr-only" checked={terms} onChange={(e) => setTerms(e.target.checked)} />
+        <span className="text-xs text-white/50 leading-relaxed">
+          Souhlasím se{" "}
+          <a href="#" className="text-white/70 underline underline-offset-2 hover:text-white transition-colors">
+            zpracováním osobních údajů
+          </a>{" "}
+          a zasíláním informací o spuštění SimCall.
+        </span>
+      </label>
+      {error && <p className="text-red-400 text-xs">{error}</p>}
+      <button
+        type="submit"
+        disabled={loading || !email || !terms}
+        className="w-full py-3.5 bg-[#e8491d] hover:bg-[#d13f17] text-white font-semibold rounded-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed text-sm"
+      >
+        {loading ? "Odesílám..." : "Chci být mezi prvními →"}
+      </button>
+    </form>
+  );
+}
 
-        <Container>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            {/* Left: Text */}
-            <div>
-              <ScrollReveal>
-                <Badge className="mb-5">AI trénink pro realitní makléře</Badge>
-              </ScrollReveal>
+// ─── Main page ──────────────────────────────────────────────────────────────────
+export default function ComingSoonPage() {
+  const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-              <ScrollReveal delay={0.1}>
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-neutral-800 leading-[1.1]">
-                  Každá chyba u telefonu <br />
-                  vás stojí klienta. <br />
-                  <GradientText>Trénujte nanečisto.</GradientText>
-                </h1>
-              </ScrollReveal>
+  useEffect(() => {
+    setMounted(true);
+    // Check if already has valid password cookie
+    const hasCookie = document.cookie
+      .split(";")
+      .some((c) => c.trim().startsWith("site-password=MercedesCLE53"));
+    if (hasCookie) {
+      router.push("/dashboard");
+    }
+  }, [router]);
 
-              <ScrollReveal delay={0.2}>
-                <ul className="mt-6 space-y-2.5">
-                  {[
-                    "Zapomeňte na PDF manuály a nudné školení",
-                    "Postaveno makléři, kteří si tím sami prošli",
-                    "Bezpečný prostor pro chyby, než přijdou skuteční klienti",
-                  ].map((item) => (
-                    <li
-                      key={item}
-                      className="flex items-center gap-2.5 text-neutral-500"
-                    >
-                      <Check className="w-5 h-5 text-primary-500 shrink-0" />
-                      <span className="text-base sm:text-lg font-medium">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </ScrollReveal>
+  function handlePasswordSuccess() {
+    router.push("/dashboard");
+  }
 
-              <ScrollReveal delay={0.3}>
-                <div className="mt-8 flex flex-col sm:flex-row gap-3">
-                  <Link href="/registrace">
-                    <Button size="lg" className="group w-full sm:w-auto">
-                      Vyzkoušet 10 minut zdarma
-                      <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                    </Button>
-                  </Link>
-                  <Link href="/cenik">
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className="w-full sm:w-auto"
-                    >
-                      Zobrazit ceník
-                    </Button>
-                  </Link>
-                </div>
-                <div className="mt-3 flex items-center gap-2 text-neutral-400">
-                  <CheckCircle className="w-4 h-4 text-emerald-400" />
-                  10 minut na vyzkoušení, bez platby.
-                </div>
-              </ScrollReveal>
+  return (
+    <div className="min-h-screen bg-[#0a0a0a] text-white overflow-x-hidden">
+      {/* Background gradient */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-[#e8491d]/10 rounded-full blur-[120px] opacity-60" />
+        <div className="absolute bottom-0 right-0 w-[600px] h-[400px] bg-blue-500/5 rounded-full blur-[100px]" />
+      </div>
+
+      <div className="relative z-10">
+        {/* Nav */}
+        <nav className="flex items-center justify-between px-6 md:px-12 py-6">
+          <div className="flex items-center gap-2">
+            <span className="text-xl font-bold tracking-tight">
+              Sim<span className="text-[#e8491d]">Call</span>
+            </span>
+            <span className="text-xs text-white/30 border border-white/10 rounded-full px-2 py-0.5 font-medium">
+              beta
+            </span>
+          </div>
+          <button
+            onClick={() => setShowPassword(!showPassword)}
+            className="text-xs text-white/40 hover:text-white/70 transition-colors"
+          >
+            Jsem z týmu →
+          </button>
+        </nav>
+
+        {/* Hero */}
+        <section className="px-6 md:px-12 pt-16 pb-12 max-w-5xl mx-auto">
+          <div
+            className={`transition-all duration-700 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+          >
+            <div className="inline-flex items-center gap-2 text-xs text-[#e8491d] font-medium border border-[#e8491d]/30 bg-[#e8491d]/10 rounded-full px-3 py-1.5 mb-8">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#e8491d] animate-pulse" />
+              Spuštění se blíží
             </div>
 
-            {/* Right: Hero Mockup */}
-            <div className="flex justify-center lg:justify-end">
-              <HeroMockup />
-            </div>
+            <h1 className="text-5xl md:text-7xl font-extrabold leading-[1.1] tracking-tight mb-6">
+              Každá chyba
+              <br />
+              <span className="text-white/20">u telefonu</span>
+              <br />
+              <span className="text-[#e8491d]">tě stojí klienta.</span>
+            </h1>
+
+            <p className="text-lg md:text-xl text-white/50 max-w-2xl leading-relaxed mb-4">
+              Připravujeme prostředí, kde si realitní makléři mohou trénovat
+              hovory s AI klienty — bez rizika, bez trapných chvil,
+              bez ztracených obchodů.
+            </p>
+            <p className="text-sm text-white/30 max-w-xl">
+              Stovky scénářů. Živé hlasové hovory. Zpětná vazba po každém
+              tréninku. Přesně tak, jak to v realitě funguje.
+            </p>
           </div>
-        </Container>
-      </section>
+        </section>
 
-      {/* ============================================ */}
-      {/* HOW IT WORKS - 3 steps                       */}
-      {/* ============================================ */}
-      <section className="py-16 sm:py-24">
-        <Container>
-          <ScrollReveal>
-            <SectionHeader
-              badge="Jak to funguje"
-              title="Od paralyzovaného nováčka k profesionálovi ve 3 krocích"
-            />
-          </ScrollReveal>
-
-          <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-4xl mx-auto">
-            {steps.map((step, index) => (
-              <ScrollReveal key={step.num} delay={index * 0.1}>
-                <div className="relative text-center p-6 rounded-2xl border border-neutral-100 bg-white hover:shadow-lg transition-shadow">
-                  <span className="text-5xl font-black text-neutral-100">
-                    {step.num}
-                  </span>
-                  <div className="mt-2 flex justify-center">
-                    <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center">
-                      <step.icon className="w-5 h-5 text-primary-500" />
-                    </div>
-                  </div>
-                  <h3 className="mt-3 font-semibold text-neutral-800">
-                    {step.title}
-                  </h3>
-                  <p className="mt-2 text-sm text-neutral-500 leading-relaxed">
-                    {step.desc}
-                  </p>
-
-                  {index < 2 && (
-                    <div className="hidden md:block absolute top-1/2 -right-4 sm:-right-5 -translate-y-1/2 text-neutral-200">
-                      <ArrowRight className="w-5 h-5" />
-                    </div>
-                  )}
-                </div>
-              </ScrollReveal>
-            ))}
-          </div>
-        </Container>
-      </section>
-
-      {/* ============================================ */}
-      {/* NOT JUST FOR BEGINNERS                       */}
-      {/* ============================================ */}
-      <section className="py-16 sm:py-24 bg-neutral-900 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-primary-500/5 rounded-full blur-3xl pointer-events-none" />
-        <Container>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            <div>
-              <ScrollReveal>
-                <Badge className="mb-4">I pro pokročilé</Badge>
-                <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
-                  I zkušený makléř najde situaci,{" "}
-                  <span className="text-primary-400">kterou nikdy neřešil.</span>
-                </h2>
-                <p className="mt-5 text-neutral-400 leading-relaxed">
-                  Naši pokročilí AI agenti mají hlubokou znalost českého práva, smluvních procesů a neobvyklých situací. Můžete si ověřit, že znáte správné řešení, nebo se připravit na případy, které jste ještě nikdy neřešili.
-                </p>
-              </ScrollReveal>
-
-              <ScrollReveal delay={0.1}>
-                <ul className="mt-8 space-y-3">
-                  {[
-                    "Developerské projekty a prodej celých bytových domů",
-                    "Vyplacení exekuce klienta a komplikované zástavy",
-                    "Stavba bez stavebního povolení a jak to řešit s kupcem",
-                    "Nájemník odmítá odejít a prodej obsazené nemovitosti",
-                    "Dědické spory a prodej s více vlastníky",
-                    "Právní nuance: věcná břemena, předkupní práva, zápisy v katastru",
-                  ].map((item) => (
-                    <li key={item} className="flex items-center gap-2.5 text-neutral-300">
-                      <Shield className="w-4 h-4 text-primary-400 shrink-0" />
-                      <span className="text-sm">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </ScrollReveal>
-            </div>
-
-            <ScrollReveal delay={0.2}>
-              <div className="bg-neutral-800/60 border border-neutral-700/50 rounded-2xl p-8 sm:p-10">
-                <p className="text-lg sm:text-xl text-neutral-300 font-medium leading-relaxed italic">
-                  „I když prodávám 10 let, našel jsem v SimCallu případy, které jsem nikdy neřešil. Třeba prodej nemovitosti s nájemníkem, který odmítá odejít. Teď vím přesně, co říc klientovi.“
-                </p>
-                <div className="mt-6 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary-500/20 flex items-center justify-center text-sm font-bold text-primary-400">PM</div>
-                  <div>
-                    <p className="text-sm font-semibold text-white">Pokročilý makléř</p>
-                    <p className="text-xs text-neutral-500">10+ let v oboru</p>
-                  </div>
-                </div>
-              </div>
-            </ScrollReveal>
-          </div>
-        </Container>
-      </section>
-
-      {/* ============================================ */}
-      {/* FEATURES GRID                                */}
-      {/* ============================================ */}
-      <section className="py-16 sm:py-24 bg-neutral-50/80">
-        <Container>
-          <ScrollReveal>
-            <SectionHeader
-              badge="Funkce"
-              title="Vše, co potřebujete k masivnímu růstu prodejů"
-              subtitle="Neztrácejte čas neefektivním trénováním. Nechte umělou inteligenci odhalit chyby, které vás a váš tým stojí tisíce na provizích."
-            />
-          </ScrollReveal>
-
-          <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl mx-auto">
-            {features.map((feature, index) => (
-              <ScrollReveal key={feature.title} delay={index * 0.07}>
-                <div className="h-full bg-white rounded-2xl border border-neutral-100 p-6 hover:shadow-lg transition-shadow group">
-                  <div className="flex items-start justify-between gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center shrink-0 group-hover:bg-primary-100 transition-colors">
-                      <feature.icon className="w-5 h-5 text-primary-500" />
-                    </div>
-                    <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${feature.tagColor}`}>
-                      {feature.tag}
-                    </span>
-                  </div>
-                  <h3 className="font-semibold text-neutral-800 text-sm leading-snug">
-                    {feature.title}
-                  </h3>
-                  <p className="mt-2 text-sm text-neutral-500 leading-relaxed">
-                    {feature.desc}
-                  </p>
-                </div>
-              </ScrollReveal>
-            ))}
-          </div>
-
-          <ScrollReveal delay={0.3}>
-            <div className="mt-10 text-center">
-              <Link href="/registrace">
-                <Button size="lg" className="group">
-                  Vyzkoušet 10 minut zdarma
-                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
-                </Button>
-              </Link>
-            </div>
-          </ScrollReveal>
-        </Container>
-      </section>
-
-      {/* ============================================ */}
-      {/* ANALYTICS SHOWCASE                           */}
-      {/* ============================================ */}
-      <section className="py-16 sm:py-24 bg-neutral-900 relative overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary-500/5 rounded-full blur-3xl pointer-events-none" />
-
-        <Container>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-            {/* Left: Text */}
-            <div>
-              <ScrollReveal>
-                <Badge className="mb-4">Zpětná vazba</Badge>
-                <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
-                  Odhalte chyby, které vás stojí{" "}
-                  <span className="text-primary-400">statisíce na provizích</span>
-                </h2>
-                <p className="mt-4 text-neutral-400 leading-relaxed">
-                  Každé zaváhání u telefonu vás může stát klienta. Naše AI zanalyzuje každý detail hovoru a ukáže vám, jak dotáhnout obchod do úspěšného konce. Vycvičte si nekompromisní tah na branku.
-                </p>
-              </ScrollReveal>
-
-              <ScrollReveal delay={0.1}>
-                <ul className="mt-6 space-y-3">
-                  {[
-                    "Celkové skóre a splněné cíle hovoru",
-                    "Kompletní přepis s časovými razítky",
-                    "Identifikace výplňových slov",
-                    "Personalizované tipy ke zlepšení",
-                  ].map((item) => (
-                    <li
-                      key={item}
-                      className="flex items-center gap-2.5 text-neutral-300"
-                    >
-                      <Sparkles className="w-4 h-4 text-primary-400 shrink-0" />
-                      <span className="text-sm">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </ScrollReveal>
-
-              <ScrollReveal delay={0.2}>
-                <div className="mt-8 flex gap-3">
-                  <Link href="/registrace">
-                    <Button size="lg" className="group w-full sm:w-auto">
-                      Vyzkoušet 10 minut zdarma
-                      <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                    </Button>
-                  </Link>
-                  <Link href="/cenik">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="border-neutral-700 text-neutral-300 hover:bg-neutral-800 hover:text-white hover:border-neutral-600"
-                    >
-                      Zobrazit ceník
-                    </Button>
-                  </Link>
-                </div>
-              </ScrollReveal>
-            </div>
-
-            {/* Right: Analytics Mockup */}
-            <div className="flex justify-center">
-              <AnalyticsMockup className="max-w-sm w-full" />
-            </div>
-          </div>
-        </Container>
-      </section>
-
-      {/* ============================================ */}
-      {/* AUDIENCE SPLIT - Makléři / Manažeři          */}
-      {/* ============================================ */}
-      <section className="py-16 sm:py-24">
-        <Container>
-          <ScrollReveal>
-            <SectionHeader
-              badge="Pro koho je SimCall"
-              title="Řešení pro makléře i manažery"
-            />
-          </ScrollReveal>
-
-          <div className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            {/* Pro makléře */}
-            <ScrollReveal delay={0.05}>
-              <div className="h-full rounded-2xl border border-neutral-200 bg-white p-6 sm:p-8 hover:shadow-lg transition-shadow group relative overflow-hidden">
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-500 to-primary-400" />
-                <div className="w-12 h-12 rounded-xl bg-primary-50 flex items-center justify-center mb-5">
-                  <User className="w-6 h-6 text-primary-500" />
-                </div>
-                <h3 className="text-xl font-bold text-neutral-800">
-                  Pro jednotlivé makléře
-                </h3>
-                <ul className="mt-4 space-y-2.5">
-                  {[
-                    "Zbavte se paralyzujícího strachu z volání a získejte sebevědomí",
-                    "Natrénujte si ty nejtěžší námitky nanečisto a neztraťte už ani jeden lead",
-                    "Získejte okamžitou zpětnou vazbu a konkrétní tipy co říct jinak",
-                    "Maximalizujte svou úspěšnost a vydělávejte mnohonásobně vyšší provize",
-                  ].map((item) => (
-                    <li
-                      key={item}
-                      className="flex items-center gap-2 text-sm text-neutral-600"
-                    >
-                      <Check className="w-4 h-4 text-green-500 shrink-0" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href="/cenik"
-                  className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-primary-500 hover:text-primary-600 transition-colors group"
-                >
-                  Solo plán od 990 Kč/měs.
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                </Link>
-              </div>
-            </ScrollReveal>
-
-            {/* Pro manažery */}
-            <ScrollReveal delay={0.1}>
-              <div className="h-full rounded-2xl border border-neutral-200 bg-white p-6 sm:p-8 hover:shadow-lg transition-shadow group relative overflow-hidden">
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-blue-400" />
-                <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mb-5">
-                  <Users className="w-6 h-6 text-blue-500" />
-                </div>
-                <h3 className="text-xl font-bold text-neutral-800">
-                  Pro majitele kanceláří & manažery
-                </h3>
-                <ul className="mt-4 space-y-2.5">
-                  {[
-                    "Neztrácejte navždy svůj drahocenný čas tréninkem juniorů",
-                    "Předávejte platící leady makléřům až když jsou 100% připraveni",
-                    "Získejte absolutní kontrolu nad prodejními dovednostmi a aktivitou týmu",
-                    "Vybudujte z kanceláře tvrdé prodejce díky žebříčkům a gamifikaci",
-                  ].map((item) => (
-                    <li
-                      key={item}
-                      className="flex items-center gap-2 text-sm text-neutral-600"
-                    >
-                      <Check className="w-4 h-4 text-green-500 shrink-0" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href="/cenik"
-                  className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-blue-500 hover:text-blue-600 transition-colors group"
-                >
-                  Team plán od 7 490 Kč/měs.
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                </Link>
-              </div>
-            </ScrollReveal>
-          </div>
-
-          {/* Enterprise teaser */}
-          <ScrollReveal delay={0.15}>
-            <div className="mt-6 max-w-4xl mx-auto rounded-2xl border border-neutral-200 bg-white p-6 sm:p-8 hover:shadow-lg transition-shadow relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-purple-400" />
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
-                <div className="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center shrink-0">
-                  <Building2 className="w-6 h-6 text-purple-500" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold text-neutral-800">
-                    Pro velké developerské a realitní korporace
-                  </h3>
-                  <p className="mt-1 text-sm text-neutral-500">
-                    Nasazení pod vaší značkou. Do AI agentů nahrajeme vaše skutečné firemní procesy, nejčastější chyby na pobočkách a zaručené prodejní skripty. Dostaňte obrat celé sítě na novou úroveň.
-                  </p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {["Whitelabel", "Vlastní AI agenti na míru", "Dedikovaný vývojář"].map((item) => (
-                      <span key={item} className="text-[11px] font-medium bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full">
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                <Link href="/domluvit-schuzku" className="shrink-0">
-                  <Button variant="outline" className="border-purple-200 text-purple-600 hover:bg-purple-50 hover:border-purple-300 group whitespace-nowrap">
-                    Domluvit schůzku
-                    <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </ScrollReveal>
-        </Container>
-      </section>
-
-      {/* ============================================ */}
-      {/* AI AGENTS                                    */}
-      {/* ============================================ */}
-      <section className="py-16 sm:py-24 bg-neutral-50/80">
-        <Container>
-          <ScrollReveal>
-            <SectionHeader
-              badge="AI Agenti"
-              title="Databáze 500+ ostrých scénářů z praxe"
-              subtitle="Arogantní investoři, skeptičtí slevovači i zmatení dědicové. Trénujte na realitě."
-            />
-          </ScrollReveal>
-
-          <div className="mt-12 flex flex-wrap justify-center gap-6 sm:gap-8 max-w-3xl mx-auto">
-            {showcaseAgents.map((agent, index) => (
-              <ScrollReveal key={agent.id} delay={index * 0.05}>
-                <div className="flex flex-col items-center group">
-                  <div
-                    className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full ${difficultyColors[agent.difficulty]} text-white flex items-center justify-center text-lg sm:text-xl font-bold shadow-lg group-hover:scale-110 transition-transform`}
-                  >
-                    {agent.avatarInitials}
-                  </div>
-                  <p className="mt-2.5 text-sm font-medium text-neutral-800 text-center">
-                    {agent.name}
-                  </p>
-                  <span
-                    className={`mt-1 text-[11px] px-2 py-0.5 rounded-full font-medium ${agent.difficulty === "easy"
-                      ? "bg-green-100 text-green-700"
-                      : agent.difficulty === "medium"
-                        ? "bg-yellow-100 text-yellow-700"
-                        : "bg-red-100 text-red-700"
-                      }`}
-                  >
-                    {difficultyLabels[agent.difficulty]}
-                  </span>
-                </div>
-              </ScrollReveal>
-            ))}
-
-            {extraAgentsCount > 0 && (
-              <ScrollReveal delay={0.3}>
-                <div className="flex flex-col items-center">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-neutral-200 text-neutral-500 flex items-center justify-center text-lg font-bold">
-                    +{extraAgentsCount}
-                  </div>
-                  <p className="mt-2.5 text-sm font-medium text-neutral-500 text-center">
-                    dalších
-                  </p>
-                </div>
-              </ScrollReveal>
-            )}
-          </div>
-
-          <ScrollReveal delay={0.35}>
-            <div className="mt-10 text-center">
-              <Link href="/registrace">
-                <Button size="lg" className="group">
-                  Vyzkoušet 30 minut zdarma
-                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
-                </Button>
-              </Link>
-            </div>
-          </ScrollReveal>
-        </Container>
-      </section>
-
-      {/* ============================================ */}
-      {/* PRICING TEASER                               */}
-      {/* ============================================ */}
-      <section className="py-16 sm:py-24">
-        <Container>
-          <ScrollReveal>
-            <SectionHeader
-              badge="Ceník"
-              title="Jednoduchý ceník, žádné skryté poplatky"
-            />
-          </ScrollReveal>
-
-          <div className="mt-12">
-            <PricingTeaser />
-          </div>
-
-          <ScrollReveal delay={0.2}>
-            <div className="mt-8 text-center">
-              <Link
-                href="/cenik"
-                className="text-sm font-medium text-primary-500 hover:text-primary-600 transition-colors inline-flex items-center gap-1"
+        {/* Stats */}
+        <section className="px-6 md:px-12 py-10 max-w-5xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {STATS.map((s) => (
+              <div
+                key={s.label}
+                className="border border-white/5 rounded-2xl p-5 bg-white/[0.02]"
               >
-                Porovnat všechny plány
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </ScrollReveal>
-        </Container>
-      </section>
+                <div className="text-3xl md:text-4xl font-black text-white mb-1">
+                  {s.value}
+                </div>
+                <div className="text-xs text-white/40">{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </section>
 
-      {/* ============================================ */}
-      {/* FINAL CTA                                    */}
-      {/* ============================================ */}
-      <section className="py-20 sm:py-28 bg-neutral-900 relative overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-primary-500/5 rounded-full blur-3xl pointer-events-none" />
-        <Container>
-          <ScrollReveal>
-            <div className="text-center max-w-2xl mx-auto relative">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight">
-                Nemusíte ztrácet další klienty.
+        {/* Features */}
+        <section className="px-6 md:px-12 py-10 max-w-5xl mx-auto">
+          <p className="text-xs text-white/30 uppercase tracking-widest mb-6 font-medium">
+            Co se chystá
+          </p>
+          <div className="grid md:grid-cols-2 gap-3">
+            {FEATURES.map((f) => (
+              <div
+                key={f.title}
+                className="flex gap-4 p-5 rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-colors"
+              >
+                <span className="text-2xl flex-shrink-0">{f.icon}</span>
+                <div>
+                  <h3 className="font-semibold text-white text-sm mb-1">
+                    {f.title}
+                  </h3>
+                  <p className="text-xs text-white/40 leading-relaxed">
+                    {f.desc}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Email form */}
+        <section className="px-6 md:px-12 py-10 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold mb-3">
+                Buď mezi prvními.
               </h2>
-              <p className="mt-3 sm:mt-4 text-base sm:text-lg text-neutral-400 leading-relaxed">
-                Pošlete své makléře do Simulátoru a zvyšte celkové tržby vaší kanceláře. Začněte ještě dnes.
+              <p className="text-white/40 text-sm leading-relaxed">
+                Zanech svůj email a dáme ti vědět jako prvním, jakmile SimCall
+                otevřeme. Žádný spam — jen to podstatné.
               </p>
-              <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/registrace">
-                  <Button size="lg" className="group w-full sm:w-auto">
-                    Začít zdarma
-                    <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </Link>
-                <Link href="/cenik">
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="border-neutral-700 text-neutral-300 hover:bg-neutral-800 hover:text-white hover:border-neutral-600 w-full sm:w-auto"
-                  >
-                    Zobrazit ceník
-                  </Button>
-                </Link>
+              <div className="mt-6 space-y-2">
+                <div className="flex items-center gap-2 text-xs text-white/30">
+                  <span className="text-[#e8491d]">✓</span>
+                  Dostaneš pozvánku dříve než ostatní
+                </div>
+                <div className="flex items-center gap-2 text-xs text-white/30">
+                  <span className="text-[#e8491d]">✓</span>
+                  Speciální podmínky pro early adopters
+                </div>
+                <div className="flex items-center gap-2 text-xs text-white/30">
+                  <span className="text-[#e8491d]">✓</span>
+                  Žádné spamování, kdykoli se odhlásíš
+                </div>
               </div>
             </div>
-          </ScrollReveal>
-        </Container>
-      </section>
-    </>
+            <div className="border border-white/10 rounded-2xl p-6 bg-white/[0.02]">
+              <SubscribeForm />
+            </div>
+          </div>
+        </section>
+
+        {/* Password gate (collapsible) */}
+        <section className="px-6 md:px-12 py-6 max-w-5xl mx-auto">
+          {showPassword && (
+            <div
+              className={`transition-all duration-300 ${showPassword ? "opacity-100" : "opacity-0"}`}
+            >
+              <PasswordGate onSuccess={handlePasswordSuccess} />
+            </div>
+          )}
+        </section>
+
+        {/* Footer */}
+        <footer className="px-6 md:px-12 py-8 max-w-5xl mx-auto border-t border-white/5 mt-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <span className="text-sm font-semibold">
+              Sim<span className="text-[#e8491d]">Call</span>
+            </span>
+            <p className="text-xs text-white/25">
+              © {new Date().getFullYear()} SimCall · AI tréninky pro realitní makléře v ČR
+            </p>
+            <div className="flex gap-4 text-xs text-white/30">
+              <a href="#" className="hover:text-white/60 transition-colors">
+                Podmínky
+              </a>
+              <a href="#" className="hover:text-white/60 transition-colors">
+                Ochrana soukromí
+              </a>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </div>
   );
 }

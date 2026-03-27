@@ -2,8 +2,40 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
+const SITE_PASSWORD = "MercedesCLE53";
+
+// Paths that are always publicly accessible (no site password needed)
+const PUBLIC_PATHS = ["/", "/api/subscribe", "/api/"];
+
+function isSitePasswordValid(request: NextRequest): boolean {
+  const cookie = request.cookies.get("site-password")?.value;
+  return cookie === SITE_PASSWORD;
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // ---- Static assets / Next.js internals — always pass through ----
+  if (
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/favicon") ||
+    pathname.endsWith(".png") ||
+    pathname.endsWith(".ico") ||
+    pathname.endsWith(".svg") ||
+    pathname.endsWith(".jpg") ||
+    pathname.endsWith(".webp")
+  ) {
+    return NextResponse.next();
+  }
+
+  // ---- Public paths — no site password needed ----
+  const isPublic = PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/") || pathname.startsWith("/api/"));
+  if (!isPublic) {
+    // ---- Site-wide password gate ----
+    if (!isSitePasswordValid(request)) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+  }
 
   // ---- Admin login page is always accessible ----
   if (pathname === "/admin/login") {
@@ -129,5 +161,11 @@ async function getUserProfile(userId: string) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/admin/:path*", "/manager/:path*"],
+  matcher: [
+    /*
+     * Match all paths except static files.
+     * Site password gate applies to everything except /, /api/*, /_next/*, static assets.
+     */
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|ico|svg|jpg|jpeg|webp|gif)).*)",
+  ],
 };
