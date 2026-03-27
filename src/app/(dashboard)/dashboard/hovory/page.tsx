@@ -21,6 +21,8 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useCallHistory } from "@/hooks/useCallHistory";
+import { CriticalMoment } from "@/components/call/CriticalMoment";
+import { EvalCategories } from "@/components/call/EvalCategories";
 import type { CallRecord } from "@/types/dashboard";
 
 function getSuccessRateBg(rate: number) {
@@ -137,6 +139,11 @@ function CallDetailModal({
                 improvements: fb.improvements || [],
                 fillerWords: fb.filler_words || [],
                 recommendations: fb.recommendations || [],
+                summaryGood: fb.summary_good || undefined,
+                summaryImprove: fb.summary_improve || undefined,
+                // V2 pole:
+                criticalMoment: fb.critical_moment || undefined,
+                categories: fb.categories || undefined,
               }
             : callPreview.feedback;
 
@@ -322,6 +329,16 @@ function CallDetailModal({
               <div className="flex justify-center">
                 <ScoreCircle score={call.feedback.overallScore} />
               </div>
+
+              {/* V2: Kritický moment */}
+              {call.feedback.criticalMoment && (
+                <CriticalMoment moment={call.feedback.criticalMoment} />
+              )}
+
+              {/* V2: 6 hodnotících kategorií */}
+              {call.feedback.categories && (
+                <EvalCategories categories={call.feedback.categories as Record<string, import("@/types/dashboard").EvalCategory>} />
+              )}
 
               {/* Strengths */}
               {call.feedback.strengths.length > 0 && (
