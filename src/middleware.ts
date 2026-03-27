@@ -2,41 +2,10 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-const SITE_PASSWORD = "MercedesCLE53";
-
-// Only these paths are accessible without the site password cookie
-const ALWAYS_PUBLIC = ["/", "/vstup", "/api/subscribe"];
-
-function hasSiteAccess(request: NextRequest): boolean {
-  return request.cookies.get("site-password")?.value === SITE_PASSWORD;
-}
-
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // ---- Always allow: static assets & Next.js internals ----
-  if (
-    pathname.startsWith("/_next") ||
-    pathname.startsWith("/favicon") ||
-    pathname.endsWith(".png") ||
-    pathname.endsWith(".ico") ||
-    pathname.endsWith(".svg") ||
-    pathname.endsWith(".jpg") ||
-    pathname.endsWith(".webp")
-  ) {
-    return NextResponse.next();
-  }
-
-  // ---- Site-wide password gate (everything except /vstup and /api/subscribe) ----
-  const isAlwaysPublic = ALWAYS_PUBLIC.some(
-    (p) => pathname === p || pathname.startsWith(p + "/")
-  );
-
-  if (!isAlwaysPublic && !hasSiteAccess(request)) {
-    return NextResponse.redirect(new URL("/vstup", request.url));
-  }
-
-  // ---- Admin login page is always accessible (once past site gate) ----
+  // ---- Admin login page is always accessible ----
   if (pathname === "/admin/login") {
     return NextResponse.next();
   }

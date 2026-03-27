@@ -1,9 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-
-const SITE_PASSWORD = "MercedesCLE53";
 
 function SubscribeForm() {
   const [email, setEmail] = useState("");
@@ -85,48 +82,6 @@ function SubscribeForm() {
   );
 }
 
-function AccessForm() {
-  const router = useRouter();
-  const [pw, setPw] = useState("");
-  const [error, setError] = useState(false);
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (pw === SITE_PASSWORD) {
-      const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
-      document.cookie = `site-password=${SITE_PASSWORD}; expires=${expires}; path=/`;
-      router.push("/prihlaseni");
-    } else {
-      setError(true);
-      setPw("");
-    }
-  }
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-3">
-      <input
-        type="password"
-        value={pw}
-        onChange={(e) => { setPw(e.target.value); setError(false); }}
-        placeholder="Přístupový kód"
-        className={`w-full bg-white/5 border rounded-xl px-4 py-3.5 text-white placeholder-white/25 text-sm outline-none focus:ring-1 transition-all ${
-          error
-            ? "border-red-500/40 focus:ring-red-500/20"
-            : "border-white/10 focus:ring-white/20 focus:border-white/20"
-        }`}
-      />
-      {error && <p className="text-red-400/70 text-xs">Nesprávný přístupový kód</p>}
-      <button
-        type="submit"
-        disabled={pw.length === 0}
-        className="w-full py-3.5 bg-white/8 hover:bg-white/12 border border-white/10 text-white font-semibold rounded-xl transition-all disabled:opacity-30 disabled:cursor-not-allowed text-sm"
-      >
-        Vstoupit
-      </button>
-    </form>
-  );
-}
-
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white flex flex-col">
@@ -145,10 +100,13 @@ export default function LandingPage() {
         {/* Main */}
         <main className="flex-1 flex items-center px-8 md:px-16 py-16">
           <div className="w-full max-w-4xl">
-            <div className="grid md:grid-cols-2 gap-16 items-start">
+            <div className="grid md:grid-cols-2 gap-16 items-center">
 
               {/* Left — headline */}
-              <div className="flex items-center md:min-h-[260px]">
+              <div>
+                <p className="text-xs font-medium text-white/30 uppercase tracking-widest mb-6">
+                  Připravujeme spuštění
+                </p>
                 <h1 className="text-5xl md:text-6xl font-extrabold leading-[1.08] tracking-tight">
                   Každá chyba
                   <br />
@@ -158,30 +116,12 @@ export default function LandingPage() {
                 </h1>
               </div>
 
-              {/* Right — forms */}
-              <div className="space-y-8">
-                {/* Email */}
-                <div>
-                  <p className="text-xs text-white/30 uppercase tracking-widest mb-4">
-                    Připravujeme spuštění
-                  </p>
-                  <SubscribeForm />
-                </div>
-
-                {/* Divider */}
-                <div className="flex items-center gap-4">
-                  <div className="flex-1 h-px bg-white/8" />
-                  <span className="text-xs text-white/20">nebo</span>
-                  <div className="flex-1 h-px bg-white/8" />
-                </div>
-
-                {/* Password */}
-                <div>
-                  <p className="text-xs text-white/30 uppercase tracking-widest mb-4">
-                    Máte přístupový kód
-                  </p>
-                  <AccessForm />
-                </div>
+              {/* Right — email form */}
+              <div>
+                <p className="text-sm text-white/40 mb-6 leading-relaxed">
+                  Zanechte svůj e-mail a budete mezi prvními, kdo se dozví o spuštění.
+                </p>
+                <SubscribeForm />
               </div>
 
             </div>
