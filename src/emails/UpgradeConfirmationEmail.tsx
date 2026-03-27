@@ -99,6 +99,10 @@ export default function UpgradeConfirmationEmail({
               Od příštího zúčtovacího období se bude strhávat plná cena nového balíčku.
               Den obnovení se nemění.
             </Text>
+            
+            <Text style={paragraphStyle}>
+              Souhlasem s okamžitým dodáním služby přes výslovnou žádost v objednávkovém procesu berete na vědomí, že ztrácíte právo na odstoupení od smlouvy ve 14denní lhůtě.
+            </Text>
 
             <Section style={ctaContainerStyle}>
               <Button style={ctaButtonStyle} href="https://simcall.cz/dashboard">

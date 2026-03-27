@@ -29,6 +29,7 @@ interface BillingForm {
   email: string;
   phone: string;
   companyName: string;
+  agreeTerms: boolean;
 }
 
 const emptyForm: BillingForm = {
@@ -36,6 +37,7 @@ const emptyForm: BillingForm = {
   email: "",
   phone: "+420 ",
   companyName: "",
+  agreeTerms: false,
 };
 
 const planIcons = {
@@ -103,6 +105,8 @@ function CheckoutPage() {
     if (!form.email.trim()) newErrors.email = "Zadejte e-mail";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
       newErrors.email = "Neplatný formát e-mailu";
+
+    if (!form.agreeTerms) newErrors.agreeTerms = "Musíte souhlasit s obchodními podmínkami a ochranou soukromí.";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -323,6 +327,30 @@ function CheckoutPage() {
                       />
                     </div>
                   </div>
+                </div>
+              </ScrollReveal>
+
+              {/* Checkbox for terms and conditions */}
+              <ScrollReveal delay={0.15}>
+                <div>
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      name="agreeTerms"
+                      checked={form.agreeTerms}
+                      onChange={(e) => {
+                        setForm(prev => ({ ...prev, agreeTerms: e.target.checked }));
+                        if (errors.agreeTerms) {
+                          setErrors(prev => ({ ...prev, agreeTerms: undefined }));
+                        }
+                      }}
+                      className="mt-1 h-4 w-4 rounded border-neutral-300 text-primary-500 focus:ring-primary-500"
+                    />
+                    <span className="text-sm text-neutral-600 leading-tight">
+                      Souhlasím s <Link href="/obchodni-podminky" target="_blank" className="text-primary-500 hover:underline">Všeobecnými obchodními podmínkami</Link> a <Link href="/ochrana-soukromi" target="_blank" className="text-primary-500 hover:underline">Ochranou soukromí</Link>.
+                    </span>
+                  </label>
+                  {errors.agreeTerms && <p className="mt-1 text-xs text-red-500">{errors.agreeTerms}</p>}
                 </div>
               </ScrollReveal>
 
