@@ -5,7 +5,7 @@ import { createClient } from "@supabase/supabase-js";
 const SITE_PASSWORD = "MercedesCLE53";
 
 // Only these paths are accessible without the site password cookie
-const ALWAYS_PUBLIC = ["/vstup", "/api/subscribe"];
+const ALWAYS_PUBLIC = ["/", "/vstup", "/api/subscribe"];
 
 function hasSiteAccess(request: NextRequest): boolean {
   return request.cookies.get("site-password")?.value === SITE_PASSWORD;
