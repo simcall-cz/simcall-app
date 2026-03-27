@@ -4,18 +4,17 @@ import { createClient } from "@supabase/supabase-js";
 
 const SITE_PASSWORD = "MercedesCLE53";
 
-// Paths that are always publicly accessible (no site password needed)
-const PUBLIC_PATHS = ["/", "/api/subscribe", "/api/"];
+// Only these paths are accessible without the site password cookie
+const ALWAYS_PUBLIC = ["/vstup", "/api/subscribe"];
 
-function isSitePasswordValid(request: NextRequest): boolean {
-  const cookie = request.cookies.get("site-password")?.value;
-  return cookie === SITE_PASSWORD;
+function hasSiteAccess(request: NextRequest): boolean {
+  return request.cookies.get("site-password")?.value === SITE_PASSWORD;
 }
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // ---- Static assets / Next.js internals — always pass through ----
+  // ---- Always allow: static assets & Next.js internals ----
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/favicon") ||
@@ -28,24 +27,21 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // ---- Public paths — no site password needed ----
-  const isPublic = PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/") || pathname.startsWith("/api/"));
-  if (!isPublic) {
-    // ---- Site-wide password gate ----
-    if (!isSitePasswordValid(request)) {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
+  // ---- Site-wide password gate (everything except /vstup and /api/subscribe) ----
+  const isAlwaysPublic = ALWAYS_PUBLIC.some(
+    (p) => pathname === p || pathname.startsWith(p + "/")
+  );
+
+  if (!isAlwaysPublic && !hasSiteAccess(request)) {
+    return NextResponse.redirect(new URL("/vstup", request.url));
   }
 
-  // ---- Admin login page is always accessible ----
+  // ---- Admin login page is always accessible (once past site gate) ----
   if (pathname === "/admin/login") {
     return NextResponse.next();
   }
 
-  // ---- Get session from cookie/header ----
-  const token = getTokenFromRequest(request);
-
-  // ---- Protected routes: require authentication ----
+  // ---- Protected routes: require Supabase authentication ----
   const protectedPaths = ["/dashboard", "/admin", "/manager"];
   const isProtected = protectedPaths.some((p) => pathname.startsWith(p));
 
@@ -53,14 +49,14 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  const token = getTokenFromRequest(request);
+
   if (!token) {
-    // Not authenticated — redirect to login
     const loginUrl = new URL("/prihlaseni", request.url);
     loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  // Verify token with Supabase
   const user = await verifyToken(token);
   if (!user) {
     const loginUrl = new URL("/prihlaseni", request.url);
@@ -78,7 +74,6 @@ export async function middleware(request: NextRequest) {
 
   // ---- Manager routes: require team plan ----
   if (pathname.startsWith("/manager")) {
-    // Check if user has team/team_manager plan via profile
     const profile = await getUserProfile(user.id);
     if (!profile || !["team", "team_manager", "admin"].includes(profile.role)) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
@@ -93,30 +88,24 @@ export async function middleware(request: NextRequest) {
 // ============================================================
 
 function getTokenFromRequest(request: NextRequest): string | null {
-  // Check Authorization header first
   const authHeader = request.headers.get("authorization");
   if (authHeader?.startsWith("Bearer ")) {
     return authHeader.replace("Bearer ", "");
   }
 
-  // Check explicit auth cookie (set by login page)
   const explicitToken = request.cookies.get("sb-access-token")?.value;
   if (explicitToken && explicitToken.length > 20) {
     return explicitToken;
   }
 
-  // Check Supabase session cookies
   const cookies = request.cookies;
-  // Supabase stores tokens in cookies with pattern: sb-{ref}-auth-token
   for (const [name, cookie] of cookies) {
     if (name.includes("auth-token") || name.includes("access-token")) {
       try {
-        // Parse the cookie value (may be JSON with access_token)
         const parsed = JSON.parse(cookie.value);
         if (parsed?.access_token) return parsed.access_token;
         if (typeof parsed === "string") return parsed;
       } catch {
-        // Not JSON, use raw value
         if (cookie.value && cookie.value.length > 20) return cookie.value;
       }
     }
@@ -131,8 +120,10 @@ async function verifyToken(token: string) {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
-
-    const { data: { user }, error } = await supabase.auth.getUser(token);
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser(token);
     if (error || !user) return null;
     return user;
   } catch {
@@ -147,13 +138,11 @@ async function getUserProfile(userId: string) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!,
       { auth: { autoRefreshToken: false, persistSession: false } }
     );
-
     const { data } = await supabase
       .from("profiles")
       .select("role")
       .eq("id", userId)
       .single();
-
     return data;
   } catch {
     return null;
@@ -162,10 +151,6 @@ async function getUserProfile(userId: string) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all paths except static files.
-     * Site password gate applies to everything except /, /api/*, /_next/*, static assets.
-     */
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|ico|svg|jpg|jpeg|webp|gif)).*)",
   ],
 };
