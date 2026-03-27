@@ -18,12 +18,53 @@ export interface TranscriptEntry {
   highlight?: "good" | "mistake" | null;
 }
 
+// ===== EVALUATION V2 TYPES =====
+
+export interface EvalCheckpoint {
+  label: string;
+  passed: boolean;
+}
+
+export interface EvalCategory {
+  label: string;
+  weight: number;
+  score: number;
+  checkpoints: EvalCheckpoint[];
+  critical_errors?: string[];
+  note: string;
+}
+
+export interface EvalCriticalMoment {
+  label: string;
+  passed: boolean;
+  evidence: string;
+}
+
+// ===== CallFeedback — V1 + V2 compatible =====
+// V1 pole zachována pro backward compat se stávajícími záznamy v DB.
+// V2 pole jsou volitelná — starší hovory je mít nebudou.
+
 export interface CallFeedback {
+  // V1 pole:
   overallScore: number;
   strengths: string[];
   improvements: string[];
   fillerWords: { word: string; count: number }[];
   recommendations: string[];
+  summaryGood?: string;
+  summaryImprove?: string;
+  transcriptHighlights?: { index: number; highlight: "good" | "mistake" | null }[];
+
+  // V2 pole:
+  criticalMoment?: EvalCriticalMoment;
+  categories?: {
+    rapport: EvalCategory;
+    discovery: EvalCategory;
+    expertise: EvalCategory;
+    objections: EvalCategory;
+    communication: EvalCategory;
+    closing: EvalCategory;
+  };
 }
 
 export interface Lesson {
