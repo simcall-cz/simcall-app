@@ -88,7 +88,7 @@ export function adaptCallToRecord(row: SupabaseCallRow): CallRecord {
     date: row.date,
     agentName: row.agents?.name || "Neznámý agent",
     agentPersonality: row.agents?.personality || "",
-    scenario: row.scenarios?.title || "Neznámý scénář",
+    scenario: row.scenarios?.title || (row.agents?.name ? `${row.agents.name}` : "Tréninkový hovor"),
     duration: formatDuration(row.duration_seconds),
     successRate: row.success_rate || fb?.overall_score || 0,
     audioUrl: row.audio_url || null,

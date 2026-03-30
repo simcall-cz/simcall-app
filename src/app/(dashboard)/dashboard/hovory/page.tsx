@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
   Search,
   X,
@@ -423,11 +424,26 @@ function CallDetailModal({
   );
 }
 
-export default function HovoryPage() {
+function HovoryPageContent() {
   const { calls, isLoading, error } = useCallHistory({ limit: 100 });
+  const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [difficultyFilter, setDifficultyFilter] = useState("all");
   const [selectedCall, setSelectedCall] = useState<CallRecord | null>(null);
+  const [autoOpenHandled, setAutoOpenHandled] = useState(false);
+
+  // Auto-open call detail from query param (e.g. after finishing a lesson call)
+  useEffect(() => {
+    if (autoOpenHandled || isLoading || calls.length === 0) return;
+    const detailId = searchParams.get("detail");
+    if (detailId) {
+      const call = calls.find((c) => c.id === detailId);
+      if (call) {
+        setSelectedCall(call);
+      }
+      setAutoOpenHandled(true);
+    }
+  }, [searchParams, calls, isLoading, autoOpenHandled]);
 
   const filteredCalls = useMemo(() => {
     return calls.filter((call) => {
@@ -626,5 +642,17 @@ export default function HovoryPage() {
         />
       )}
     </div>
+  );
+}
+
+export default function HovoryPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-8 h-8 animate-spin text-neutral-400" />
+      </div>
+    }>
+      <HovoryPageContent />
+    </Suspense>
   );
 }

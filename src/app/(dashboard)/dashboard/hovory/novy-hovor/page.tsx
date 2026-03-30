@@ -232,7 +232,7 @@ function NovyHovorContent() {
 
   const handleViewResults = () => {
     if (callId) {
-      router.push("/dashboard/hovory");
+      router.push(`/dashboard/hovory?detail=${callId}`);
     }
   };
 
