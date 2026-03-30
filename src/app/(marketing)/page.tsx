@@ -599,7 +599,7 @@ export default function HomePage() {
             <div className="mt-10 text-center">
               <Link href="/registrace">
                 <Button size="lg" className="group">
-                  Vyzkoušet 30 minut zdarma
+                  Vyzkoušet 10 minut zdarma
                   <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
                 </Button>
               </Link>

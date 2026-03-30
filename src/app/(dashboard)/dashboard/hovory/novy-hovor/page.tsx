@@ -18,7 +18,9 @@ import {
   BookOpen,
   GraduationCap,
   Lightbulb,
+  Lock,
 } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -87,6 +89,7 @@ function NovyHovorContent() {
   const [selectedDifficulty, setSelectedDifficulty] = useState<"all" | "easy" | "medium" | "hard">("all");
   const [imageZoom, setImageZoom] = useState(false);
   const [lessonModal, setLessonModal] = useState<Lesson | null>(null);
+  const [isDemoUser, setIsDemoUser] = useState(false);
 
   // Auto-select scenario if provided in URL
   useEffect(() => {
@@ -180,6 +183,9 @@ function NovyHovorContent() {
             const used = subData.minutesUsed || 0;
             const remainingMinutes = Math.max(0, limit - used);
             setMaxDurationSeconds(remainingMinutes * 60);
+            if (!subData || subData.error || subData.plan === "demo") {
+              setIsDemoUser(true);
+            }
           }
         } catch {
           // If subscription fetch fails, still allow the page to load
@@ -209,9 +215,15 @@ function NovyHovorContent() {
   const scenario = scenarios.find((s) => s.id === selectedScenario);
   const agent = scenario ? agents.find((a) => a.id === scenario.agentId) : null;
 
-  const filteredScenarios = selectedDifficulty === "all"
+  const allFilteredScenarios = selectedDifficulty === "all"
     ? scenarios
     : scenarios.filter((s) => s.difficulty === selectedDifficulty);
+
+  // Demo users only see 5 agents
+  const DEMO_AGENT_LIMIT = 5;
+  const filteredScenarios = isDemoUser
+    ? allFilteredScenarios.slice(0, DEMO_AGENT_LIMIT)
+    : allFilteredScenarios;
 
   const handleSelectScenario = (scenarioId: string) => {
     setSelectedScenario(scenarioId);
@@ -748,8 +760,8 @@ function NovyHovorContent() {
         ))}
       </div>
 
-      {/* Scenarios Grid */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {/* Scenarios List - CRM style */}
+      <div className="rounded-xl border border-neutral-200 bg-white overflow-hidden divide-y divide-neutral-100">
         {filteredScenarios.map((s, i) => {
           const a = agents.find((ag) => ag.id === s.agentId);
           if (!a) return null;
@@ -760,63 +772,46 @@ function NovyHovorContent() {
           return (
             <motion.div
               key={s.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: (i % 10) * 0.05 }}
-              className="h-full"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: (i % 20) * 0.02 }}
+              className={cn(
+                "flex items-center gap-4 px-4 py-3.5 cursor-pointer transition-colors hover:bg-neutral-50 group",
+                "border-l-3",
+                diffConf.borderColor
+              )}
+              onClick={() => handleSelectScenario(s.id)}
             >
-              <Card
-                className={cn(
-                  "cursor-pointer h-full flex flex-col transition-all hover:shadow-md overflow-hidden border-l-4",
-                  diffConf.borderColor,
-                  diffConf.bgTint
-                )}
-                onClick={() => handleSelectScenario(s.id)}
-              >
-                <div className="p-5 flex flex-col flex-1">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="mb-3 flex flex-wrap items-center gap-2">
-                        <Badge variant={diffConf.color} className="gap-1.5 px-3 py-1 text-sm font-semibold">
-                          <DiffIcon className="h-3.5 w-3.5" />
-                          {diffConf.label}
-                        </Badge>
-                        <span className="text-xs font-medium px-2 py-0.5 rounded bg-neutral-100 text-neutral-600">
-                          {categoryLabels[s.category] || s.category}
-                        </span>
-                      </div>
-                      <h3 className="text-lg font-semibold text-neutral-900 leading-tight">
-                        {s.title}
-                      </h3>
-                      <p className="mt-2 line-clamp-2 text-sm text-neutral-500">
-                        {s.description.split('\\n')[0]}
-                      </p>
-                    </div>
-                  </div>
+              {/* Avatar */}
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-neutral-100 group-hover:bg-neutral-200 transition-colors">
+                <span className="text-xs font-bold text-neutral-600">
+                  {a.avatarInitials}
+                </span>
+              </div>
 
-                  <div className="flex-1"></div>
-
-                  {/* Agent preview - Fixed truncation */}
-                  <div className="mt-5 flex items-center justify-between border-t border-neutral-100 pt-4">
-                    <div className="flex items-center gap-3 w-full pr-2">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-neutral-100">
-                        <span className="text-xs font-bold text-neutral-600">
-                          {a.avatarInitials}
-                        </span>
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-neutral-900 break-words leading-tight line-clamp-2">
-                          {a.name}
-                        </p>
-                        <p className="text-xs text-neutral-500 break-words mt-1 leading-tight line-clamp-2">
-                          {a.personality}
-                        </p>
-                      </div>
-                    </div>
-                    <ChevronRight className="h-5 w-5 shrink-0 text-neutral-300" />
-                  </div>
+              {/* Main info */}
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <p className="text-sm font-semibold text-neutral-900 truncate">
+                    {a.name}
+                  </p>
+                  <Badge variant={diffConf.color} className="gap-1 px-2 py-0.5 text-[10px] font-semibold shrink-0">
+                    <DiffIcon className="h-3 w-3" />
+                    {diffConf.label}
+                  </Badge>
                 </div>
-              </Card>
+                <p className="text-xs text-neutral-500 truncate">
+                  {s.title}
+                </p>
+              </div>
+
+              {/* Category tag */}
+              <span className="hidden sm:inline-flex text-[10px] font-medium px-2 py-0.5 rounded bg-neutral-100 text-neutral-500 shrink-0">
+                {categoryLabels[s.category] || s.category}
+              </span>
+
+              {/* Arrow */}
+              <ChevronRight className="h-4 w-4 shrink-0 text-neutral-300 group-hover:text-neutral-500 transition-colors" />
             </motion.div>
           );
         })}
@@ -824,7 +819,26 @@ function NovyHovorContent() {
 
       {filteredScenarios.length === 0 && (
         <div className="text-center py-12 rounded-xl border border-dashed border-neutral-200">
-          <p className="text-neutral-500">Nenalezeny žádné scénáře s touto obtížností.</p>
+          <p className="text-neutral-500">Nenalezeny zadne scenare s touto obtiznosti.</p>
+        </div>
+      )}
+
+      {/* Demo CTA */}
+      {isDemoUser && allFilteredScenarios.length > DEMO_AGENT_LIMIT && (
+        <div className="mt-6 rounded-xl border border-primary-200 bg-primary-50/50 p-6 text-center">
+          <Lock className="h-8 w-8 text-primary-400 mx-auto mb-3" />
+          <h3 className="text-lg font-bold text-neutral-900 mb-1">
+            Dalsi {allFilteredScenarios.length - DEMO_AGENT_LIMIT} agentu je dostupnych v placenem planu
+          </h3>
+          <p className="text-sm text-neutral-500 mb-4">
+            Odemknete vsechny AI agenty, lekce a neomezeny trenink.
+          </p>
+          <Link href="/dashboard/balicek">
+            <Button className="gap-2">
+              Zobrazit plany
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </Link>
         </div>
       )}
     </div>

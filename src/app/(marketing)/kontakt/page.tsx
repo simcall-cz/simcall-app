@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Mail, Clock, CheckCircle, ArrowRight, Calendar } from "lucide-react";
+import { Mail, Phone, CheckCircle, ArrowRight, Calendar } from "lucide-react";
 
 import { Container } from "@/components/shared/container";
 import { ScrollReveal } from "@/components/shared/scroll-reveal";
@@ -110,11 +110,16 @@ export default function KontaktPage() {
               <ScrollReveal delay={0.05}>
                 <div className="p-5 rounded-2xl bg-neutral-50 border border-neutral-100 flex items-start gap-4">
                   <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center shrink-0">
-                    <Clock className="w-5 h-5 text-primary-500" />
+                    <Phone className="w-5 h-5 text-primary-500" />
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-neutral-400 mb-0.5">Provozní doba</p>
-                    <p className="text-sm font-semibold text-neutral-800">Po až Pá: 9:00 až 18:00</p>
+                    <p className="text-xs font-medium text-neutral-400 mb-0.5">Telefonní podpora (Po-Pá 9:00-16:00)</p>
+                    <a
+                      href="tel:+420732142077"
+                      className="text-sm font-semibold text-neutral-800 hover:text-primary-500 transition-colors"
+                    >
+                      +420 732 142 077
+                    </a>
                   </div>
                 </div>
               </ScrollReveal>

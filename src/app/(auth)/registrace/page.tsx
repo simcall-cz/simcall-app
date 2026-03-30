@@ -19,7 +19,10 @@ export default function RegistracePage() {
     phone: "+420 ",
     password: "",
     confirmPassword: "",
+    companyName: "",
+    ico: "",
   });
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -55,6 +58,10 @@ export default function RegistracePage() {
       setError("Hesla se neshodují");
       return;
     }
+    if (!termsAccepted) {
+      setError("Pro registraci musíte souhlasit s obchodními podmínkami");
+      return;
+    }
 
     setIsLoading(true);
 
@@ -69,6 +76,8 @@ export default function RegistracePage() {
             full_name: formData.fullName,
             phone: formData.phone || undefined,
             role: "free",
+            company_name: formData.companyName || undefined,
+            ico: formData.ico || undefined,
           },
           emailRedirectTo: `${window.location.origin}/prihlaseni`,
         },
@@ -293,6 +302,73 @@ export default function RegistracePage() {
           />
         </div>
 
+        {/* Company info (optional) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label
+              htmlFor="companyName"
+              className="mb-1.5 block text-sm font-medium text-neutral-700"
+            >
+              Firma <span className="text-neutral-400 font-normal">(nepovinne)</span>
+            </label>
+            <input
+              id="companyName"
+              name="companyName"
+              type="text"
+              value={formData.companyName}
+              onChange={handleChange}
+              placeholder="Nazev firmy"
+              className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="ico"
+              className="mb-1.5 block text-sm font-medium text-neutral-700"
+            >
+              ICO <span className="text-neutral-400 font-normal">(nepovinne)</span>
+            </label>
+            <input
+              id="ico"
+              name="ico"
+              type="text"
+              value={formData.ico}
+              onChange={handleChange}
+              placeholder="12345678"
+              className="w-full rounded-lg border border-neutral-300 px-4 py-2.5 text-sm text-neutral-900 placeholder-neutral-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+            />
+          </div>
+        </div>
+
+        {/* Terms checkbox */}
+        <label className="flex items-start gap-3 cursor-pointer group">
+          <input
+            type="checkbox"
+            checked={termsAccepted}
+            onChange={(e) => {
+              setTermsAccepted(e.target.checked);
+              setError(null);
+            }}
+            className="mt-0.5 h-4 w-4 rounded border-neutral-300 text-primary-500 focus:ring-primary-500/20 cursor-pointer"
+          />
+          <span className="text-xs text-neutral-500 leading-relaxed">
+            Souhlasim s{" "}
+            <Link
+              href="/obchodni-podminky"
+              className="text-primary-500 hover:text-primary-600 underline"
+            >
+              obchodnimi podminkami
+            </Link>{" "}
+            a{" "}
+            <Link
+              href="/ochrana-soukromi"
+              className="text-primary-500 hover:text-primary-600 underline"
+            >
+              zasadami ochrany osobnich udaju
+            </Link>
+          </span>
+        </label>
+
         {/* Error */}
         {error && (
           <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
@@ -303,16 +379,16 @@ export default function RegistracePage() {
         {/* Submit */}
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={isLoading || !termsAccepted}
           className="w-full rounded-lg bg-primary-500 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {isLoading ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
-              Vytvářím účet...
+              Vytvarim ucet...
             </>
           ) : (
-            "Vytvořit účet zdarma"
+            "Vytvorit ucet zdarma"
           )}
         </button>
 
@@ -320,28 +396,10 @@ export default function RegistracePage() {
         <div className="rounded-lg bg-neutral-50 border border-neutral-100 p-3">
           <p className="text-xs text-neutral-500 text-center">
             <span className="font-medium text-neutral-700">Demo zdarma</span>
-            {", "}10 tréninkových minut, 1 AI agent, základní zpětná vazba.
-            Plné plány od 990 Kč/měsíc.
+            {", "}10 treninkovych minut, 5 AI agentu, zakladni zpetna vazba.
+            Plne plany od 990 Kc/mesic.
           </p>
         </div>
-
-        {/* Terms */}
-        <p className="text-center text-xs text-neutral-400">
-          Registrací souhlasíte s{" "}
-          <Link
-            href="/obchodni-podminky"
-            className="text-primary-500 hover:text-primary-600"
-          >
-            obchodními podmínkami
-          </Link>{" "}
-          a{" "}
-          <Link
-            href="/ochrana-soukromi"
-            className="text-primary-500 hover:text-primary-600"
-          >
-            zásadami ochrany osobních údajů
-          </Link>
-        </p>
       </form>
 
       {/* Login link */}
