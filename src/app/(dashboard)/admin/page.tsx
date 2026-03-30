@@ -10,6 +10,10 @@ import {
   Clock,
   Loader2,
   AlertCircle,
+  Bot,
+  FileText,
+  UserPlus,
+  TrendingUp,
 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +25,8 @@ interface AdminStats {
   activeSubscriptions: number;
   mrr: number;
   callsToday: number;
+  callsThisWeek: number;
+  callsThisMonth: number;
   recentRegistrations: {
     id: string;
     email: string;
@@ -29,6 +35,12 @@ interface AdminStats {
     created_at: string;
   }[];
   revenueByPlan: Record<string, { count: number; revenue: number }>;
+  usersByRole: Record<string, number>;
+  newUsersThisWeek: number;
+  newUsersThisMonth: number;
+  totalMinutesUsed: number;
+  totalAgents: number;
+  totalScenarios: number;
 }
 
 const planBadgeColor: Record<
@@ -106,10 +118,22 @@ export default function AdminOverviewPage() {
       color: "bg-blue-50 text-blue-600",
     },
     {
-      label: "Celkem minut",
+      label: "Nových tento týden",
+      value: stats.newUsersThisWeek.toString(),
+      icon: UserPlus,
+      color: "bg-indigo-50 text-indigo-600",
+    },
+    {
+      label: "Celkem hovorů",
       value: stats.totalCalls.toLocaleString("cs-CZ"),
       icon: Phone,
       color: "bg-purple-50 text-purple-600",
+    },
+    {
+      label: "Využité minuty",
+      value: stats.totalMinutesUsed.toLocaleString("cs-CZ"),
+      icon: Clock,
+      color: "bg-cyan-50 text-cyan-600",
     },
     {
       label: "MRR",
@@ -126,7 +150,36 @@ export default function AdminOverviewPage() {
       icon: CreditCard,
       color: "bg-amber-50 text-amber-600",
     },
+    {
+      label: "AI agentů",
+      value: stats.totalAgents.toLocaleString("cs-CZ"),
+      icon: Bot,
+      color: "bg-rose-50 text-rose-600",
+    },
+    {
+      label: "Scénářů",
+      value: stats.totalScenarios.toLocaleString("cs-CZ"),
+      icon: FileText,
+      color: "bg-orange-50 text-orange-600",
+    },
   ];
+
+  const roleLabels: Record<string, string> = {
+    free: "Free",
+    demo: "Demo",
+    solo: "Solo",
+    team: "Člen týmu",
+    team_manager: "Team Manager",
+    admin: "Admin",
+  };
+  const roleColors: Record<string, string> = {
+    free: "#94a3b8",
+    demo: "#94a3b8",
+    solo: "#ef4444",
+    team: "#3b82f6",
+    team_manager: "#f59e0b",
+    admin: "#8b5cf6",
+  };
 
   const revenueByPlanEntries = Object.entries(stats.revenueByPlan);
   const planColors: Record<string, string> = {
@@ -178,8 +231,65 @@ export default function AdminOverviewPage() {
         ))}
       </div>
 
-      {/* Revenue by Plan + Calls Today */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Users by Role + Revenue by Plan + Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Users by Role */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
+        >
+          <Card className="h-full">
+            <CardHeader>
+              <CardTitle>Uživatelé dle role</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {Object.keys(stats.usersByRole || {}).length === 0 ? (
+                <p className="text-sm text-neutral-400 text-center py-8">
+                  Žádní uživatelé
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {Object.entries(stats.usersByRole).map(([role, count]) => {
+                    const percentage = stats.totalUsers > 0 ? Math.round((count / stats.totalUsers) * 100) : 0;
+                    return (
+                      <div key={role}>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <div className="flex items-center gap-2">
+                            <span
+                              className="w-2.5 h-2.5 rounded-sm"
+                              style={{ backgroundColor: roleColors[role] || "#6b7280" }}
+                            />
+                            <span className="text-sm font-medium text-neutral-700">
+                              {roleLabels[role] || role}
+                            </span>
+                          </div>
+                          <span className="text-sm font-bold text-neutral-900">
+                            {count} <span className="text-xs font-normal text-neutral-400">({percentage}%)</span>
+                          </span>
+                        </div>
+                        <div className="w-full bg-neutral-100 rounded-full h-1.5">
+                          <div
+                            className="h-1.5 rounded-full transition-all"
+                            style={{
+                              width: `${percentage}%`,
+                              backgroundColor: roleColors[role] || "#6b7280",
+                            }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                  <div className="pt-2 border-t border-neutral-100 flex items-center justify-between">
+                    <span className="text-xs text-neutral-400">Nových za 30 dní</span>
+                    <span className="text-sm font-bold text-neutral-900">{stats.newUsersThisMonth}</span>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+
         {/* Revenue by Plan */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -268,12 +378,12 @@ export default function AdminOverviewPage() {
               <CardTitle>Dnešní aktivita</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-6">
-                <div className="flex items-center justify-between p-4 rounded-lg bg-purple-50">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-purple-50">
                   <div className="flex items-center gap-3">
                     <Phone className="w-5 h-5 text-purple-600" />
                     <span className="text-sm font-medium text-purple-700">
-                      Minut dnes
+                      Hovorů dnes
                     </span>
                   </div>
                   <span className="text-2xl font-bold text-purple-600">
@@ -281,19 +391,31 @@ export default function AdminOverviewPage() {
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between p-4 rounded-lg bg-blue-50">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-indigo-50">
                   <div className="flex items-center gap-3">
-                    <Users className="w-5 h-5 text-blue-600" />
-                    <span className="text-sm font-medium text-blue-700">
-                      Registrovaných celkem
+                    <TrendingUp className="w-5 h-5 text-indigo-600" />
+                    <span className="text-sm font-medium text-indigo-700">
+                      Hovorů tento týden
                     </span>
                   </div>
-                  <span className="text-2xl font-bold text-blue-600">
-                    {stats.totalUsers}
+                  <span className="text-2xl font-bold text-indigo-600">
+                    {stats.callsThisWeek}
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between p-4 rounded-lg bg-green-50">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-cyan-50">
+                  <div className="flex items-center gap-3">
+                    <Phone className="w-5 h-5 text-cyan-600" />
+                    <span className="text-sm font-medium text-cyan-700">
+                      Hovorů za 30 dní
+                    </span>
+                  </div>
+                  <span className="text-2xl font-bold text-cyan-600">
+                    {stats.callsThisMonth}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between p-3 rounded-lg bg-green-50">
                   <div className="flex items-center gap-3">
                     <CreditCard className="w-5 h-5 text-green-600" />
                     <span className="text-sm font-medium text-green-700">
@@ -307,6 +429,17 @@ export default function AdminOverviewPage() {
                         )}%`
                       : "—"}
                   </span>
+                </div>
+
+                <div className="pt-2 border-t border-neutral-100">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-neutral-500">
+                      ARR
+                    </span>
+                    <span className="text-lg font-bold text-neutral-900">
+                      {(stats.mrr * 12).toLocaleString("cs-CZ")} Kč
+                    </span>
+                  </div>
                 </div>
               </div>
             </CardContent>

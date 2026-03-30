@@ -18,6 +18,10 @@ import {
   Shield,
   Clock,
   BarChart3,
+  Building2,
+  Bot,
+  FileText,
+  LogIn,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -117,9 +121,19 @@ function formatDate(dateStr: string) {
   });
 }
 
+interface UserAuthDetail {
+  phone: string | null;
+  company_name: string | null;
+  ico: string | null;
+  agents_count: number;
+  scenarios_count: number;
+  last_sign_in: string | null;
+}
+
 function UserDetailModal({ user, onClose }: { user: AdminUser; onClose: () => void }) {
   const [calls, setCalls] = useState<UserCallSummary | null>(null);
   const [payments, setPayments] = useState<UserPayment[]>([]);
+  const [authDetail, setAuthDetail] = useState<UserAuthDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -127,8 +141,13 @@ function UserDetailModal({ user, onClose }: { user: AdminUser; onClose: () => vo
       try {
         const headers = await getAuthHeaders();
 
-        // Fetch user's calls
-        const callsRes = await fetch(`/api/admin/calls?user_id=${user.id}&limit=500`, { headers });
+        // Fetch all data in parallel
+        const [callsRes, detailRes] = await Promise.all([
+          fetch(`/api/admin/calls?user_id=${user.id}&limit=500`, { headers }),
+          fetch(`/api/admin/users/detail?user_id=${user.id}`, { headers }),
+        ]);
+
+        // Process calls
         const callsData = await callsRes.json();
         const allCalls = callsData.calls || [];
 
@@ -141,6 +160,12 @@ function UserDetailModal({ user, onClose }: { user: AdminUser; onClose: () => vo
         const avgScore = scores.length > 0 ? Math.round(scores.reduce((a: number, b: number) => a + b, 0) / scores.length) : 0;
 
         setCalls({ total: allCalls.length, thisMonth: thisMonthCalls.length, avgScore });
+
+        // Process auth detail
+        if (detailRes.ok) {
+          const detail = await detailRes.json();
+          setAuthDetail(detail);
+        }
 
         // Fetch user's payments
         try {
@@ -180,6 +205,12 @@ function UserDetailModal({ user, onClose }: { user: AdminUser; onClose: () => vo
             <div>
               <h2 className="text-lg font-bold text-neutral-900">{user.full_name || "Bez jména"}</h2>
               <p className="text-sm text-neutral-500">{user.email}</p>
+              {authDetail?.phone && (
+                <p className="text-sm text-neutral-500 flex items-center gap-1 mt-0.5">
+                  <Phone className="w-3 h-3" />
+                  {authDetail.phone}
+                </p>
+              )}
             </div>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-neutral-50 rounded-lg text-neutral-400 hover:text-neutral-600">
@@ -208,7 +239,7 @@ function UserDetailModal({ user, onClose }: { user: AdminUser; onClose: () => vo
             <div className="bg-neutral-50 rounded-xl p-3">
               <div className="flex items-center gap-1.5 mb-1">
                 <Phone className="w-3.5 h-3.5 text-neutral-400" />
-                <span className="text-[10px] text-neutral-500 uppercase">Minuty</span>
+                <span className="text-[10px] text-neutral-500 uppercase">Hovory</span>
               </div>
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin text-neutral-400" />
@@ -226,6 +257,45 @@ function UserDetailModal({ user, onClose }: { user: AdminUser; onClose: () => vo
                 </div>
                 <p className={`text-sm font-semibold ${calls.avgScore >= 70 ? "text-green-600" : calls.avgScore >= 50 ? "text-yellow-600" : "text-red-600"}`}>
                   {calls.avgScore}%
+                </p>
+              </div>
+            )}
+            {!isLoading && authDetail && (
+              <>
+                <div className="bg-neutral-50 rounded-xl p-3">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <Bot className="w-3.5 h-3.5 text-neutral-400" />
+                    <span className="text-[10px] text-neutral-500 uppercase">Agenti</span>
+                  </div>
+                  <p className="text-sm font-semibold text-neutral-800">{authDetail.agents_count}</p>
+                </div>
+                <div className="bg-neutral-50 rounded-xl p-3">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <FileText className="w-3.5 h-3.5 text-neutral-400" />
+                    <span className="text-[10px] text-neutral-500 uppercase">Scénáře</span>
+                  </div>
+                  <p className="text-sm font-semibold text-neutral-800">{authDetail.scenarios_count}</p>
+                </div>
+                {authDetail.last_sign_in && (
+                  <div className="bg-neutral-50 rounded-xl p-3">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <LogIn className="w-3.5 h-3.5 text-neutral-400" />
+                      <span className="text-[10px] text-neutral-500 uppercase">Poslední přihlášení</span>
+                    </div>
+                    <p className="text-sm font-semibold text-neutral-800">{formatDate(authDetail.last_sign_in)}</p>
+                  </div>
+                )}
+              </>
+            )}
+            {!isLoading && authDetail?.company_name && (
+              <div className="bg-neutral-50 rounded-xl p-3 col-span-2">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <Building2 className="w-3.5 h-3.5 text-neutral-400" />
+                  <span className="text-[10px] text-neutral-500 uppercase">Firma</span>
+                </div>
+                <p className="text-sm font-semibold text-neutral-800">
+                  {authDetail.company_name}
+                  {authDetail.ico && <span className="text-neutral-400 font-normal ml-2">IČO: {authDetail.ico}</span>}
                 </p>
               </div>
             )}
