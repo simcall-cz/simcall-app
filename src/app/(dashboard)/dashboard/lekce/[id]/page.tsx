@@ -63,9 +63,32 @@ function isLessonCompleted(lessonNum: number, progress: ProgressRecord[]): boole
   return lp.length > 0;
 }
 
-function isLessonUnlocked(lessonNum: number, progress: ProgressRecord[]): boolean {
-  if (lessonNum === 1) return true;
-  return isLessonCompleted(lessonNum - 1, progress);
+/** Per-category unlock: first lesson in category is always unlocked */
+function isLessonUnlockedInCategory(lessonNum: number, progress: ProgressRecord[]): boolean {
+  const lesson = lessonsV2.find((l) => l.number === lessonNum);
+  if (!lesson) return false;
+  const categoryLessons = lessonsV2.filter((l) => l.category === lesson.category);
+  const idx = categoryLessons.findIndex((l) => l.number === lessonNum);
+  if (idx <= 0) return true;
+  return isLessonCompleted(categoryLessons[idx - 1].number, progress);
+}
+
+function getCategoryLessons(lessonNum: number) {
+  const lesson = lessonsV2.find((l) => l.number === lessonNum);
+  if (!lesson) return [];
+  return lessonsV2.filter((l) => l.category === lesson.category);
+}
+
+function getNextLessonInCategory(lessonNum: number): number | null {
+  const categoryLessons = getCategoryLessons(lessonNum);
+  const idx = categoryLessons.findIndex((l) => l.number === lessonNum);
+  if (idx < 0 || idx >= categoryLessons.length - 1) return null;
+  return categoryLessons[idx + 1].number;
+}
+
+function isCategoryComplete(lessonNum: number, progress: ProgressRecord[]): boolean {
+  const categoryLessons = getCategoryLessons(lessonNum);
+  return categoryLessons.every((l) => isLessonCompleted(l.number, progress));
 }
 
 function LessonDetailContent() {
@@ -130,7 +153,7 @@ function LessonDetailContent() {
     init();
   }, [fetchProgress]);
 
-  const unlocked = useMemo(() => isLessonUnlocked(lessonNumber, progress), [lessonNumber, progress]);
+  const unlocked = useMemo(() => isLessonUnlockedInCategory(lessonNumber, progress), [lessonNumber, progress]);
   const completed = useMemo(() => isLessonCompleted(lessonNumber, progress), [lessonNumber, progress]);
 
   // Per-agent stats (sub_scenario 1=beginner, 2=intermediate, 3=advanced)
@@ -177,9 +200,9 @@ function LessonDetailContent() {
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100 mb-4">
           <Lock className="h-8 w-8 text-neutral-400" />
         </div>
-        <h1 className="text-xl font-bold text-neutral-900 mb-2">Lekce {lessonNumber} je zamčená</h1>
+        <h1 className="text-xl font-bold text-neutral-900 mb-2">Lekce je zamčená</h1>
         <p className="text-neutral-500 mb-6">
-          Nejprve splňte lekci {lessonNumber - 1} se skóre alespoň 80 % ve všech 3 hovorech.
+          Nejprve splňte předchozí lekci v této kategorii se skóre alespoň 80 % ve všech 3 hovorech.
         </p>
         <Link href="/dashboard/lekce">
           <Button variant="outline" className="gap-2">
@@ -325,7 +348,7 @@ function LessonDetailContent() {
             {lesson.category}
           </span>
           <span className="text-xs text-neutral-400">
-            Lekce {lesson.number}/100
+            Lekce {getCategoryLessons(lessonNumber).findIndex((l) => l.number === lessonNumber) + 1}/{getCategoryLessons(lessonNumber).length}
           </span>
           {completed && (
             <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700">
@@ -584,22 +607,48 @@ function LessonDetailContent() {
         })}
       </div>
 
-      {/* Lesson completed → next lesson */}
-      {completed && lessonNumber < 100 && (
-        <div className="mb-12 text-center">
-          <div className="rounded-xl border border-green-200 bg-green-50 p-6 mb-4">
-            <Trophy className="h-8 w-8 text-green-500 mx-auto mb-2" />
-            <h3 className="text-lg font-bold text-green-800 mb-1">Lekce {lessonNumber} splněna!</h3>
-            <p className="text-sm text-green-600">Další lekce je odemčena. Pokračujte v cestě k titulu Elitního makléře.</p>
+      {/* Lesson completed → next lesson or category done */}
+      {completed && (() => {
+        const nextLesson = getNextLessonInCategory(lessonNumber);
+        const catComplete = isCategoryComplete(lessonNumber, progress);
+
+        return (
+          <div className="mb-12 text-center">
+            {catComplete ? (
+              <div className="rounded-xl border border-green-200 bg-green-50 p-6 mb-4">
+                <Trophy className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                <h3 className="text-lg font-bold text-green-800 mb-1">
+                  Kategorie {lesson.category} dokončena!
+                </h3>
+                <p className="text-sm text-green-600">
+                  Gratulujeme! Zvládli jste všechny lekce v této kategorii. Vaše znalosti jsou na profesionální úrovni.
+                </p>
+              </div>
+            ) : (
+              <div className="rounded-xl border border-green-200 bg-green-50 p-6 mb-4">
+                <Trophy className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                <h3 className="text-lg font-bold text-green-800 mb-1">Lekce splněna!</h3>
+                <p className="text-sm text-green-600">Další lekce v kategorii {lesson.category} je odemčena.</p>
+              </div>
+            )}
+            <div className="flex items-center justify-center gap-3">
+              {nextLesson && (
+                <Link href={`/dashboard/lekce/${nextLesson}`}>
+                  <Button size="lg" className="gap-2">
+                    Další lekce
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+              )}
+              <Link href="/dashboard/lekce">
+                <Button size="lg" variant="outline" className="gap-2">
+                  Zpět na přehled
+                </Button>
+              </Link>
+            </div>
           </div>
-          <Link href={`/dashboard/lekce/${lessonNumber + 1}`}>
-            <Button size="lg" className="gap-2">
-              Další lekce
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </Link>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }

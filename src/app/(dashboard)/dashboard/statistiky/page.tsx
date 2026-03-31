@@ -1,7 +1,10 @@
 "use client";
 
 import { useMemo, useEffect, useState } from "react";
-import { Phone, TrendingUp, Clock, Award, Lock, GraduationCap, Target, BarChart3 } from "lucide-react";
+import {
+  Phone, TrendingUp, Clock, Award, Lock, GraduationCap, Target, BarChart3,
+  AlertTriangle, Trophy, Zap, Flame,
+} from "lucide-react";
 import Link from "next/link";
 import {
   ResponsiveContainer,
@@ -14,6 +17,11 @@ import {
   CartesianGrid,
   Tooltip,
   Cell,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  Radar,
 } from "recharts";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -27,6 +35,7 @@ interface LessonProgress {
   sub_scenario: number;
   attempt: number;
   score: number;
+  completed_at?: string;
 }
 
 function formatDateShort(dateStr: string) {
@@ -42,6 +51,12 @@ function isLessonCompleted(lessonNum: number, progress: LessonProgress[]): boole
   }
   return lp.length > 0;
 }
+
+const COLOR_MAP: Record<string, string> = {
+  blue: "#3B82F6", emerald: "#10B981", yellow: "#F59E0B", purple: "#8B5CF6",
+  indigo: "#6366F1", orange: "#F97316", cyan: "#06B6D4", rose: "#F43F5E",
+  pink: "#EC4899", teal: "#14B8A6", amber: "#F59E0B",
+};
 
 export default function StatistikyPage() {
   const { calls, isLoading } = useCallHistory({ limit: 200 });
@@ -152,9 +167,72 @@ export default function StatistikyPage() {
       const catAvg = catProgress.length > 0
         ? Math.round(catProgress.reduce((s, p) => s + p.score, 0) / catProgress.length)
         : null;
-      return { category: cat, total: catLessons.length, completed: catCompleted, avgScore: catAvg };
+      const catBest = catProgress.length > 0
+        ? Math.max(...catProgress.map((p) => p.score))
+        : null;
+      const catAttempts = catProgress.length;
+      const catColor = CATEGORY_CONFIG[cat]?.color || "blue";
+
+      // Find weakest lesson (lowest avg score among attempted lessons)
+      let weakestLesson: { number: number; title: string; avgScore: number } | null = null;
+      let strongestLesson: { number: number; title: string; avgScore: number } | null = null;
+      for (const lesson of catLessons) {
+        const lp = catProgress.filter((p) => p.lesson_number === lesson.number);
+        if (lp.length === 0) continue;
+        const avg = Math.round(lp.reduce((s, p) => s + p.score, 0) / lp.length);
+        if (!weakestLesson || avg < weakestLesson.avgScore) {
+          weakestLesson = { number: lesson.number, title: lesson.title, avgScore: avg };
+        }
+        if (!strongestLesson || avg > strongestLesson.avgScore) {
+          strongestLesson = { number: lesson.number, title: lesson.title, avgScore: avg };
+        }
+      }
+
+      return {
+        category: cat,
+        total: catLessons.length,
+        completed: catCompleted,
+        avgScore: catAvg,
+        bestScore: catBest,
+        attempts: catAttempts,
+        color: catColor,
+        isComplete: catCompleted === catLessons.length && catLessons.length > 0,
+        weakestLesson,
+        strongestLesson,
+      };
     });
   }, [lessonProgress]);
+
+  // Radar chart data for category comparison
+  const radarData = useMemo(() => {
+    return categoryStats
+      .filter((cs) => cs.avgScore !== null)
+      .map((cs) => ({
+        category: cs.category.length > 12 ? cs.category.slice(0, 10) + "…" : cs.category,
+        fullName: cs.category,
+        skóre: cs.avgScore || 0,
+        progress: cs.total > 0 ? Math.round((cs.completed / cs.total) * 100) : 0,
+      }));
+  }, [categoryStats]);
+
+  // Weakest categories (sorted by avg score ascending)
+  const weakAreas = useMemo(() => {
+    return categoryStats
+      .filter((cs) => cs.avgScore !== null && cs.avgScore < 80)
+      .sort((a, b) => (a.avgScore || 0) - (b.avgScore || 0))
+      .slice(0, 3);
+  }, [categoryStats]);
+
+  // Completed categories count
+  const completedCategories = useMemo(() => {
+    return categoryStats.filter((cs) => cs.isComplete).length;
+  }, [categoryStats]);
+
+  // Attempts per lesson (efficiency)
+  const avgAttemptsPerLesson = useMemo(() => {
+    if (lessonCompletedCount === 0) return 0;
+    return Math.round((lessonTotalAttempts / lessonCompletedCount) * 10) / 10;
+  }, [lessonCompletedCount, lessonTotalAttempts]);
 
   const lessonScoreDistribution = useMemo(() => {
     const buckets = [
@@ -171,6 +249,16 @@ export default function StatistikyPage() {
     });
     return buckets;
   }, [lessonProgress]);
+
+  // Category completion bar chart
+  const categoryBarData = useMemo(() => {
+    return categoryStats.map((cs) => ({
+      name: cs.category.length > 8 ? cs.category.slice(0, 7) + "…" : cs.category,
+      fullName: cs.category,
+      dokončeno: cs.total > 0 ? Math.round((cs.completed / cs.total) * 100) : 0,
+      color: COLOR_MAP[cs.color] || "#3B82F6",
+    }));
+  }, [categoryStats]);
 
   if (isLoading) {
     return (
@@ -190,7 +278,7 @@ export default function StatistikyPage() {
   const lessonStatCards = [
     { label: "Splněné lekce", value: `${lessonCompletedCount}/100`, icon: GraduationCap, bg: "bg-neutral-50", iconColor: "text-neutral-600" },
     { label: "Průměrné skóre", value: lessonAvgScore > 0 ? `${lessonAvgScore}%` : "—", icon: TrendingUp, bg: "bg-green-50", iconColor: "text-green-600" },
-    { label: "Nejlepší skóre", value: lessonBestScore > 0 ? `${lessonBestScore}%` : "—", icon: Award, bg: "bg-amber-50", iconColor: "text-amber-600" },
+    { label: "Dokončené kategorie", value: `${completedCategories}/10`, icon: Trophy, bg: "bg-amber-50", iconColor: "text-amber-600" },
     { label: "Celkem pokusů", value: lessonTotalAttempts > 0 ? lessonTotalAttempts.toString() : "—", icon: Target, bg: "bg-blue-50", iconColor: "text-blue-600" },
   ];
 
@@ -359,6 +447,51 @@ export default function StatistikyPage() {
             ))}
           </div>
 
+          {/* Extra stat row */}
+          {lessonTotalAttempts > 0 && (
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+              <Card>
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-purple-50">
+                      <Award className="w-5 h-5 text-purple-600" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs text-neutral-500 truncate">Nejlepší skóre</p>
+                      <p className="text-lg font-semibold text-neutral-900">{lessonBestScore > 0 ? `${lessonBestScore}%` : "—"}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-orange-50">
+                      <Zap className="w-5 h-5 text-orange-600" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs text-neutral-500 truncate">Pokusů na lekci</p>
+                      <p className="text-lg font-semibold text-neutral-900">{avgAttemptsPerLesson > 0 ? `${avgAttemptsPerLesson}x` : "—"}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="col-span-2 lg:col-span-1">
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-rose-50">
+                      <Flame className="w-5 h-5 text-rose-600" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs text-neutral-500 truncate">Celkové dokončení</p>
+                      <p className="text-lg font-semibold text-neutral-900">{lessonCompletedCount}%</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
           {lessonTotalAttempts === 0 && (
             <Card>
               <CardContent className="py-16 text-center">
@@ -371,7 +504,43 @@ export default function StatistikyPage() {
             </Card>
           )}
 
-          {/* Category progress */}
+          {/* Weak areas alert */}
+          {weakAreas.length > 0 && (
+            <Card className="border-amber-200 bg-amber-50/30">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-amber-800">
+                  <AlertTriangle className="h-4 w-4" />
+                  Oblasti k zlepšení
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2.5">
+                  {weakAreas.map((area) => (
+                    <div key={area.category} className="flex items-center justify-between rounded-lg bg-white/60 px-3 py-2.5">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-neutral-800">{area.category}</p>
+                        <p className="text-xs text-neutral-500">
+                          {area.completed}/{area.total} lekcí — prům. skóre {area.avgScore}%
+                        </p>
+                        {area.weakestLesson && (
+                          <p className="text-xs text-amber-600 mt-0.5">
+                            Nejslabší: {area.weakestLesson.title} ({area.weakestLesson.avgScore}%)
+                          </p>
+                        )}
+                      </div>
+                      <Link href="/dashboard/lekce">
+                        <Button size="sm" variant="outline" className="text-xs shrink-0 ml-3">
+                          Trénovat
+                        </Button>
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Category detailed progress */}
           {lessonTotalAttempts > 0 && (
             <Card>
               <CardHeader>
@@ -381,20 +550,46 @@ export default function StatistikyPage() {
                 <div className="space-y-3">
                   {categoryStats.map((cs) => {
                     const pct = cs.total > 0 ? Math.round((cs.completed / cs.total) * 100) : 0;
+                    const catColor = COLOR_MAP[cs.color] || "#3B82F6";
                     return (
-                      <div key={cs.category} className="flex items-center gap-3">
-                        <span className="text-sm text-neutral-700 w-40 truncate">{cs.category}</span>
-                        <div className="flex-1 h-2 rounded-full bg-neutral-100 overflow-hidden">
-                          <div
-                            className="h-full rounded-full bg-primary-500 transition-all"
-                            style={{ width: `${pct}%` }}
-                          />
+                      <div key={cs.category}>
+                        <div className="flex items-center gap-3">
+                          <span className="text-sm text-neutral-700 w-40 truncate">{cs.category}</span>
+                          <div className="flex-1 h-2 rounded-full bg-neutral-100 overflow-hidden">
+                            <div
+                              className="h-full rounded-full transition-all"
+                              style={{ width: `${pct}%`, backgroundColor: catColor }}
+                            />
+                          </div>
+                          <span className="text-xs text-neutral-500 w-12 text-right">
+                            {cs.completed}/{cs.total}
+                          </span>
+                          {cs.avgScore !== null && (
+                            <span className={cn(
+                              "text-xs font-bold w-10 text-right",
+                              cs.avgScore >= 80 ? "text-green-600" : cs.avgScore >= 60 ? "text-amber-600" : "text-red-500"
+                            )}>
+                              {cs.avgScore}%
+                            </span>
+                          )}
+                          {cs.isComplete && (
+                            <Trophy className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+                          )}
                         </div>
-                        <span className="text-xs text-neutral-500 w-16 text-right">
-                          {cs.completed}/{cs.total}
-                        </span>
-                        {cs.avgScore !== null && (
-                          <span className="text-xs font-bold text-neutral-600 w-10 text-right">{cs.avgScore}%</span>
+                        {/* Sub-detail: strongest & weakest lesson */}
+                        {cs.attempts > 0 && (
+                          <div className="ml-[168px] flex gap-4 mt-1">
+                            {cs.strongestLesson && (
+                              <span className="text-[10px] text-green-600">
+                                Nejlepší: {cs.strongestLesson.title.slice(0, 30)}{cs.strongestLesson.title.length > 30 ? "…" : ""} ({cs.strongestLesson.avgScore}%)
+                              </span>
+                            )}
+                            {cs.weakestLesson && cs.weakestLesson.number !== cs.strongestLesson?.number && (
+                              <span className="text-[10px] text-red-500">
+                                Nejslabší: {cs.weakestLesson.title.slice(0, 30)}{cs.weakestLesson.title.length > 30 ? "…" : ""} ({cs.weakestLesson.avgScore}%)
+                              </span>
+                            )}
+                          </div>
                         )}
                       </div>
                     );
@@ -402,6 +597,67 @@ export default function StatistikyPage() {
                 </div>
               </CardContent>
             </Card>
+          )}
+
+          {/* Charts row */}
+          {lessonTotalAttempts > 0 && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Radar chart: category comparison */}
+              {radarData.length >= 3 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Porovnání kategorií</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-72">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <RadarChart data={radarData} margin={{ top: 10, right: 30, bottom: 10, left: 30 }}>
+                          <PolarGrid stroke="#e5e7eb" />
+                          <PolarAngleAxis dataKey="category" tick={{ fontSize: 10, fill: "#6b7280" }} />
+                          <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fontSize: 9, fill: "#9ca3af" }} />
+                          <Radar name="Skóre" dataKey="skóre" stroke="#EF4444" fill="#EF4444" fillOpacity={0.15} strokeWidth={2} />
+                          <Radar name="Progress" dataKey="progress" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.1} strokeWidth={2} />
+                          <Tooltip />
+                        </RadarChart>
+                      </ResponsiveContainer>
+                    </div>
+                    <div className="flex items-center justify-center gap-4 mt-2">
+                      <span className="flex items-center gap-1.5 text-xs text-neutral-500">
+                        <span className="w-3 h-0.5 rounded bg-red-500" /> Prům. skóre
+                      </span>
+                      <span className="flex items-center gap-1.5 text-xs text-neutral-500">
+                        <span className="w-3 h-0.5 rounded bg-blue-500" /> Dokončení %
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Category completion bar chart */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Dokončení dle kategorií</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-72">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={categoryBarData} layout="vertical" margin={{ left: 10, right: 20 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" horizontal={false} />
+                        <XAxis type="number" domain={[0, 100]} unit="%" tick={{ fontSize: 11, fill: "#6b7280" }} tickLine={false} />
+                        <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: "#6b7280" }} tickLine={false} width={65} />
+                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                        <Tooltip formatter={(value: any) => [`${value}%`, "Dokončeno"]} />
+                        <Bar dataKey="dokončeno" radius={[0, 4, 4, 0]}>
+                          {categoryBarData.map((entry, index) => (
+                            <Cell key={index} fill={entry.color} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           )}
 
           {/* Lesson score distribution */}
