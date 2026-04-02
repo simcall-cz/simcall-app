@@ -259,10 +259,11 @@ export function useTrainingCall(options: UseTrainingCallOptions = {}) {
   const toggleMute = useCallback(() => {
     setState((prev) => {
       const newMuted = !prev.isMuted;
-      conversation.setMuted(newMuted);
+      // Note: SDK v0.14.1 doesn't expose a mute method.
+      // Upgrade to @elevenlabs/react v1.0+ for native mute support.
       return { ...prev, isMuted: newMuted };
     });
-  }, [conversation]);
+  }, []);
 
   const reset = useCallback(() => {
     if (timerRef.current) {
