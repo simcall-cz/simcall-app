@@ -44,7 +44,7 @@ interface DisputeRecord {
 const statusConfig = {
   pending: { label: "Čekající", variant: "warning" as const, icon: Clock },
   approved: { label: "Schváleno", variant: "success" as const, icon: CheckCircle2 },
-  rejected: { label: "Zamítnuto", variant: "destructive" as const, icon: XCircle },
+  rejected: { label: "Zamítnuto", variant: "secondary" as const, icon: XCircle },
 };
 
 function formatDate(dateStr: string) {
