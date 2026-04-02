@@ -259,7 +259,7 @@ export function useTrainingCall(options: UseTrainingCallOptions = {}) {
   const toggleMute = useCallback(() => {
     setState((prev) => {
       const newMuted = !prev.isMuted;
-      conversation.setMicMuted(newMuted);
+      conversation.setMuted(newMuted);
       return { ...prev, isMuted: newMuted };
     });
   }, [conversation]);
