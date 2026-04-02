@@ -238,3 +238,17 @@ export function notifyCheckoutStarted(opts: {
     ],
   });
 }
+
+/** Call dispute — user reports an issue with a call */
+export function notifyCallDispute(email: string, reason: string, message: string) {
+  return notifyBusiness({
+    title: "Reklamace hovoru",
+    color: NotifyColors.ERROR,
+    fields: [
+      { name: "Od", value: email, inline: true },
+      { name: "Důvod", value: reason, inline: true },
+      ...(message ? [{ name: "Popis", value: message.substring(0, 300) + (message.length > 300 ? "..." : ""), inline: false }] : []),
+    ],
+  });
+}
+

@@ -257,8 +257,12 @@ export function useTrainingCall(options: UseTrainingCallOptions = {}) {
   }, [conversation]);
 
   const toggleMute = useCallback(() => {
-    setState((prev) => ({ ...prev, isMuted: !prev.isMuted }));
-  }, []);
+    setState((prev) => {
+      const newMuted = !prev.isMuted;
+      conversation.setMicMuted(newMuted);
+      return { ...prev, isMuted: newMuted };
+    });
+  }, [conversation]);
 
   const reset = useCallback(() => {
     if (timerRef.current) {

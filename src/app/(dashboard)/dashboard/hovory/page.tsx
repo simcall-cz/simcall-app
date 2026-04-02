@@ -16,6 +16,8 @@ import {
   PhoneCall,
   Loader2,
   PhoneOff,
+  AlertTriangle,
+  Send,
 } from "lucide-react";
 import { getAuthHeaders } from "@/lib/auth";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -101,6 +103,68 @@ function CallDetailModal({
   );
   const [fullCall, setFullCall] = useState<CallRecord | null>(null);
   const [isLoadingDetail, setIsLoadingDetail] = useState(true);
+
+  // Dispute form state
+  const [showDisputeForm, setShowDisputeForm] = useState(false);
+  const [disputeReason, setDisputeReason] = useState("");
+  const [disputeMessage, setDisputeMessage] = useState("");
+  const [disputeSubmitting, setDisputeSubmitting] = useState(false);
+  const [disputeError, setDisputeError] = useState<string | null>(null);
+  const [disputeSuccess, setDisputeSuccess] = useState(false);
+  const [existingDispute, setExistingDispute] = useState<{ status: string; admin_note?: string } | null>(null);
+
+  const DISPUTE_REASONS = [
+    "Nesouhlasím s hodnocením",
+    "Agent byl zmatený / nereagoval správně",
+    "Technický problém (zvuk, přerušení)",
+    "Hovor se ukončil předčasně",
+    "Jiný důvod",
+  ];
+
+  // Check for existing dispute
+  useEffect(() => {
+    async function checkDispute() {
+      try {
+        const headers = await getAuthHeaders();
+        const res = await fetch(`/api/calls/${callId}/dispute`, { headers });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.dispute) setExistingDispute(data.dispute);
+        }
+      } catch { /* silent */ }
+    }
+    checkDispute();
+  }, [callId]);
+
+  async function handleDisputeSubmit() {
+    if (!disputeReason) return;
+    if (disputeReason === "Jiný důvod" && !disputeMessage.trim()) {
+      setDisputeError("Při výběru 'Jiný důvod' je popis povinný");
+      return;
+    }
+    setDisputeSubmitting(true);
+    setDisputeError(null);
+    try {
+      const headers = await getAuthHeaders();
+      const res = await fetch(`/api/calls/${callId}/dispute`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({ reason: disputeReason, message: disputeMessage.trim() || null }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Chyba při odesílání");
+      }
+      setDisputeSuccess(true);
+      setShowDisputeForm(false);
+      const data = await res.json();
+      setExistingDispute(data.dispute);
+    } catch (err) {
+      setDisputeError(err instanceof Error ? err.message : "Chyba");
+    } finally {
+      setDisputeSubmitting(false);
+    }
+  }
 
   // Fetch full call detail (with transcripts) when modal opens
   useEffect(() => {
@@ -413,8 +477,96 @@ function CallDetailModal({
           )}
         </div>
 
+        {/* Dispute Form */}
+        {showDisputeForm && !existingDispute && (
+          <div className="px-4 sm:px-6 py-4 border-t border-neutral-100 bg-amber-50/30 space-y-3">
+            <h4 className="text-sm font-semibold text-neutral-800">Nahlásit problém s hovorem</h4>
+            <div className="space-y-2">
+              {DISPUTE_REASONS.map((reason) => (
+                <label key={reason} className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="disputeReason"
+                    value={reason}
+                    checked={disputeReason === reason}
+                    onChange={(e) => setDisputeReason(e.target.value)}
+                    className="accent-primary-500"
+                  />
+                  <span className="text-sm text-neutral-700">{reason}</span>
+                </label>
+              ))}
+            </div>
+            <textarea
+              value={disputeMessage}
+              onChange={(e) => setDisputeMessage(e.target.value)}
+              placeholder="Doplňující popis (volitelné)..."
+              rows={2}
+              className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-900 placeholder-neutral-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 resize-none"
+            />
+            {disputeError && (
+              <div className="flex items-center gap-2 text-xs text-red-600">
+                <AlertTriangle className="w-3.5 h-3.5" />
+                {disputeError}
+              </div>
+            )}
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                onClick={handleDisputeSubmit}
+                disabled={disputeSubmitting || !disputeReason}
+                className="gap-1.5"
+              >
+                {disputeSubmitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+                Odeslat reklamaci
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => setShowDisputeForm(false)}>
+                Zrušit
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Dispute status */}
+        {(existingDispute || disputeSuccess) && (
+          <div className="px-4 sm:px-6 py-3 border-t border-neutral-100">
+            <div className="flex items-center gap-2 text-sm">
+              {existingDispute?.status === "approved" ? (
+                <>
+                  <CheckCircle2 className="w-4 h-4 text-green-500" />
+                  <span className="text-green-700">Reklamace schválena</span>
+                </>
+              ) : existingDispute?.status === "rejected" ? (
+                <>
+                  <XCircle className="w-4 h-4 text-red-500" />
+                  <span className="text-red-700">Reklamace zamítnuta</span>
+                </>
+              ) : (
+                <>
+                  <Clock className="w-4 h-4 text-amber-500" />
+                  <span className="text-amber-700">Reklamace odeslána — čeká na kontrolu</span>
+                </>
+              )}
+            </div>
+            {existingDispute?.admin_note && (
+              <p className="text-xs text-neutral-600 mt-1 ml-6">{existingDispute.admin_note}</p>
+            )}
+          </div>
+        )}
+
         {/* Footer */}
-        <div className="flex justify-end p-3 sm:p-4 border-t border-neutral-100 shrink-0">
+        <div className="flex justify-between p-3 sm:p-4 border-t border-neutral-100 shrink-0">
+          {!existingDispute && !disputeSuccess && !showDisputeForm && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowDisputeForm(true)}
+              className="gap-1.5 text-amber-600 border-amber-200 hover:bg-amber-50"
+            >
+              <AlertTriangle className="w-3.5 h-3.5" />
+              Nahlásit problém
+            </Button>
+          )}
+          {(existingDispute || disputeSuccess || showDisputeForm) && <div />}
           <Button variant="outline" size="sm" onClick={onClose}>
             Zavřít
           </Button>

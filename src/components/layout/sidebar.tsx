@@ -27,6 +27,7 @@ import {
   GraduationCap,
   Calendar,
   Lightbulb,
+  RotateCcw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
@@ -120,6 +121,11 @@ const adminNavItems: SidebarNavItem[] = [
     label: "Platby",
     href: "/admin/platby",
     icon: <Receipt className="w-5 h-5" />,
+  },
+  {
+    label: "Refundace",
+    href: "/admin/refundace",
+    icon: <RotateCcw className="w-5 h-5" />,
   },
   {
     label: "Agenti",
