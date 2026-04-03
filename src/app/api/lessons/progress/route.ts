@@ -53,6 +53,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid score (0-100)" }, { status: 400 });
   }
 
+  const userId = user.id;
   const supabase = getServiceSupabase();
 
   // Atomically resolve the next attempt number by retrying on unique constraint
@@ -67,7 +68,7 @@ export async function POST(request: NextRequest) {
     const { data: existing } = await supabase
       .from("lesson_progress")
       .select("attempt")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .eq("lesson_number", lessonNumber)
       .eq("sub_scenario", subScenario)
       .order("attempt", { ascending: false })
@@ -85,7 +86,7 @@ export async function POST(request: NextRequest) {
     const { data: inserted, error } = await supabase
       .from("lesson_progress")
       .insert({
-        user_id: user.id,
+        user_id: userId,
         lesson_number: lessonNumber,
         sub_scenario: subScenario,
         attempt: nextAttempt,
