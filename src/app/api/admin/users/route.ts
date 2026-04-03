@@ -15,8 +15,13 @@ export async function GET(request: NextRequest) {
 
     const search = searchParams.get("search") || "";
     const planRole = searchParams.get("role") || "";
-    const limit = parseInt(searchParams.get("limit") || "20");
-    const offset = parseInt(searchParams.get("offset") || "0");
+    function safeInt(val: string | null, fallback: number, max: number): number {
+      const n = parseInt(val || String(fallback), 10);
+      if (isNaN(n) || n < 0) return fallback;
+      return Math.min(n, max);
+    }
+    const limit = safeInt(searchParams.get("limit"), 20, 200);
+    const offset = safeInt(searchParams.get("offset"), 0, 100000);
 
     // Build query for profiles — no join (subscriptions table may not exist)
     let query = db
@@ -30,7 +35,7 @@ export async function GET(request: NextRequest) {
 
     // Apply search filter (email or name)
     if (search) {
-      const sanitizedSearch = search.replace(/[%_(),.*\\]/g, "").slice(0, 100);
+      const sanitizedSearch = search.replace(/[%_(),.*\\"`']/g, "").slice(0, 100);
       if (sanitizedSearch.length > 0) {
         query = query.or(`email.ilike.%${sanitizedSearch}%,full_name.ilike.%${sanitizedSearch}%`);
       }

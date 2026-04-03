@@ -356,13 +356,15 @@ export async function addSecondsUsed(userId: string, durationSeconds: number): P
   const sub = await findSubscriptionForUser(db, userId);
 
   if (sub) {
-    await db
-      .from("subscriptions")
-      .update({
-        seconds_used: (sub.seconds_used || 0) + Math.round(durationSeconds),
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", sub.id);
+    // Use an atomic Postgres RPC to avoid the read-modify-write race condition.
+    // A plain .update() would read seconds_used here in JS, add to it, then
+    // write back — two concurrent calls reading the same value would cause one
+    // increment to be silently lost. The RPC executes the increment as a single
+    // UPDATE … SET seconds_used = COALESCE(seconds_used, 0) + N inside Postgres.
+    await db.rpc("increment_seconds_used", {
+      sub_id: sub.id,
+      additional_seconds: Math.round(durationSeconds),
+    });
   }
   // Demo users: no subscription record to update.
   // Their usage is derived by summing duration_seconds from the calls table.
@@ -392,8 +394,22 @@ export async function verifyAdmin(request: NextRequest): Promise<{ isAdmin: bool
   const user = await getUserFromRequest(request);
   if (!user) return { isAdmin: false, user: null };
 
+  // Primary check: email match
+  if (isAdminEmail(user.email || "")) {
+    return { isAdmin: true, user };
+  }
+
+  // Secondary check: DB role — prevents a user from gaining admin access
+  // by changing their email to match ADMIN_EMAIL
+  const db = createServerClient();
+  const { data: profile } = await db
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
   return {
-    isAdmin: isAdminEmail(user.email || ""),
+    isAdmin: profile?.role === "admin",
     user,
   };
 }

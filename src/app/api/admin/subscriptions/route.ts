@@ -26,26 +26,44 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ subscriptions: [] });
       }
 
-      // Enrich subscriptions with profile data for missing names
-      const enriched = await Promise.all(
-        (subscriptions || []).map(async (sub) => {
-          if (!sub.customer_name && sub.user_id) {
-            const { data: profile } = await db
-              .from("profiles")
-              .select("full_name, email")
-              .eq("id", sub.user_id)
-              .single();
-            if (profile) {
-              return {
-                ...sub,
-                customer_name: profile.full_name || null,
-                customer_email: sub.customer_email || profile.email || null,
-              };
-            }
+      // Enrich subscriptions with profile data for missing names.
+      // Batch-fetch all needed profiles in a single query to avoid N+1.
+      const subs = subscriptions || [];
+
+      const userIds = [
+        ...new Set(
+          subs
+            .filter((sub) => !sub.customer_name && sub.user_id)
+            .map((sub) => sub.user_id as string)
+        ),
+      ];
+
+      const profileMap = new Map<string, { full_name: string | null; email: string | null }>();
+
+      if (userIds.length > 0) {
+        const { data: profiles } = await db
+          .from("profiles")
+          .select("id, full_name, email")
+          .in("id", userIds);
+
+        for (const profile of profiles ?? []) {
+          profileMap.set(profile.id, { full_name: profile.full_name ?? null, email: profile.email ?? null });
+        }
+      }
+
+      const enriched = subs.map((sub) => {
+        if (!sub.customer_name && sub.user_id) {
+          const profile = profileMap.get(sub.user_id);
+          if (profile) {
+            return {
+              ...sub,
+              customer_name: profile.full_name || null,
+              customer_email: sub.customer_email || profile.email || null,
+            };
           }
-          return sub;
-        })
-      );
+        }
+        return sub;
+      });
 
       return NextResponse.json({ subscriptions: enriched });
     } catch {
@@ -79,6 +97,14 @@ export async function PATCH(request: NextRequest) {
     if (!subscriptionId) {
       return NextResponse.json(
         { error: "subscriptionId is required" },
+        { status: 400 }
+      );
+    }
+
+    const validStatuses = ["active", "cancelled", "past_due", "trialing"];
+    if (status && !validStatuses.includes(status)) {
+      return NextResponse.json(
+        { error: `Invalid status. Must be one of: ${validStatuses.join(", ")}` },
         { status: 400 }
       );
     }

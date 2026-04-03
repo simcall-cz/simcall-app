@@ -34,11 +34,12 @@ export async function POST(
   const { id } = await params;
   const supabase = createServerClient();
 
-  // 1. Get the call record
+  // 1. Get the call record (scoped to the requesting user to prevent IDOR)
   const { data: call, error: callError } = await supabase
     .from("calls")
     .select("*")
     .eq("id", id)
+    .eq("user_id", user.id)
     .single();
 
   if (callError || !call) {

@@ -10,7 +10,8 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const limit = parseInt(searchParams.get("limit") || "50");
+    const rawLimit = parseInt(searchParams.get("limit") || "50", 10);
+    const limit = isNaN(rawLimit) || rawLimit < 1 ? 50 : Math.min(rawLimit, 200);
 
     const db = createServerClient();
     const { data: notifications, error } = await db
@@ -22,8 +23,8 @@ export async function GET(request: NextRequest) {
     if (error) throw error;
 
     return NextResponse.json({ notifications });
-  } catch (error: any) {
+  } catch (error) {
     console.error("[api/admin/notifications GET]", error);
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

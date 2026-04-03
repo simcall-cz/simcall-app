@@ -89,7 +89,7 @@ export async function POST(
     if (disputeError) {
       console.error("POST dispute error:", disputeError);
       return NextResponse.json(
-        { error: disputeError.message },
+        { error: "Failed to create dispute" },
         { status: 500 }
       );
     }
@@ -103,7 +103,7 @@ export async function POST(
     const userEmail = profile?.email || user.email || "";
 
     // Discord notification
-    notifyCallDispute(userEmail, reason.trim(), message?.trim() || "");
+    await notifyCallDispute(userEmail, reason.trim(), message?.trim() || "");
 
     // Admin notification
     try {

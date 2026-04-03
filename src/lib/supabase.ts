@@ -1,6 +1,9 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
-// Browser client (uses anon key, respects RLS) — lazy initialized
+// Browser client (uses anon key, respects RLS) — lazy initialized.
+// Singleton is safe: browser page reloads recreate it. In HMR dev mode,
+// the module may persist across hot reloads, but env vars (NEXT_PUBLIC_*)
+// are baked in at build/start time and don't change at runtime.
 let _supabase: SupabaseClient | null = null;
 
 export function getSupabase() {

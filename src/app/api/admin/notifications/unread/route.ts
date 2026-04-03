@@ -18,8 +18,8 @@ export async function GET(request: NextRequest) {
     if (error) throw error;
 
     return NextResponse.json({ count: count || 0 });
-  } catch (error: any) {
+  } catch (error) {
     console.error("[api/admin/notifications/unread GET]", error);
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

@@ -24,9 +24,9 @@ export async function PATCH(
     if (error) throw error;
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error) {
     console.error("[api/admin/notifications/[id] PATCH]", error);
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
@@ -51,8 +51,8 @@ export async function DELETE(
     if (error) throw error;
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error) {
     console.error("[api/admin/notifications/[id] DELETE]", error);
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

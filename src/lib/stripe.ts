@@ -4,6 +4,8 @@ import Stripe from "stripe";
 // Stripe client (server-side only)
 // ============================================================
 
+// Module-level singleton — safe in Vercel serverless (short-lived per invocation).
+// In long-running dev servers, restart the process if STRIPE_SECRET_KEY is rotated.
 let _stripe: Stripe | null = null;
 
 export function getStripe(): Stripe {

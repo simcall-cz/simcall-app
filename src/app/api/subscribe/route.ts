@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const DISCORD_WEBHOOK_URL =
-  "https://discord.com/api/webhooks/1487070625267716147/bKQWUnIHIylePFJrilsdqMD3iHEOjYc2Ugc42nRjavS6hMHJ1y1qr4HIjghoW7BJeteT";
+const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
 
 export async function POST(request: NextRequest) {
+  if (!DISCORD_WEBHOOK_URL) {
+    console.error("DISCORD_WEBHOOK_URL environment variable is not set");
+    return NextResponse.json({ error: "Chyba serveru" }, { status: 500 });
+  }
+
   try {
     const { email, terms } = await request.json();
 

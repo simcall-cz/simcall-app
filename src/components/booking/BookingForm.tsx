@@ -314,11 +314,7 @@ export default function BookingForm() {
           </motion.div>
         )}
       </AnimatePresence>
-      <style dangerouslySetInnerHTML={{__html: `
-        .hide-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-      `}} />
+      <style>{`.hide-scrollbar::-webkit-scrollbar{display:none}`}</style>
     </div>
   );
 }

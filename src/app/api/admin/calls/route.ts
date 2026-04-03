@@ -12,8 +12,13 @@ export async function GET(request: NextRequest) {
 
     const db = createServerClient();
     const { searchParams } = new URL(request.url);
-    const limit = parseInt(searchParams.get("limit") || "100");
-    const offset = parseInt(searchParams.get("offset") || "0");
+    function safeInt(val: string | null, fallback: number, max: number): number {
+      const n = parseInt(val || String(fallback), 10);
+      if (isNaN(n) || n < 0) return fallback;
+      return Math.min(n, max);
+    }
+    const limit = safeInt(searchParams.get("limit"), 100, 200);
+    const offset = safeInt(searchParams.get("offset"), 0, 100000);
     const userId = searchParams.get("user_id");
 
     let query = db

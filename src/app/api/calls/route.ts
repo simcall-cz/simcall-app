@@ -12,8 +12,13 @@ export async function GET(request: NextRequest) {
 
     const supabase = createServerClient();
     const { searchParams } = new URL(request.url);
-    const limit = parseInt(searchParams.get("limit") || "20");
-    const offset = parseInt(searchParams.get("offset") || "0");
+    function safeInt(val: string | null, fallback: number, max: number): number {
+      const n = parseInt(val || String(fallback), 10);
+      if (isNaN(n) || n < 0) return fallback;
+      return Math.min(n, max);
+    }
+    const limit = safeInt(searchParams.get("limit"), 20, 200);
+    const offset = safeInt(searchParams.get("offset"), 0, 100000);
     const status = searchParams.get("status");
 
     let query = supabase
@@ -37,7 +42,7 @@ export async function GET(request: NextRequest) {
     const { data, error } = await query;
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: "Failed to fetch calls" }, { status: 500 });
     }
 
     return NextResponse.json({ calls: data });
@@ -138,7 +143,7 @@ export async function POST(request: NextRequest) {
 
     if (callError) {
       return NextResponse.json(
-        { error: callError.message },
+        { error: "Failed to create call" },
         { status: 500 }
       );
     }
