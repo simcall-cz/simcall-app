@@ -57,7 +57,7 @@ export async function GET(
     .order("attempt", { ascending: true });
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Failed to load progress" }, { status: 500 });
   }
 
   // Fetch user profile info

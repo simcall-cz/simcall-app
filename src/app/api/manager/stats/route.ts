@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
         .eq("company_id", companyId);
 
       if (membersError) {
-        return NextResponse.json({ error: membersError.message }, { status: 500 });
+        return NextResponse.json({ error: "Failed to load stats" }, { status: 500 });
       }
       members = (companyMembers || []) as unknown as typeof members;
       memberIds = members.map((m) => m.user_id);

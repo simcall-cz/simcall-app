@@ -29,8 +29,12 @@ export async function GET(request: NextRequest) {
 
     // 2. Get existing meetings for this specific date
     // We check meetings from start of day to end of day
-    const startOfDay = new Date(requestedDate.setHours(0, 0, 0, 0)).toISOString();
-    const endOfDay = new Date(requestedDate.setHours(23, 59, 59, 999)).toISOString();
+    const dayStart = new Date(requestedDate);
+    dayStart.setHours(0, 0, 0, 0);
+    const startOfDay = dayStart.toISOString();
+    const dayEnd = new Date(requestedDate);
+    dayEnd.setHours(23, 59, 59, 999);
+    const endOfDay = dayEnd.toISOString();
 
     const { data: meetings, error: meetingsError } = await db
       .from("meetings")
@@ -78,7 +82,7 @@ export async function GET(request: NextRequest) {
 
         if (!isBooked) {
           slots.push({
-            time: currentSlotStart.toLocaleTimeString("cs-CZ", { hour: "2-digit", minute: "2-digit" }),
+            time: new Intl.DateTimeFormat("cs-CZ", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Prague" }).format(currentSlotStart),
             isoDate: currentSlotStart.toISOString()
           });
         }
@@ -90,6 +94,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ slots });
   } catch (error: any) {
     console.error("[api/booking/availability GET]", error);
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

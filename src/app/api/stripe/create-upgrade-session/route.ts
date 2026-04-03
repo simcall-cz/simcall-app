@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
               );
             }
 
-            const origin = request.headers.get("origin") || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+            const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
             // Create a Checkout Session in payment mode for the surcharge
             const checkoutSession = await stripe.checkout.sessions.create({
@@ -183,7 +183,7 @@ export async function POST(request: NextRequest) {
               ? new Date(subData.current_period_end * 1000)
               : null;
             const periodEnd = periodEndDate
-              ? periodEndDate.toLocaleDateString("cs-CZ")
+              ? new Intl.DateTimeFormat("cs-CZ", { dateStyle: "short", timeZone: "Europe/Prague" }).format(periodEndDate)
               : "konce období";
 
             // Send downgrade scheduled email
@@ -234,16 +234,15 @@ export async function POST(request: NextRequest) {
         }
       } catch (err) {
         console.error("[upgrade] Stripe operation failed:", err);
-        const errMsg = err instanceof Error ? err.message : "Stripe operace selhala";
         return NextResponse.json(
-          { error: `Nepodařilo se provést změnu plánu: ${errMsg}` },
+          { error: "Nepodařilo se provést změnu plánu" },
           { status: 500 }
         );
       }
     }
 
     // Fallback: Create a new checkout session (user has no Stripe subscription)
-    const origin = request.headers.get("origin") || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+    const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
@@ -272,7 +271,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ url: session.url });
   } catch (error: unknown) {
     console.error("[create-upgrade-session] Error:", error);
-    const message = error instanceof Error ? error.message : "Interní chyba serveru";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: "Interní chyba serveru" }, { status: 500 });
   }
 }

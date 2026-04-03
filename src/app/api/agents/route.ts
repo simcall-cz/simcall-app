@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
         .in("id", demoIds)
         .not("elevenlabs_agent_id", "is", null);
       if (demoError) {
-        return NextResponse.json({ error: demoError.message }, { status: 500 });
+        return NextResponse.json({ error: "Failed to load agents" }, { status: 500 });
       }
       return NextResponse.json({
         agents: demoAgents || [],
@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
       .order("created_at", { ascending: true });
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: "Failed to load agents" }, { status: 500 });
     }
 
     return NextResponse.json({

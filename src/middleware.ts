@@ -33,10 +33,15 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // ---- Admin routes: require admin email ----
+  // ---- Admin routes: require admin email + DB role ----
   if (pathname.startsWith("/admin")) {
     const adminEmail = process.env.ADMIN_EMAIL;
     if (!adminEmail || user.email?.toLowerCase() !== adminEmail.toLowerCase()) {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+    // Secondary check: verify DB role to prevent email-spoofing access
+    const profile = await getUserProfile(user.id);
+    if (!profile || profile.role !== "admin") {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
   }

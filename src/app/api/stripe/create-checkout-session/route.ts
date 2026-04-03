@@ -54,15 +54,11 @@ export async function POST(request: NextRequest) {
     if (user) {
       userId = user.id;
     }
-    // Also accept explicit userId from the body (e.g. pre-auth flow)
-    if (!userId && body.userId) {
-      userId = body.userId as string;
-    }
 
     // ----------------------------------------------------------------
     // Build URLs
     // ----------------------------------------------------------------
-    const origin = request.headers.get("origin") || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+    const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
     const successUrl = `${origin}/dekujeme?session_id={CHECKOUT_SESSION_ID}`;
     const cancelUrl = `${origin}/checkout`;
 
@@ -101,7 +97,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ url: session.url });
   } catch (error: unknown) {
     console.error("[create-checkout-session] Error:", error);
-    const message = error instanceof Error ? error.message : "Interní chyba serveru";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: "Interní chyba serveru" }, { status: 500 });
   }
 }

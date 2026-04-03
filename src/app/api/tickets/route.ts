@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error("POST ticket error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: "Failed to load tickets" }, { status: 500 });
     }
 
     // Discord notification
@@ -108,7 +108,7 @@ export async function PATCH(request: NextRequest) {
 
     if (error) {
       console.error("PATCH tickets read error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: "Failed to create ticket" }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });

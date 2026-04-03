@@ -10,9 +10,10 @@ export default function VstupPage() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (pw === "MercedesCLE53") {
+    const sitePassword = process.env.NEXT_PUBLIC_SITE_PASSWORD;
+    if (sitePassword && pw === sitePassword) {
       const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
-      document.cookie = `site-password=MercedesCLE53; expires=${expires}; path=/`;
+      document.cookie = `site-password=${sitePassword}; expires=${expires}; path=/; SameSite=Strict${window.location.protocol === "https:" ? "; Secure" : ""}`;
       router.push("/");
     } else {
       setError(true);

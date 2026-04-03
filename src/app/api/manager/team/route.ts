@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
         .eq("company_id", companyId);
 
       if (membersError) {
-        return NextResponse.json({ error: membersError.message }, { status: 500 });
+        return NextResponse.json({ error: "Failed to load team" }, { status: 500 });
       }
       rawMembers = (companyMembers || []) as unknown as typeof rawMembers;
     } else {
@@ -44,59 +44,53 @@ export async function GET(request: NextRequest) {
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
     const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59).toISOString();
 
-    // Build enriched member list with call stats
-    const enrichedMembers = await Promise.all(
-      rawMembers.map(async (member) => {
-        const profile = member.profiles;
-        const userId = member.user_id;
+    // Bulk-fetch all calls for every member in a single query to avoid N+1
+    const memberUserIds = rawMembers.map((m) => m.user_id);
+    const { data: allCalls } = await supabase
+      .from("calls")
+      .select("user_id, duration_seconds, score, date, status")
+      .in("user_id", memberUserIds);
 
-        const { data: totalDurationData } = await supabase
-          .from("calls")
-          .select("duration_seconds")
-          .eq("user_id", userId)
-          .eq("status", "completed");
+    const calls = allCalls || [];
 
-        const totalMinutes = Math.round(
-          (totalDurationData || []).reduce((sum: number, c: { duration_seconds: number }) => sum + (c.duration_seconds || 0), 0) / 60
-        );
+    // Build enriched member list with call stats computed in-memory
+    const enrichedMembers = rawMembers.map((member) => {
+      const profile = member.profiles;
+      const userId = member.user_id;
 
-        const { data: scoreData } = await supabase
-          .from("calls")
-          .select("score")
-          .eq("user_id", userId)
-          .not("score", "is", null);
+      const memberCalls = calls.filter((c) => c.user_id === userId);
 
-        const scores = (scoreData || []).map((c) => c.score as number);
-        const avgScore =
-          scores.length > 0
-            ? Math.round(
-                (scores.reduce((a, b) => a + b, 0) / scores.length) * 10
-              ) / 10
-            : null;
+      const completedCalls = memberCalls.filter((c) => c.status === "completed");
 
-        const { data: monthDurationData } = await supabase
-          .from("calls")
-          .select("duration_seconds")
-          .eq("user_id", userId)
-          .eq("status", "completed")
-          .gte("date", monthStart)
-          .lte("date", monthEnd);
+      const totalMinutes = Math.round(
+        completedCalls.reduce((sum: number, c: { duration_seconds: number }) => sum + (c.duration_seconds || 0), 0) / 60
+      );
 
-        const minutesThisMonth = Math.round(
-          (monthDurationData || []).reduce((sum: number, c: { duration_seconds: number }) => sum + (c.duration_seconds || 0), 0) / 60
-        );
+      const scoredCalls = memberCalls.filter((c) => c.score !== null && c.score !== undefined);
+      const scores = scoredCalls.map((c) => c.score as number);
+      const avgScore =
+        scores.length > 0
+          ? Math.round(
+              (scores.reduce((a, b) => a + b, 0) / scores.length) * 10
+            ) / 10
+          : null;
 
-        return {
-          userId,
-          fullName: profile?.full_name || "",
-          email: profile?.email || "",
-          role: member.role,
-          totalMinutes,
-          avgScore,
-          minutesThisMonth,
-        };
-      })
-    );
+      const minutesThisMonth = Math.round(
+        completedCalls
+          .filter((c) => c.date >= monthStart && c.date <= monthEnd)
+          .reduce((sum: number, c: { duration_seconds: number }) => sum + (c.duration_seconds || 0), 0) / 60
+      );
+
+      return {
+        userId,
+        fullName: profile?.full_name || "",
+        email: profile?.email || "",
+        role: member.role,
+        totalMinutes,
+        avgScore,
+        minutesThisMonth,
+      };
+    });
 
     // Team-level totals
     const teamMinutesUsed = enrichedMembers.reduce(
@@ -240,7 +234,7 @@ export async function POST(request: NextRequest) {
 
     if (insertError) {
       return NextResponse.json(
-        { error: insertError.message },
+        { error: "Failed to add member" },
         { status: 500 }
       );
     }
@@ -324,7 +318,7 @@ export async function DELETE(request: NextRequest) {
 
     if (deleteError) {
       return NextResponse.json(
-        { error: deleteError.message },
+        { error: "Failed to remove member" },
         { status: 500 }
       );
     }

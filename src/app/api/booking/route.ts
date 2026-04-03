@@ -1,15 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
 import { createMeetingEvent } from "@/lib/google-calendar";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 // import { sendMeetingConfirmationEmail } from "@/lib/emails"; // We will add this later
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = getClientIp(request);
+    const rl = rateLimit(ip, 3, 60_000); // 3 bookings per minute
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: "Příliš mnoho požadavků. Zkuste to za chvíli." },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { guest_name, guest_email, guest_phone, guest_notes, start_time } = body;
 
     if (!guest_name || !guest_email || !start_time) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    // Validate lengths
+    if (guest_name.length > 200 || guest_email.length > 320) {
+      return NextResponse.json({ error: "Vstupní data jsou příliš dlouhá" }, { status: 400 });
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(guest_email)) {
+      return NextResponse.json({ error: "Neplatný formát emailu" }, { status: 400 });
+    }
+    if (guest_phone && guest_phone.length > 30) {
+      return NextResponse.json({ error: "Telefonní číslo je příliš dlouhé" }, { status: 400 });
+    }
+    if (guest_notes && guest_notes.length > 2000) {
+      return NextResponse.json({ error: "Poznámka je příliš dlouhá" }, { status: 400 });
     }
 
     const start = new Date(start_time);
@@ -66,12 +90,33 @@ export async function POST(request: NextRequest) {
       .select()
       .single();
 
-    // 3.5 Create an admin notification
-    // 3.5 Create an admin notification
+    // 3.5 Post-insert overlap check (optimistic lock to close the TOCTOU window).
+    // Two concurrent requests can both pass the pre-insert check above and both
+    // reach the insert. Re-querying here — excluding the row we just created —
+    // detects that situation and rolls it back before any side-effects proceed.
+    if (meeting) {
+      const { data: postInsertOverlap } = await db
+        .from("meetings")
+        .select("id")
+        .neq("status", "cancelled")
+        .neq("id", meeting.id)
+        .lt("start_time", end.toISOString())
+        .gt("end_time", start.toISOString());
+
+      if (postInsertOverlap && postInsertOverlap.length > 0) {
+        await db.from("meetings").delete().eq("id", meeting.id);
+        return NextResponse.json(
+          { error: "Tento termín již někdo obsadil, vyberte prosím jiný." },
+          { status: 409 }
+        );
+      }
+    }
+
+    // 3.6 Create an admin notification
     try {
       const { error: notifError } = await db.from("admin_notifications").insert({
         title: "Nová schůzka",
-        message: `${guest_name} si rezervoval(a) schůzku na ${start.toLocaleDateString("cs-CZ")} v ${start.toLocaleTimeString("cs-CZ", { hour: '2-digit', minute: '2-digit' })}.`,
+        message: `${guest_name} si rezervoval(a) schůzku na ${new Intl.DateTimeFormat("cs-CZ", { dateStyle: "short", timeZone: "Europe/Prague" }).format(start)} v ${new Intl.DateTimeFormat("cs-CZ", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Prague" }).format(start)}.`,
         type: "meeting",
         link: "/admin/schuzky"
       });
@@ -106,6 +151,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, meeting });
   } catch (error: any) {
     console.error("[api/booking POST]", error);
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

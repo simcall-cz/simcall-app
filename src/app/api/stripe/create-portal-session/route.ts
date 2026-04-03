@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     // ----------------------------------------------------------------
     // 3. Create portal session
     // ----------------------------------------------------------------
-    const origin = request.headers.get("origin") || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+    const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
     const returnUrl = `${origin}/dashboard`;
 
     const session = await createPortalSession(
@@ -61,7 +61,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ url: session.url });
   } catch (error: unknown) {
     console.error("[create-portal-session] Error:", error);
-    const message = error instanceof Error ? error.message : "Interní chyba serveru";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: "Interní chyba serveru" }, { status: 500 });
   }
 }

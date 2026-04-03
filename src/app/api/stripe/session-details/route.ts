@@ -49,7 +49,6 @@ export async function GET(request: NextRequest) {
     });
   } catch (error: unknown) {
     console.error("[session-details] Error:", error);
-    const message = error instanceof Error ? error.message : "Nepodařilo se načíst detaily session";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: "Nepodařilo se načíst detaily session" }, { status: 500 });
   }
 }

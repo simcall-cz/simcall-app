@@ -55,7 +55,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, message: "Plánovaná změna byla úspěšně zrušena." });
   } catch (error: unknown) {
     console.error("[cancel-downgrade] Error:", error);
-    const message = error instanceof Error ? error.message : "Interní chyba serveru";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: "Interní chyba serveru" }, { status: 500 });
   }
 }

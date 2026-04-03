@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error("[email/welcome] Resend error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: "Failed to send email" }, { status: 500 });
     }
 
     await notifyNewRegistration(email, fullName || "");
