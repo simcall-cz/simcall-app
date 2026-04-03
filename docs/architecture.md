@@ -42,26 +42,24 @@ simcall-app/
 │   │   ├── marketing/          # Hero, Pricing, Mockupy
 │   │   ├── shared/             # Sdilene komponenty
 │   │   └── ui/                 # Badge, Button, Card, Input
-│   ├── data/                   # Staticka data (agenty, lekce, scenare, cenik, FAQ)
+│   ├── data/                   # Staticka data (lekce, cenik, FAQ)
 │   ├── emails/                 # React Email sablony (9 sablon)
 │   ├── hooks/                  # useTrainingCall, useCallHistory
 │   ├── lib/                    # Utility knihovny
-│   │   ├── auth.ts             # Autentizace (getAuthHeaders, getUserFromRequest)
-│   │   ├── supabase.ts         # Supabase klient
-│   │   ├── stripe.ts           # Stripe helper
+│   │   ├── auth.ts             # Autentizace (getAuthHeaders, getUserFromRequest, verifyAdmin, safeInt)
+│   │   ├── supabase.ts         # Supabase klient (singleton)
+│   │   ├── stripe.ts           # Stripe helper (singleton)
 │   │   ├── notifications.ts    # Discord + in-app notifikace
 │   │   ├── resend.ts           # Email klient
 │   │   ├── google-calendar.ts  # Google Calendar integrace
-│   │   ├── rate-limit.ts       # API rate limiting
+│   │   ├── rate-limit.ts       # In-memory API rate limiting
 │   │   ├── adapters.ts         # Data adaptery
 │   │   └── prompts/            # AI evaluacni prompty
 │   ├── styles/                 # Globalni CSS
 │   ├── types/                  # TypeScript definice
-│   └── middleware.ts           # Auth middleware (route protection)
-├── supabase/                   # DB schema, migrace, seed data
+│   └── middleware.ts           # Auth middleware (token + DB role overeni)
+├── supabase/migrations/        # DB migrace
 ├── public/                     # Staticke soubory
-├── email-templates/            # Email sablony (export)
-├── scripts/                    # Pomocne skripty
 └── docs/                       # Dokumentace
 ```
 
@@ -294,18 +292,20 @@ In-app notifikace uzivateli  ──────>  support_tickets zaznam
 ## Autentizace
 
 ```
-Supabase Auth (email + heslo)
+Supabase Auth (email + heslo, bcrypt pres GoTrue)
         │
         ▼
 middleware.ts  ─────>  Kontrola tokenu z cookies/headers
         │              Route protection: /dashboard, /admin, /manager
+        │              Admin: email match + DB role check (profiles.role)
         ▼
 lib/auth.ts  ──────>  getAuthHeaders(): pripravi Bearer token
                        getUserFromRequest(): extrahuje usera z requestu
-                       isAdmin(): kontrola admin emailu
+                       verifyAdmin(): kontrola JWT + DB role
+                       safeInt(): validace numerickych parametru
 ```
 
-**Admin pristup:** Overuje se pres `ADMIN_EMAIL` env promennou v middleware.
+**Admin pristup:** Dvoustupnove overeni — `ADMIN_EMAIL` env match v middleware + `profiles.role === "admin"` check v DB. API endpointy pouzivaji `verifyAdmin()` z `lib/auth.ts`.
 
 ---
 
@@ -366,8 +366,24 @@ DISCORD_WEBHOOK_URL=
 ADMIN_EMAIL=
 
 # App
-NEXT_PUBLIC_APP_URL=
+NEXT_PUBLIC_SITE_URL=              # Trusted base URL for redirects (required)
+NEXT_PUBLIC_SITE_PASSWORD=         # Site gate password
 ```
+
+---
+
+## Bezpecnost
+
+| Opatreni | Detail |
+|---|---|
+| Hesla | Supabase Auth (bcrypt pres GoTrue), aplikace se hesel nikdy nedotyka |
+| API chybove zpravy | Genericke zpravy v odpovedi (`"Internal server error"`), detaily jen v `console.error` |
+| Stripe presmerovani | Pouziva `NEXT_PUBLIC_SITE_URL`, nikdy `Origin` header z requestu |
+| Admin pristup | Dvoustupnove overeni: email match + DB `profiles.role === "admin"` |
+| User ID | Vzdy z JWT tokenu, nikdy z `body.userId` |
+| Rate limiting | In-memory limiter na verejne endpointy (booking, forms, subscribe) |
+| Citlive udaje | Vsechny tokeny/klice v env promennych, zadne hardcoded v kodu |
+| Vstupni validace | `safeInt()` pro numericke parametry, Zod pro formulare |
 
 ---
 
@@ -375,9 +391,13 @@ NEXT_PUBLIC_APP_URL=
 
 - **Jazyk UI:** Cestina (URL i popisky)
 - **Jazyk kodu:** Anglictina (promenne, funkce, API)
-- **Supabase klient:** Vzdy service role pro API mutace, anon key pro read
+- **Supabase klient:** Vzdy `createServerClient()` (service role) pro API mutace, `createBrowserClient()` (anon key) pro klientske cteni
 - **Auth headers:** `getAuthHeaders()` z `lib/auth.ts` pro vsechny fetch volani
-- **Admin overeni:** `isAdmin()` kontrola na zacatku kazdeho admin API
+- **Admin overeni:** `verifyAdmin()` kontrola (JWT + DB role) na zacatku kazdeho admin API
+- **Chybove zpravy:** NIKDY nevracet `error.message` v API odpovedi — vzdy genericke zpravy
+- **Presmerovani:** NIKDY nepouzivat `request.headers.get("origin")` — vzdy `process.env.NEXT_PUBLIC_SITE_URL`
+- **User ID:** NIKDY neprijimat z body requestu — vzdy z JWT pres `getUserFromRequest()`
 - **Notifikace:** Discord pro admina, in-app (support_tickets) pro uzivatele
-- **Styling:** Tailwind CSS, design system pres `components/ui/`
+- **Styling:** Tailwind CSS v4, design system pres `components/ui/`
 - **Ikonky:** Lucide React (bez emoji v UI)
+- **Singletony:** Stripe a Supabase klienty na urovni modulu (bezpecne pro Vercel serverless)
