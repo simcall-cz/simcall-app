@@ -220,7 +220,7 @@ export async function POST(
               const agentTranscriptText = transcript
                 .filter((e) => e.role === "user")
                 .map((e) => e.message)
-                .join(" ");
+                .join(". ");
               const fillerWords = countFillerWords(agentTranscriptText);
 
               analysis = {
