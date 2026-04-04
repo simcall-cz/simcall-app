@@ -24,9 +24,40 @@ export async function GET(request: NextRequest) {
 
     const agentsLimit = subscription?.agents_limit ?? 1; // demo = 1
 
+    // Support optional filters: ?topic_id=xxx&status=approved
+    const { searchParams } = new URL(request.url);
+    const topicIdFilter = searchParams.get("topic_id");
+    const statusFilter = searchParams.get("status");
+
+    // If topic_id filter is provided, always query by it (both demo and paid)
+    // This is used by the lesson detail page to fetch agents for a specific lesson
+    if (topicIdFilter) {
+      let query = supabase
+        .from("agents")
+        .select("*")
+        .eq("topic_id", topicIdFilter);
+
+      if (statusFilter) {
+        query = query.eq("status", statusFilter);
+      }
+
+      query = query.order("created_at", { ascending: true });
+
+      const { data: agents, error } = await query;
+
+      if (error) {
+        return NextResponse.json({ error: "Failed to load agents" }, { status: 500 });
+      }
+
+      return NextResponse.json({
+        agents: agents || [],
+        total: agents?.length || 0,
+        limit: agentsLimit,
+      });
+    }
+
     if (!subscription) {
-      // Demo user: show agents for first 5 lessons (all tiers)
-      // Look up topic_ids for lessons 1-5, then fetch their agents
+      // Demo user (no topic_id filter): show agents for first 5 lessons (all tiers)
       const { data: demoLessons } = await supabase
         .from("lessons")
         .select("id")
@@ -35,12 +66,17 @@ export async function GET(request: NextRequest) {
 
       const demoTopicIds = (demoLessons || []).map((l: { id: string }) => l.id);
 
-      const { data: demoAgents, error: demoError } = await supabase
+      let demoQuery = supabase
         .from("agents")
         .select("*")
         .in("topic_id", demoTopicIds)
-        .not("elevenlabs_agent_id", "is", null)
         .eq("status", "approved");
+
+      if (statusFilter) {
+        demoQuery = demoQuery.eq("status", statusFilter);
+      }
+
+      const { data: demoAgents, error: demoError } = await demoQuery;
 
       if (demoError) {
         return NextResponse.json({ error: "Failed to load agents" }, { status: 500 });
@@ -52,20 +88,12 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Support optional filters: ?topic_id=xxx&status=approved
-    const { searchParams } = new URL(request.url);
-    const topicIdFilter = searchParams.get("topic_id");
-    const statusFilter = searchParams.get("status");
-
-    // Fetch agents that have an ElevenLabs agent configured (paid users)
+    // Paid users: fetch all agents
     let query = supabase
       .from("agents")
       .select("*")
       .not("elevenlabs_agent_id", "is", null);
 
-    if (topicIdFilter) {
-      query = query.eq("topic_id", topicIdFilter);
-    }
     if (statusFilter) {
       query = query.eq("status", statusFilter);
     }
