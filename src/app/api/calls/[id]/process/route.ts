@@ -256,16 +256,16 @@ Vrať POUZE validní JSON bez markdown bloků, přesně podle struktury definova
               const fillerWords = countFillerWords(agentTranscriptText);
 
               analysis = {
-                overall_score: evalResult.overall_score,
-                strengths: evalResult.strengths,
-                improvements: evalResult.improvements,
+                overall_score: evalResult.overall_score as number,
+                strengths: evalResult.strengths as string[],
+                improvements: evalResult.improvements as string[],
                 filler_words: fillerWords,
-                recommendations: evalResult.recommendations,
-                summary_good: evalResult.summary_good || "",
-                summary_improve: evalResult.summary_improve || "",
+                recommendations: evalResult.recommendations as string[],
+                summary_good: (evalResult.summary_good as string) || "",
+                summary_improve: (evalResult.summary_improve as string) || "",
                 // V2 nová pole:
-                critical_moment: evalResult.critical_moment,
-                categories: evalResult.categories,
+                critical_moment: evalResult.critical_moment as Record<string, unknown>,
+                categories: evalResult.categories as Record<string, unknown>,
               };
             } catch (parseErr) {
               console.error("Failed to parse V2 ChatGPT JSON:", parseErr);
