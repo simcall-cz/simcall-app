@@ -40,21 +40,55 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { lessonNumber, subScenario, score, callId } = body;
+  const { score, callId } = body;
 
-  // Validate
-  if (!lessonNumber || lessonNumber < 1 || lessonNumber > 100) {
-    return NextResponse.json({ error: "Invalid lessonNumber (1-100)" }, { status: 400 });
-  }
-  if (!subScenario || subScenario < 1 || subScenario > 3) {
-    return NextResponse.json({ error: "Invalid subScenario (1-3)" }, { status: 400 });
-  }
   if (score === undefined || score < 0 || score > 100) {
     return NextResponse.json({ error: "Invalid score (0-100)" }, { status: 400 });
   }
 
   const userId = user.id;
   const supabase = getServiceSupabase();
+
+  // V3 format: { topicId, tier } — resolve lesson_number from DB
+  // V2 fallback: { lessonNumber, subScenario }
+  let lessonNumber: number;
+  let subScenario: number;
+  let topicId: string | null = null;
+  let tier: string | null = null;
+
+  if (body.topicId && body.tier) {
+    topicId = body.topicId;
+    tier = body.tier;
+
+    const tierMap: Record<string, number> = { beginner: 1, intermediate: 2, advanced: 3 };
+    subScenario = tierMap[tier!];
+    if (!subScenario) {
+      return NextResponse.json({ error: "Invalid tier (beginner/intermediate/advanced)" }, { status: 400 });
+    }
+
+    // Look up lesson_number from lessons table
+    const { data: lesson, error: lessonErr } = await supabase
+      .from("lessons")
+      .select("lesson_number")
+      .eq("id", topicId)
+      .single();
+
+    if (lessonErr || !lesson) {
+      return NextResponse.json({ error: "Lesson not found for topicId" }, { status: 400 });
+    }
+    lessonNumber = lesson.lesson_number;
+  } else {
+    // V2 fallback
+    lessonNumber = body.lessonNumber;
+    subScenario = body.subScenario;
+
+    if (!lessonNumber || lessonNumber < 1 || lessonNumber > 105) {
+      return NextResponse.json({ error: "Invalid lessonNumber (1-105)" }, { status: 400 });
+    }
+    if (!subScenario || subScenario < 1 || subScenario > 3) {
+      return NextResponse.json({ error: "Invalid subScenario (1-3)" }, { status: 400 });
+    }
+  }
 
   // Atomically resolve the next attempt number by retrying on unique constraint
   // violations (Postgres error code 23505). Two concurrent requests can read the
@@ -83,16 +117,20 @@ export async function POST(request: NextRequest) {
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
     const nextAttempt = await readNextAttempt();
 
+    const insertData: Record<string, unknown> = {
+      user_id: userId,
+      lesson_number: lessonNumber,
+      sub_scenario: subScenario,
+      attempt: nextAttempt,
+      score,
+      call_id: callId || null,
+    };
+    if (topicId) insertData.topic_id = topicId;
+    if (tier) insertData.tier = tier;
+
     const { data: inserted, error } = await supabase
       .from("lesson_progress")
-      .insert({
-        user_id: userId,
-        lesson_number: lessonNumber,
-        sub_scenario: subScenario,
-        attempt: nextAttempt,
-        score,
-        call_id: callId || null,
-      })
+      .insert(insertData)
       .select()
       .single();
 

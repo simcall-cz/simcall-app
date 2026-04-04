@@ -28,7 +28,14 @@ import { Button } from "@/components/ui/button";
 import { useCallHistory } from "@/hooks/useCallHistory";
 import { getAuthHeaders } from "@/lib/auth";
 import { cn } from "@/lib/utils";
-import { lessonsV2, CATEGORIES, CATEGORY_CONFIG } from "@/data/lessons-v2";
+import { CATEGORIES, CATEGORY_CONFIG } from "@/lib/lessons";
+
+interface LessonDB {
+  id: string;
+  lesson_number: number;
+  title_cs: string;
+  category: string;
+}
 
 interface LessonProgress {
   lesson_number: number;
@@ -64,18 +71,21 @@ export default function StatistikyPage() {
   const [tab, setTab] = useState<"trenink" | "lekce">("trenink");
   const [lessonProgress, setLessonProgress] = useState<LessonProgress[]>([]);
   const [lessonProgressLoading, setLessonProgressLoading] = useState(true);
+  const [lessons, setLessons] = useState<LessonDB[]>([]);
 
   useEffect(() => {
     getAuthHeaders().then((headers) => {
       Promise.all([
         fetch("/api/subscription", { headers }).then((r) => r.json()),
         fetch("/api/lessons/progress", { headers }).then((r) => r.ok ? r.json() : { progress: [] }),
+        fetch("/api/lessons", { headers }).then((r) => r.ok ? r.json() : { lessons: [] }),
       ])
-        .then(([subData, progressData]) => {
+        .then(([subData, progressData, lessonsData]) => {
           if (!subData || subData.error || subData.plan === "demo") {
             setIsFree(true);
           }
           setLessonProgress(progressData.progress || []);
+          setLessons(lessonsData.lessons || []);
         })
         .catch(() => setIsFree(true))
         .finally(() => setLessonProgressLoading(false));
@@ -139,13 +149,18 @@ export default function StatistikyPage() {
   }, [completedCalls]);
 
   // --- Lesson stats ---
+  const totalLessons = lessons.length || 105;
+
   const lessonCompletedCount = useMemo(() => {
     let count = 0;
-    for (let i = 1; i <= 100; i++) {
-      if (isLessonCompleted(i, lessonProgress)) count++;
+    const lessonNumbers = lessons.length > 0
+      ? lessons.map((l) => l.lesson_number)
+      : Array.from({ length: 105 }, (_, i) => i + 1);
+    for (const num of lessonNumbers) {
+      if (isLessonCompleted(num, lessonProgress)) count++;
     }
     return count;
-  }, [lessonProgress]);
+  }, [lessonProgress, lessons]);
 
   const lessonTotalAttempts = lessonProgress.length;
 
@@ -161,9 +176,9 @@ export default function StatistikyPage() {
 
   const categoryStats = useMemo(() => {
     return CATEGORIES.map((cat) => {
-      const catLessons = lessonsV2.filter((l) => l.category === cat);
-      const catProgress = lessonProgress.filter((p) => catLessons.some((l) => l.number === p.lesson_number));
-      const catCompleted = catLessons.filter((l) => isLessonCompleted(l.number, lessonProgress)).length;
+      const catLessons = lessons.filter((l) => l.category === cat);
+      const catProgress = lessonProgress.filter((p) => catLessons.some((l) => l.lesson_number === p.lesson_number));
+      const catCompleted = catLessons.filter((l) => isLessonCompleted(l.lesson_number, lessonProgress)).length;
       const catAvg = catProgress.length > 0
         ? Math.round(catProgress.reduce((s, p) => s + p.score, 0) / catProgress.length)
         : null;
@@ -177,14 +192,14 @@ export default function StatistikyPage() {
       let weakestLesson: { number: number; title: string; avgScore: number } | null = null;
       let strongestLesson: { number: number; title: string; avgScore: number } | null = null;
       for (const lesson of catLessons) {
-        const lp = catProgress.filter((p) => p.lesson_number === lesson.number);
+        const lp = catProgress.filter((p) => p.lesson_number === lesson.lesson_number);
         if (lp.length === 0) continue;
         const avg = Math.round(lp.reduce((s, p) => s + p.score, 0) / lp.length);
         if (!weakestLesson || avg < weakestLesson.avgScore) {
-          weakestLesson = { number: lesson.number, title: lesson.title, avgScore: avg };
+          weakestLesson = { number: lesson.lesson_number, title: lesson.title_cs, avgScore: avg };
         }
         if (!strongestLesson || avg > strongestLesson.avgScore) {
-          strongestLesson = { number: lesson.number, title: lesson.title, avgScore: avg };
+          strongestLesson = { number: lesson.lesson_number, title: lesson.title_cs, avgScore: avg };
         }
       }
 
@@ -201,7 +216,7 @@ export default function StatistikyPage() {
         strongestLesson,
       };
     });
-  }, [lessonProgress]);
+  }, [lessonProgress, lessons]);
 
   // Radar chart data for category comparison
   const radarData = useMemo(() => {
@@ -276,9 +291,9 @@ export default function StatistikyPage() {
   ];
 
   const lessonStatCards = [
-    { label: "Splněné lekce", value: `${lessonCompletedCount}/100`, icon: GraduationCap, bg: "bg-neutral-50", iconColor: "text-neutral-600" },
+    { label: "Splněné lekce", value: `${lessonCompletedCount}/${totalLessons}`, icon: GraduationCap, bg: "bg-neutral-50", iconColor: "text-neutral-600" },
     { label: "Průměrné skóre", value: lessonAvgScore > 0 ? `${lessonAvgScore}%` : "—", icon: TrendingUp, bg: "bg-green-50", iconColor: "text-green-600" },
-    { label: "Dokončené kategorie", value: `${completedCategories}/10`, icon: Trophy, bg: "bg-amber-50", iconColor: "text-amber-600" },
+    { label: "Dokončené kategorie", value: `${completedCategories}/${CATEGORIES.length}`, icon: Trophy, bg: "bg-amber-50", iconColor: "text-amber-600" },
     { label: "Celkem pokusů", value: lessonTotalAttempts > 0 ? lessonTotalAttempts.toString() : "—", icon: Target, bg: "bg-blue-50", iconColor: "text-blue-600" },
   ];
 

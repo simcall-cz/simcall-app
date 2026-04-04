@@ -27,7 +27,14 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { getAuthHeaders } from "@/lib/auth";
-import { lessonsV2, CATEGORIES, CATEGORY_CONFIG, PROGRESS_LEVELS } from "@/data/lessons-v2";
+import { CATEGORIES, CATEGORY_CONFIG, PROGRESS_LEVELS } from "@/lib/lessons";
+
+interface LessonDB {
+  id: string;
+  lesson_number: number;
+  title_cs: string;
+  category: string;
+}
 
 interface ProgressRecord {
   lesson_number: number;
@@ -62,10 +69,10 @@ function isLessonCompleted(lessonNum: number, progress: ProgressRecord[]): boole
   return lp.length > 0;
 }
 
-function getCompletedCount(progress: ProgressRecord[]): number {
+function getCompletedCount(progress: ProgressRecord[], lessonNumbers: number[]): number {
   let count = 0;
-  for (let i = 1; i <= 100; i++) {
-    if (isLessonCompleted(i, progress)) count++;
+  for (const num of lessonNumbers) {
+    if (isLessonCompleted(num, progress)) count++;
   }
   return count;
 }
@@ -76,6 +83,7 @@ export default function MaklerDetailPage() {
   const userId = params.id as string;
 
   const [progress, setProgress] = useState<ProgressRecord[]>([]);
+  const [lessons, setLessons] = useState<LessonDB[]>([]);
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [loading, setLoading] = useState(true);
@@ -85,13 +93,18 @@ export default function MaklerDetailPage() {
     async function fetchData() {
       try {
         const headers = await getAuthHeaders();
-        const res = await fetch(`/api/lessons/progress/${userId}`, { headers });
+        const [res, lessonsRes] = await Promise.all([
+          fetch(`/api/lessons/progress/${userId}`, { headers }),
+          fetch("/api/lessons", { headers }),
+        ]);
         if (!res.ok) {
           const data = await res.json();
           throw new Error(data.error || "Chyba při načítání");
         }
         const data = await res.json();
+        const lessonsData = lessonsRes.ok ? await lessonsRes.json() : { lessons: [] };
         setProgress(data.progress || []);
+        setLessons(lessonsData.lessons || []);
         setUserName(data.user?.fullName || "");
         setUserEmail(data.user?.email || "");
       } catch (err) {
@@ -103,7 +116,12 @@ export default function MaklerDetailPage() {
     fetchData();
   }, [userId]);
 
-  const completedCount = useMemo(() => getCompletedCount(progress), [progress]);
+  const lessonNumbers = useMemo(() =>
+    lessons.length > 0 ? lessons.map((l) => l.lesson_number) : Array.from({ length: 105 }, (_, i) => i + 1),
+    [lessons]
+  );
+  const totalLessons = lessons.length || 105;
+  const completedCount = useMemo(() => getCompletedCount(progress, lessonNumbers), [progress, lessonNumbers]);
   const totalAttempts = progress.length;
   const avgScore = useMemo(() => {
     if (progress.length === 0) return 0;
@@ -113,25 +131,25 @@ export default function MaklerDetailPage() {
   const avgAttemptsPerLesson = useMemo(() => {
     if (completedCount === 0) return 0;
     const completedLessons = new Set<number>();
-    for (let i = 1; i <= 100; i++) {
-      if (isLessonCompleted(i, progress)) completedLessons.add(i);
+    for (const num of lessonNumbers) {
+      if (isLessonCompleted(num, progress)) completedLessons.add(num);
     }
     const totalAttemptsForCompleted = progress.filter((p) => completedLessons.has(p.lesson_number)).length;
     return Math.round((totalAttemptsForCompleted / completedCount) * 10) / 10;
-  }, [progress, completedCount]);
+  }, [progress, completedCount, lessonNumbers]);
 
   // Category stats
   const categoryStats = useMemo(() => {
     return CATEGORIES.map((cat) => {
-      const catLessons = lessonsV2.filter((l) => l.category === cat);
-      const catProgress = progress.filter((p) => catLessons.some((l) => l.number === p.lesson_number));
-      const catCompleted = catLessons.filter((l) => isLessonCompleted(l.number, progress)).length;
+      const catLessons = lessons.filter((l) => l.category === cat);
+      const catProgress = progress.filter((p) => catLessons.some((l) => l.lesson_number === p.lesson_number));
+      const catCompleted = catLessons.filter((l) => isLessonCompleted(l.lesson_number, progress)).length;
       const catAvg = catProgress.length > 0
         ? Math.round(catProgress.reduce((s, p) => s + p.score, 0) / catProgress.length)
         : null;
       return { category: cat, total: catLessons.length, completed: catCompleted, avgScore: catAvg };
     });
-  }, [progress]);
+  }, [progress, lessons]);
 
   const bestCategory = categoryStats.filter((c) => c.avgScore !== null).sort((a, b) => (b.avgScore || 0) - (a.avgScore || 0))[0];
   const worstCategory = categoryStats.filter((c) => c.avgScore !== null).sort((a, b) => (a.avgScore || 0) - (b.avgScore || 0))[0];
@@ -190,14 +208,14 @@ export default function MaklerDetailPage() {
             <p className="text-xs text-neutral-500">{level.description}</p>
           </div>
           <div className="text-right">
-            <p className="text-2xl font-bold text-neutral-900">{completedCount}<span className="text-sm font-normal text-neutral-400">/100</span></p>
+            <p className="text-2xl font-bold text-neutral-900">{completedCount}<span className="text-sm font-normal text-neutral-400">/{totalLessons}</span></p>
           </div>
         </div>
         <div className="relative h-3 rounded-full bg-neutral-100 overflow-hidden">
           <motion.div
             className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-primary-400 to-primary-600"
             initial={{ width: 0 }}
-            animate={{ width: `${completedCount}%` }}
+            animate={{ width: `${totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0}%` }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           />
         </div>
@@ -206,7 +224,7 @@ export default function MaklerDetailPage() {
       {/* Stats grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
         {[
-          { label: "Splněné lekce", value: `${completedCount}/100`, icon: GraduationCap },
+          { label: "Splněné lekce", value: `${completedCount}/${totalLessons}`, icon: GraduationCap },
           { label: "Průměrné skóre", value: avgScore > 0 ? `${avgScore}%` : "--", icon: BarChart3 },
           { label: "Celkem pokusů", value: totalAttempts.toString(), icon: Target },
           { label: "Pokusů/lekce", value: avgAttemptsPerLesson > 0 ? avgAttemptsPerLesson.toString() : "--", icon: Target },
@@ -290,21 +308,21 @@ export default function MaklerDetailPage() {
                 </tr>
               </thead>
               <tbody>
-                {lessonsV2.map((lesson) => {
-                  const lp = progress.filter((p) => p.lesson_number === lesson.number);
-                  const done = isLessonCompleted(lesson.number, progress);
+                {lessons.map((lesson) => {
+                  const lp = progress.filter((p) => p.lesson_number === lesson.lesson_number);
+                  const done = isLessonCompleted(lesson.lesson_number, progress);
                   const attempts = lp.length;
                   const bestScore = lp.length > 0
                     ? Math.round(lp.reduce((s, p) => s + p.score, 0) / lp.length)
                     : null;
 
                   return (
-                    <tr key={lesson.number} className="border-b border-neutral-50 last:border-0">
+                    <tr key={lesson.lesson_number} className="border-b border-neutral-50 last:border-0">
                       <td className="px-4 py-2 text-neutral-400 font-mono text-xs">
-                        {String(lesson.number).padStart(2, "0")}
+                        {String(lesson.lesson_number).padStart(2, "0")}
                       </td>
                       <td className="px-4 py-2 text-neutral-900 truncate max-w-[200px]">
-                        {lesson.title}
+                        {lesson.title_cs}
                       </td>
                       <td className="px-4 py-2 text-center">
                         {bestScore !== null ? (

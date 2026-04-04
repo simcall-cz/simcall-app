@@ -78,6 +78,15 @@ export interface Lesson {
   progress: number;
 }
 
+export interface LessonDB {
+  id: string;               // topic_id
+  lessonNumber: number;      // 1-105
+  titleCs: string;
+  category: string;          // 14 engine categories
+  skillsTested: string[];
+  knowledgeSnippets: string[];
+}
+
 export interface Achievement {
   id: string;
   title: string;

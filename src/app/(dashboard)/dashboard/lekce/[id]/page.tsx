@@ -7,7 +7,6 @@ import {
   Lock,
   Check,
   Loader2,
-  Target,
   Lightbulb,
   GraduationCap,
   Phone,
@@ -23,9 +22,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { getAuthHeaders } from "@/lib/auth";
-import { lessonsV2, CATEGORY_CONFIG } from "@/data/lessons-v2";
-import { LESSON_AGENTS } from "@/data/lesson-agents";
-import type { LessonAgent } from "@/data/lesson-agents";
+import { CATEGORY_CONFIG, TIER_CONFIG } from "@/lib/lessons";
 import { ActiveCall } from "@/components/call/ActiveCall";
 import { useTrainingCall } from "@/hooks/useTrainingCall";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -38,57 +35,51 @@ interface ProgressRecord {
   score: number;
 }
 
-const TIER_LABELS: Record<string, string> = {
-  beginner: "Začátečník",
-  intermediate: "Pokročilý",
-  advanced: "Expert",
-};
+interface LessonRow {
+  id: string;
+  lesson_number: number;
+  title_cs: string;
+  category: string;
+  skills_tested: string[];
+  knowledge_snippets: string[];
+}
 
-const TIER_COLORS: Record<string, { bg: string; text: string; border: string; ring: string }> = {
-  beginner: { bg: "bg-green-50", text: "text-green-700", border: "border-green-200", ring: "ring-green-500" },
-  intermediate: { bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200", ring: "ring-amber-500" },
-  advanced: { bg: "bg-red-50", text: "text-red-700", border: "border-red-200", ring: "ring-red-500" },
-};
+interface AgentRow {
+  id: string;
+  name: string;
+  persona_name: string | null;
+  tier: "beginner" | "intermediate" | "advanced";
+  difficulty_overall: number | null;
+  archetype: string | null;
+  traits: string[] | null;
+  avatar_initials: string | null;
+  elevenlabs_agent_id: string | null;
+}
 
 const TIER_ORDER: ("beginner" | "intermediate" | "advanced")[] = ["beginner", "intermediate", "advanced"];
+
+const TIER_COLORS: Record<string, { bg: string; text: string; border: string }> = {
+  beginner: { bg: "bg-green-50", text: "text-green-700", border: "border-green-200" },
+  intermediate: { bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200" },
+  advanced: { bg: "bg-red-50", text: "text-red-700", border: "border-red-200" },
+};
 
 function isLessonCompleted(lessonNum: number, progress: ProgressRecord[]): boolean {
   const lp = progress.filter((p) => p.lesson_number === lessonNum);
   for (let sub = 1; sub <= 3; sub++) {
-    const best = lp
-      .filter((p) => p.sub_scenario === sub)
-      .reduce((max, p) => Math.max(max, p.score), 0);
+    const best = lp.filter((p) => p.sub_scenario === sub).reduce((max, p) => Math.max(max, p.score), 0);
     if (best < 80) return false;
   }
   return lp.length > 0;
 }
 
-/** Per-category unlock: first lesson in category is always unlocked */
-function isLessonUnlockedInCategory(lessonNum: number, progress: ProgressRecord[]): boolean {
-  const lesson = lessonsV2.find((l) => l.number === lessonNum);
-  if (!lesson) return false;
-  const categoryLessons = lessonsV2.filter((l) => l.category === lesson.category);
-  const idx = categoryLessons.findIndex((l) => l.number === lessonNum);
-  if (idx <= 0) return true;
-  return isLessonCompleted(categoryLessons[idx - 1].number, progress);
-}
-
-function getCategoryLessons(lessonNum: number) {
-  const lesson = lessonsV2.find((l) => l.number === lessonNum);
-  if (!lesson) return [];
-  return lessonsV2.filter((l) => l.category === lesson.category);
-}
-
-function getNextLessonInCategory(lessonNum: number): number | null {
-  const categoryLessons = getCategoryLessons(lessonNum);
-  const idx = categoryLessons.findIndex((l) => l.number === lessonNum);
-  if (idx < 0 || idx >= categoryLessons.length - 1) return null;
-  return categoryLessons[idx + 1].number;
-}
-
-function isCategoryComplete(lessonNum: number, progress: ProgressRecord[]): boolean {
-  const categoryLessons = getCategoryLessons(lessonNum);
-  return categoryLessons.every((l) => isLessonCompleted(l.number, progress));
+function getConsecutiveFails(attempts: ProgressRecord[]): number {
+  let count = 0;
+  for (let i = attempts.length - 1; i >= 0; i--) {
+    if (attempts[i].score < 80) count++;
+    else break;
+  }
+  return count;
 }
 
 function LessonDetailContent() {
@@ -96,20 +87,18 @@ function LessonDetailContent() {
   const router = useRouter();
   const lessonNumber = Number(params.id);
 
+  const [lesson, setLesson] = useState<LessonRow | null>(null);
+  const [agents, setAgents] = useState<AgentRow[]>([]);
+  const [allLessons, setAllLessons] = useState<LessonRow[]>([]);
   const [progress, setProgress] = useState<ProgressRecord[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeAgent, setActiveAgent] = useState<LessonAgent | null>(null);
+  const [activeAgent, setActiveAgent] = useState<AgentRow | null>(null);
   const [activeSubScenario, setActiveSubScenario] = useState<number>(0);
   const [showTrainingSuggestion, setShowTrainingSuggestion] = useState(false);
   const [expandedAttempts, setExpandedAttempts] = useState<Record<number, boolean>>({});
 
-  const lesson = lessonsV2.find((l) => l.number === lessonNumber);
-  const lessonAgents = LESSON_AGENTS[lessonNumber];
-
-  // Training call hook
   const callHook = useTrainingCall({
     onCallEnded: async (callId) => {
-      // After call ends, save progress via API
       if (callHook.processingResult && activeSubScenario > 0) {
         try {
           const headers = await getAuthHeaders();
@@ -121,9 +110,10 @@ function LessonDetailContent() {
               subScenario: activeSubScenario,
               score: callHook.processingResult.overall_score,
               callId,
+              topicId: lesson?.id,
+              tier: activeAgent?.tier,
             }),
           });
-          // Refresh progress
           fetchProgress();
         } catch (e) {
           console.error("Failed to save lesson progress:", e);
@@ -147,21 +137,64 @@ function LessonDetailContent() {
 
   useEffect(() => {
     async function init() {
-      await fetchProgress();
-      setLoading(false);
+      try {
+        const headers = await getAuthHeaders();
+        const [progressRes, lessonsRes] = await Promise.all([
+          fetch("/api/lessons/progress", { headers }),
+          fetch("/api/lessons"),
+        ]);
+
+        if (progressRes.ok) {
+          const data = await progressRes.json();
+          setProgress(data.progress || []);
+        }
+
+        if (lessonsRes.ok) {
+          const lessonsData: LessonRow[] = await lessonsRes.json();
+          setAllLessons(lessonsData);
+          const currentLesson = lessonsData.find((l) => l.lesson_number === lessonNumber);
+          setLesson(currentLesson || null);
+
+          // Fetch agents for this lesson's topic_id
+          if (currentLesson) {
+            const agentsRes = await fetch(
+              `/api/agents?topic_id=${currentLesson.id}&status=approved`
+            );
+            if (agentsRes.ok) {
+              const agentsData = await agentsRes.json();
+              setAgents(agentsData || []);
+            }
+          }
+        }
+      } catch {
+        // ignore
+      } finally {
+        setLoading(false);
+      }
     }
     init();
-  }, [fetchProgress]);
+  }, [lessonNumber, fetchProgress]);
 
-  const unlocked = useMemo(() => isLessonUnlockedInCategory(lessonNumber, progress), [lessonNumber, progress]);
+  // Category lessons for unlock logic
+  const categoryLessons = useMemo(() => {
+    if (!lesson) return [];
+    return allLessons.filter((l) => l.category === lesson.category);
+  }, [allLessons, lesson]);
+
+  const unlocked = useMemo(() => {
+    if (!lesson) return false;
+    const idx = categoryLessons.findIndex((l) => l.lesson_number === lesson.lesson_number);
+    if (idx <= 0) return true;
+    return isLessonCompleted(categoryLessons[idx - 1].lesson_number, progress);
+  }, [lesson, categoryLessons, progress]);
+
   const completed = useMemo(() => isLessonCompleted(lessonNumber, progress), [lessonNumber, progress]);
 
   // Per-agent stats (sub_scenario 1=beginner, 2=intermediate, 3=advanced)
   const agentStats = useMemo(() => {
-    if (!lessonAgents) return [];
     return TIER_ORDER.map((tier, idx) => {
       const subNum = idx + 1;
-      const agent = lessonAgents[tier];
+      const agent = agents.find((a) => a.tier === tier) || null;
       const attempts = progress
         .filter((p) => p.lesson_number === lessonNumber && p.sub_scenario === subNum)
         .sort((a, b) => a.attempt - b.attempt);
@@ -170,26 +203,26 @@ function LessonDetailContent() {
       const totalAttempts = attempts.length;
       return { agent, tier, subNum, attempts, bestScore, passed, totalAttempts };
     });
-  }, [lessonAgents, lessonNumber, progress]);
+  }, [agents, lessonNumber, progress]);
 
   const passedCount = agentStats.filter((s) => s.passed).length;
   const remainingCount = 3 - passedCount;
 
-  if (!lesson || !lessonAgents) {
+  if (loading) {
+    return (
+      <div className="flex h-[50vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary-500" />
+      </div>
+    );
+  }
+
+  if (!lesson) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
         <p className="text-neutral-500">Lekce nenalezena.</p>
         <Link href="/dashboard/lekce" className="mt-4 text-primary-500 hover:underline text-sm">
           Zpět na mapu
         </Link>
-      </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="flex h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary-500" />
       </div>
     );
   }
@@ -216,14 +249,17 @@ function LessonDetailContent() {
 
   // If a call is active, show ActiveCall
   if (callHook.phase !== "idle" && activeAgent) {
+    const agentDisplayName = activeAgent.persona_name || activeAgent.name;
+    const tierLabel = TIER_CONFIG[activeAgent.tier]?.label || "";
+
     return (
       <div className="max-w-3xl mx-auto px-2 sm:px-0">
         <ActiveCall
           phase={callHook.phase}
           duration={callHook.duration}
-          agentName={activeAgent.name}
-          agentPersonality={TIER_LABELS[activeAgent.tier] || ""}
-          agentInitials={activeAgent.name.slice(0, 2).toUpperCase()}
+          agentName={agentDisplayName}
+          agentPersonality={tierLabel}
+          agentInitials={activeAgent.avatar_initials || agentDisplayName.slice(0, 2).toUpperCase()}
           userInitials="JA"
           isSpeaking={callHook.isSpeaking}
           isMuted={callHook.isMuted}
@@ -238,7 +274,6 @@ function LessonDetailContent() {
             fetchProgress();
           }}
           onViewResults={() => {
-            // Save progress if we have a score
             const currentCallId = callHook.callId;
             if (callHook.processingResult && activeSubScenario > 0) {
               getAuthHeaders().then((headers) => {
@@ -250,11 +285,12 @@ function LessonDetailContent() {
                     subScenario: activeSubScenario,
                     score: callHook.processingResult!.overall_score,
                     callId: currentCallId,
+                    topicId: lesson?.id,
+                    tier: activeAgent?.tier,
                   }),
                 }).then(() => fetchProgress());
               });
             }
-            // Redirect to full call detail
             if (currentCallId) {
               router.push(`/dashboard/hovory?detail=${currentCallId}`);
             } else {
@@ -270,12 +306,15 @@ function LessonDetailContent() {
   }
 
   const catConf = CATEGORY_CONFIG[lesson.category];
+  const nextLessonIdx = categoryLessons.findIndex((l) => l.lesson_number === lessonNumber) + 1;
+  const nextLesson = nextLessonIdx < categoryLessons.length ? categoryLessons[nextLessonIdx] : null;
+  const catComplete = categoryLessons.every((l) => isLessonCompleted(l.lesson_number, progress));
 
-  const handleStartCall = async (agent: LessonAgent, subNum: number) => {
+  const handleStartCall = async (agent: AgentRow, subNum: number) => {
+    if (!agent.elevenlabs_agent_id && !agent.id) return;
     setActiveAgent(agent);
     setActiveSubScenario(subNum);
-    // Use the agent's elevenlabs ID directly
-    await callHook.startCall(agent.agentId, `lesson-${lessonNumber}-${subNum}`);
+    await callHook.startCall(agent.elevenlabs_agent_id || agent.id, `lesson-${lessonNumber}-${subNum}`);
   };
 
   return (
@@ -345,10 +384,10 @@ function LessonDetailContent() {
             "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold",
             `bg-${catConf?.color || "blue"}-100 text-${catConf?.color || "blue"}-700`
           )}>
-            {lesson.category}
+            {catConf?.label || lesson.category}
           </span>
           <span className="text-xs text-neutral-400">
-            Lekce {getCategoryLessons(lessonNumber).findIndex((l) => l.number === lessonNumber) + 1}/{getCategoryLessons(lessonNumber).length}
+            Lekce {categoryLessons.findIndex((l) => l.lesson_number === lessonNumber) + 1}/{categoryLessons.length}
           </span>
           {completed && (
             <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700">
@@ -357,25 +396,17 @@ function LessonDetailContent() {
             </span>
           )}
         </div>
-        <h1 className="text-2xl font-bold text-neutral-900 mb-2">{lesson.title}</h1>
+        <h1 className="text-2xl font-bold text-neutral-900 mb-2">{lesson.title_cs}</h1>
       </div>
 
-      {/* Lesson overview info */}
-      <div className="mb-5 rounded-xl border border-neutral-200 bg-white p-5">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-2">
-          Situace
-        </h3>
-        <p className="text-sm text-neutral-700 leading-relaxed">{lesson.situation}</p>
-      </div>
-
-      {/* Knowledge */}
-      {lesson.knowledge.length > 0 && (
+      {/* Knowledge snippets */}
+      {lesson.knowledge_snippets && lesson.knowledge_snippets.length > 0 && (
         <div className="mb-5 rounded-xl border border-neutral-200 bg-white p-5">
           <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-3">
             Co musíte znát
           </h3>
           <ul className="space-y-2">
-            {lesson.knowledge.map((k, i) => (
+            {lesson.knowledge_snippets.map((k, i) => (
               <li key={i} className="flex items-start gap-2.5 text-sm text-neutral-600">
                 <GraduationCap className="h-4 w-4 shrink-0 mt-0.5 text-primary-400" />
                 <span>{k}</span>
@@ -385,18 +416,18 @@ function LessonDetailContent() {
         </div>
       )}
 
-      {/* Tips */}
-      {lesson.tips.length > 0 && (
+      {/* Skills tested */}
+      {lesson.skills_tested && lesson.skills_tested.length > 0 && (
         <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50/50 p-5">
           <h3 className="text-xs font-semibold text-amber-700 mb-3 flex items-center gap-1.5">
             <Lightbulb className="h-3.5 w-3.5" />
-            Tipy pro simulaci
+            Testované dovednosti
           </h3>
           <ul className="space-y-1.5">
-            {lesson.tips.map((tip, i) => (
+            {lesson.skills_tested.map((skill, i) => (
               <li key={i} className="flex items-start gap-2 text-sm text-amber-700">
                 <span className="shrink-0 mt-0.5">-</span>
-                <span>{tip}</span>
+                <span>{skill}</span>
               </li>
             ))}
           </ul>
@@ -405,9 +436,7 @@ function LessonDetailContent() {
 
       {/* Progress summary */}
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-sm font-bold text-neutral-900">
-          3 hovory k absolvování
-        </h3>
+        <h3 className="text-sm font-bold text-neutral-900">3 hovory k absolvování</h3>
         {remainingCount > 0 && !completed ? (
           <span className="text-xs text-neutral-500">
             Zbývá dokončit: <strong className="text-neutral-700">{remainingCount}</strong>
@@ -428,7 +457,10 @@ function LessonDetailContent() {
       <div className="space-y-3 mb-8">
         {agentStats.map(({ agent, tier, subNum, attempts, bestScore, passed, totalAttempts }) => {
           const colors = TIER_COLORS[tier] || TIER_COLORS.beginner;
+          const tierConf = TIER_CONFIG[tier];
           const consecutiveFails = getConsecutiveFails(attempts);
+          const agentName = agent?.persona_name || agent?.name || `Agent ${tier}`;
+          const initials = agent?.avatar_initials || agentName.slice(0, 2).toUpperCase();
 
           return (
             <motion.div
@@ -438,9 +470,7 @@ function LessonDetailContent() {
               transition={{ delay: subNum * 0.1 }}
               className={cn(
                 "rounded-xl border p-5 transition-all",
-                passed
-                  ? "border-green-200 bg-green-50/40"
-                  : colors.border, colors.bg
+                passed ? "border-green-200 bg-green-50/40" : colors.border, colors.bg
               )}
             >
               {/* Agent header row */}
@@ -450,20 +480,26 @@ function LessonDetailContent() {
                     "flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-bold",
                     passed ? "bg-green-500 text-white" : `${colors.bg} ${colors.text} border ${colors.border}`
                   )}>
-                    {passed ? <Check className="h-5 w-5" /> : agent.name.slice(0, 2).toUpperCase()}
+                    {passed ? <Check className="h-5 w-5" /> : initials}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="font-semibold text-neutral-900 leading-tight">{agent.name}</p>
-                    <span className={cn(
-                      "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold mt-1",
-                      passed ? "bg-green-100 text-green-700" : `${colors.bg} ${colors.text}`
-                    )}>
-                      {TIER_LABELS[tier]}
-                    </span>
+                    <p className="font-semibold text-neutral-900 leading-tight">{agentName}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className={cn(
+                        "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold",
+                        passed ? "bg-green-100 text-green-700" : `${colors.bg} ${colors.text}`
+                      )}>
+                        {tierConf?.label || tier}
+                      </span>
+                      {agent?.difficulty_overall && (
+                        <span className="text-[10px] text-neutral-400">
+                          Obtížnost {agent.difficulty_overall.toFixed(1)}/10
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
-                {/* Score display */}
                 {totalAttempts > 0 && (
                   <div className="text-right shrink-0">
                     <p className={cn(
@@ -482,9 +518,7 @@ function LessonDetailContent() {
               {/* Mini progress bar */}
               <div className="mb-3">
                 <div className="relative h-2 rounded-full bg-neutral-100 overflow-hidden">
-                  {/* 80% threshold marker */}
                   <div className="absolute top-0 bottom-0 left-[80%] w-px bg-neutral-300 z-10" />
-                  {/* Score bar */}
                   {totalAttempts > 0 && (
                     <motion.div
                       className={cn(
@@ -508,7 +542,6 @@ function LessonDetailContent() {
                 </div>
               </div>
 
-              {/* Passed badge */}
               {passed && (
                 <div className="flex items-center gap-2 mb-3 rounded-lg bg-green-100 px-3 py-2">
                   <Check className="h-4 w-4 text-green-600" />
@@ -516,7 +549,7 @@ function LessonDetailContent() {
                 </div>
               )}
 
-              {/* Attempt history - expandable */}
+              {/* Attempt history */}
               {totalAttempts > 0 && (
                 <div className="mb-3">
                   <button
@@ -550,13 +583,8 @@ function LessonDetailContent() {
                                   : "bg-red-50 border border-red-100"
                               )}
                             >
-                              <span className="text-neutral-600">
-                                Pokus {a.attempt}
-                              </span>
-                              <span className={cn(
-                                "font-bold",
-                                a.score >= 80 ? "text-green-700" : "text-red-600"
-                              )}>
+                              <span className="text-neutral-600">Pokus {a.attempt}</span>
+                              <span className={cn("font-bold", a.score >= 80 ? "text-green-700" : "text-red-600")}>
                                 {a.score} %
                               </span>
                             </div>
@@ -568,18 +596,14 @@ function LessonDetailContent() {
                 </div>
               )}
 
-              {/* Consecutive fails warning */}
               {consecutiveFails >= 3 && !passed && (
                 <div className="mb-3 flex items-center gap-2 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2">
                   <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0" />
-                  <p className="text-xs text-amber-700">
-                    3× po sobě pod 80 %. Zvažte volný trénink.
-                  </p>
+                  <p className="text-xs text-amber-700">3× po sobě pod 80 %. Zvažte volný trénink.</p>
                 </div>
               )}
 
-              {/* Call button */}
-              {!passed && (
+              {!passed && agent && (
                 <Button
                   onClick={() => handleStartCall(agent, subNum)}
                   className="w-full gap-2 bg-red-500 hover:bg-red-600 text-white"
@@ -590,8 +614,7 @@ function LessonDetailContent() {
                 </Button>
               )}
 
-              {/* Retry button for passed */}
-              {passed && (
+              {passed && agent && (
                 <Button
                   onClick={() => handleStartCall(agent, subNum)}
                   variant="outline"
@@ -602,64 +625,56 @@ function LessonDetailContent() {
                   Zavolat znovu
                 </Button>
               )}
+
+              {!agent && (
+                <p className="text-xs text-neutral-400 text-center py-2">Agent zatím není dostupný</p>
+              )}
             </motion.div>
           );
         })}
       </div>
 
       {/* Lesson completed → next lesson or category done */}
-      {completed && (() => {
-        const nextLesson = getNextLessonInCategory(lessonNumber);
-        const catComplete = isCategoryComplete(lessonNumber, progress);
-
-        return (
-          <div className="mb-12 text-center">
-            {catComplete ? (
-              <div className="rounded-xl border border-green-200 bg-green-50 p-6 mb-4">
-                <Trophy className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                <h3 className="text-lg font-bold text-green-800 mb-1">
-                  Kategorie {lesson.category} dokončena!
-                </h3>
-                <p className="text-sm text-green-600">
-                  Gratulujeme! Zvládli jste všechny lekce v této kategorii. Vaše znalosti jsou na profesionální úrovni.
-                </p>
-              </div>
-            ) : (
-              <div className="rounded-xl border border-green-200 bg-green-50 p-6 mb-4">
-                <Trophy className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                <h3 className="text-lg font-bold text-green-800 mb-1">Lekce splněna!</h3>
-                <p className="text-sm text-green-600">Další lekce v kategorii {lesson.category} je odemčena.</p>
-              </div>
-            )}
-            <div className="flex items-center justify-center gap-3">
-              {nextLesson && (
-                <Link href={`/dashboard/lekce/${nextLesson}`}>
-                  <Button size="lg" className="gap-2">
-                    Další lekce
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </Link>
-              )}
-              <Link href="/dashboard/lekce">
-                <Button size="lg" variant="outline" className="gap-2">
-                  Zpět na přehled
+      {completed && (
+        <div className="mb-12 text-center">
+          {catComplete ? (
+            <div className="rounded-xl border border-green-200 bg-green-50 p-6 mb-4">
+              <Trophy className="h-8 w-8 text-green-500 mx-auto mb-2" />
+              <h3 className="text-lg font-bold text-green-800 mb-1">
+                Kategorie {catConf?.label || lesson.category} dokončena!
+              </h3>
+              <p className="text-sm text-green-600">
+                Gratulujeme! Zvládli jste všechny lekce v této kategorii.
+              </p>
+            </div>
+          ) : (
+            <div className="rounded-xl border border-green-200 bg-green-50 p-6 mb-4">
+              <Trophy className="h-8 w-8 text-green-500 mx-auto mb-2" />
+              <h3 className="text-lg font-bold text-green-800 mb-1">Lekce splněna!</h3>
+              <p className="text-sm text-green-600">
+                Další lekce v kategorii {catConf?.label || lesson.category} je odemčena.
+              </p>
+            </div>
+          )}
+          <div className="flex items-center justify-center gap-3">
+            {nextLesson && (
+              <Link href={`/dashboard/lekce/${nextLesson.lesson_number}`}>
+                <Button size="lg" className="gap-2">
+                  Další lekce
+                  <ChevronRight className="h-4 w-4" />
                 </Button>
               </Link>
-            </div>
+            )}
+            <Link href="/dashboard/lekce">
+              <Button size="lg" variant="outline" className="gap-2">
+                Zpět na přehled
+              </Button>
+            </Link>
           </div>
-        );
-      })()}
+        </div>
+      )}
     </div>
   );
-}
-
-function getConsecutiveFails(attempts: ProgressRecord[]): number {
-  let count = 0;
-  for (let i = attempts.length - 1; i >= 0; i--) {
-    if (attempts[i].score < 80) count++;
-    else break;
-  }
-  return count;
 }
 
 export default function LessonDetailPage() {

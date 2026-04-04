@@ -30,6 +30,10 @@ interface SupabaseFeedback {
   improvements: string[];
   filler_words: { word: string; count: number }[];
   recommendations: string[];
+  summary_good?: string | null;
+  summary_improve?: string | null;
+  critical_moment?: { label: string; passed: boolean; evidence: string } | null;
+  categories?: Record<string, unknown> | null;
 }
 
 interface SupabaseCallRow {
@@ -74,6 +78,10 @@ export function adaptCallToRecord(row: SupabaseCallRow): CallRecord {
         improvements: fb.improvements || [],
         fillerWords: fb.filler_words || [],
         recommendations: fb.recommendations || [],
+        summaryGood: fb.summary_good ?? undefined,
+        summaryImprove: fb.summary_improve ?? undefined,
+        criticalMoment: fb.critical_moment ?? undefined,
+        categories: fb.categories as CallFeedback["categories"],
       }
     : {
         overallScore: row.success_rate || 0,

@@ -1,12 +1,27 @@
 export interface AIAgent {
+  // Existing fields (keep):
   id: string;
   name: string;
   personality: string;
   description: string;
-  difficulty: "easy" | "medium" | "hard";
+  difficulty: "easy" | "medium" | "hard"; // legacy, kept for old agents
   avatarInitials: string;
   traits: string[];
   exampleScenario: string;
+  category?: string;
+
+  // V3 fields (new):
+  topicId?: string;
+  tier?: "beginner" | "intermediate" | "advanced";
+  difficultyOverall?: number;
+  difficulty5d?: { K: number; P: number; R: number; E: number; F: number };
+  personaName?: string;
+  archetype?: string;
+  emotionalState?: string;
+  evaluationProfile?: string;
+  behaviorMaxDuration?: number;
+  status?: string;
+  schemaVersion?: string;
 }
 
 export interface Scenario {

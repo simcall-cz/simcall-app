@@ -48,12 +48,27 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Fetch ALL agents that have an ElevenLabs agent configured (paid users)
-    const { data: agents, error } = await supabase
+    // Support optional filters: ?topic_id=xxx&status=approved
+    const { searchParams } = new URL(request.url);
+    const topicIdFilter = searchParams.get("topic_id");
+    const statusFilter = searchParams.get("status");
+
+    // Fetch agents that have an ElevenLabs agent configured (paid users)
+    let query = supabase
       .from("agents")
       .select("*")
-      .not("elevenlabs_agent_id", "is", null)
-      .order("created_at", { ascending: true });
+      .not("elevenlabs_agent_id", "is", null);
+
+    if (topicIdFilter) {
+      query = query.eq("topic_id", topicIdFilter);
+    }
+    if (statusFilter) {
+      query = query.eq("status", statusFilter);
+    }
+
+    query = query.order("created_at", { ascending: true });
+
+    const { data: agents, error } = await query;
 
     if (error) {
       return NextResponse.json({ error: "Failed to load agents" }, { status: 500 });

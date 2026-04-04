@@ -10,6 +10,40 @@ import { countFillerWords } from "@/lib/utils/filler-words";
 export const maxDuration = 60;
 
 /**
+ * Validates and enforces business rules on the parsed V2 eval result.
+ * LLM may compute overall_score incorrectly — this enforces the critical moment cap
+ * and clamps scores to valid ranges.
+ */
+function validateAndEnforceEvalResult(raw: Record<string, unknown>): Record<string, unknown> {
+  const result = { ...raw };
+
+  // Clamp overall_score
+  result.overall_score = Math.max(0, Math.min(100, Math.round((result.overall_score as number) ?? 0)));
+
+  // Enforce critical moment cap
+  const cm = result.critical_moment as { passed?: boolean } | undefined;
+  if (cm && cm.passed === false) {
+    result.overall_score = Math.min(result.overall_score as number, 60);
+  }
+
+  // Validate categories exist and clamp scores
+  const requiredCategories = ['rapport', 'discovery', 'expertise', 'objections', 'communication', 'closing'];
+  const categories = result.categories as Record<string, Record<string, unknown>> | undefined;
+  for (const cat of requiredCategories) {
+    if (!categories?.[cat]) {
+      console.warn(`Missing category: ${cat}`);
+    } else {
+      categories[cat].score = Math.max(1, Math.min(10, categories[cat].score as number));
+      if (!Array.isArray(categories[cat].critical_errors)) {
+        categories[cat].critical_errors = [];
+      }
+    }
+  }
+
+  return result;
+}
+
+/**
  * POST /api/calls/[id]/process
  *
  * Server-side post-call processing:
@@ -54,10 +88,26 @@ export async function POST(
   }
 
   try {
-    // 2a. Look up scenario — including V2 evaluation_profile
+    // 2a. Look up evaluation profile — V3 agents first, then scenario fallback
     let evaluationProfile: string | null = null;
     let evaluationPrompt = ""; // V1 fallback
-    if (call.scenario_id) {
+
+    // V3: look up eval profile from agent table
+    if (call.agent_id) {
+      const { data: agent } = await supabase
+        .from("agents")
+        .select("evaluation_profile, internal_brief, topic_id, tier")
+        .eq("id", call.agent_id)
+        .single();
+
+      evaluationProfile = agent?.evaluation_profile || agent?.internal_brief || null;
+      if (evaluationProfile) {
+        console.log(`V3 eval: using agent evaluation_profile for topic=${agent?.topic_id}, tier=${agent?.tier}`);
+      }
+    }
+
+    // Fallback to scenario (V2 compat)
+    if (!evaluationProfile && call.scenario_id) {
       const { data: scenario } = await supabase
         .from("scenarios")
         .select("difficulty, control_prompt, title, evaluation_profile")
@@ -65,11 +115,9 @@ export async function POST(
         .single();
 
       if (scenario?.evaluation_profile) {
-        // V2: per-lesson evaluation profile
         evaluationProfile = scenario.evaluation_profile;
-        console.log(`V2 eval: using evaluation_profile for: ${scenario.title}`);
+        console.log(`V2 eval: using scenario evaluation_profile for: ${scenario.title}`);
       } else if (scenario?.control_prompt) {
-        // V1: per-scenario control prompt
         evaluationPrompt = scenario.control_prompt;
         console.log(`V1 eval: using control_prompt for: ${scenario.title}`);
       } else {
@@ -173,32 +221,15 @@ export async function POST(
                   },
                   {
                     role: "user",
-                    content: [
-                      "PŘEPIS HOVORU:",
-                      transcriptText,
-                      "",
-                      "EVALUAČNÍ PROFIL LEKCE:",
-                      evaluationProfile,
-                      "",
-                      'Vrať POUZE validní JSON (bez ```json bloků) v tomto formátu:',
-                      "{",
-                      '  "overall_score": <0-100>,',
-                      '  "critical_moment": { "label": "...", "passed": true/false, "evidence": "..." },',
-                      '  "categories": {',
-                      '    "rapport":       { "label": "...", "weight": <num>, "score": <1-10>, "checkpoints": [{"label": "...", "passed": true/false}], "note": "..." },',
-                      '    "discovery":     { "label": "...", "weight": <num>, "score": <1-10>, "checkpoints": [...], "note": "..." },',
-                      '    "expertise":     { "label": "...", "weight": <num>, "score": <1-10>, "checkpoints": [...], "critical_errors": ["..."], "note": "..." },',
-                      '    "objections":    { "label": "...", "weight": <num>, "score": <1-10>, "checkpoints": [...], "note": "..." },',
-                      '    "communication": { "label": "...", "weight": <num>, "score": <1-10>, "checkpoints": [...], "note": "..." },',
-                      '    "closing":       { "label": "...", "weight": <num>, "score": <1-10>, "checkpoints": [...], "note": "..." }',
-                      "  },",
-                      '  "strengths": ["...", "..."],',
-                      '  "improvements": ["...", "..."],',
-                      '  "recommendations": ["...", "..."],',
-                      '  "summary_good": "...",',
-                      '  "summary_improve": "..."',
-                      "}",
-                    ].join("\n"),
+                    content: `Analyzuj následující tréninkový hovor realitního makléře.
+
+EVALUAČNÍ PROFIL LEKCE:
+${evaluationProfile}
+
+PŘEPIS HOVORU:
+${transcriptText}
+
+Vrať POUZE validní JSON bez markdown bloků, přesně podle struktury definované v systémovém promptu.`,
                   },
                 ],
               }),
@@ -214,7 +245,8 @@ export async function POST(
                 .replace(/```\n?/g, "")
                 .trim();
               const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
-              const evalResult = JSON.parse(jsonMatch ? jsonMatch[0] : cleaned);
+              const evalResultRaw = JSON.parse(jsonMatch ? jsonMatch[0] : cleaned);
+              const evalResult = validateAndEnforceEvalResult(evalResultRaw);
 
               // Filler words počítáme rule-based — pouze z replik makléře (user role v ElevenLabs)
               const agentTranscriptText = transcript

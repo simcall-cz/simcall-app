@@ -7,100 +7,81 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import {
   Phone,
   ArrowLeft,
-  Target,
-  Shield,
-  Zap,
-  Flame,
   ChevronRight,
   Loader2,
-  ZoomIn,
-  X,
-  BookOpen,
-  GraduationCap,
-  Lightbulb,
   Lock,
+  Zap,
+  Shield,
+  Flame,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
 import { ActiveCall } from "@/components/call/ActiveCall";
 import { useTrainingCall } from "@/hooks/useTrainingCall";
 import { supabase } from "@/lib/supabase";
 import { getAuthHeaders } from "@/lib/auth";
 import { cn } from "@/lib/utils";
-import type { AIAgent, Scenario } from "@/types";
-import { lessons, DIFFICULTY_CONFIG as LESSON_DIFF, type Lesson } from "@/data/lessons";
-import { TRAINING_AGENT_IDS } from "@/data/lesson-agents";
+import { CATEGORY_CONFIG, TIER_CONFIG, CATEGORIES, TIERS } from "@/lib/lessons";
 
-const difficultyConfig = {
-  easy: {
-    label: "Začátečník",
-    color: "success" as const,
-    icon: Zap,
-    borderColor: "border-l-green-400",
-    bgTint: "bg-green-50/40",
-  },
-  medium: {
-    label: "Pokročilý",
-    color: "warning" as const,
-    icon: Shield,
-    borderColor: "border-l-amber-400",
-    bgTint: "bg-amber-50/40",
-  },
-  hard: {
-    label: "Expert",
-    color: "default" as const,
-    icon: Flame,
-    borderColor: "border-l-red-400",
-    bgTint: "bg-red-50/40",
-  },
+interface V3Agent {
+  id: string;
+  name: string;
+  persona_name: string | null;
+  personality: string;
+  description: string;
+  topic_id: string | null;
+  tier: "beginner" | "intermediate" | "advanced" | null;
+  difficulty_overall: number | null;
+  archetype: string | null;
+  traits: string[] | null;
+  avatar_initials: string | null;
+  elevenlabs_agent_id: string | null;
+  category: string | null;
+  status: string | null;
+  // Joined lesson data
+  lessons?: { title_cs: string; category: string; lesson_number: number } | null;
+}
+
+const tierConfig = {
+  beginner:     { label: TIER_CONFIG.beginner.label,     color: "success" as const, icon: Zap,    borderColor: "border-l-green-400",  bgTint: "bg-green-50/40"  },
+  intermediate: { label: TIER_CONFIG.intermediate.label,  color: "warning" as const, icon: Shield, borderColor: "border-l-amber-400",  bgTint: "bg-amber-50/40"  },
+  advanced:     { label: TIER_CONFIG.advanced.label,      color: "default" as const, icon: Flame,  borderColor: "border-l-red-400",    bgTint: "bg-red-50/40"    },
 };
 
 const filterChipColors: Record<string, string> = {
   all: "border-primary-500 bg-primary-50 text-primary-600",
-  easy: "border-green-500 bg-green-50 text-green-700",
-  medium: "border-amber-500 bg-amber-50 text-amber-700",
-  hard: "border-red-500 bg-red-50 text-red-700",
-};
-
-const categoryLabels: Record<string, string> = {
-  "hot-lead": "Horký lead",
-  "warm-lead": "Teplý lead",
-  "cold-lead": "Studený lead",
-  "competitive": "Konkurence",
-  "negotiation": "Vyjednávání",
-  "listing": "Získání zakázky",
+  beginner: "border-green-500 bg-green-50 text-green-700",
+  intermediate: "border-amber-500 bg-amber-50 text-amber-700",
+  advanced: "border-red-500 bg-red-50 text-red-700",
 };
 
 function NovyHovorContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const scenarioIdParam = searchParams.get("scenarioId");
+  const agentIdParam = searchParams.get("agentId");
 
-  const [agents, setAgents] = useState<AIAgent[]>([]);
-  const [scenarios, setScenarios] = useState<Scenario[]>([]);
+  const [agents, setAgents] = useState<V3Agent[]>([]);
   const [loading, setLoading] = useState(true);
   const [maxDurationSeconds, setMaxDurationSeconds] = useState<number | undefined>();
   const [userInitials, setUserInitials] = useState("U");
 
-  const [selectedScenario, setSelectedScenario] = useState<string | null>(null);
+  const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
   const [step, setStep] = useState<"select" | "confirm" | "call">("select");
-  const [selectedDifficulty, setSelectedDifficulty] = useState<"all" | "easy" | "medium" | "hard">("all");
-  const [imageZoom, setImageZoom] = useState(false);
-  const [lessonModal, setLessonModal] = useState<Lesson | null>(null);
+  const [selectedTier, setSelectedTier] = useState<"all" | "beginner" | "intermediate" | "advanced">("all");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isDemoUser, setIsDemoUser] = useState(false);
 
-  // Auto-select scenario if provided in URL
+  // Auto-select agent if provided in URL
   useEffect(() => {
-    if (scenarioIdParam && scenarios.length > 0) {
-      const exists = scenarios.find(s => s.id === scenarioIdParam);
-      if (exists && !selectedScenario) {
-        setSelectedScenario(scenarioIdParam);
+    if (agentIdParam && agents.length > 0) {
+      const exists = agents.find(a => a.id === agentIdParam);
+      if (exists && !selectedAgentId) {
+        setSelectedAgentId(agentIdParam);
         setStep("confirm");
       }
     }
-  }, [scenarioIdParam, scenarios, selectedScenario]);
+  }, [agentIdParam, agents, selectedAgentId]);
 
   const {
     phase,
@@ -124,56 +105,33 @@ function NovyHovorContent() {
   useEffect(() => {
     async function fetchData() {
       try {
-        // Fetch agents and scenarios directly from Supabase (avoids auth-gated API race conditions)
-        const [agentsRes, scenariosRes] = await Promise.all([
-          supabase.from("agents").select("*").not("elevenlabs_agent_id", "is", null),
-          supabase.from("scenarios").select("*"),
-        ]);
+        // Fetch V3 agents with joined lesson data
+        const { data: agentsData } = await supabase
+          .from("agents")
+          .select("*, lessons!left(title_cs, category, lesson_number)")
+          .not("elevenlabs_agent_id", "is", null)
+          .eq("status", "approved")
+          .not("topic_id", "is", null)
+          .order("difficulty_overall", { ascending: true });
 
-        if (agentsRes.data) {
-          const formattedAgents: AIAgent[] = agentsRes.data
-            .filter((a: any) => TRAINING_AGENT_IDS.includes(a.elevenlabs_agent_id))
-            .map((a: any) => ({
-            id: a.id,
-            name: a.name || "Agent",
-            personality: a.personality || "",
-            description: a.description || "",
-            difficulty: a.difficulty as any,
-            avatarInitials: a.avatar_initials || (a.name ? a.name.slice(0, 2).toUpperCase() : "AG"),
-            traits: a.traits || [],
-            exampleScenario: a.example_scenario || ""
-          }));
-          setAgents(formattedAgents);
+        if (agentsData) {
+          setAgents(agentsData as V3Agent[]);
         }
 
-        if (scenariosRes.data) {
-          // Helper to safely parse array fields that might be stored as JSON strings
-          const toArray = (val: unknown): string[] => {
-            if (Array.isArray(val)) return val;
-            if (typeof val === "string") {
-              try { const parsed = JSON.parse(val); return Array.isArray(parsed) ? parsed : []; }
-              catch { return []; }
-            }
-            return [];
-          };
+        // Fallback: if no V3 agents, fetch all agents (old system)
+        if (!agentsData || agentsData.length === 0) {
+          const { data: fallbackAgents } = await supabase
+            .from("agents")
+            .select("*")
+            .not("elevenlabs_agent_id", "is", null)
+            .order("created_at", { ascending: true });
 
-          const formattedScenarios: Scenario[] = scenariosRes.data.map((s: any) => {
-            return {
-              id: s.id,
-              title: s.title || "",
-              description: s.description || "",
-              category: s.category as any,
-              difficulty: s.difficulty as any,
-              objectives: toArray(s.objectives),
-              agentId: s.agent_id,
-              imageUrl: s.image_url || "",
-              tips: toArray(s.tips)
-            };
-          });
-          setScenarios(formattedScenarios);
+          if (fallbackAgents) {
+            setAgents(fallbackAgents as V3Agent[]);
+          }
         }
 
-        // Fetch subscription info for minute limit
+        // Fetch subscription info
         try {
           const headers = await getAuthHeaders();
           const subscriptionRes = await fetch("/api/subscription", { headers });
@@ -188,11 +146,10 @@ function NovyHovorContent() {
             }
           }
         } catch {
-          // If subscription fetch fails, still allow the page to load
           console.warn("Could not fetch subscription info");
         }
 
-        // Fetch user initials for call view
+        // Fetch user initials
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
           const fullName = user.user_metadata?.full_name || "";
@@ -212,63 +169,51 @@ function NovyHovorContent() {
     fetchData();
   }, []);
 
-  const scenario = scenarios.find((s) => s.id === selectedScenario);
-  const agent = scenario ? agents.find((a) => a.id === scenario.agentId) : null;
+  const agent = agents.find((a) => a.id === selectedAgentId);
 
-  const allFilteredScenarios = selectedDifficulty === "all"
-    ? scenarios
-    : scenarios.filter((s) => s.difficulty === selectedDifficulty);
+  // Filter agents by tier and category
+  let filteredAgents = agents;
+  if (selectedTier !== "all") {
+    filteredAgents = filteredAgents.filter((a) => a.tier === selectedTier);
+  }
+  if (selectedCategory) {
+    filteredAgents = filteredAgents.filter((a) => {
+      const cat = a.lessons?.category || a.category;
+      return cat === selectedCategory;
+    });
+  }
 
-  // Demo users only see 5 agents
+  // Demo users see limited agents
   const DEMO_AGENT_LIMIT = 5;
-  const filteredScenarios = isDemoUser
-    ? allFilteredScenarios.slice(0, DEMO_AGENT_LIMIT)
-    : allFilteredScenarios;
+  const allFilteredCount = filteredAgents.length;
+  if (isDemoUser) {
+    filteredAgents = filteredAgents.slice(0, DEMO_AGENT_LIMIT);
+  }
 
-  const handleSelectScenario = (scenarioId: string) => {
-    setSelectedScenario(scenarioId);
+  // Unique categories from available agents
+  const availableCategories = [...new Set(agents.map((a) => a.lessons?.category || a.category).filter(Boolean))];
+
+  const handleSelectAgent = (agentId: string) => {
+    setSelectedAgentId(agentId);
     setStep("confirm");
   };
 
   const handleStartCall = async () => {
-    if (!scenario || !agent) return;
+    if (!agent) return;
     setStep("call");
-    await startCall(agent.id, scenario.id);
+    await startCall(agent.elevenlabs_agent_id || agent.id);
   };
 
   const handleReset = () => {
     reset();
     setStep("select");
-    setSelectedScenario(null);
+    setSelectedAgentId(null);
   };
 
   const handleViewResults = () => {
     if (callId) {
       router.push(`/dashboard/hovory?detail=${callId}`);
     }
-  };
-
-  // Find the best matching lesson for a scenario title
-  const findMatchingLesson = (scenarioTitle: string): Lesson | null => {
-    const words = scenarioTitle
-      .toLowerCase()
-      .replace(/[–—:,.\-()]/g, " ")
-      .split(/\s+/)
-      .filter((w) => w.length > 3);
-    let bestMatch: Lesson | null = null;
-    let bestScore = 0;
-    for (const lesson of lessons) {
-      const lt = lesson.title.toLowerCase();
-      let score = 0;
-      for (const w of words) {
-        if (lt.includes(w)) score++;
-      }
-      if (score > bestScore) {
-        bestScore = score;
-        bestMatch = lesson;
-      }
-    }
-    return bestScore >= 1 ? bestMatch : null;
   };
 
   if (loading) {
@@ -281,14 +226,15 @@ function NovyHovorContent() {
 
   // CALL VIEW
   if (step === "call" && agent) {
+    const agentName = agent.persona_name || agent.name;
     return (
       <div className="p-2 sm:p-6">
         <ActiveCall
           phase={phase}
           duration={duration}
-          agentName={agent.name}
-          agentPersonality={agent.personality}
-          agentInitials={agent.avatarInitials}
+          agentName={agentName}
+          agentPersonality={agent.personality || agent.archetype || ""}
+          agentInitials={agent.avatar_initials || agentName.slice(0, 2).toUpperCase()}
           userInitials={userInitials}
           isSpeaking={isSpeaking}
           isMuted={isMuted}
@@ -303,419 +249,87 @@ function NovyHovorContent() {
     );
   }
 
-  // CONFIRM VIEW — 2-column layout on desktop
-  if (step === "confirm" && scenario && agent) {
-    const diffConf = difficultyConfig[scenario.difficulty] || difficultyConfig.medium;
-    const hasTips = scenario.tips && scenario.tips.length > 0;
-    const defaultTips = [
-      "Představte se profesionálně v prvních 10 sekundách",
-      "Poslouchejte pozorně a reagujte na potřeby klienta",
-      "Snažte se domluvit konkrétní schůzku",
-      "Ujistěte se, že chápete kontext z popisu výše",
-    ];
-    const tipsToShow = hasTips ? scenario.tips! : defaultTips;
+  // CONFIRM VIEW
+  if (step === "confirm" && agent) {
+    const agentName = agent.persona_name || agent.name;
+    const agentTier = agent.tier || "intermediate";
+    const tConf = tierConfig[agentTier] || tierConfig.intermediate;
+    const TierIcon = tConf.icon;
+    const lessonTitle = agent.lessons?.title_cs || agent.description || "";
+    const catKey = agent.lessons?.category || agent.category || "";
+    const catConf = CATEGORY_CONFIG[catKey];
 
     return (
-      <div className="mx-auto max-w-6xl px-2 sm:px-6">
+      <div className="mx-auto max-w-3xl px-2 sm:px-6">
         <button
           onClick={() => setStep("select")}
           className="mb-4 sm:mb-6 flex items-center gap-2 text-sm text-neutral-500 transition-colors hover:text-neutral-900"
         >
           <ArrowLeft className="h-4 w-4" />
-          Zpět na výběr scénáře
+          Zpět na výběr
         </button>
 
-        {/* Lightbox */}
-        {imageZoom && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
-            onClick={() => setImageZoom(false)}
-          >
-            <button
-              onClick={() => setImageZoom(false)}
-              className="absolute right-4 top-4 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20"
-            >
-              <X className="h-6 w-6" />
-            </button>
-            <img
-              src={scenario.imageUrl}
-              alt={`Kontext: ${scenario.title}`}
-              className="max-h-[90vh] max-w-[90vw] rounded-lg object-contain shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            />
-          </div>
-        )}
-
-        {/* Lesson modal */}
-        {lessonModal && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
-            onClick={() => setLessonModal(null)}
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="relative w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-2xl bg-white shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Modal header */}
-              <div className="sticky top-0 z-10 flex items-center justify-between border-b border-neutral-100 bg-white px-6 py-4 rounded-t-2xl">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-100">
-                    <BookOpen className="h-4 w-4 text-primary-600" />
-                  </div>
-                  <div className="min-w-0">
-                    <h2 className="font-bold text-neutral-900 truncate">
-                      Lekce {lessonModal.number}
-                    </h2>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-xs text-neutral-400">
-                        {lessonModal.category}
-                      </span>
-                      <span
-                        className={cn(
-                          "inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold",
-                          LESSON_DIFF[lessonModal.difficulty].color
-                        )}
-                      >
-                        {LESSON_DIFF[lessonModal.difficulty].label}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setLessonModal(null)}
-                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full hover:bg-neutral-100 transition-colors"
-                >
-                  <X className="h-5 w-5 text-neutral-500" />
-                </button>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+          <div className="rounded-xl border border-neutral-200 bg-white shadow-sm overflow-hidden">
+            {/* Header */}
+            <div className="border-b border-neutral-100 bg-neutral-50 p-6">
+              <div className="flex flex-wrap items-center gap-2 mb-3">
+                <Badge variant={tConf.color}>
+                  <TierIcon className="h-3 w-3 mr-1" />
+                  {tConf.label}
+                </Badge>
+                {catConf && (
+                  <span className="text-xs font-medium px-2 py-0.5 rounded bg-neutral-100 text-neutral-600">
+                    {catConf.label}
+                  </span>
+                )}
+                {agent.difficulty_overall && (
+                  <span className="text-xs text-neutral-400">
+                    Obtížnost {agent.difficulty_overall.toFixed(1)}/10
+                  </span>
+                )}
               </div>
+              <h1 className="text-2xl font-bold text-neutral-900">{lessonTitle}</h1>
+            </div>
 
-              {/* Modal content */}
-              <div className="p-6 space-y-5">
-                <h3 className="text-lg font-bold text-neutral-900">
-                  {lessonModal.title}
-                </h3>
-
-                {/* Situation */}
-                <div>
-                  <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-2">
-                    Situace
-                  </h4>
-                  <p className="text-sm text-neutral-700 leading-relaxed">
-                    {lessonModal.situation}
+            {/* Agent Info */}
+            <div className="border-b border-neutral-100 p-6">
+              <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-neutral-400">
+                Váš protějšek
+              </h3>
+              <div className="flex items-center gap-3">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary-50">
+                  <span className="text-base font-bold text-primary-600">
+                    {agent.avatar_initials || agentName.slice(0, 2).toUpperCase()}
+                  </span>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-neutral-900">{agentName}</p>
+                  <p className="text-sm text-neutral-500">
+                    {agent.archetype || agent.personality}
                   </p>
                 </div>
-
-                {/* Knowledge */}
-                {lessonModal.knowledge.length > 0 && (
-                  <div>
-                    <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-2">
-                      Co potřebujete vědět
-                    </h4>
-                    <ul className="space-y-2">
-                      {lessonModal.knowledge.map((k, i) => (
-                        <li
-                          key={i}
-                          className="flex items-start gap-2 text-sm text-neutral-600"
-                        >
-                          <GraduationCap className="h-4 w-4 shrink-0 mt-0.5 text-primary-400" />
-                          <span>{k}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {/* Goal */}
-                <div>
-                  <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-400 mb-2">
-                    Cíl
-                  </h4>
-                  <div className="flex items-start gap-2">
-                    <Target className="h-4 w-4 shrink-0 mt-0.5 text-green-500" />
-                    <p className="text-sm text-neutral-700">
-                      {lessonModal.goal}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Tips */}
-                {lessonModal.tips.length > 0 && (
-                  <div className="rounded-lg bg-amber-50/60 border border-amber-100 p-4">
-                    <h4 className="text-xs font-semibold text-amber-700 mb-2 flex items-center gap-1.5">
-                      <Lightbulb className="h-3.5 w-3.5" />
-                      Tipy
-                    </h4>
-                    <ul className="space-y-1.5">
-                      {lessonModal.tips.map((tip, i) => (
-                        <li
-                          key={i}
-                          className="flex items-start gap-2 text-sm text-amber-700"
-                        >
-                          <span className="shrink-0 mt-0.5">•</span>
-                          <span>{tip}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
               </div>
-
-              {/* Modal footer */}
-              <div className="sticky bottom-0 border-t border-neutral-100 bg-white px-6 py-4 rounded-b-2xl">
-                <Button
-                  onClick={() => setLessonModal(null)}
-                  className="w-full"
-                >
-                  Zavřít a pokračovat k hovoru
-                </Button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          {/* Mobile-only header */}
-          <div className="lg:hidden mb-6">
-            <div className="flex flex-wrap items-center gap-2 mb-3">
-              <Badge variant={diffConf.color}>
-                {diffConf.label}
-              </Badge>
-              <span className="text-xs font-medium px-2 py-0.5 rounded bg-neutral-100 text-neutral-600">
-                {categoryLabels[scenario.category] || scenario.category}
-              </span>
-            </div>
-            <h1 className="text-2xl font-bold text-neutral-900">
-              {scenario.title}
-            </h1>
-            <p className="mt-2 text-neutral-600 whitespace-pre-wrap">{scenario.description}</p>
-          </div>
-
-          {/* Two-column grid */}
-          <div className="lg:grid lg:grid-cols-[380px_1fr] lg:gap-8">
-
-            {/* LEFT COLUMN — sticky on desktop */}
-            <div className="lg:sticky lg:top-6 lg:self-start space-y-5">
-              {/* Agent card with image */}
-              <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm">
-                {/* Scenario Image */}
-                {scenario.imageUrl && (
-                  <div
-                    className="group relative cursor-pointer"
-                    onClick={() => setImageZoom(true)}
-                  >
-                    <img
-                      src={scenario.imageUrl}
-                      alt={`Kontext: ${scenario.title}`}
-                      className="w-full h-auto object-contain"
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/10">
-                      <div className="rounded-full bg-white/80 p-2 opacity-0 shadow transition-opacity group-hover:opacity-100">
-                        <ZoomIn className="h-5 w-5 text-neutral-700" />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Agent Info */}
-                <div className="p-5">
-                  <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-neutral-400">
-                    Váš protějšek
-                  </h3>
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary-50">
-                      <span className="text-base font-bold text-primary-600">
-                        {agent.avatarInitials}
-                      </span>
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="font-semibold text-neutral-900 break-words leading-tight">{agent.name}</p>
-                      <p className="text-sm text-neutral-500 break-words">
-                        {agent.personality}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="mt-3 flex flex-wrap gap-1.5">
-                    {(Array.isArray(agent.traits) ? agent.traits : []).map((trait) => (
-                      <span
-                        key={trait}
-                        className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs text-neutral-600"
-                      >
-                        {trait}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Start Button — desktop (always visible due to sticky) */}
-              <div className="hidden lg:block">
-                <Button
-                  size="lg"
-                  className="w-full gap-2"
-                  onClick={handleStartCall}
-                >
-                  <Phone className="h-5 w-5" />
-                  Zahájit hovor
-                </Button>
-                <p className="mt-3 text-center text-xs text-neutral-400">
-                  Hovor bude nahráván a analyzován pro zpětnou vazbu
-                </p>
-              </div>
-            </div>
-
-            {/* RIGHT COLUMN */}
-            <div className="mt-6 lg:mt-0">
-              <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm">
-                {/* Header — desktop only */}
-                <div className="hidden lg:block border-b border-neutral-100 bg-neutral-50 p-6">
-                  <div className="flex flex-wrap items-center gap-2 mb-3">
-                    <Badge variant={diffConf.color}>
-                      {diffConf.label}
-                    </Badge>
-                    <span className="text-xs font-medium px-2 py-0.5 rounded bg-neutral-100 text-neutral-600">
-                      {categoryLabels[scenario.category] || scenario.category}
+              {agent.traits && agent.traits.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {agent.traits.map((trait) => (
+                    <span key={trait} className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs text-neutral-600">
+                      {trait}
                     </span>
-                  </div>
-                  <h1 className="text-2xl font-bold text-neutral-900">
-                    {scenario.title}
-                  </h1>
-                  <p className="mt-2 text-neutral-600 whitespace-pre-wrap">{scenario.description}</p>
+                  ))}
                 </div>
+              )}
+            </div>
 
-                {/* Mobile-only: agent info + image (already shown in left column on desktop) */}
-                <div className="lg:hidden">
-                  {/* Agent Info */}
-                  <div className="border-b border-neutral-100 p-5">
-                    <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-neutral-400">
-                      Váš protějšek
-                    </h3>
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary-50">
-                        <span className="text-base font-bold text-primary-600">
-                          {agent.avatarInitials}
-                        </span>
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="font-semibold text-neutral-900 break-words leading-tight">{agent.name}</p>
-                        <p className="text-sm text-neutral-500 break-words">
-                          {agent.personality}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="mt-3 flex flex-wrap gap-1.5">
-                      {(Array.isArray(agent.traits) ? agent.traits : []).map((trait) => (
-                        <span
-                          key={trait}
-                          className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs text-neutral-600"
-                        >
-                          {trait}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Image */}
-                  {scenario.imageUrl && (
-                    <div className="border-b border-neutral-100 p-5">
-                      <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-neutral-400">
-                        Kontext leadu
-                      </h3>
-                      <div
-                        className="group relative cursor-pointer rounded-xl overflow-hidden border border-neutral-200/60 bg-white shadow-sm"
-                        onClick={() => setImageZoom(true)}
-                      >
-                        <img
-                          src={scenario.imageUrl}
-                          alt={`Kontext: ${scenario.title}`}
-                          className="w-full h-auto object-contain"
-                        />
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/10">
-                          <div className="rounded-full bg-white/80 p-2 opacity-0 shadow transition-opacity group-hover:opacity-100">
-                            <ZoomIn className="h-5 w-5 text-neutral-700" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Objectives */}
-                <div className="border-b border-neutral-100 p-6">
-                  <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-400">
-                    Cíle hovoru
-                  </h3>
-                  <ul className="space-y-2.5">
-                    {(Array.isArray(scenario.objectives) ? scenario.objectives : []).map((obj, i) => (
-                      <li key={i} className="flex items-start gap-2.5">
-                        <Target className="mt-0.5 h-4 w-4 shrink-0 text-primary-500" />
-                        <span className="text-sm text-neutral-700">{obj}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Dynamic Tips */}
-                <div className="bg-amber-50/50 p-6">
-                  <h3 className="mb-3 text-sm font-semibold text-amber-800">
-                    💡 Tipy před hovorem
-                  </h3>
-                  <ul className="space-y-2 text-sm text-amber-700">
-                    {tipsToShow.map((tip, i) => (
-                      <li key={i} className="flex items-start gap-2">
-                        <span className="mt-0.5 shrink-0">•</span>
-                        <span>{tip}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Lesson hint button */}
-                {(() => {
-                  const matchedLesson = findMatchingLesson(scenario.title);
-                  if (!matchedLesson) return null;
-                  return (
-                    <div className="border-t border-neutral-100 p-6">
-                      <button
-                        onClick={() => setLessonModal(matchedLesson)}
-                        className="w-full flex items-center gap-3 rounded-lg border border-primary-200 bg-primary-50/50 px-4 py-3 text-left transition-colors hover:bg-primary-50 hover:border-primary-300"
-                      >
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-100">
-                          <BookOpen className="h-4 w-4 text-primary-600" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-primary-700">
-                            Přečíst si lekci k tomuto scénáři
-                          </p>
-                          <p className="text-xs text-primary-500 truncate mt-0.5">
-                            {matchedLesson.title}
-                          </p>
-                        </div>
-                        <ChevronRight className="h-4 w-4 shrink-0 text-primary-400" />
-                      </button>
-                    </div>
-                  );
-                })()}
-              </div>
-
-              {/* Start Button — mobile only */}
-              <div className="lg:hidden mt-6">
-                <Button
-                  size="lg"
-                  className="w-full gap-2"
-                  onClick={handleStartCall}
-                >
-                  <Phone className="h-5 w-5" />
-                  Zahájit hovor
-                </Button>
-                <p className="mt-3 text-center text-xs text-neutral-400">
-                  Hovor bude nahráván a analyzován pro zpětnou vazbu
-                </p>
-              </div>
+            {/* Start Button */}
+            <div className="p-6">
+              <Button size="lg" className="w-full gap-2" onClick={handleStartCall}>
+                <Phone className="h-5 w-5" />
+                Zahájit hovor
+              </Button>
+              <p className="mt-3 text-center text-xs text-neutral-400">
+                Hovor bude nahráván a analyzován pro zpětnou vazbu
+              </p>
             </div>
           </div>
         </motion.div>
@@ -723,7 +337,7 @@ function NovyHovorContent() {
     );
   }
 
-  // SELECT SCENARIO VIEW (default)
+  // SELECT AGENT VIEW (default)
   return (
     <div>
       <div className="mb-6 sm:mb-8">
@@ -736,106 +350,143 @@ function NovyHovorContent() {
         </button>
         <h1 className="text-2xl sm:text-3xl font-bold text-neutral-900">Trénink</h1>
         <p className="mt-2 text-neutral-500">
-          Vyberte scénář a trénujte s AI agenty. K dispozici je {filteredScenarios.length} agentů pro různé situace z praxe.
+          Vyberte agenta a trénujte s AI. K dispozici je {agents.length} agentů pro různé situace z praxe.
         </p>
       </div>
 
-      {/* Difficulty Filter Chips */}
-      <div className="mb-6 flex flex-wrap gap-2">
-        {(["all", "easy", "medium", "hard"] as const).map((diff) => (
+      {/* Tier Filter Chips */}
+      <div className="mb-4 flex flex-wrap gap-2">
+        {(["all", ...TIERS] as const).map((tier) => (
           <button
-            key={diff}
-            onClick={() => setSelectedDifficulty(diff)}
+            key={tier}
+            onClick={() => setSelectedTier(tier as typeof selectedTier)}
             className={cn(
               "rounded-full border px-4 py-1.5 text-sm font-medium transition-colors",
-              selectedDifficulty === diff
-                ? filterChipColors[diff]
+              selectedTier === tier
+                ? filterChipColors[tier] || filterChipColors.all
                 : "border-neutral-200 bg-white text-neutral-600 hover:border-neutral-400 hover:text-neutral-900"
             )}
           >
-            {diff === "all"
-              ? "Všechny"
-              : difficultyConfig[diff].label}
+            {tier === "all" ? "Všechny" : TIER_CONFIG[tier].label}
           </button>
         ))}
       </div>
 
-      {/* Scenarios List - CRM style */}
-      <div className="rounded-xl border border-neutral-200 bg-white overflow-hidden divide-y divide-neutral-100">
-        {filteredScenarios.map((s, i) => {
-          const a = agents.find((ag) => ag.id === s.agentId);
-          if (!a) return null;
+      {/* Category Filter Pills */}
+      <div className="mb-6 flex flex-wrap gap-1.5">
+        <button
+          onClick={() => setSelectedCategory(null)}
+          className={cn(
+            "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
+            !selectedCategory
+              ? "border-primary-300 bg-primary-50 text-primary-700"
+              : "border-neutral-200 text-neutral-600 hover:border-neutral-300"
+          )}
+        >
+          Vše
+        </button>
+        {CATEGORIES.filter((cat) => availableCategories.includes(cat)).map((cat) => {
+          const conf = CATEGORY_CONFIG[cat];
+          return (
+            <button
+              key={cat}
+              onClick={() => setSelectedCategory(selectedCategory === cat ? null : cat)}
+              className={cn(
+                "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
+                selectedCategory === cat
+                  ? "border-primary-300 bg-primary-50 text-primary-700"
+                  : "border-neutral-200 text-neutral-600 hover:border-neutral-300"
+              )}
+            >
+              {conf?.label || cat}
+            </button>
+          );
+        })}
+      </div>
 
-          const diffConf = difficultyConfig[s.difficulty] || difficultyConfig.medium;
-          const DiffIcon = diffConf.icon;
+      {/* Agents List */}
+      <div className="rounded-xl border border-neutral-200 bg-white overflow-hidden divide-y divide-neutral-100">
+        {filteredAgents.map((a, i) => {
+          const agentName = a.persona_name || a.name;
+          const agentTier = a.tier || "intermediate";
+          const tConf = tierConfig[agentTier] || tierConfig.intermediate;
+          const TierIcon = tConf.icon;
+          const catKey = a.lessons?.category || a.category || "";
+          const catConf = CATEGORY_CONFIG[catKey];
 
           return (
             <motion.div
-              key={s.id}
+              key={a.id}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: (i % 20) * 0.02 }}
               className={cn(
                 "flex items-center gap-4 px-4 py-3.5 cursor-pointer transition-colors hover:bg-neutral-50 group",
                 "border-l-3",
-                diffConf.borderColor
+                tConf.borderColor
               )}
-              onClick={() => handleSelectScenario(s.id)}
+              onClick={() => handleSelectAgent(a.id)}
             >
               {/* Avatar */}
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-neutral-100 group-hover:bg-neutral-200 transition-colors">
                 <span className="text-xs font-bold text-neutral-600">
-                  {a.avatarInitials}
+                  {a.avatar_initials || agentName.slice(0, 2).toUpperCase()}
                 </span>
               </div>
 
               {/* Main info */}
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 mb-0.5">
-                  <p className="text-sm font-semibold text-neutral-900 truncate">
-                    {a.name}
-                  </p>
-                  <Badge variant={diffConf.color} className="gap-1 px-2 py-0.5 text-[10px] font-semibold shrink-0">
-                    <DiffIcon className="h-3 w-3" />
-                    {diffConf.label}
+                  <p className="text-sm font-semibold text-neutral-900 truncate">{agentName}</p>
+                  <Badge variant={tConf.color} className="gap-1 px-2 py-0.5 text-[10px] font-semibold shrink-0">
+                    <TierIcon className="h-3 w-3" />
+                    {tConf.label}
                   </Badge>
                 </div>
                 <p className="text-xs text-neutral-500 truncate">
-                  {s.title}
+                  {a.lessons?.title_cs || a.description}
                 </p>
               </div>
 
-              {/* Category tag */}
-              <span className="hidden sm:inline-flex text-[10px] font-medium px-2 py-0.5 rounded bg-neutral-100 text-neutral-500 shrink-0">
-                {categoryLabels[s.category] || s.category}
-              </span>
+              {/* Category + difficulty */}
+              <div className="hidden sm:flex items-center gap-2 shrink-0">
+                {catConf && (
+                  <span className="text-[10px] font-medium px-2 py-0.5 rounded bg-neutral-100 text-neutral-500">
+                    {catConf.label}
+                  </span>
+                )}
+                {a.difficulty_overall && (
+                  <span className="text-[10px] text-neutral-400">
+                    {a.difficulty_overall.toFixed(1)}
+                  </span>
+                )}
+              </div>
 
-              {/* Arrow */}
               <ChevronRight className="h-4 w-4 shrink-0 text-neutral-300 group-hover:text-neutral-500 transition-colors" />
             </motion.div>
           );
         })}
       </div>
 
-      {filteredScenarios.length === 0 && (
+      {filteredAgents.length === 0 && (
         <div className="text-center py-12 rounded-xl border border-dashed border-neutral-200">
-          <p className="text-neutral-500">Nenalezeny zadne scenare s touto obtiznosti.</p>
+          <p className="text-neutral-500">Žádní agenti pro vybraný filtr.</p>
         </div>
       )}
 
       {/* Demo CTA */}
-      {isDemoUser && allFilteredScenarios.length > DEMO_AGENT_LIMIT && (
+      {isDemoUser && allFilteredCount > DEMO_AGENT_LIMIT && (
         <div className="mt-6 rounded-xl border border-primary-200 bg-primary-50/50 p-6 text-center">
           <Lock className="h-8 w-8 text-primary-400 mx-auto mb-3" />
           <h3 className="text-lg font-bold text-neutral-900 mb-1">
-            Dalsi {allFilteredScenarios.length - DEMO_AGENT_LIMIT} agentu je dostupnych v placenem planu
+            Dalších {allFilteredCount - DEMO_AGENT_LIMIT} agentů je dostupných v placeném plánu
           </h3>
           <p className="text-sm text-neutral-500 mb-4">
-            Odemknete vsechny AI agenty, lekce a neomezeny trenink.
+            Odemkněte všechny AI agenty, lekce a neomezený trénink.
           </p>
           <Link href="/dashboard/balicek">
             <Button className="gap-2">
-              Zobrazit plany
+              Zobrazit plány
               <ChevronRight className="h-4 w-4" />
             </Button>
           </Link>

@@ -29,7 +29,14 @@ import { HeroMockup } from "@/components/marketing/hero-mockup";
 import { AnalyticsMockup } from "@/components/marketing/analytics-mockup";
 import { PricingTeaser } from "@/components/marketing/pricing-teaser";
 
-import { aiAgents } from "@/data/ai-agents";
+// Static showcase agents for marketing (no DB dependency)
+const showcaseAgentsData = [
+  { id: "agent-eva-tomanova", name: "Eva Tomanová", difficulty: "easy" as const, avatarInitials: "ET" },
+  { id: "agent-karin-horackova", name: "Karin Horáčková", difficulty: "easy" as const, avatarInitials: "KH" },
+  { id: "agent-karin-pitrova", name: "Karin Pitrová", difficulty: "easy" as const, avatarInitials: "KP" },
+  { id: "agent-michal-kolar", name: "Michal Kolář", difficulty: "medium" as const, avatarInitials: "MK" },
+  { id: "agent-radek-skalicky", name: "Radek Skalický", difficulty: "hard" as const, avatarInitials: "RS" },
+];
 
 /* ------------------------------------------------------------------ */
 /*  Difficulty config                                                   */
@@ -122,7 +129,7 @@ const features = [
 /*  Page                                                                */
 /* ------------------------------------------------------------------ */
 export default function HomePage() {
-  const showcaseAgents = aiAgents.slice(0, 5);
+  const showcaseAgents = showcaseAgentsData;
   const extraAgentsCount = 495;
 
   return (

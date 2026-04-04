@@ -7,3 +7,9 @@ ALTER TABLE scenarios ADD COLUMN IF NOT EXISTS evaluation_profile TEXT;
 -- categories: { rapport, discovery, expertise, objections, communication, closing }
 ALTER TABLE feedback ADD COLUMN IF NOT EXISTS critical_moment JSONB;
 ALTER TABLE feedback ADD COLUMN IF NOT EXISTS categories JSONB;
+ALTER TABLE feedback ADD COLUMN IF NOT EXISTS summary_good TEXT;
+ALTER TABLE feedback ADD COLUMN IF NOT EXISTS summary_improve TEXT;
+
+-- Add control_prompt column to scenarios table
+-- Used by V1 eval: per-scenario custom evaluation prompt
+ALTER TABLE scenarios ADD COLUMN IF NOT EXISTS control_prompt TEXT;
