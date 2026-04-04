@@ -231,7 +231,7 @@ export default function LekcePage() {
     const colors = COLOR_MAP[colorKey] || COLOR_MAP.blue;
     const rows: (LessonRow | null)[][] = [];
     for (let i = 0; i < categoryLessons.length; i += 5) {
-      const row = categoryLessons.slice(i, i + 5);
+      const row: (LessonRow | null)[] = categoryLessons.slice(i, i + 5);
       while (row.length < 5) row.push(null);
       rows.push(row);
     }
