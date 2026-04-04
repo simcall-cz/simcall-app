@@ -201,7 +201,7 @@ function NovyHovorContent() {
   const handleStartCall = async () => {
     if (!agent) return;
     setStep("call");
-    await startCall(agent.elevenlabs_agent_id || agent.id, agent.id);
+    await startCall(agent.id, agent.id);
   };
 
   const handleReset = () => {

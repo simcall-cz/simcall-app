@@ -313,10 +313,10 @@ function LessonDetailContent() {
   const catComplete = categoryLessons.every((l) => isLessonCompleted(l.lesson_number, progress));
 
   const handleStartCall = async (agent: AgentRow, subNum: number) => {
-    if (!agent.elevenlabs_agent_id && !agent.id) return;
+    if (!agent.id) return;
     setActiveAgent(agent);
     setActiveSubScenario(subNum);
-    await callHook.startCall(agent.elevenlabs_agent_id || agent.id, `lesson-${lessonNumber}-${subNum}`);
+    await callHook.startCall(agent.id, `lesson-${lessonNumber}-${subNum}`);
   };
 
   return (
