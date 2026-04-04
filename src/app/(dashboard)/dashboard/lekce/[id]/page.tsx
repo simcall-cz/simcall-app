@@ -141,7 +141,7 @@ function LessonDetailContent() {
         const headers = await getAuthHeaders();
         const [progressRes, lessonsRes] = await Promise.all([
           fetch("/api/lessons/progress", { headers }),
-          fetch("/api/lessons"),
+          fetch("/api/lessons", { headers }),
         ]);
 
         if (progressRes.ok) {
@@ -159,7 +159,8 @@ function LessonDetailContent() {
           // Fetch agents for this lesson's topic_id
           if (currentLesson) {
             const agentsRes = await fetch(
-              `/api/agents?topic_id=${currentLesson.id}&status=approved`
+              `/api/agents?topic_id=${currentLesson.id}&status=approved`,
+              { headers }
             );
             if (agentsRes.ok) {
               const agentsData = await agentsRes.json();
