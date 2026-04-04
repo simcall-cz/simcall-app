@@ -264,7 +264,7 @@ Vrať POUZE validní JSON bez markdown bloků, přesně podle struktury definova
                 summary_good: (evalResult.summary_good as string) || "",
                 summary_improve: (evalResult.summary_improve as string) || "",
                 // V2 nová pole:
-                critical_moment: evalResult.critical_moment as Record<string, unknown>,
+                critical_moment: evalResult.critical_moment as { label: string; passed: boolean; evidence: string },
                 categories: evalResult.categories as Record<string, unknown>,
               };
             } catch (parseErr) {
