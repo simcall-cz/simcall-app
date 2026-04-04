@@ -144,7 +144,7 @@ export default function LekcePage() {
 
         if (lessonsRes.ok) {
           const lessonsData = await lessonsRes.json();
-          setLessons(lessonsData || []);
+          setLessons(lessonsData.lessons || []);
         }
       } catch {
         setIsFree(true);

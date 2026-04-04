@@ -25,19 +25,23 @@ export async function GET(request: NextRequest) {
     const agentsLimit = subscription?.agents_limit ?? 1; // demo = 1
 
     if (!subscription) {
-      // Demo user: show agents for first 5 lessons (easy/medium/hard)
-      const demoIds = [
-        "ag-1-easy", "ag-1-medium", "ag-1-hard",
-        "ag-2-easy", "ag-2-medium", "ag-2-hard",
-        "ag-3-easy", "ag-3-medium", "ag-3-hard",
-        "ag-4-easy", "ag-4-medium", "ag-4-hard",
-        "ag-5-easy", "ag-5-medium", "ag-5-hard",
-      ];
+      // Demo user: show agents for first 5 lessons (all tiers)
+      // Look up topic_ids for lessons 1-5, then fetch their agents
+      const { data: demoLessons } = await supabase
+        .from("lessons")
+        .select("id")
+        .gte("lesson_number", 1)
+        .lte("lesson_number", 5);
+
+      const demoTopicIds = (demoLessons || []).map((l: { id: string }) => l.id);
+
       const { data: demoAgents, error: demoError } = await supabase
         .from("agents")
         .select("*")
-        .in("id", demoIds)
-        .not("elevenlabs_agent_id", "is", null);
+        .in("topic_id", demoTopicIds)
+        .not("elevenlabs_agent_id", "is", null)
+        .eq("status", "approved");
+
       if (demoError) {
         return NextResponse.json({ error: "Failed to load agents" }, { status: 500 });
       }

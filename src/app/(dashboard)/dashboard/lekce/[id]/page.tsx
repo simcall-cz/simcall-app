@@ -150,7 +150,8 @@ function LessonDetailContent() {
         }
 
         if (lessonsRes.ok) {
-          const lessonsData: LessonRow[] = await lessonsRes.json();
+          const lessonsJson = await lessonsRes.json();
+          const lessonsData: LessonRow[] = lessonsJson.lessons || [];
           setAllLessons(lessonsData);
           const currentLesson = lessonsData.find((l) => l.lesson_number === lessonNumber);
           setLesson(currentLesson || null);
@@ -162,7 +163,7 @@ function LessonDetailContent() {
             );
             if (agentsRes.ok) {
               const agentsData = await agentsRes.json();
-              setAgents(agentsData || []);
+              setAgents(agentsData.agents || []);
             }
           }
         }

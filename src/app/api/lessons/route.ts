@@ -19,5 +19,5 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Failed to load lessons" }, { status: 500 });
   }
 
-  return NextResponse.json(data);
+  return NextResponse.json({ lessons: data || [] });
 }
