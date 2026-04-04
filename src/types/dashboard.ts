@@ -80,11 +80,11 @@ export interface Lesson {
 
 export interface LessonDB {
   id: string;               // topic_id
-  lessonNumber: number;      // 1-105
-  titleCs: string;
-  category: string;          // 14 engine categories
-  skillsTested: string[];
-  knowledgeSnippets: string[];
+  lesson_number: number;    // 1-105
+  title_cs: string;
+  category: string;         // 14 engine categories
+  skills_tested: string[];
+  knowledge_snippets: string[];
 }
 
 export interface Achievement {
